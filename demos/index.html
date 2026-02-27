@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Demos - Makoto (誠)</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <style>
+        /* Demo cards */
+        .demo-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            transition: border-color 0.2s;
+        }
+        .demo-card:hover {
+            border-color: var(--primary-light);
+        }
+        .demo-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .demo-number {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .demo-card h3 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .demo-card .description {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Problem → Solution badge */
+        .flow-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .flow-badge .problem {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+        }
+        .flow-badge .arrow {
+            color: var(--text-light);
+        }
+        .flow-badge .solution {
+            background: #f0fdf4;
+            color: #16a34a;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+        }
+
+        /* Terminal block */
+        .terminal {
+            background: #0d0d0d;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .terminal-bar {
+            background: #1a1a1a;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .terminal-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .terminal-dots span:nth-child(1) { background: #ff5f57; }
+        .terminal-dots span:nth-child(2) { background: #febc2e; }
+        .terminal-dots span:nth-child(3) { background: #28c840; }
+        .terminal-copy {
+            background: none;
+            border: 1px solid #333;
+            color: #888;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            transition: all 0.2s;
+        }
+        .terminal-copy:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .terminal-body {
+            padding: 1rem 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: #e2e8f0;
+            overflow-x: auto;
+        }
+        .terminal-body .prompt {
+            color: #22c55e;
+            user-select: none;
+        }
+        .terminal-body .cmd {
+            color: #e2e8f0;
+        }
+
+        /* Callout */
+        .callout {
+            background: var(--accent-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+            color: var(--primary-dark);
+        }
+
+        /* Hero for demos page */
+        .demos-hero {
+            background: linear-gradient(135deg, #09090b 0%, #18181b 50%, #312e81 100%);
+            color: white;
+            padding: 4rem 3rem;
+            position: relative;
+        }
+        .demos-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+        .demos-hero p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+
+        @media (max-width: 900px) {
+            .demo-card-header {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="/" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="/spec/" class="nav-item">Makoto v0.1</a>
+            <a href="/levels/" class="nav-item">Understanding Levels</a>
+            <a href="/spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="/comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="/comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="/examples/" class="nav-item">Examples</a>
+            <a href="/demos/" class="nav-item active">Demos</a>
+            <a href="/privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="/threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="/expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="demos-hero">
+            <h1>Live Demos</h1>
+            <p>Five scenarios. Copy-paste commands. See exactly what Makoto does — and what happens without it.</p>
+        </section>
+
+        <div class="callout">
+            All demos require only <strong>Python stdlib (3.8+)</strong> or <strong>bash</strong> — no installs needed.
+        </div>
+
+        <section class="section" style="max-width: 960px;">
+
+            <!-- Demo 01 -->
+            <div class="demo-card">
+                <div class="demo-card-header">
+                    <div>
+                        <div class="demo-number">Demo 01</div>
+                        <h3>The Poisoned Pipeline</h3>
+                    </div>
+                    <div class="flow-badge">
+                        <span class="problem">Corrupted data accepted silently</span>
+                        <span class="arrow">&rarr;</span>
+                        <span class="solution">Unsigned data rejected at intake</span>
+                    </div>
+                </div>
+                <p class="description">Your IoT pipeline ingests partner CSVs. Without a DBOM gate, SQL injection payloads and impossible readings flow straight to analytics.</p>
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <div class="terminal-dots"><span></span><span></span><span></span></div>
+                        <button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/makoto&#10;cd makoto/demos/01-poisoned-pipeline&#10;./run.sh">Copy</button>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/makoto-project/makoto</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">cd makoto/demos/01-poisoned-pipeline</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">./run.sh</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 02 -->
+            <div class="demo-card">
+                <div class="demo-card-header">
+                    <div>
+                        <div class="demo-number">Demo 02</div>
+                        <h3>The Reproducibility Gap</h3>
+                    </div>
+                    <div class="flow-badge">
+                        <span class="problem">Origin and processing unknown</span>
+                        <span class="arrow">&rarr;</span>
+                        <span class="solution">Full lineage chain verified</span>
+                    </div>
+                </div>
+                <p class="description">A researcher cites <code>experiment_v2.csv</code> but can't explain which raw data version, outlier method, or processing steps were used. Paper rejected.</p>
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <div class="terminal-dots"><span></span><span></span><span></span></div>
+                        <button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/makoto&#10;cd makoto/demos/02-reproducibility-gap&#10;python3 demo.py">Copy</button>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/makoto-project/makoto</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">cd makoto/demos/02-reproducibility-gap</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">python3 demo.py</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 03 -->
+            <div class="demo-card">
+                <div class="demo-card-header">
+                    <div>
+                        <div class="demo-number">Demo 03</div>
+                        <h3>GitHub Action &mdash; Provenance on Every Release</h3>
+                    </div>
+                    <div class="flow-badge">
+                        <span class="problem">Manual, forgotten provenance</span>
+                        <span class="arrow">&rarr;</span>
+                        <span class="solution">Automatic DBOM in CI</span>
+                    </div>
+                </div>
+                <p class="description">Every data file change triggers automatic DBOM generation. No manual steps, no forgotten provenance. A real, usable GitHub Action.</p>
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <div class="terminal-dots"><span></span><span></span><span></span></div>
+                        <button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/makoto&#10;cd makoto/demos/03-github-action&#10;python3 generate_dbom.py path/to/your/data.csv">Copy</button>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/makoto-project/makoto</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">cd makoto/demos/03-github-action</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">python3 generate_dbom.py path/to/your/data.csv</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 04 -->
+            <div class="demo-card">
+                <div class="demo-card-header">
+                    <div>
+                        <div class="demo-number">Demo 04</div>
+                        <h3>Configuration Incident Post-Mortem</h3>
+                    </div>
+                    <div class="flow-badge">
+                        <span class="problem">Hours digging through git blame</span>
+                        <span class="arrow">&rarr;</span>
+                        <span class="solution">Instant who/what/when/why</span>
+                    </div>
+                </div>
+                <p class="description">Someone changes <code>max_batch_size</code> at 3am. Throughput drops 95%. Without an audit trail, the team burns hours investigating.</p>
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <div class="terminal-dots"><span></span><span></span><span></span></div>
+                        <button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/makoto&#10;cd makoto/demos/04-config-postmortem&#10;python3 demo.py">Copy</button>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/makoto-project/makoto</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">cd makoto/demos/04-config-postmortem</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">python3 demo.py</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 05 -->
+            <div class="demo-card">
+                <div class="demo-card-header">
+                    <div>
+                        <div class="demo-number">Demo 05</div>
+                        <h3>AI Dataset Verification</h3>
+                    </div>
+                    <div class="flow-badge">
+                        <span class="problem">Dataset loaded on blind trust</span>
+                        <span class="arrow">&rarr;</span>
+                        <span class="solution">Hash mismatch blocks training</span>
+                    </div>
+                </div>
+                <p class="description">Your ML team downloads a training dataset from a shared drive. A single poisoned label can compromise model behavior — and you'd never know.</p>
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <div class="terminal-dots"><span></span><span></span><span></span></div>
+                        <button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/makoto&#10;cd makoto/demos/05-ai-dataset-verification&#10;python3 demo.py">Copy</button>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/makoto-project/makoto</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">cd makoto/demos/05-ai-dataset-verification</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">python3 demo.py</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://github.com/makoto-project/makoto" target="_blank">View on GitHub &rarr;</a>
+            </p>
+        </footer>
+    </main>
+
+    <script>
+    function copyCommands(btn) {
+        const commands = btn.getAttribute('data-commands').replace(/&#10;/g, '\n');
+        navigator.clipboard.writeText(commands).then(() => {
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+        });
+    }
+    </script>
+</body>
+</html>
