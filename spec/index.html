@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Specification - Makoto Levels | Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="./" class="nav-item active">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="l1-requirements.html" class="nav-item nav-item-sub">L1 Requirements</a>
+            <a href="l2-requirements.html" class="nav-item nav-item-sub">L2 Requirements</a>
+            <a href="l3-requirements.html" class="nav-item nav-item-sub">L3 Requirements</a>
+            <a href="signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="../comparison/w3c-prov.html" class="nav-item">W3C PROV Comparison</a>
+            <a href="../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <div class="status-box">
+                <div class="status-label">Status</div>
+                <div class="status-value">Draft v0.1</div>
+            </div>
+
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">Makoto Levels Specification</h1>
+
+            <p>
+                Makoto (誠 — "sincerity") is a specification for describing and incrementally improving data supply chain security,
+                established by industry consensus. It is organized into a series of levels that describe
+                increasing security guarantees.
+            </p>
+            <p>
+                This is <strong>Version 0.1</strong> of the Makoto specification. It defines the provenance levels (L1, L2, L3),
+                as well as recommended attestation formats for producing DBOMs (Data Bills of Materials).
+            </p>
+        </section>
+
+        <!-- Overview -->
+        <section class="section" id="overview">
+            <h2>Overview</h2>
+            <p>
+                Makoto is a security framework that establishes trust in data artifacts through verifiable attestations.
+                It brings <strong>SLSA-style assurance levels to data pipelines</strong>, addressing the unique challenges of
+                data supply chains while sharing SLSA's philosophy of progressive security levels.
+            </p>
+
+            <div class="card" style="background: #eff6ff; border-color: #bfdbfe;">
+                <p style="margin: 0;"><strong>Core Principle:</strong> Every data artifact should be accompanied by attestations that document its origin, transformations, and lineage—enabling consumers to verify the data's integrity and provenance. The resulting DBOM proves where your data came from.</p>
+            </div>
+
+            <h3>Why Makoto?</h3>
+            <p>While SLSA effectively secures software build pipelines, data pipelines have fundamentally different characteristics:</p>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Characteristic</th>
+                        <th>Software (SLSA)</th>
+                        <th>Data (Makoto)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Artifact Type</td>
+                        <td>Discrete builds</td>
+                        <td>Streams and batches</td>
+                    </tr>
+                    <tr>
+                        <td>Transformations</td>
+                        <td>Single build step</td>
+                        <td>Multi-stage ETL pipelines</td>
+                    </tr>
+                    <tr>
+                        <td>Granularity</td>
+                        <td>File/package</td>
+                        <td>Record/window/table</td>
+                    </tr>
+                    <tr>
+                        <td>Privacy</td>
+                        <td>Generally public</td>
+                        <td>May contain PII</td>
+                    </tr>
+                    <tr>
+                        <td>Velocity</td>
+                        <td>Per-release</td>
+                        <td>Millions of events/sec</td>
+                    </tr>
+                    <tr>
+                        <td>Output</td>
+                        <td>SBOM</td>
+                        <td>DBOM</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Provenance Levels -->
+        <section class="section" id="levels">
+            <h2>Makoto Levels</h2>
+            <p>Makoto defines three progressive levels, each building on the previous with stronger guarantees.</p>
+
+            <!-- Level 1 -->
+            <div class="level-section l1" id="level-1">
+                <h3><span class="level-badge l1">L1</span> Provenance Exists</h3>
+                <p><em>"Documentation exists for data origin and processing."</em></p>
+
+                <table class="content-table">
+                    <thead>
+                        <tr><th>Requirement</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Attestation Exists</strong></td>
+                            <td>Machine-readable attestation accompanies the data artifact</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Origin Documented</strong></td>
+                            <td>Source of data is recorded (may be self-attested)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Transforms Documented</strong></td>
+                            <td>Processing steps are listed (best-effort completeness)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Format Compliance</strong></td>
+                            <td>Uses Makoto attestation schema with valid predicate type</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Adoption Difficulty: Low</strong> — Can be implemented with manual documentation or simple scripting.</p>
+            </div>
+
+            <!-- Level 2 -->
+            <div class="level-section l2" id="level-2">
+                <h3><span class="level-badge l2">L2</span> Provenance is Authentic</h3>
+                <p><em>"Attestations are cryptographically signed and tamper-evident."</em></p>
+
+                <table class="content-table">
+                    <thead>
+                        <tr><th>Requirement</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>All L1 Requirements</strong></td>
+                            <td>Plus additional controls below</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Signed Attestations</strong></td>
+                            <td>Digital signatures using ECDSA P-256 or equivalent</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tamper-Evident</strong></td>
+                            <td>Consumers can verify signature validity against known keys</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Timestamp Binding</strong></td>
+                            <td>Attestations include verifiable timestamps (RFC 3161 or similar)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hash Chaining</strong></td>
+                            <td>Each transform attestation references cryptographic hash of inputs</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Adoption Difficulty: Medium</strong> — Requires key management infrastructure. Can use Sigstore.</p>
+            </div>
+
+            <!-- Level 3 -->
+            <div class="level-section l3" id="level-3">
+                <h3><span class="level-badge l3">L3</span> Provenance is Unforgeable</h3>
+                <p><em>"Attestations are generated by isolated infrastructure that processing code cannot influence."</em></p>
+
+                <table class="content-table">
+                    <thead>
+                        <tr><th>Requirement</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>All L2 Requirements</strong></td>
+                            <td>Plus additional controls below</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Isolated Signing</strong></td>
+                            <td>Signing keys stored in secure enclave, inaccessible to processing code</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Platform-Generated</strong></td>
+                            <td>Attestations created by trusted control plane, not user code</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Deterministic Hashing</strong></td>
+                            <td>Data hashes computed by platform, not influenced by tenant</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Immutable Audit Trail</strong></td>
+                            <td>All attestation operations logged to append-only store</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Adoption Difficulty: High</strong> — Requires platform support with TEE or HSM.</p>
+            </div>
+        </section>
+
+        <!-- Attestation Model -->
+        <section class="section" id="attestation-model">
+            <h2>Attestation Model</h2>
+            <p>
+                Makoto attestations use the <a href="https://github.com/in-toto/attestation" target="_blank">in-toto attestation framework</a>
+                with Makoto-specific predicate types.
+            </p>
+
+            <h3>Attestation Structure</h3>
+            <div class="code-block">
+<pre>{
+  <span class="hl-key">"_type"</span>: <span class="hl-string">"https://in-toto.io/Statement/v1"</span>,
+  <span class="hl-key">"subject"</span>: [{
+    <span class="hl-key">"name"</span>: <span class="hl-string">"dataset:customer_transactions"</span>,
+    <span class="hl-key">"digest"</span>: {
+      <span class="hl-key">"sha256"</span>: <span class="hl-string">"abc123..."</span>,
+      <span class="hl-key">"recordCount"</span>: <span class="hl-string">"1000000"</span>
+    }
+  }],
+  <span class="hl-key">"predicateType"</span>: <span class="hl-string">"https://makoto.dev/origin/v1"</span>,
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-comment">// Predicate-specific content</span>
+  }
+}</pre>
+            </div>
+
+            <h3>Predicate Types</h3>
+            <table class="content-table">
+                <thead>
+                    <tr><th>Predicate Type</th><th>Purpose</th><th>Used For</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code class="code-inline">makoto.dev/origin/v1</code></td>
+                        <td>Data origin and collection</td>
+                        <td>Initial data ingestion</td>
+                    </tr>
+                    <tr>
+                        <td><code class="code-inline">makoto.dev/transform/v1</code></td>
+                        <td>Data transformation</td>
+                        <td>ETL, filtering, aggregation</td>
+                    </tr>
+                    <tr>
+                        <td><code class="code-inline">makoto.dev/stream-window/v1</code></td>
+                        <td>Stream window attestation</td>
+                        <td>High-throughput streaming</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- DBOM -->
+        <section class="section" id="dbom">
+            <h2>Data Bill of Materials (DBOM)</h2>
+            <p>A DBOM documents the complete lineage of a data artifact, similar to an SBOM for software.</p>
+
+            <div class="code-block">
+<pre>{
+  <span class="hl-key">"dbomVersion"</span>: <span class="hl-string">"1.0.0"</span>,
+  <span class="hl-key">"dataset"</span>: {
+    <span class="hl-key">"name"</span>: <span class="hl-string">"ml_training_dataset_v3"</span>,
+    <span class="hl-key">"version"</span>: <span class="hl-string">"3.0.0"</span>,
+    <span class="hl-key">"makotoLevel"</span>: <span class="hl-string">"L2"</span>
+  },
+  <span class="hl-key">"sources"</span>: [
+    {
+      <span class="hl-key">"name"</span>: <span class="hl-string">"customer_transactions"</span>,
+      <span class="hl-key">"attestationRef"</span>: <span class="hl-string">"https://attestations.example.com/origin/abc"</span>,
+      <span class="hl-key">"makotoLevel"</span>: <span class="hl-string">"L2"</span>
+    }
+  ],
+  <span class="hl-key">"transformations"</span>: [
+    {
+      <span class="hl-key">"order"</span>: <span class="hl-number">1</span>,
+      <span class="hl-key">"name"</span>: <span class="hl-string">"Anonymize PII"</span>,
+      <span class="hl-key">"attestationRef"</span>: <span class="hl-string">"https://attestations.example.com/transform/def"</span>
+    }
+  ]
+}</pre>
+            </div>
+        </section>
+
+        <!-- Verification -->
+        <section class="section" id="verification">
+            <h2>Verification</h2>
+            <p>Consumers verify DBOMs and Makoto attestations through the following steps:</p>
+
+            <div class="pipeline-diagram">
+                <div class="pipeline-stages">
+                    <div class="pipeline-stage">
+                        <div class="pipeline-stage-label">1. Fetch Attestation</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage">
+                        <div class="pipeline-stage-label">2. Verify Signature</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage">
+                        <div class="pipeline-stage-label">3. Check Data Hash</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage">
+                        <div class="pipeline-stage-label">4. Verify Lineage</div>
+                    </div>
+                </div>
+            </div>
+
+            <ol style="color: var(--text-muted);">
+                <li><strong>Fetch attestation</strong> — Retrieve attestation from registry or alongside data</li>
+                <li><strong>Verify signature</strong> — Validate cryptographic signature against trusted keys</li>
+                <li><strong>Check data hash</strong> — Compute hash of data, compare to attestation subject</li>
+                <li><strong>Verify lineage</strong> — Recursively verify input attestations</li>
+            </ol>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://slsa.dev" target="_blank">Inspired by SLSA →</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

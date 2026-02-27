@@ -1,0 +1,75 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "dataset:customer_transactions_anonymized_2025q4",
+      "digest": {
+        "sha256": "abc1234567890123456789012345678901234567890123456789012345678901",
+        "recordCount": "1847293",
+        "merkleRoot": "def1234567890123456789012345678901234567890123456789012345678901"
+      }
+    }
+  ],
+  "predicateType": "https://makoto.dev/transform/v1",
+  "predicate": {
+    "inputs": [
+      {
+        "name": "dataset:customer_transactions_2025q4",
+        "digest": {
+          "sha256": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456"
+        },
+        "attestationRef": "https://attestations.example.com/origin/a1b2c3d4",
+        "makotoLevel": "L2"
+      }
+    ],
+    "transform": {
+      "type": "https://makoto.dev/transforms/anonymization",
+      "name": "PII Anonymization Pipeline",
+      "version": "1.2.0",
+      "description": "Removes and hashes PII fields for ML training compliance",
+      "parameters": {
+        "fieldsRemoved": ["customer_name", "email", "phone", "address"],
+        "fieldsHashed": ["customer_id", "account_number"],
+        "hashAlgorithm": "sha256",
+        "hashSalt": "per-field-unique-salt",
+        "kAnonymity": 5,
+        "lDiversity": 3
+      },
+      "codeRef": {
+        "uri": "git+https://github.com/expanso-io/pipelines.git",
+        "commit": "abc123def456789",
+        "path": "pipelines/anonymization/pii-removal.yaml",
+        "digest": {
+          "sha256": "pipeline_code_hash_here"
+        }
+      }
+    },
+    "executor": {
+      "id": "https://expanso.io/pipelines/prod-transform-cluster-01",
+      "platform": "expanso",
+      "version": {
+        "expanso-runtime": "2.3.1",
+        "bloblang": "1.8.0"
+      },
+      "environment": "production",
+      "isolation": "container"
+    },
+    "metadata": {
+      "invocationId": "transform-20251220-080045-abc123",
+      "startedOn": "2025-12-20T08:00:45Z",
+      "finishedOn": "2025-12-20T08:15:32Z",
+      "durationSeconds": 887,
+      "recordsInput": 1847293,
+      "recordsOutput": 1847293,
+      "recordsDropped": 0,
+      "recordsModified": 1847293,
+      "bytesInput": 2847293847,
+      "bytesOutput": 1923847293
+    },
+    "verification": {
+      "inputHashVerified": true,
+      "transformDeterministic": true,
+      "outputReproducible": true
+    }
+  }
+}

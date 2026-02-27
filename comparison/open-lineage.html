@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenLineage vs Makoto | Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+
+            <div class="nav-section">Comparisons</div>
+            <a href="./" class="nav-item">SLSA Comparison</a>
+            <a href="./open-lineage.html" class="nav-item active">OpenLineage Comparison</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">OpenLineage vs Makoto</h1>
+
+            <p>
+                <a href="https://openlineage.io" target="_blank">OpenLineage</a> and Makoto address different aspects of
+                data pipeline management. OpenLineage provides <strong>observational metadata</strong> for tracking job
+                executions and dataset dependencies. Makoto provides <strong>cryptographic attestations</strong> that
+                prove data provenance with verifiable guarantees.
+            </p>
+
+            <div class="card" style="background: #eff6ff; border-color: #bfdbfe;">
+                <p style="margin: 0;"><strong>Complementary tools:</strong> OpenLineage tells you <em>what happened</em> in your
+                pipelines. Makoto <em>proves</em> what happened with cryptographic evidence. Many organizations will benefit
+                from using both: OpenLineage for operational visibility, Makoto for compliance and trust.</p>
+            </div>
+        </section>
+
+        <!-- Core Philosophy -->
+        <section class="section" id="philosophy">
+            <h2>Different Problems, Different Solutions</h2>
+
+            <div class="card-grid">
+                <div class="card">
+                    <h3 style="margin-top: 0; color: #059669;">OpenLineage</h3>
+                    <p class="text-muted"><strong>Metadata collection for operational visibility</strong></p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Track job executions across platforms</li>
+                        <li>Discover dataset dependencies automatically</li>
+                        <li>Debug pipeline failures</li>
+                        <li>Power data catalogs and discovery tools</li>
+                        <li>Enable impact analysis for schema changes</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top: 0; color: #4f46e5;">Makoto</h3>
+                    <p class="text-muted"><strong>Cryptographic proof for data integrity</strong></p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Prove data origin with signed attestations</li>
+                        <li>Verify transformation chain integrity</li>
+                        <li>Meet regulatory compliance requirements</li>
+                        <li>Enable trustless data sharing</li>
+                        <li>Document AI training data provenance</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Concept Mapping -->
+        <section class="section" id="mapping" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Concept Mapping</h2>
+
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>OpenLineage</th>
+                            <th>Makoto</th>
+                            <th>Key Difference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Job</strong></td>
+                            <td><strong>Transform</strong></td>
+                            <td>Makoto transforms include cryptographic hashes of code and inputs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dataset</strong></td>
+                            <td><strong>Subject</strong></td>
+                            <td>Makoto subjects have cryptographic digests, not just identifiers</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Run</strong></td>
+                            <td><strong>Attestation</strong></td>
+                            <td>Makoto attestations are signed; OpenLineage runs are metadata events</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Facets</strong></td>
+                            <td><strong>Predicate fields</strong></td>
+                            <td>Both support extensibility; Makoto predicates follow in-toto format</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Input/Output Datasets</strong></td>
+                            <td><strong>inputs[] / subject[]</strong></td>
+                            <td>Makoto inputs include attestation references for chain verification</td>
+                        </tr>
+                        <tr>
+                            <td><strong>—</strong></td>
+                            <td><strong>Origin attestation</strong></td>
+                            <td>Makoto has explicit origin type; OpenLineage infers from first dataset</td>
+                        </tr>
+                        <tr>
+                            <td><strong>—</strong></td>
+                            <td><strong>Stream Window</strong></td>
+                            <td>Makoto has dedicated streaming support with Merkle trees</td>
+                        </tr>
+                        <tr>
+                            <td><strong>—</strong></td>
+                            <td><strong>DBOM</strong></td>
+                            <td>Makoto provides complete lineage documentation format</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Trust Model -->
+        <section class="section" id="trust">
+            <h2>Trust Model Comparison</h2>
+
+            <p>
+                The fundamental difference lies in the trust model. OpenLineage assumes you trust your infrastructure
+                to report accurate metadata. Makoto provides cryptographic proof that can be verified independently.
+            </p>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>OpenLineage</th>
+                        <th>Makoto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Trust basis</strong></td>
+                        <td>Trust the emitting system</td>
+                        <td>Cryptographic verification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Signing</strong></td>
+                        <td>Not built-in</td>
+                        <td>Required at L2+</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tamper detection</strong></td>
+                        <td>Not provided</td>
+                        <td>Signature verification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data binding</strong></td>
+                        <td>Reference by name</td>
+                        <td>Cryptographic hash binding</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Chain verification</strong></td>
+                        <td>Graph traversal</td>
+                        <td>Hash chain verification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Non-repudiation</strong></td>
+                        <td>No</td>
+                        <td>Yes (at L2+)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="card" style="margin-top: 1.5rem; background: #fef3c7; border-color: #fcd34d;">
+                <p style="margin: 0;"><strong>When trust matters:</strong> If you're sharing data externally, need regulatory
+                compliance, or training AI models where provenance affects liability—cryptographic verification isn't optional.
+                OpenLineage metadata can be falsified; Makoto attestations cannot (at L2+).</p>
+            </div>
+        </section>
+
+        <!-- Technical Comparison -->
+        <section class="section" id="technical" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Technical Comparison</h2>
+
+                <h3>Event Structure</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0;">
+                    <div>
+                        <h4>OpenLineage RunEvent</h4>
+                        <div class="code-block">
+<pre>{
+  <span class="hl-key">"eventType"</span>: <span class="hl-string">"COMPLETE"</span>,
+  <span class="hl-key">"eventTime"</span>: <span class="hl-string">"2025-01-15T10:30:00Z"</span>,
+  <span class="hl-key">"run"</span>: {
+    <span class="hl-key">"runId"</span>: <span class="hl-string">"uuid-here"</span>
+  },
+  <span class="hl-key">"job"</span>: {
+    <span class="hl-key">"namespace"</span>: <span class="hl-string">"airflow"</span>,
+    <span class="hl-key">"name"</span>: <span class="hl-string">"etl_pipeline"</span>
+  },
+  <span class="hl-key">"inputs"</span>: [...],
+  <span class="hl-key">"outputs"</span>: [...],
+  <span class="hl-key">"producer"</span>: <span class="hl-string">"https://airflow.example.com"</span>
+}</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Makoto Transform Attestation</h4>
+                        <div class="code-block">
+<pre>{
+  <span class="hl-key">"_type"</span>: <span class="hl-string">"https://in-toto.io/Statement/v1"</span>,
+  <span class="hl-key">"subject"</span>: [{
+    <span class="hl-key">"digest"</span>: {<span class="hl-key">"sha256"</span>: <span class="hl-string">"abc..."</span>}
+  }],
+  <span class="hl-key">"predicateType"</span>: <span class="hl-string">"https://makoto.dev/transform/v1"</span>,
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-key">"inputs"</span>: [{
+      <span class="hl-key">"digest"</span>: {<span class="hl-key">"sha256"</span>: <span class="hl-string">"def..."</span>}
+    }],
+    <span class="hl-key">"transform"</span>: {...}
+  }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Specification Foundations</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>OpenLineage</th>
+                            <th>Makoto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Schema format</strong></td>
+                            <td>OpenAPI + JSON Schema</td>
+                            <td>in-toto Statement + JSON Schema</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Transport</strong></td>
+                            <td>HTTP API, Kafka, custom</td>
+                            <td>Any (attestations are documents)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Extensibility</strong></td>
+                            <td>Custom Facets</td>
+                            <td>Custom predicates, additional fields</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Governance</strong></td>
+                            <td>LF AI & Data Foundation</td>
+                            <td>Open specification (in-toto aligned)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reference impl</strong></td>
+                            <td>Marquez</td>
+                            <td>Expanso</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Streaming Support -->
+        <section class="section" id="streaming">
+            <h2>Streaming Data Support</h2>
+
+            <p>
+                Both frameworks support streaming data, but with different approaches:
+            </p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <h3 style="margin-top: 0;">OpenLineage Streaming</h3>
+                    <ul>
+                        <li>Events emitted per micro-batch or checkpoint</li>
+                        <li>Same Job/Dataset/Run model as batch</li>
+                        <li>Integrations for Spark Streaming, Flink</li>
+                        <li>Metadata about streaming job state</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top: 0;">Makoto Stream Windows</h3>
+                    <ul>
+                        <li>Dedicated <code>stream-window/v1</code> predicate type</li>
+                        <li>Merkle tree root for all records in window</li>
+                        <li>Chain linking between consecutive windows</li>
+                        <li>Cryptographic proof of window integrity</li>
+                        <li>Supports millions of events/second</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p style="margin-top: 1.5rem;">
+                Makoto's streaming support is designed for cryptographic verification at scale. The Merkle tree approach
+                allows individual record verification without storing all records, and chain linking enables detection of
+                missing or modified windows.
+            </p>
+        </section>
+
+        <!-- Use Cases -->
+        <section class="section" id="use-cases" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>When to Use Each</h2>
+
+                <h3>Use OpenLineage when...</h3>
+                <ul>
+                    <li>Building a data catalog or discovery platform</li>
+                    <li>Debugging pipeline failures and data quality issues</li>
+                    <li>Performing impact analysis for schema changes</li>
+                    <li>Tracking job performance and SLAs</li>
+                    <li>All consumers are internal and trusted</li>
+                </ul>
+
+                <h3>Use Makoto when...</h3>
+                <ul>
+                    <li>Sharing data with external partners who need verification</li>
+                    <li>Meeting regulatory compliance (GDPR, CCPA, EU AI Act)</li>
+                    <li>Documenting AI/ML training data provenance</li>
+                    <li>Building data marketplaces with trust requirements</li>
+                    <li>Needing tamper-evident audit trails</li>
+                </ul>
+
+                <h3>Use Both when...</h3>
+                <ul>
+                    <li>You need operational visibility <em>and</em> compliance guarantees</li>
+                    <li>Internal teams use OpenLineage for debugging; external data uses Makoto for trust</li>
+                    <li>Building comprehensive data governance with different trust levels</li>
+                </ul>
+
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h4 style="margin-top: 0;">Example: ML Training Data Pipeline</h4>
+                    <p class="text-muted">
+                        Use <strong>OpenLineage</strong> to track feature engineering jobs in Airflow, debug failures,
+                        and understand dataset dependencies. Use <strong>Makoto</strong> to create signed attestations
+                        for the final training dataset, proving its provenance for model governance and regulatory review.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Integration -->
+        <section class="section" id="integration">
+            <h2>Integration Possibilities</h2>
+
+            <p>
+                OpenLineage and Makoto can work together. OpenLineage events can trigger Makoto attestation generation,
+                creating cryptographic proof from operational metadata:
+            </p>
+
+            <div class="code-block">
+<pre><span class="hl-comment"># Conceptual integration flow</span>
+<span class="hl-comment"># 1. OpenLineage captures job completion</span>
+openlineage_event = {
+    "eventType": "COMPLETE",
+    "job": {"name": "anonymization_pipeline"},
+    "outputs": [{"name": "anonymized_customers"}]
+}
+
+<span class="hl-comment"># 2. Generate Makoto attestation from OpenLineage metadata</span>
+makoto_attestation = {
+    "_type": "https://in-toto.io/Statement/v1",
+    "predicateType": "https://makoto.dev/transform/v1",
+    "predicate": {
+        "transform": {
+            "name": openlineage_event["job"]["name"],
+            <span class="hl-comment"># Add cryptographic hashes not in OpenLineage</span>
+            "codeRef": {"digest": {"sha256": "..."}}
+        }
+    }
+}
+
+<span class="hl-comment"># 3. Sign the attestation for L2 compliance</span>
+signed_attestation = sign_with_sigstore(makoto_attestation)</pre>
+            </div>
+
+            <p style="margin-top: 1.5rem;">
+                This approach lets organizations leverage existing OpenLineage integrations while adding
+                cryptographic guarantees where needed.
+            </p>
+        </section>
+
+        <!-- Summary -->
+        <section class="section" id="summary" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Summary</h2>
+
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>Dimension</th>
+                            <th>OpenLineage</th>
+                            <th>Makoto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Primary purpose</strong></td>
+                            <td>Operational metadata</td>
+                            <td>Cryptographic provenance</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trust model</strong></td>
+                            <td>Trust the infrastructure</td>
+                            <td>Verify cryptographically</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Core entities</strong></td>
+                            <td>Job, Dataset, Run</td>
+                            <td>Origin, Transform, Stream Window</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data binding</strong></td>
+                            <td>Name-based references</td>
+                            <td>Cryptographic hashes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Signing</strong></td>
+                            <td>Not built-in</td>
+                            <td>Required at L2+</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Best for</strong></td>
+                            <td>Data catalogs, debugging</td>
+                            <td>Compliance, external trust</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Output artifact</strong></td>
+                            <td>Lineage graph</td>
+                            <td>DBOM (Data Bill of Materials)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p style="margin-top: 1.5rem;">
+                    <strong>Bottom line:</strong> OpenLineage is excellent for understanding your data pipelines internally.
+                    Makoto is essential when you need to <em>prove</em> data provenance to external parties or regulators.
+                </p>
+
+                <p style="margin-top: 1rem;">
+                    <a href="../levels/">Learn about Makoto Levels →</a> |
+                    <a href="./">Compare with SLSA →</a> |
+                    <a href="https://openlineage.io" target="_blank">OpenLineage Documentation →</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://slsa.dev" target="_blank">Inspired by SLSA →</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

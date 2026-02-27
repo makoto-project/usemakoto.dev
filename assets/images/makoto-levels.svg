@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="l1Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f5e9"/>
+      <stop offset="100%" style="stop-color:#c8e6c9"/>
+    </linearGradient>
+    <linearGradient id="l2Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e3f2fd"/>
+      <stop offset="100%" style="stop-color:#bbdefb"/>
+    </linearGradient>
+    <linearGradient id="l3Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f3e5f5"/>
+      <stop offset="100%" style="stop-color:#e1bee7"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="600" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="450" y="45" text-anchor="middle" font-size="28" font-weight="700" fill="#1a1a2e">
+    Makoto Levels
+  </text>
+  <text x="450" y="72" text-anchor="middle" font-size="14" fill="#666">
+    Progressive Data Provenance Assurance
+  </text>
+
+  <!-- Level 1 Card -->
+  <g filter="url(#shadow)">
+    <rect x="40" y="100" width="260" height="440" rx="12" fill="url(#l1Grad)" stroke="#4caf50" stroke-width="2"/>
+  </g>
+
+  <!-- L1 Header -->
+  <rect x="40" y="100" width="260" height="60" rx="12" fill="#4caf50"/>
+  <rect x="40" y="140" width="260" height="20" fill="#4caf50"/>
+  <text x="170" y="138" text-anchor="middle" font-size="22" font-weight="700" fill="white">L1</text>
+
+  <!-- L1 Content -->
+  <text x="170" y="185" text-anchor="middle" font-size="16" font-weight="600" fill="#2e7d32">
+    Provenance Exists
+  </text>
+  <line x1="70" y1="200" x2="270" y2="200" stroke="#4caf50" stroke-width="1" opacity="0.5"/>
+
+  <!-- L1 Features -->
+  <text x="60" y="230" font-size="13" font-weight="600" fill="#1b5e20">Key Guarantee:</text>
+  <text x="60" y="250" font-size="12" fill="#333">Documentation exists</text>
+
+  <text x="60" y="285" font-size="13" font-weight="600" fill="#1b5e20">Requirements:</text>
+  <text x="60" y="308" font-size="11" fill="#444">• Machine-readable attestation</text>
+  <text x="60" y="328" font-size="11" fill="#444">• Origin documented</text>
+  <text x="60" y="348" font-size="11" fill="#444">• Transforms listed (best-effort)</text>
+  <text x="60" y="368" font-size="11" fill="#444">• Makoto schema compliance</text>
+
+  <text x="60" y="403" font-size="13" font-weight="600" fill="#1b5e20">Threats Mitigated:</text>
+  <text x="60" y="426" font-size="11" fill="#444">• D1: Source Falsification (partial)</text>
+  <text x="60" y="446" font-size="11" fill="#444">• D3: Transform Opacity (partial)</text>
+
+  <text x="60" y="481" font-size="13" font-weight="600" fill="#1b5e20">Adoption:</text>
+  <rect x="60" y="490" width="60" height="8" rx="4" fill="#c8e6c9" stroke="#4caf50"/>
+  <rect x="60" y="490" width="20" height="8" rx="4" fill="#4caf50"/>
+  <text x="130" y="498" font-size="11" fill="#666">Low effort</text>
+
+  <!-- Level 2 Card -->
+  <g filter="url(#shadow)">
+    <rect x="320" y="100" width="260" height="440" rx="12" fill="url(#l2Grad)" stroke="#2196f3" stroke-width="2"/>
+  </g>
+
+  <!-- L2 Header -->
+  <rect x="320" y="100" width="260" height="60" rx="12" fill="#2196f3"/>
+  <rect x="320" y="140" width="260" height="20" fill="#2196f3"/>
+  <text x="450" y="138" text-anchor="middle" font-size="22" font-weight="700" fill="white">L2</text>
+
+  <!-- L2 Content -->
+  <text x="450" y="185" text-anchor="middle" font-size="16" font-weight="600" fill="#1565c0">
+    Provenance is Authentic
+  </text>
+  <line x1="350" y1="200" x2="550" y2="200" stroke="#2196f3" stroke-width="1" opacity="0.5"/>
+
+  <!-- L2 Features -->
+  <text x="340" y="230" font-size="13" font-weight="600" fill="#0d47a1">Key Guarantee:</text>
+  <text x="340" y="250" font-size="12" fill="#333">Signed, tamper-evident</text>
+
+  <text x="340" y="285" font-size="13" font-weight="600" fill="#0d47a1">Requirements:</text>
+  <text x="340" y="308" font-size="11" fill="#444">• All L1 requirements +</text>
+  <text x="340" y="328" font-size="11" fill="#444">• Digital signatures</text>
+  <text x="340" y="348" font-size="11" fill="#444">• Verifiable timestamps</text>
+  <text x="340" y="368" font-size="11" fill="#444">• Hash chaining</text>
+
+  <text x="340" y="403" font-size="13" font-weight="600" fill="#0d47a1">Threats Mitigated:</text>
+  <text x="340" y="426" font-size="11" fill="#444">• D1: Source Falsification</text>
+  <text x="340" y="446" font-size="11" fill="#444">• D2: Collection Tampering</text>
+  <text x="340" y="466" font-size="11" fill="#444">• D3: Transform Opacity</text>
+  <text x="340" y="486" font-size="11" fill="#444">• D4: Lineage Forgery (partial)</text>
+
+  <text x="340" y="516" font-size="13" font-weight="600" fill="#0d47a1">Adoption:</text>
+  <rect x="340" y="525" width="60" height="8" rx="4" fill="#bbdefb" stroke="#2196f3"/>
+  <rect x="340" y="525" width="40" height="8" rx="4" fill="#2196f3"/>
+  <text x="410" y="533" font-size="11" fill="#666">Medium effort</text>
+
+  <!-- Level 3 Card -->
+  <g filter="url(#shadow)">
+    <rect x="600" y="100" width="260" height="440" rx="12" fill="url(#l3Grad)" stroke="#9c27b0" stroke-width="2"/>
+  </g>
+
+  <!-- L3 Header -->
+  <rect x="600" y="100" width="260" height="60" rx="12" fill="#9c27b0"/>
+  <rect x="600" y="140" width="260" height="20" fill="#9c27b0"/>
+  <text x="730" y="138" text-anchor="middle" font-size="22" font-weight="700" fill="white">L3</text>
+
+  <!-- L3 Content -->
+  <text x="730" y="185" text-anchor="middle" font-size="16" font-weight="600" fill="#7b1fa2">
+    Provenance is Unforgeable
+  </text>
+  <line x1="630" y1="200" x2="830" y2="200" stroke="#9c27b0" stroke-width="1" opacity="0.5"/>
+
+  <!-- L3 Features -->
+  <text x="620" y="230" font-size="13" font-weight="600" fill="#4a148c">Key Guarantee:</text>
+  <text x="620" y="250" font-size="12" fill="#333">Cannot be forged</text>
+
+  <text x="620" y="285" font-size="13" font-weight="600" fill="#4a148c">Requirements:</text>
+  <text x="620" y="308" font-size="11" fill="#444">• All L2 requirements +</text>
+  <text x="620" y="328" font-size="11" fill="#444">• Isolated signing (HSM)</text>
+  <text x="620" y="348" font-size="11" fill="#444">• Platform-generated attestations</text>
+  <text x="620" y="368" font-size="11" fill="#444">• Deterministic hashing</text>
+  <text x="620" y="388" font-size="11" fill="#444">• Immutable audit trail</text>
+
+  <text x="620" y="423" font-size="13" font-weight="600" fill="#4a148c">Threats Mitigated:</text>
+  <text x="620" y="446" font-size="11" fill="#444">• D1-D6: All data threats</text>
+  <text x="620" y="466" font-size="11" fill="#444">• D8: Time Manipulation</text>
+
+  <text x="620" y="501" font-size="13" font-weight="600" fill="#4a148c">Adoption:</text>
+  <rect x="620" y="510" width="60" height="8" rx="4" fill="#e1bee7" stroke="#9c27b0"/>
+  <rect x="620" y="510" width="55" height="8" rx="4" fill="#9c27b0"/>
+  <text x="690" y="518" font-size="11" fill="#666">High effort</text>
+
+  <!-- Arrows between levels -->
+  <path d="M305 320 L315 320" stroke="#888" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M585 320 L595 320" stroke="#888" stroke-width="2" fill="none"/>
+
+  <!-- Footer -->
+  <text x="450" y="570" text-anchor="middle" font-size="11" fill="#999">
+    誠 Makoto — Data Integrity Framework
+  </text>
+</svg>

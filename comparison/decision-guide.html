@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Which Standard Should I Use? | Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="./" class="nav-item">SLSA Comparison</a>
+            <a href="decision-guide.html" class="nav-item active">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">Which Standard Should I Use?</h1>
+
+            <p>
+                Multiple standards address provenance and lineage in different ways. This guide helps you choose
+                the right standard—or combination of standards—for your use case. The good news: these standards
+                are often complementary, not competing.
+            </p>
+
+            <div class="card" style="background: #eff6ff; border-color: #bfdbfe;">
+                <p style="margin: 0;"><strong>TL;DR:</strong> Use <strong>SLSA</strong> for software builds,
+                <strong>Makoto</strong> for data integrity, <strong>OpenLineage</strong> for pipeline observability,
+                and <strong>W3C PROV</strong> for semantic interoperability. Many organizations use multiple standards together.</p>
+            </div>
+        </section>
+
+        <!-- Quick Decision Matrix -->
+        <section class="section" id="quick-decision">
+            <h2>Quick Decision Matrix</h2>
+
+            <p>Find your primary need in the left column to identify the best starting point:</p>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Primary Need</th>
+                        <th>Recommended Standard</th>
+                        <th>Why</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Prove software wasn't tampered with</strong></td>
+                        <td><span style="color: #4f46e5; font-weight: 600;">SLSA</span></td>
+                        <td>Purpose-built for software supply chain security</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Prove data origin and transformations</strong></td>
+                        <td><span style="color: #059669; font-weight: 600;">Makoto</span></td>
+                        <td>Cryptographic attestations for data integrity</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Track pipeline runs and dependencies</strong></td>
+                        <td><span style="color: #dc2626; font-weight: 600;">OpenLineage</span></td>
+                        <td>Runtime metadata for observability and debugging</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Semantic provenance interchange</strong></td>
+                        <td><span style="color: #7c3aed; font-weight: 600;">W3C PROV</span></td>
+                        <td>Standard ontology for cross-system interoperability</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ML model training data governance</strong></td>
+                        <td><span style="color: #059669; font-weight: 600;">Makoto</span> + <span style="color: #4f46e5; font-weight: 600;">SLSA</span></td>
+                        <td>Makoto for data, SLSA for model artifacts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data catalog with lineage visibility</strong></td>
+                        <td><span style="color: #dc2626; font-weight: 600;">OpenLineage</span> + <span style="color: #059669; font-weight: 600;">Makoto</span></td>
+                        <td>OpenLineage for discovery, Makoto for verification</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Standard Profiles -->
+        <section class="section" id="profiles" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Standard Profiles</h2>
+
+                <!-- SLSA -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h3 style="margin-top: 0; color: #4f46e5;">
+                        <a href="https://slsa.dev" target="_blank" style="color: inherit; text-decoration: none;">SLSA</a>
+                        <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);"> — Supply-chain Levels for Software Artifacts</span>
+                    </h3>
+                    <p><strong>Purpose:</strong> Secure the software build process with verifiable provenance.</p>
+                    <p><strong>Focus:</strong> Software artifacts (binaries, packages, containers)</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem; color: #059669;">Strengths</h4>
+                            <ul style="margin: 0; padding-left: 1.25rem;">
+                                <li>Mature ecosystem (GitHub, GitLab support)</li>
+                                <li>Clear level progression (L1-L3)</li>
+                                <li>Strong tooling (Sigstore, cosign)</li>
+                                <li>Industry adoption (OpenSSF)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem; color: #dc2626;">Limitations</h4>
+                            <ul style="margin: 0; padding-left: 1.25rem;">
+                                <li>Software-focused (not data)</li>
+                                <li>Single build step model</li>
+                                <li>No streaming support</li>
+                                <li>No privacy considerations</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <p style="margin-bottom: 0;"><strong>Best for:</strong> CI/CD pipelines, container builds, package publishing, infrastructure-as-code</p>
+                </div>
+
+                <!-- Makoto -->
+                <div class="card" style="margin-bottom: 1.5rem; border-color: #10b981;">
+                    <h3 style="margin-top: 0; color: #059669;">
+                        <a href="../" style="color: inherit; text-decoration: none;">Makoto</a>
+                        <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);"> — Data Integrity Framework</span>
+                    </h3>
+                    <p><strong>Purpose:</strong> Cryptographic attestations for data origin, transformation, and lineage.</p>
+                    <p><strong>Focus:</strong> Data artifacts (datasets, streams, ETL outputs)</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem; color: #059669;">Strengths</h4>
+                            <ul style="margin: 0; padding-left: 1.25rem;">
+                                <li>Multi-stage transform chains</li>
+                                <li>Streaming data support (Merkle windows)</li>
+                                <li>Privacy-preserving options</li>
+                                <li>DBOM output format</li>
+                                <li>in-toto compatible</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem; color: #dc2626;">Limitations</h4>
+                            <ul style="margin: 0; padding-left: 1.25rem;">
+                                <li>Newer standard (less tooling)</li>
+                                <li>Requires implementation effort</li>
+                                <li>L3 requires platform support</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <p style="margin-bottom: 0;"><strong>Best for:</strong> ETL pipelines, ML training data, data marketplaces, regulatory compliance</p>
+                </div>
+
+                <!-- OpenLineage -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h3 style="margin-top: 0; color: #dc2626;">
+                        <a href="https://openlineage.io" target="_blank" style="color: inherit; text-decoration: none;">OpenLineage</a>
+                        <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);"> — Open Standard for Data Lineage</span>
+                    </h3>
+                    <p><strong>Purpose:</strong> Runtime metadata collection for pipeline observability and lineage tracking.</p>
+                    <p><strong>Focus:</strong> Job/task execution metadata and dataset dependencies</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem; color: #059669;">Strengths</h4>
+                            <ul style="margin: 0; padding-left: 1.25rem;">
+                                <li>Broad tool integration (Airflow, Spark, dbt)</li>
+                                <li>Rich runtime metadata</li>
+                                <li>Active community (LF AI & Data)</li>
+                                <li>Great for data catalogs</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem; color: #dc2626;">Limitations</h4>
+                            <ul style="margin: 0; padding-left: 1.25rem;">
+                                <li>No cryptographic verification</li>
+                                <li>Observability focus (not security)</li>
+                                <li>No integrity guarantees</li>
+                                <li>Metadata only (no data hashing)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <p style="margin-bottom: 0;"><strong>Best for:</strong> Data catalogs, pipeline debugging, impact analysis, data discovery</p>
+                </div>
+
+                <!-- W3C PROV -->
+                <div class="card">
+                    <h3 style="margin-top: 0; color: #7c3aed;">
+                        <a href="https://www.w3.org/TR/prov-overview/" target="_blank" style="color: inherit; text-decoration: none;">W3C PROV</a>
+                        <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);"> — Provenance Data Model</span>
+                    </h3>
+                    <p><strong>Purpose:</strong> Standard ontology for representing provenance information across systems.</p>
+                    <p><strong>Focus:</strong> Semantic interoperability and provenance interchange</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem; color: #059669;">Strengths</h4>
+                            <ul style="margin: 0; padding-left: 1.25rem;">
+                                <li>W3C recommendation (stable)</li>
+                                <li>Rich semantic model</li>
+                                <li>Cross-domain applicability</li>
+                                <li>RDF/OWL support</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 0.5rem; color: #dc2626;">Limitations</h4>
+                            <ul style="margin: 0; padding-left: 1.25rem;">
+                                <li>Generic (not data-specific)</li>
+                                <li>No security levels</li>
+                                <li>Complex for simple use cases</li>
+                                <li>Limited modern tooling</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <p style="margin-bottom: 0;"><strong>Best for:</strong> Research data, cross-organization sharing, semantic web applications, archives</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison Table -->
+        <section class="section" id="comparison">
+            <h2>Feature Comparison</h2>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th style="color: #4f46e5;">SLSA</th>
+                        <th style="color: #059669;">Makoto</th>
+                        <th style="color: #dc2626;">OpenLineage</th>
+                        <th style="color: #7c3aed;">W3C PROV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Primary domain</strong></td>
+                        <td>Software</td>
+                        <td>Data</td>
+                        <td>Data</td>
+                        <td>General</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cryptographic signing</strong></td>
+                        <td>Yes (L2+)</td>
+                        <td>Yes (L2+)</td>
+                        <td>No</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Content hashing</strong></td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Security levels</strong></td>
+                        <td>L1-L3</td>
+                        <td>L1-L3</td>
+                        <td>No</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Streaming support</strong></td>
+                        <td>No</td>
+                        <td>Yes (windows)</td>
+                        <td>Limited</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multi-stage lineage</strong></td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Privacy features</strong></td>
+                        <td>No</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Runtime metadata</strong></td>
+                        <td>Basic</td>
+                        <td>Basic</td>
+                        <td>Rich</td>
+                        <td>Basic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tool integrations</strong></td>
+                        <td>Many</td>
+                        <td>Growing</td>
+                        <td>Many</td>
+                        <td>Limited</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Output format</strong></td>
+                        <td>SBOM</td>
+                        <td>DBOM</td>
+                        <td>Events</td>
+                        <td>RDF/JSON</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Attestation format</strong></td>
+                        <td>in-toto/DSSE</td>
+                        <td>in-toto/DSSE</td>
+                        <td>JSON</td>
+                        <td>PROV-O/PROV-JSON</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Use Case Scenarios -->
+        <section class="section" id="scenarios" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Use Case Scenarios</h2>
+
+                <h3>Scenario 1: ML Training Pipeline</h3>
+                <div class="card">
+                    <p style="margin-top: 0;"><em>"I'm training ML models and need to prove the provenance of both my training data and model artifacts."</em></p>
+                    <p><strong>Recommendation:</strong> Use <strong>Makoto</strong> for training data attestations and <strong>SLSA</strong> for model artifact provenance.</p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Makoto tracks data origin, transformations, and feature engineering</li>
+                        <li>SLSA tracks model training code and resulting artifacts</li>
+                        <li>Both use in-toto format, enabling unified verification policies</li>
+                    </ul>
+                </div>
+
+                <h3>Scenario 2: Data Warehouse Governance</h3>
+                <div class="card">
+                    <p style="margin-top: 0;"><em>"I need to understand data lineage for impact analysis and also prove data hasn't been tampered with."</em></p>
+                    <p><strong>Recommendation:</strong> Use <strong>OpenLineage</strong> for lineage visibility and <strong>Makoto</strong> for integrity verification.</p>
+                    <ul style="margin-bottom: 0;">
+                        <li>OpenLineage integrates with dbt, Airflow, and data catalogs for discovery</li>
+                        <li>Makoto provides cryptographic proof of data integrity for high-value tables</li>
+                        <li>Use OpenLineage broadly, Makoto for regulated or sensitive data</li>
+                    </ul>
+                </div>
+
+                <h3>Scenario 3: Cross-Organization Data Sharing</h3>
+                <div class="card">
+                    <p style="margin-top: 0;"><em>"I'm sharing data with external partners and need to provide verifiable provenance claims."</em></p>
+                    <p><strong>Recommendation:</strong> Use <strong>Makoto L2</strong> with signed attestations. Consider <strong>W3C PROV</strong> if partners use semantic web systems.</p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Makoto L2 provides signed, tamper-evident attestations</li>
+                        <li>Partners can independently verify data hasn't been modified</li>
+                        <li>DBOM documents complete chain of custody</li>
+                    </ul>
+                </div>
+
+                <h3>Scenario 4: Real-Time Streaming Analytics</h3>
+                <div class="card">
+                    <p style="margin-top: 0;"><em>"I'm processing millions of events per second and need to attest to data integrity without impacting throughput."</em></p>
+                    <p><strong>Recommendation:</strong> Use <strong>Makoto stream-window attestations</strong>.</p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Window-based Merkle trees enable high-throughput attestation</li>
+                        <li>Single signature per window (not per record)</li>
+                        <li>Hash chaining provides tamper-evident stream history</li>
+                    </ul>
+                </div>
+
+                <h3>Scenario 5: Research Data Publication</h3>
+                <div class="card">
+                    <p style="margin-top: 0;"><em>"I'm publishing research datasets and need to document provenance for reproducibility."</em></p>
+                    <p><strong>Recommendation:</strong> Use <strong>W3C PROV</strong> for semantic richness, optionally with <strong>Makoto L1</strong> for structured attestations.</p>
+                    <ul style="margin-bottom: 0;">
+                        <li>W3C PROV provides rich semantic descriptions understood by research tools</li>
+                        <li>PROV-O enables integration with research data repositories</li>
+                        <li>Makoto adds structured, machine-verifiable attestations</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Combining Standards -->
+        <section class="section" id="combining">
+            <h2>Using Multiple Standards Together</h2>
+
+            <p>
+                These standards are designed to complement each other. Here's how they fit together:
+            </p>
+
+            <div class="card" style="margin: 1.5rem 0;">
+                <h3 style="margin-top: 0;">The Full Stack Approach</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>Layer</th>
+                            <th>Standard</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Observability</strong></td>
+                            <td>OpenLineage</td>
+                            <td>Runtime lineage events for data catalogs and debugging</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data Integrity</strong></td>
+                            <td>Makoto</td>
+                            <td>Cryptographic attestations for data provenance</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Code Integrity</strong></td>
+                            <td>SLSA</td>
+                            <td>Build provenance for pipeline code and tools</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Interchange</strong></td>
+                            <td>W3C PROV</td>
+                            <td>Semantic export for cross-system interoperability</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Integration Points</h3>
+            <ul>
+                <li><strong>Makoto + SLSA:</strong> Both use in-toto/DSSE attestation format—store together, verify together</li>
+                <li><strong>Makoto + OpenLineage:</strong> OpenLineage events can reference Makoto attestation URIs</li>
+                <li><strong>Makoto + W3C PROV:</strong> Makoto attestations can be exported to PROV-JSON for semantic queries</li>
+                <li><strong>OpenLineage + W3C PROV:</strong> OpenLineage lineage can be mapped to PROV entities/activities</li>
+            </ul>
+        </section>
+
+        <!-- Decision Flowchart -->
+        <section class="section" id="flowchart" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Decision Flowchart</h2>
+
+                <p>Answer these questions to find your starting point:</p>
+
+                <div class="card" style="margin: 1.5rem 0;">
+                    <h4 style="margin-top: 0;">1. What type of artifact are you attesting?</h4>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>Software (binaries, packages, containers)</strong> → SLSA</li>
+                        <li><strong>Data (datasets, streams, ETL outputs)</strong> → Continue to question 2</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="margin: 1.5rem 0;">
+                    <h4 style="margin-top: 0;">2. Do you need cryptographic integrity verification?</h4>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>Yes, I need to prove data wasn't tampered with</strong> → Makoto</li>
+                        <li><strong>No, I just need lineage visibility for observability</strong> → OpenLineage</li>
+                        <li><strong>Both</strong> → Makoto + OpenLineage</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="margin: 1.5rem 0;">
+                    <h4 style="margin-top: 0;">3. Do you need to share provenance across different systems/organizations?</h4>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>Yes, with semantic web or research systems</strong> → Consider W3C PROV export</li>
+                        <li><strong>Yes, with modern data systems</strong> → Makoto/OpenLineage native formats work well</li>
+                        <li><strong>No, internal use only</strong> → Use native format of your chosen standard</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="margin: 1.5rem 0;">
+                    <h4 style="margin-top: 0;">4. What security level do you need?</h4>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>Documentation only</strong> → Makoto L1 or OpenLineage</li>
+                        <li><strong>Signed, tamper-evident records</strong> → Makoto L2</li>
+                        <li><strong>Hardware-backed, unforgeable attestations</strong> → Makoto L3</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="section" id="summary">
+            <h2>Summary</h2>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Standard</th>
+                        <th>Use When You Need</th>
+                        <th>Don't Use When</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong style="color: #4f46e5;">SLSA</strong></td>
+                        <td>Software build provenance, supply chain security</td>
+                        <td>Data provenance, streaming, multi-stage transforms</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: #059669;">Makoto</strong></td>
+                        <td>Data integrity, cryptographic verification, streaming, privacy</td>
+                        <td>Software builds, basic lineage without security needs</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: #dc2626;">OpenLineage</strong></td>
+                        <td>Pipeline observability, data catalogs, impact analysis</td>
+                        <td>Cryptographic integrity, security requirements</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: #7c3aed;">W3C PROV</strong></td>
+                        <td>Semantic interoperability, research data, cross-system sharing</td>
+                        <td>Simple use cases, when modern tooling is needed</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="card" style="background: #ecfdf5; border-color: #6ee7b7; margin-top: 1.5rem;">
+                <p style="margin: 0;"><strong>Bottom line:</strong> Start with the standard that matches your primary need.
+                Add complementary standards as your requirements grow. Most organizations benefit from using
+                2-3 standards together for comprehensive provenance coverage.</p>
+            </div>
+
+            <p style="margin-top: 1.5rem;">
+                <a href="./">Compare SLSA and Makoto in depth →</a> |
+                <a href="../levels/">Learn about Makoto Levels →</a>
+            </p>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://slsa.dev" target="_blank">Inspired by SLSA →</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

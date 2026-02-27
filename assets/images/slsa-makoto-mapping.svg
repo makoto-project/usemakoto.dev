@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="slsaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f5e9"/>
+      <stop offset="100%" style="stop-color:#c8e6c9"/>
+    </linearGradient>
+    <linearGradient id="makotoGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e3f2fd"/>
+      <stop offset="100%" style="stop-color:#bbdefb"/>
+    </linearGradient>
+    <linearGradient id="sharedGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff3e0"/>
+      <stop offset="100%" style="stop-color:#ffe0b2"/>
+    </linearGradient>
+    <linearGradient id="newGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f3e5f5"/>
+      <stop offset="100%" style="stop-color:#e1bee7"/>
+    </linearGradient>
+    <marker id="mapArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#78909c"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="700" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="500" y="40" text-anchor="middle" font-size="26" font-weight="700" fill="#1a1a2e">
+    SLSA → Makoto Mapping
+  </text>
+  <text x="500" y="65" text-anchor="middle" font-size="13" fill="#666">
+    How SLSA concepts translate to data provenance
+  </text>
+
+  <!-- SLSA Column Header -->
+  <g transform="translate(50, 90)">
+    <g filter="url(#shadow)">
+      <rect x="0" y="0" width="350" height="50" rx="10" fill="#4caf50"/>
+    </g>
+    <text x="175" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="white">SLSA</text>
+    <text x="175" y="48" text-anchor="middle" font-size="10" fill="#c8e6c9">Software Supply Chain</text>
+  </g>
+
+  <!-- Makoto Column Header -->
+  <g transform="translate(600, 90)">
+    <g filter="url(#shadow)">
+      <rect x="0" y="0" width="350" height="50" rx="10" fill="#1976d2"/>
+    </g>
+    <text x="175" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="white">Makoto</text>
+    <text x="175" y="48" text-anchor="middle" font-size="10" fill="#bbdefb">Data Supply Chain</text>
+  </g>
+
+  <!-- Mapping Rows -->
+
+  <!-- Row 1: Artifact / Dataset -->
+  <g transform="translate(50, 160)">
+    <!-- SLSA -->
+    <g filter="url(#shadow)">
+      <rect x="0" y="0" width="350" height="60" rx="8" fill="url(#slsaGrad)" stroke="#4caf50" stroke-width="1.5"/>
+    </g>
+    <text x="20" y="25" font-size="12" font-weight="600" fill="#2e7d32">Artifact</text>
+    <text x="20" y="42" font-size="10" fill="#558b2f">Binary, container image, package</text>
+    <text x="20" y="55" font-size="9" fill="#888">Discrete, versioned, immutable</text>
+
+    <!-- Arrow -->
+    <line x1="360" y1="30" x2="540" y2="30" stroke="#78909c" stroke-width="2" marker-end="url(#mapArrow)"/>
+    <text x="450" y="25" text-anchor="middle" font-size="9" fill="#78909c">maps to</text>
+
+    <!-- Makoto -->
+    <g filter="url(#shadow)">
+      <rect x="550" y="0" width="350" height="60" rx="8" fill="url(#makotoGrad)" stroke="#1976d2" stroke-width="1.5"/>
+    </g>
+    <text x="570" y="25" font-size="12" font-weight="600" fill="#0d47a1">Dataset / Stream Window</text>
+    <text x="570" y="42" font-size="10" fill="#1565c0">Batch dataset, stream window, table</text>
+    <text x="570" y="55" font-size="9" fill="#888">Batch or continuous, versioned, hashed</text>
+  </g>
+
+  <!-- Row 2: Build / Transform -->
+  <g transform="translate(50, 235)">
+    <!-- SLSA -->
+    <g filter="url(#shadow)">
+      <rect x="0" y="0" width="350" height="60" rx="8" fill="url(#slsaGrad)" stroke="#4caf50" stroke-width="1.5"/>
+    </g>
+    <text x="20" y="25" font-size="12" font-weight="600" fill="#2e7d32">Build</text>
+    <text x="20" y="42" font-size="10" fill="#558b2f">Compile, link, package</text>
+    <text x="20" y="55" font-size="9" fill="#888">Source → Binary (one step)</text>
+
+    <!-- Arrow -->
+    <line x1="360" y1="30" x2="540" y2="30" stroke="#78909c" stroke-width="2" marker-end="url(#mapArrow)"/>
+    <text x="450" y="25" text-anchor="middle" font-size="9" fill="#78909c">maps to</text>
+
+    <!-- Makoto -->
+    <g filter="url(#shadow)">
+      <rect x="550" y="0" width="350" height="60" rx="8" fill="url(#makotoGrad)" stroke="#1976d2" stroke-width="1.5"/>
+    </g>
+    <text x="570" y="25" font-size="12" font-weight="600" fill="#0d47a1">Transform Chain</text>
+    <text x="570" y="42" font-size="10" fill="#1565c0">ETL, aggregation, filtering, ML training</text>
+    <text x="570" y="55" font-size="9" fill="#888">Source → T₁ → T₂ → ... → Tₙ (multi-step)</text>
+  </g>
+
+  <!-- Row 3: Provenance / Lineage -->
+  <g transform="translate(50, 310)">
+    <!-- SLSA -->
+    <g filter="url(#shadow)">
+      <rect x="0" y="0" width="350" height="60" rx="8" fill="url(#slsaGrad)" stroke="#4caf50" stroke-width="1.5"/>
+    </g>
+    <text x="20" y="25" font-size="12" font-weight="600" fill="#2e7d32">Provenance</text>
+    <text x="20" y="42" font-size="10" fill="#558b2f">Where, when, how artifact was built</text>
+    <text x="20" y="55" font-size="9" fill="#888">Build inputs, builder, parameters</text>
+
+    <!-- Arrow -->
+    <line x1="360" y1="30" x2="540" y2="30" stroke="#78909c" stroke-width="2" marker-end="url(#mapArrow)"/>
+    <text x="450" y="25" text-anchor="middle" font-size="9" fill="#78909c">maps to</text>
+
+    <!-- Makoto -->
+    <g filter="url(#shadow)">
+      <rect x="550" y="0" width="350" height="60" rx="8" fill="url(#makotoGrad)" stroke="#1976d2" stroke-width="1.5"/>
+    </g>
+    <text x="570" y="25" font-size="12" font-weight="600" fill="#0d47a1">Lineage + Provenance</text>
+    <text x="570" y="42" font-size="10" fill="#1565c0">Full transform history + origin metadata</text>
+    <text x="570" y="55" font-size="9" fill="#888">Chained attestations, input/output hashes</text>
+  </g>
+
+  <!-- Row 4: SBOM / DBOM -->
+  <g transform="translate(50, 385)">
+    <!-- SLSA -->
+    <g filter="url(#shadow)">
+      <rect x="0" y="0" width="350" height="60" rx="8" fill="url(#slsaGrad)" stroke="#4caf50" stroke-width="1.5"/>
+    </g>
+    <text x="20" y="25" font-size="12" font-weight="600" fill="#2e7d32">SBOM</text>
+    <text x="20" y="42" font-size="10" fill="#558b2f">Software Bill of Materials</text>
+    <text x="20" y="55" font-size="9" fill="#888">Dependencies, licenses, vulnerabilities</text>
+
+    <!-- Arrow -->
+    <line x1="360" y1="30" x2="540" y2="30" stroke="#78909c" stroke-width="2" marker-end="url(#mapArrow)"/>
+    <text x="450" y="25" text-anchor="middle" font-size="9" fill="#78909c">maps to</text>
+
+    <!-- Makoto -->
+    <g filter="url(#shadow)">
+      <rect x="550" y="0" width="350" height="60" rx="8" fill="url(#makotoGrad)" stroke="#1976d2" stroke-width="1.5"/>
+    </g>
+    <text x="570" y="25" font-size="12" font-weight="600" fill="#0d47a1">DBOM</text>
+    <text x="570" y="42" font-size="10" fill="#1565c0">Data Bill of Materials</text>
+    <text x="570" y="55" font-size="9" fill="#888">Sources, transforms, consent, geography</text>
+  </g>
+
+  <!-- Shared Foundation -->
+  <g transform="translate(200, 470)">
+    <g filter="url(#shadow)">
+      <rect x="0" y="0" width="600" height="70" rx="10" fill="url(#sharedGrad)" stroke="#ef6c00" stroke-width="2"/>
+    </g>
+    <text x="300" y="25" text-anchor="middle" font-size="14" font-weight="700" fill="#e65100">Shared Foundation</text>
+    <text x="300" y="45" text-anchor="middle" font-size="11" fill="#bf360c">in-toto Attestation Format • L1/L2/L3 Level Structure • Threat-Based Design</text>
+    <text x="300" y="62" text-anchor="middle" font-size="10" fill="#666">Makoto builds on SLSA philosophy and in-toto attestation layer</text>
+  </g>
+
+  <!-- Makoto Extensions -->
+  <g transform="translate(50, 560)">
+    <text x="0" y="0" font-size="14" font-weight="700" fill="#7b1fa2">Makoto Extensions (Beyond SLSA)</text>
+
+    <g transform="translate(0, 20)">
+      <!-- Extension 1 -->
+      <g filter="url(#shadow)">
+        <rect x="0" y="0" width="220" height="70" rx="8" fill="url(#newGrad)" stroke="#9c27b0" stroke-width="1.5"/>
+      </g>
+      <text x="110" y="22" text-anchor="middle" font-size="11" font-weight="600" fill="#6a1b9a">Stream Windows</text>
+      <text x="110" y="40" text-anchor="middle" font-size="9" fill="#7b1fa2">Merkle trees for high-throughput</text>
+      <text x="110" y="55" text-anchor="middle" font-size="9" fill="#7b1fa2">Hash chains between windows</text>
+
+      <!-- Extension 2 -->
+      <g filter="url(#shadow)">
+        <rect x="240" y="0" width="220" height="70" rx="8" fill="url(#newGrad)" stroke="#9c27b0" stroke-width="1.5"/>
+      </g>
+      <text x="350" y="22" text-anchor="middle" font-size="11" font-weight="600" fill="#6a1b9a">Privacy Techniques</text>
+      <text x="350" y="40" text-anchor="middle" font-size="9" fill="#7b1fa2">Commitment schemes</text>
+      <text x="350" y="55" text-anchor="middle" font-size="9" fill="#7b1fa2">Zero-knowledge proofs (optional)</text>
+
+      <!-- Extension 3 -->
+      <g filter="url(#shadow)">
+        <rect x="480" y="0" width="220" height="70" rx="8" fill="url(#newGrad)" stroke="#9c27b0" stroke-width="1.5"/>
+      </g>
+      <text x="590" y="22" text-anchor="middle" font-size="11" font-weight="600" fill="#6a1b9a">Data-Specific Threats</text>
+      <text x="590" y="40" text-anchor="middle" font-size="9" fill="#7b1fa2">D5: Stream injection</text>
+      <text x="590" y="55" text-anchor="middle" font-size="9" fill="#7b1fa2">D6: Aggregation manipulation</text>
+
+      <!-- Extension 4 -->
+      <g filter="url(#shadow)">
+        <rect x="720" y="0" width="220" height="70" rx="8" fill="url(#newGrad)" stroke="#9c27b0" stroke-width="1.5"/>
+      </g>
+      <text x="830" y="22" text-anchor="middle" font-size="11" font-weight="600" fill="#6a1b9a">Consent & Geography</text>
+      <text x="830" y="40" text-anchor="middle" font-size="9" fill="#7b1fa2">Data consent tracking</text>
+      <text x="830" y="55" text-anchor="middle" font-size="9" fill="#7b1fa2">Geographic origin metadata</text>
+    </g>
+  </g>
+
+  <!-- Footer -->
+  <text x="500" y="680" text-anchor="middle" font-size="11" fill="#999">
+    誠 Makoto — A sibling framework to SLSA for data supply chain integrity
+  </text>
+</svg>

@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Makoto L2 Requirements | Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .req-id {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding: 0.125rem 0.375rem;
+            background: var(--bg-light);
+            border-radius: 4px;
+            margin-right: 0.5rem;
+        }
+        .req-level {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+        }
+        .req-must {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        .req-should {
+            background: #fefce8;
+            color: #ca8a04;
+            border: 1px solid #fef08a;
+        }
+        .req-may {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+        .req-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .req-title {
+            font-weight: 600;
+        }
+        .section-anchor {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-left: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        h2:hover .section-anchor,
+        h3:hover .section-anchor {
+            opacity: 1;
+        }
+        .verification-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .verification-box h4 {
+            margin: 0 0 0.5rem 0;
+            color: #16a34a;
+            font-size: 0.9rem;
+        }
+        .threat-ref {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--bg-light);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-right: 0.25rem;
+        }
+        .toc-section {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        .toc-section h3 {
+            margin-top: 0;
+        }
+        .toc-section ul {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+        .toc-section li {
+            margin-bottom: 0.375rem;
+        }
+        .toc-section a {
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="./" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="l1-requirements.html" class="nav-item nav-item-sub">L1 Requirements</a>
+            <a href="l2-requirements.html" class="nav-item nav-item-sub active">L2 Requirements</a>
+            <a href="l3-requirements.html" class="nav-item nav-item-sub">L3 Requirements</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <div class="status-box">
+                <div class="status-label">Status</div>
+                <div class="status-value">Draft v0.1</div>
+            </div>
+
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">
+                <span class="level-badge l2">L2</span> Formal Requirements
+            </h1>
+
+            <p>
+                This document specifies the formal requirements for achieving <strong>Makoto Level 2: Provenance is Authentic</strong>.
+                Level 2 builds upon <a href="l1-requirements.html">Level 1</a> by adding cryptographic guarantees—attestations
+                are digitally signed and tamper-evident, enabling consumers to verify authenticity and integrity.
+            </p>
+
+            <div class="card" style="background: #fef3c7; border-color: #fcd34d;">
+                <p style="margin: 0;"><strong>Summary:</strong> L2 requires cryptographically signed attestations with verifiable
+                identity binding, timestamp assurance, and hash-chained lineage. Consumers can detect tampering and verify
+                that attestations came from a known, trusted producer.</p>
+            </div>
+        </section>
+
+        <!-- Table of Contents -->
+        <section class="toc-section">
+            <h3>Contents</h3>
+            <ul>
+                <li><a href="#terminology">Terminology</a></li>
+                <li><a href="#producer-requirements">Producer Requirements</a>
+                    <ul>
+                        <li><a href="#signing">Attestation Signing</a></li>
+                        <li><a href="#identity">Identity Binding</a></li>
+                        <li><a href="#timestamping">Timestamping</a></li>
+                        <li><a href="#hash-chaining">Hash Chaining</a></li>
+                    </ul>
+                </li>
+                <li><a href="#platform-requirements">Platform Requirements</a>
+                    <ul>
+                        <li><a href="#key-management">Key Management</a></li>
+                        <li><a href="#signing-infrastructure">Signing Infrastructure</a></li>
+                        <li><a href="#timestamp-service">Timestamp Service Integration</a></li>
+                    </ul>
+                </li>
+                <li><a href="#verification-requirements">Verification Requirements</a>
+                    <ul>
+                        <li><a href="#signature-verification">Signature Verification</a></li>
+                        <li><a href="#identity-verification">Identity Verification</a></li>
+                        <li><a href="#timestamp-verification">Timestamp Verification</a></li>
+                        <li><a href="#lineage-verification">Lineage Chain Verification</a></li>
+                    </ul>
+                </li>
+                <li><a href="#threats-mitigated">Threats Mitigated</a></li>
+                <li><a href="#conformance">Conformance Checklist</a></li>
+            </ul>
+        </section>
+
+        <!-- Terminology -->
+        <section class="section" id="terminology">
+            <h2>Terminology <a href="#terminology" class="section-anchor">#</a></h2>
+
+            <p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT",
+            "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in
+            <a href="https://www.rfc-editor.org/rfc/rfc2119" target="_blank">RFC 2119</a>.</p>
+
+            <table class="content-table">
+                <thead>
+                    <tr><th>Term</th><th>Definition</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Producer</strong></td>
+                        <td>Entity that creates data attestations. May be a data collector, transformer, or pipeline operator.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Platform</strong></td>
+                        <td>Infrastructure that executes data pipelines and supports attestation generation.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Verifier</strong></td>
+                        <td>Entity that validates attestations before consuming or trusting the associated data.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DSSE</strong></td>
+                        <td>Dead Simple Signing Envelope—the envelope format for signed in-toto attestations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TSA</strong></td>
+                        <td>Timestamp Authority—a trusted service providing verifiable timestamps per RFC 3161.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Producer Requirements -->
+        <section class="section" id="producer-requirements" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Producer Requirements <a href="#producer-requirements" class="section-anchor">#</a></h2>
+
+                <p>Producers MUST meet all <a href="l1-requirements.html">L1 requirements</a> plus the following additional requirements.</p>
+
+                <!-- Signing -->
+                <h3 id="signing">Attestation Signing <a href="#signing" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.P.1</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Sign all attestations</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        All attestations MUST be cryptographically signed using a digital signature algorithm.
+                        The attestation MUST be wrapped in a <a href="https://github.com/secure-systems-lab/dsse" target="_blank">DSSE envelope</a>
+                        containing the signature.
+                    </p>
+                    <div class="verification-box">
+                        <h4>Verification</h4>
+                        <p style="margin: 0;">Verifiers check that the attestation is wrapped in a DSSE envelope with a valid <code>signatures</code> array containing at least one signature.</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.P.2</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Use approved signature algorithms</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Signatures MUST use one of the following algorithms:
+                    </p>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>ECDSA P-256</strong> (ES256) — RECOMMENDED for most use cases</li>
+                        <li><strong>ECDSA P-384</strong> (ES384) — For higher security requirements</li>
+                        <li><strong>Ed25519</strong> — For performance-sensitive applications</li>
+                        <li><strong>RSA-PSS</strong> (PS256, PS384, PS512) — For legacy compatibility only</li>
+                    </ul>
+                    <div class="verification-box">
+                        <h4>Verification</h4>
+                        <p style="margin: 0;">Verifiers check the signature algorithm identifier in the DSSE envelope or associated key material.</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.P.3</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Use keyless signing where available</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Producers SHOULD use <a href="https://sigstore.dev" target="_blank">Sigstore</a> keyless signing
+                        when possible. Keyless signing binds attestations to OIDC identities without requiring
+                        long-lived signing keys, simplifying key management and improving auditability.
+                    </p>
+                </div>
+
+                <!-- Identity -->
+                <h3 id="identity">Identity Binding <a href="#identity" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.P.4</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Bind signatures to verifiable identity</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Each signature MUST be bound to a verifiable identity through one of the following mechanisms:
+                    </p>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>X.509 certificate</strong> — Certificate chain to trusted root CA</li>
+                        <li><strong>Sigstore/Fulcio certificate</strong> — Short-lived certificate from OIDC identity</li>
+                        <li><strong>Published public key</strong> — Key published at well-known location with documented ownership</li>
+                    </ul>
+                    <div class="verification-box">
+                        <h4>Verification</h4>
+                        <p style="margin: 0;">Verifiers MUST be able to determine the identity that created the signature and validate that identity against a trust policy.</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.P.5</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Include identity reference in attestation</span>
+                    </div>
+                    <p>
+                        The attestation predicate MUST include a reference to the signing identity in the
+                        <code>collector.id</code> (for origin attestations) or <code>executor.id</code> (for transform attestations) field.
+                        This identifier MUST match or be verifiable against the signing identity.
+                    </p>
+                    <div class="code-block">
+<pre>{
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-key">"collector"</span>: {
+      <span class="hl-key">"id"</span>: <span class="hl-string">"https://expanso.io/collectors/prod-west-1"</span>,
+      <span class="hl-comment">// This ID must match the signing certificate's subject</span>
+    }
+  }
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Timestamping -->
+                <h3 id="timestamping">Timestamping <a href="#timestamping" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.P.6</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Include verifiable timestamps</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        All attestations MUST include a verifiable timestamp proving when the attestation was created.
+                        This MUST be achieved through one of:
+                    </p>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>RFC 3161 timestamp token</strong> — From a trusted Timestamp Authority</li>
+                        <li><strong>Sigstore Rekor entry</strong> — Attestation logged to transparency log with timestamp</li>
+                        <li><strong>Certificate-embedded timestamp</strong> — When using short-lived signing certificates</li>
+                    </ul>
+                    <div class="verification-box">
+                        <h4>Verification</h4>
+                        <p style="margin: 0;">Verifiers check the timestamp token signature or transparency log entry to confirm attestation creation time.</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.P.7</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Record timestamps in predicate</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        The attestation predicate MUST include <code>metadata.startedOn</code> and <code>metadata.finishedOn</code>
+                        (for transforms) or <code>origin.collectionTimestamp</code> (for origins) as ISO 8601 timestamps.
+                        These self-reported times SHOULD be consistent with the verifiable timestamp (within reasonable clock skew).
+                    </p>
+                </div>
+
+                <!-- Hash Chaining -->
+                <h3 id="hash-chaining">Hash Chaining <a href="#hash-chaining" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.P.8</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Reference input digests in transform attestations</span>
+                    </div>
+                    <p>
+                        Transform attestations MUST include cryptographic digests of all input datasets in the
+                        <code>predicate.inputs</code> array. Each input MUST specify at minimum a <code>sha256</code> digest.
+                    </p>
+                    <div class="code-block">
+<pre>{
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-key">"inputs"</span>: [{
+      <span class="hl-key">"name"</span>: <span class="hl-string">"dataset:raw_transactions"</span>,
+      <span class="hl-key">"digest"</span>: {
+        <span class="hl-key">"sha256"</span>: <span class="hl-string">"a1b2c3d4e5f6..."</span>
+      },
+      <span class="hl-key">"attestationRef"</span>: <span class="hl-string">"https://attestations.example.com/abc123"</span>
+    }]
+  }
+}</pre>
+                    </div>
+                    <div class="verification-box">
+                        <h4>Verification</h4>
+                        <p style="margin: 0;">Verifiers confirm that input digests match the <code>subject.digest</code> of the referenced input attestations, forming a verifiable chain.</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.P.9</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Include attestation references</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Transform attestations MUST include <code>attestationRef</code> URIs for each input, pointing to
+                        the signed attestation for that input dataset. This enables recursive lineage verification.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.P.10</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Chain stream window attestations</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        For streaming data, stream-window attestations SHOULD include a reference to the previous window's
+                        attestation in <code>predicate.integrity.previousWindow</code>. This creates a tamper-evident chain
+                        of windows.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platform Requirements -->
+        <section class="section" id="platform-requirements">
+            <h2>Platform Requirements <a href="#platform-requirements" class="section-anchor">#</a></h2>
+
+            <p>Platforms supporting L2 attestation MUST provide the following capabilities to producers.</p>
+
+            <!-- Key Management -->
+            <h3 id="key-management">Key Management <a href="#key-management" class="section-anchor">#</a></h3>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L2.PL.1</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Provide secure key storage</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    The platform MUST provide a mechanism for producers to store signing keys securely.
+                    Keys MUST NOT be stored in plaintext in configuration files or environment variables
+                    accessible to arbitrary user code. Acceptable storage mechanisms include:
+                </p>
+                <ul style="margin-bottom: 0;">
+                    <li>Encrypted secrets management (e.g., HashiCorp Vault, AWS Secrets Manager)</li>
+                    <li>Platform-managed key storage with access controls</li>
+                    <li>Integration with external key management systems</li>
+                </ul>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L2.PL.2</span>
+                    <span class="req-level req-should">SHOULD</span>
+                    <span class="req-title">Support Sigstore integration</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    The platform SHOULD provide native integration with Sigstore for keyless signing.
+                    This includes support for OIDC authentication and automatic Rekor transparency log submission.
+                </p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L2.PL.3</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Enforce key access controls</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    The platform MUST enforce access controls on signing keys. Only authorized pipelines
+                    or identities SHOULD be able to use a given signing key. Access MUST be auditable.
+                </p>
+            </div>
+
+            <!-- Signing Infrastructure -->
+            <h3 id="signing-infrastructure">Signing Infrastructure <a href="#signing-infrastructure" class="section-anchor">#</a></h3>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L2.PL.4</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Provide signing API or component</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    The platform MUST provide a signing API or component that producers can invoke to sign attestations.
+                    The signing operation MUST:
+                </p>
+                <ul style="margin-bottom: 0;">
+                    <li>Accept attestation payload and return signed DSSE envelope</li>
+                    <li>Use the configured signing key without exposing key material to the caller</li>
+                    <li>Log signing operations for audit purposes</li>
+                </ul>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L2.PL.5</span>
+                    <span class="req-level req-should">SHOULD</span>
+                    <span class="req-title">Provide automatic attestation generation</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    The platform SHOULD provide components that automatically generate and sign attestations
+                    as part of pipeline execution (e.g., <code>makoto_attestation</code> output component).
+                    This reduces implementation burden on producers.
+                </p>
+            </div>
+
+            <!-- Timestamp Service -->
+            <h3 id="timestamp-service">Timestamp Service Integration <a href="#timestamp-service" class="section-anchor">#</a></h3>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L2.PL.6</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Integrate with timestamp authority</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    The platform MUST integrate with at least one trusted timestamp authority or transparency log.
+                    Options include:
+                </p>
+                <ul style="margin-bottom: 0;">
+                    <li>Sigstore Rekor (RECOMMENDED for public attestations)</li>
+                    <li>RFC 3161 Timestamp Authority (for private/enterprise deployments)</li>
+                    <li>Internal transparency log with verifiable timestamps</li>
+                </ul>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L2.PL.7</span>
+                    <span class="req-level req-should">SHOULD</span>
+                    <span class="req-title">Provide clock synchronization</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    The platform SHOULD ensure that systems generating attestations have synchronized clocks (NTP)
+                    to minimize discrepancy between self-reported and authority-issued timestamps.
+                </p>
+            </div>
+        </section>
+
+        <!-- Verification Requirements -->
+        <section class="section" id="verification-requirements" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Verification Requirements <a href="#verification-requirements" class="section-anchor">#</a></h2>
+
+                <p>Verifiers (data consumers) MUST perform the following checks to confirm L2 compliance.</p>
+
+                <!-- Signature Verification -->
+                <h3 id="signature-verification">Signature Verification <a href="#signature-verification" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.1</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Verify DSSE envelope signature</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers MUST validate that the DSSE envelope signature is cryptographically valid for the payload.
+                        The verification process MUST:
+                    </p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Parse the DSSE envelope and extract payload and signatures</li>
+                        <li>Reconstruct the PAE (Pre-Authentication Encoding) from payload type and payload</li>
+                        <li>Verify at least one signature against the PAE using the signer's public key</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.2</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Reject invalid signatures</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers MUST reject attestations where signature verification fails. The data associated
+                        with a failed attestation MUST NOT be trusted for L2-requiring use cases.
+                    </p>
+                </div>
+
+                <!-- Identity Verification -->
+                <h3 id="identity-verification">Identity Verification <a href="#identity-verification" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.3</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Verify signing identity</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers MUST determine and validate the signing identity. For X.509 certificates, this means
+                        validating the certificate chain to a trusted root. For Sigstore, this means verifying the
+                        Fulcio certificate and OIDC claims.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.4</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Apply trust policy</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers MUST apply a trust policy to determine if the signing identity is authorized to
+                        produce attestations for the given data. Trust policies MAY be based on:
+                    </p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Explicit list of trusted signing identities</li>
+                        <li>Organizational membership (e.g., any identity from <code>@example.com</code>)</li>
+                        <li>Certificate attributes (e.g., specific OU or SAN values)</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.5</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Verify identity consistency</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers SHOULD check that the signing identity is consistent with the <code>collector.id</code>
+                        or <code>executor.id</code> in the attestation predicate. Mismatches MAY indicate attestation reuse
+                        or forgery attempts.
+                    </p>
+                </div>
+
+                <!-- Timestamp Verification -->
+                <h3 id="timestamp-verification">Timestamp Verification <a href="#timestamp-verification" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.6</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Verify timestamp authenticity</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers MUST verify that the attestation has a valid timestamp from a trusted source.
+                        For RFC 3161 timestamps, verify the TSA signature. For Rekor entries, verify inclusion proof.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.7</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Check timestamp freshness</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers SHOULD check that the attestation timestamp is consistent with expected data freshness.
+                        Attestations with timestamps significantly older than expected MAY indicate stale or replayed data.
+                    </p>
+                </div>
+
+                <!-- Lineage Verification -->
+                <h3 id="lineage-verification">Lineage Chain Verification <a href="#lineage-verification" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.8</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Verify hash chain integrity</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        For transform attestations, verifiers MUST verify that the <code>inputs[].digest</code> values
+                        match the <code>subject.digest</code> values of the referenced input attestations. Mismatches
+                        indicate data tampering between pipeline stages.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.9</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Recursively verify lineage</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers SHOULD recursively fetch and verify all attestations in the lineage chain, back to
+                        origin attestations. This provides full provenance verification. Verification depth MAY be
+                        limited by policy for performance reasons.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.10</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Verify data binding</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers MUST compute the cryptographic digest of the received data and compare it to the
+                        <code>subject.digest</code> in the attestation. If digests do not match, the data has been
+                        modified after attestation and MUST NOT be trusted.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Threats Mitigated -->
+        <section class="section" id="threats-mitigated">
+            <h2>Threats Mitigated <a href="#threats-mitigated" class="section-anchor">#</a></h2>
+
+            <p>L2 compliance mitigates the following threats from the <a href="../threats/">Makoto threat model</a>:</p>
+
+            <table class="content-table">
+                <thead>
+                    <tr><th>Threat</th><th>Description</th><th>Mitigation</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="threat-ref">D1</span></td>
+                        <td><strong>Source Falsification</strong></td>
+                        <td>Signed origin claims tied to verifiable identity. Falsified origins require compromising signing keys.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D2</span></td>
+                        <td><strong>Collection Tampering</strong></td>
+                        <td>Signed attestations with data hashes detect any post-collection modification.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D3</span></td>
+                        <td><strong>Transform Opacity</strong></td>
+                        <td>Signed transform records with input/output hashes provide verifiable processing documentation.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D4</span></td>
+                        <td><strong>Lineage Forgery</strong> (partial)</td>
+                        <td>Hash chaining prevents insertion of fake history without detection. Full mitigation requires L3.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D8</span></td>
+                        <td><strong>Time Manipulation</strong></td>
+                        <td>Trusted timestamps from TSA or transparency log prevent backdating attestations.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="card" style="background: #fef2f2; border-color: #fecaca; margin-top: 1.5rem;">
+                <p style="margin: 0;"><strong>Note:</strong> L2 does NOT fully mitigate threats D5 (Stream Injection) and D6 (Aggregation Manipulation).
+                These require L3's isolated infrastructure guarantees. A compromised producer can still forge attestations with their own keys at L2.</p>
+            </div>
+        </section>
+
+        <!-- Conformance Checklist -->
+        <section class="section" id="conformance" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Conformance Checklist <a href="#conformance" class="section-anchor">#</a></h2>
+
+                <p>Use this checklist to verify L2 compliance. All MUST requirements must be met; SHOULD requirements are recommended.</p>
+
+                <h3>Producer Checklist</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr><th style="width: 4rem;">Req</th><th>Requirement</th><th style="width: 5rem;">Level</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>L2.P.1</td><td>All attestations are signed and wrapped in DSSE envelopes</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.P.2</td><td>Using approved signature algorithm (ECDSA P-256, Ed25519, etc.)</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.P.3</td><td>Using keyless signing (Sigstore) where available</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                        <tr><td>L2.P.4</td><td>Signatures bound to verifiable identity (X.509, Sigstore, published key)</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.P.5</td><td>Identity reference included in attestation predicate</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.P.6</td><td>Verifiable timestamps included (RFC 3161, Rekor, or cert-embedded)</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.P.7</td><td>Timestamps recorded in attestation predicate</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.P.8</td><td>Transform attestations reference input digests</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.P.9</td><td>Transform attestations include input attestation references</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.P.10</td><td>Stream window attestations chain to previous window</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Platform Checklist</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr><th style="width: 4rem;">Req</th><th>Requirement</th><th style="width: 5rem;">Level</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>L2.PL.1</td><td>Secure key storage mechanism provided</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.PL.2</td><td>Native Sigstore integration available</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                        <tr><td>L2.PL.3</td><td>Key access controls enforced and auditable</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.PL.4</td><td>Signing API/component available to producers</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.PL.5</td><td>Automatic attestation generation components available</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                        <tr><td>L2.PL.6</td><td>Timestamp authority/transparency log integration</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.PL.7</td><td>Clock synchronization (NTP) for attestation systems</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Verifier Checklist</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr><th style="width: 4rem;">Req</th><th>Requirement</th><th style="width: 5rem;">Level</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>L2.V.1</td><td>DSSE envelope signature verified</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.V.2</td><td>Invalid signatures rejected</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.V.3</td><td>Signing identity verified (cert chain, Fulcio, etc.)</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.V.4</td><td>Trust policy applied to signing identity</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.V.5</td><td>Identity consistency with predicate verified</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                        <tr><td>L2.V.6</td><td>Timestamp authenticity verified</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.V.7</td><td>Timestamp freshness checked</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                        <tr><td>L2.V.8</td><td>Hash chain integrity verified</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L2.V.9</td><td>Lineage recursively verified</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                        <tr><td>L2.V.10</td><td>Data binding verified (compute digest, compare to attestation)</td><td><span class="req-level req-must">MUST</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Navigation -->
+        <section class="section">
+            <h2>Related Documents</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3 style="margin-top: 0;">L1 Requirements</h3>
+                    <p class="text-muted">Foundation level—provenance documentation exists.</p>
+                    <a href="l1-requirements.html">View L1 requirements →</a>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top: 0;">L3 Requirements</h3>
+                    <p class="text-muted">Maximum assurance—unforgeable platform-generated attestations.</p>
+                    <a href="l3-requirements.html">View L3 requirements →</a>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top: 0;">Examples</h3>
+                    <p class="text-muted">See L2 attestation examples with DSSE envelopes.</p>
+                    <a href="../examples/">View examples →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://slsa.dev" target="_blank">Inspired by SLSA →</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

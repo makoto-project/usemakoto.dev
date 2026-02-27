@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signature &amp; Verification Guide | Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="./" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="signature-guide.html" class="nav-item active">Signature Guide</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <div class="status-box">
+                <div class="status-label">Status</div>
+                <div class="status-value">Draft v0.1</div>
+            </div>
+
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">Signature &amp; Verification Guide</h1>
+
+            <p>
+                Cryptographic signatures are central to Makoto's trust model. Starting at <strong>Level 2</strong>,
+                all attestations must be signed to ensure authenticity and tamper-evidence. This guide covers
+                key management, signature generation, verification, and security best practices.
+            </p>
+
+            <div class="card" style="background: #eff6ff; border-color: #bfdbfe;">
+                <p style="margin: 0;"><strong>Key Principle:</strong> Signatures bind attestations to identities. At L2, signatures prove who created the attestation. At L3, isolated signing infrastructure ensures even compromised processing code cannot forge attestations.</p>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="section" id="overview">
+            <h2>Overview</h2>
+            <p>
+                Makoto uses the <a href="https://github.com/secure-systems-lab/dsse" target="_blank">DSSE (Dead Simple Signing Envelope)</a>
+                format for signed attestations, the same format used by SLSA and in-toto. This ensures interoperability
+                with existing software supply chain security tooling.
+            </p>
+
+            <h3>Signature Requirements by Level</h3>
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Signature Required</th>
+                        <th>Key Storage</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="level-badge l1">L1</span></td>
+                        <td>Optional</td>
+                        <td>Any</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td><span class="level-badge l2">L2</span></td>
+                        <td>Required</td>
+                        <td>Software-protected</td>
+                        <td>Required (RFC 3161)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="level-badge l3">L3</span></td>
+                        <td>Required</td>
+                        <td>HSM/TEE isolated</td>
+                        <td>Required (RFC 3161)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- DSSE Format -->
+        <section class="section" id="dsse-format">
+            <h2>DSSE Envelope Format</h2>
+            <p>
+                A signed Makoto attestation wraps the in-toto statement in a DSSE envelope. The envelope
+                contains the payload (base64-encoded statement), payload type, and one or more signatures.
+            </p>
+
+            <div class="code-block">
+<pre>{
+  <span class="hl-key">"payloadType"</span>: <span class="hl-string">"application/vnd.in-toto+json"</span>,
+  <span class="hl-key">"payload"</span>: <span class="hl-string">"eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjEiLC4uLn0="</span>,
+  <span class="hl-key">"signatures"</span>: [
+    {
+      <span class="hl-key">"keyid"</span>: <span class="hl-string">"SHA256:abc123..."</span>,
+      <span class="hl-key">"sig"</span>: <span class="hl-string">"MEUCIQD...base64-signature..."</span>
+    }
+  ]
+}</pre>
+            </div>
+
+            <h3>Signature Computation</h3>
+            <p>The signature is computed over a PAE (Pre-Authentication Encoding) of the payload:</p>
+
+            <div class="code-block">
+<pre><span class="hl-comment">// PAE (Pre-Authentication Encoding)</span>
+PAE(type, payload) = "DSSEv1" + SP + LEN(type) + SP + type + SP + LEN(payload) + SP + payload
+
+<span class="hl-comment">// Where SP is a space (0x20) and LEN is the ASCII decimal length</span>
+<span class="hl-comment">// Example:</span>
+"DSSEv1 29 application/vnd.in-toto+json 123 {\"_type\":...}"</pre>
+            </div>
+
+            <p>This encoding prevents type confusion attacks where an attacker might try to get a signature
+            for one payload type accepted as another.</p>
+        </section>
+
+        <!-- Key Management -->
+        <section class="section" id="key-management">
+            <h2>Signing Key Management</h2>
+            <p>
+                Proper key management is essential for maintaining the integrity of your attestations.
+                The approach varies significantly between L2 and L3.
+            </p>
+
+            <!-- L2 Key Management -->
+            <div class="level-section l2" id="l2-keys">
+                <h3><span class="level-badge l2">L2</span> Key Management</h3>
+                <p><em>Software-protected keys with identity binding.</em></p>
+
+                <h4 style="margin-top: 1.5rem;">Supported Key Types</h4>
+                <table class="content-table">
+                    <thead>
+                        <tr><th>Algorithm</th><th>Key Size</th><th>Recommended</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>ECDSA P-256</strong></td>
+                            <td>256-bit</td>
+                            <td>Yes (primary)</td>
+                        </tr>
+                        <tr>
+                            <td>ECDSA P-384</td>
+                            <td>384-bit</td>
+                            <td>Yes (high security)</td>
+                        </tr>
+                        <tr>
+                            <td>Ed25519</td>
+                            <td>256-bit</td>
+                            <td>Yes (performance)</td>
+                        </tr>
+                        <tr>
+                            <td>RSA-PSS</td>
+                            <td>3072+ bit</td>
+                            <td>Acceptable (legacy)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 style="margin-top: 1.5rem;">Key Generation</h4>
+                <div class="code-terminal">
+                    <div class="code-terminal-header">
+                        <div class="code-terminal-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <div class="code-terminal-title">Generate ECDSA P-256 Key Pair</div>
+                    </div>
+                    <div class="code-terminal-content">
+<pre><span class="hl-comment"># Generate private key</span>
+openssl ecparam -genkey -name prime256v1 -noout -out signing-key.pem
+
+<span class="hl-comment"># Extract public key</span>
+openssl ec -in signing-key.pem -pubout -out signing-key.pub
+
+<span class="hl-comment"># Compute key ID (SHA256 fingerprint of public key)</span>
+openssl ec -in signing-key.pem -pubout -outform DER | \
+  openssl dgst -sha256 -binary | base64</pre>
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 1.5rem;">Key Storage Options</h4>
+                <ul style="color: var(--text-muted); margin-left: 1.5rem;">
+                    <li><strong>Environment variables</strong> — Simple but less secure; suitable for development</li>
+                    <li><strong>Secret managers</strong> — AWS Secrets Manager, HashiCorp Vault, Azure Key Vault</li>
+                    <li><strong>Kubernetes Secrets</strong> — For containerized deployments</li>
+                    <li><strong>Sigstore/Fulcio</strong> — Keyless signing using OIDC identity (recommended)</li>
+                </ul>
+            </div>
+
+            <!-- L3 Key Management -->
+            <div class="level-section l3" id="l3-keys">
+                <h3><span class="level-badge l3">L3</span> Key Management</h3>
+                <p><em>Hardware-isolated keys inaccessible to processing code.</em></p>
+
+                <p>L3 requires that signing keys are stored in isolated hardware that the data processing
+                code cannot directly access. This ensures that even if the processing environment is
+                compromised, attestations cannot be forged.</p>
+
+                <h4 style="margin-top: 1.5rem;">Supported Hardware</h4>
+                <table class="content-table">
+                    <thead>
+                        <tr><th>Technology</th><th>Description</th><th>Cloud Options</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>HSM</strong></td>
+                            <td>Hardware Security Module — dedicated crypto hardware</td>
+                            <td>AWS CloudHSM, Azure Dedicated HSM, GCP Cloud HSM</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cloud KMS</strong></td>
+                            <td>Managed key service with HSM backing</td>
+                            <td>AWS KMS, Azure Key Vault, GCP Cloud KMS</td>
+                        </tr>
+                        <tr>
+                            <td><strong>TEE</strong></td>
+                            <td>Trusted Execution Environment — isolated CPU enclave</td>
+                            <td>AWS Nitro Enclaves, Azure Confidential Computing</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 style="margin-top: 1.5rem;">Architecture Pattern</h4>
+                <div class="pipeline-diagram">
+                    <div class="pipeline-stages">
+                        <div class="pipeline-stage">
+                            <div class="pipeline-stage-icon">⚙️</div>
+                            <div class="pipeline-stage-label">Processing</div>
+                        </div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-stage" style="border-color: var(--level-3);">
+                            <div class="pipeline-stage-icon">🔐</div>
+                            <div class="pipeline-stage-label">Control Plane</div>
+                        </div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-stage" style="border-color: var(--level-3); background: #d1fae5;">
+                            <div class="pipeline-stage-icon">🔑</div>
+                            <div class="pipeline-stage-label">HSM/TEE</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p>In L3 architecture, the processing code sends attestation requests to a trusted control
+                plane. The control plane computes data hashes, constructs the attestation, and requests
+                the HSM/TEE to sign. The processing code never has access to signing keys.</p>
+            </div>
+
+            <!-- Sigstore Integration -->
+            <div class="card" style="margin-top: 2rem;">
+                <h4 style="margin: 0 0 0.75rem;">Keyless Signing with Sigstore</h4>
+                <p style="margin-bottom: 1rem;">
+                    <a href="https://sigstore.dev" target="_blank">Sigstore</a> enables keyless signing using
+                    short-lived certificates bound to OIDC identities. This eliminates the burden of long-term
+                    key management while providing strong identity binding.
+                </p>
+                <div class="code-block" style="margin: 0;">
+<pre><span class="hl-comment"># Sign attestation with Sigstore (using cosign)</span>
+cosign attest --type makoto --predicate attestation.json \
+  --fulcio-url https://fulcio.sigstore.dev \
+  --rekor-url https://rekor.sigstore.dev \
+  dataset:sha256:abc123...</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Signature Generation -->
+        <section class="section" id="signature-generation">
+            <h2>Signature Generation</h2>
+            <p>
+                The signature generation process creates a DSSE envelope containing the signed attestation.
+                This section covers the step-by-step process.
+            </p>
+
+            <h3>Generation Steps</h3>
+            <ol style="color: var(--text-muted); margin-left: 1.5rem; line-height: 2;">
+                <li><strong>Construct the in-toto statement</strong> — Create the attestation with subject and predicate</li>
+                <li><strong>Serialize to JSON</strong> — Canonicalize the JSON (sorted keys, no extra whitespace)</li>
+                <li><strong>Base64 encode</strong> — Encode the serialized statement</li>
+                <li><strong>Compute PAE</strong> — Pre-Authentication Encoding with payload type</li>
+                <li><strong>Sign the PAE</strong> — Using ECDSA P-256 or equivalent algorithm</li>
+                <li><strong>Construct envelope</strong> — Wrap payload and signature(s) in DSSE format</li>
+            </ol>
+
+            <h3>Example: Python Signature Generation</h3>
+            <div class="code-block">
+<pre><span class="hl-key">import</span> json
+<span class="hl-key">import</span> base64
+<span class="hl-key">import</span> hashlib
+<span class="hl-key">from</span> cryptography.hazmat.primitives <span class="hl-key">import</span> hashes
+<span class="hl-key">from</span> cryptography.hazmat.primitives.asymmetric <span class="hl-key">import</span> ec
+
+<span class="hl-key">def</span> <span class="hl-type">sign_attestation</span>(statement: dict, private_key) -> dict:
+    <span class="hl-comment"># 1. Serialize statement (canonical JSON)</span>
+    payload = json.dumps(statement, sort_keys=True, separators=(<span class="hl-string">','</span>, <span class="hl-string">':'</span>))
+    payload_bytes = payload.encode(<span class="hl-string">'utf-8'</span>)
+
+    <span class="hl-comment"># 2. Base64 encode</span>
+    payload_b64 = base64.b64encode(payload_bytes).decode(<span class="hl-string">'ascii'</span>)
+
+    <span class="hl-comment"># 3. Compute PAE</span>
+    payload_type = <span class="hl-string">"application/vnd.in-toto+json"</span>
+    pae = f<span class="hl-string">"DSSEv1 {len(payload_type)} {payload_type} {len(payload_bytes)} "</span>.encode()
+    pae += payload_bytes
+
+    <span class="hl-comment"># 4. Sign</span>
+    signature = private_key.sign(pae, ec.ECDSA(hashes.SHA256()))
+    sig_b64 = base64.b64encode(signature).decode(<span class="hl-string">'ascii'</span>)
+
+    <span class="hl-comment"># 5. Compute key ID</span>
+    public_der = private_key.public_key().public_bytes(...)
+    key_id = <span class="hl-string">"SHA256:"</span> + hashlib.sha256(public_der).hexdigest()[:16]
+
+    <span class="hl-comment"># 6. Construct envelope</span>
+    <span class="hl-key">return</span> {
+        <span class="hl-string">"payloadType"</span>: payload_type,
+        <span class="hl-string">"payload"</span>: payload_b64,
+        <span class="hl-string">"signatures"</span>: [{<span class="hl-string">"keyid"</span>: key_id, <span class="hl-string">"sig"</span>: sig_b64}]
+    }</pre>
+            </div>
+
+            <h3>Multi-Signature Support</h3>
+            <p>
+                DSSE envelopes can contain multiple signatures, useful for scenarios requiring
+                multi-party attestation or key rotation:
+            </p>
+
+            <div class="code-block">
+<pre>{
+  <span class="hl-key">"payloadType"</span>: <span class="hl-string">"application/vnd.in-toto+json"</span>,
+  <span class="hl-key">"payload"</span>: <span class="hl-string">"..."</span>,
+  <span class="hl-key">"signatures"</span>: [
+    {
+      <span class="hl-key">"keyid"</span>: <span class="hl-string">"SHA256:abc123..."</span>,
+      <span class="hl-comment">// Primary signer (data processor)</span>
+      <span class="hl-key">"sig"</span>: <span class="hl-string">"MEUCIQD..."</span>
+    },
+    {
+      <span class="hl-key">"keyid"</span>: <span class="hl-string">"SHA256:def456..."</span>,
+      <span class="hl-comment">// Secondary signer (platform attestation)</span>
+      <span class="hl-key">"sig"</span>: <span class="hl-string">"MEQCIGx..."</span>
+    }
+  ]
+}</pre>
+            </div>
+        </section>
+
+        <!-- Signature Verification -->
+        <section class="section" id="verification">
+            <h2>Signature Verification</h2>
+            <p>
+                Consumers must verify signatures before trusting attestation claims.
+                Verification confirms both the cryptographic validity and the identity binding.
+            </p>
+
+            <h3>Verification Steps</h3>
+            <div class="pipeline-diagram">
+                <div class="pipeline-stages">
+                    <div class="pipeline-stage">
+                        <div class="pipeline-stage-label">1. Parse Envelope</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage">
+                        <div class="pipeline-stage-label">2. Fetch Public Key</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage">
+                        <div class="pipeline-stage-label">3. Compute PAE</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage">
+                        <div class="pipeline-stage-label">4. Verify Signature</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage">
+                        <div class="pipeline-stage-label">5. Check Policy</div>
+                    </div>
+                </div>
+            </div>
+
+            <ol style="color: var(--text-muted); margin-left: 1.5rem; line-height: 2;">
+                <li><strong>Parse the DSSE envelope</strong> — Extract payload, payload type, and signatures</li>
+                <li><strong>Fetch the public key</strong> — Using keyid, retrieve from trusted key registry</li>
+                <li><strong>Recompute PAE</strong> — Same Pre-Authentication Encoding as signing</li>
+                <li><strong>Verify cryptographic signature</strong> — Using the public key</li>
+                <li><strong>Check identity policy</strong> — Verify signer is authorized for this data/pipeline</li>
+            </ol>
+
+            <h3>Example: Python Verification</h3>
+            <div class="code-block">
+<pre><span class="hl-key">def</span> <span class="hl-type">verify_attestation</span>(envelope: dict, trusted_keys: dict) -> bool:
+    <span class="hl-comment"># 1. Parse envelope</span>
+    payload_type = envelope[<span class="hl-string">"payloadType"</span>]
+    payload_b64 = envelope[<span class="hl-string">"payload"</span>]
+    payload_bytes = base64.b64decode(payload_b64)
+
+    <span class="hl-comment"># 2. Recompute PAE</span>
+    pae = f<span class="hl-string">"DSSEv1 {len(payload_type)} {payload_type} {len(payload_bytes)} "</span>.encode()
+    pae += payload_bytes
+
+    <span class="hl-comment"># 3. Verify at least one signature</span>
+    <span class="hl-key">for</span> sig_info <span class="hl-key">in</span> envelope[<span class="hl-string">"signatures"</span>]:
+        key_id = sig_info[<span class="hl-string">"keyid"</span>]
+        signature = base64.b64decode(sig_info[<span class="hl-string">"sig"</span>])
+
+        <span class="hl-comment"># Fetch public key from trusted registry</span>
+        <span class="hl-key">if</span> key_id <span class="hl-key">not in</span> trusted_keys:
+            <span class="hl-key">continue</span>  <span class="hl-comment"># Unknown key</span>
+
+        public_key = trusted_keys[key_id]
+
+        <span class="hl-key">try</span>:
+            public_key.verify(signature, pae, ec.ECDSA(hashes.SHA256()))
+            <span class="hl-key">return</span> <span class="hl-bool">True</span>  <span class="hl-comment"># Valid signature found</span>
+        <span class="hl-key">except</span> InvalidSignature:
+            <span class="hl-key">continue</span>
+
+    <span class="hl-key">return</span> <span class="hl-bool">False</span>  <span class="hl-comment"># No valid signature</span></pre>
+            </div>
+
+            <h3>Trust Policies</h3>
+            <p>
+                Verification isn't just about cryptographic validity—you must also verify that the
+                signer is authorized. Common policy patterns include:
+            </p>
+
+            <table class="content-table">
+                <thead>
+                    <tr><th>Policy Type</th><th>Description</th><th>Example</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Key Allowlist</strong></td>
+                        <td>Only accept signatures from specific keys</td>
+                        <td>Key fingerprint matches expected value</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Identity-Based</strong></td>
+                        <td>Accept signatures from identities matching pattern</td>
+                        <td>OIDC subject matches <code>*@mycompany.com</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Certificate Chain</strong></td>
+                        <td>Verify certificate chains to trusted CA</td>
+                        <td>Certificate issued by Fulcio, chained to Sigstore root</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Transparency Log</strong></td>
+                        <td>Require signature recorded in public log</td>
+                        <td>Entry exists in Rekor transparency log</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Timestamp Authority -->
+        <section class="section" id="timestamps">
+            <h2>Timestamp Authority Integration</h2>
+            <p>
+                Timestamps prove when an attestation was created, preventing backdating attacks.
+                Makoto L2+ requires verifiable timestamps following <a href="https://www.rfc-editor.org/rfc/rfc3161" target="_blank">RFC 3161</a>.
+            </p>
+
+            <h3>Why Timestamps Matter</h3>
+            <div class="card" style="background: #fef3c7; border-color: #fcd34d;">
+                <p style="margin: 0;"><strong>Threat D8: Time Manipulation</strong> — Without trusted timestamps, an attacker could backdate attestations to claim data existed at a time when it didn't, or to bypass time-based policies. RFC 3161 timestamps from a trusted TSA (Timestamp Authority) provide cryptographic proof of when the signature was created.</p>
+            </div>
+
+            <h3>RFC 3161 Timestamp Structure</h3>
+            <p>A timestamp token contains:</p>
+            <ul style="color: var(--text-muted); margin-left: 1.5rem;">
+                <li><strong>Message imprint</strong> — Hash of the signed data (the DSSE signature)</li>
+                <li><strong>Serial number</strong> — Unique identifier from the TSA</li>
+                <li><strong>Generation time</strong> — When the TSA created the token</li>
+                <li><strong>TSA signature</strong> — The authority's signature over the token</li>
+            </ul>
+
+            <h3>Adding Timestamps to Attestations</h3>
+            <div class="code-block">
+<pre>{
+  <span class="hl-key">"payloadType"</span>: <span class="hl-string">"application/vnd.in-toto+json"</span>,
+  <span class="hl-key">"payload"</span>: <span class="hl-string">"..."</span>,
+  <span class="hl-key">"signatures"</span>: [
+    {
+      <span class="hl-key">"keyid"</span>: <span class="hl-string">"SHA256:abc123..."</span>,
+      <span class="hl-key">"sig"</span>: <span class="hl-string">"MEUCIQD..."</span>,
+      <span class="hl-key">"timestamp"</span>: {
+        <span class="hl-key">"authority"</span>: <span class="hl-string">"https://freetsa.org/tsr"</span>,
+        <span class="hl-key">"token"</span>: <span class="hl-string">"MIIEpgYJKoZI...base64-encoded-rfc3161-token..."</span>
+      }
+    }
+  ]
+}</pre>
+            </div>
+
+            <h3>Timestamp Authorities</h3>
+            <table class="content-table">
+                <thead>
+                    <tr><th>TSA</th><th>URL</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Sigstore TSA</strong></td>
+                        <td><code>https://timestamp.sigstore.dev</code></td>
+                        <td>Free, integrated with Sigstore ecosystem</td>
+                    </tr>
+                    <tr>
+                        <td><strong>FreeTSA</strong></td>
+                        <td><code>https://freetsa.org/tsr</code></td>
+                        <td>Free, RFC 3161 compliant</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DigiCert</strong></td>
+                        <td><code>http://timestamp.digicert.com</code></td>
+                        <td>Commercial, high availability</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sectigo</strong></td>
+                        <td><code>http://timestamp.sectigo.com</code></td>
+                        <td>Commercial, widely trusted</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Obtaining a Timestamp</h3>
+            <div class="code-terminal">
+                <div class="code-terminal-header">
+                    <div class="code-terminal-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <div class="code-terminal-title">Request RFC 3161 Timestamp</div>
+                </div>
+                <div class="code-terminal-content">
+<pre><span class="hl-comment"># 1. Create timestamp request from signature hash</span>
+openssl ts -query -data signature.bin -sha256 -out request.tsq
+
+<span class="hl-comment"># 2. Send to TSA</span>
+curl -H "Content-Type: application/timestamp-query" \
+  --data-binary @request.tsq \
+  https://freetsa.org/tsr -o response.tsr
+
+<span class="hl-comment"># 3. Verify timestamp response</span>
+openssl ts -verify -data signature.bin -in response.tsr \
+  -CAfile freetsa-cacert.pem</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Best Practices -->
+        <section class="section" id="best-practices">
+            <h2>Security Best Practices</h2>
+            <p>
+                Follow these practices to maintain the integrity of your signing infrastructure
+                and protect against common attack vectors.
+            </p>
+
+            <h3>Key Management</h3>
+            <div class="threat-category">
+                <div class="threat-icon">🔑</div>
+                <div class="threat-details">
+                    <h4>Rotate Keys Regularly</h4>
+                    <p>Rotate signing keys at least annually, or immediately if compromise is suspected. Use key versioning to support graceful transitions.</p>
+                </div>
+            </div>
+
+            <div class="threat-category">
+                <div class="threat-icon">🔒</div>
+                <div class="threat-details">
+                    <h4>Principle of Least Privilege</h4>
+                    <p>Signing keys should only be accessible to the specific service that needs them. Use IAM policies, network segmentation, and access controls.</p>
+                </div>
+            </div>
+
+            <div class="threat-category">
+                <div class="threat-icon">📋</div>
+                <div class="threat-details">
+                    <h4>Maintain Key Inventory</h4>
+                    <p>Track all signing keys, their purposes, rotation schedules, and authorized users. Immediately revoke keys when personnel leave.</p>
+                </div>
+            </div>
+
+            <h3>Signing Operations</h3>
+            <div class="threat-category">
+                <div class="threat-icon">⚡</div>
+                <div class="threat-details">
+                    <h4>Sign Immediately After Processing</h4>
+                    <p>Generate attestations as close as possible to the processing operation. Delays create windows for tampering.</p>
+                </div>
+            </div>
+
+            <div class="threat-category">
+                <div class="threat-icon">🔗</div>
+                <div class="threat-details">
+                    <h4>Include All Relevant Metadata</h4>
+                    <p>Attestations should capture sufficient context (timestamps, versions, configurations) to enable meaningful verification.</p>
+                </div>
+            </div>
+
+            <div class="threat-category">
+                <div class="threat-icon">📝</div>
+                <div class="threat-details">
+                    <h4>Log All Signing Operations</h4>
+                    <p>Maintain immutable audit logs of all signing operations, including key ID, timestamp, and attestation hash.</p>
+                </div>
+            </div>
+
+            <h3>Verification</h3>
+            <div class="threat-category">
+                <div class="threat-icon">🎯</div>
+                <div class="threat-details">
+                    <h4>Verify Before Trust</h4>
+                    <p>Always verify signatures before using attestation claims. Never trust attestations from unknown or untrusted signers.</p>
+                </div>
+            </div>
+
+            <div class="threat-category">
+                <div class="threat-icon">⏰</div>
+                <div class="threat-details">
+                    <h4>Check Timestamp Validity</h4>
+                    <p>Verify that timestamps are from trusted TSAs and fall within acceptable time windows for your use case.</p>
+                </div>
+            </div>
+
+            <div class="threat-category">
+                <div class="threat-icon">🔍</div>
+                <div class="threat-details">
+                    <h4>Verify Full Chain</h4>
+                    <p>For data with lineage, verify the entire attestation chain back to the origin. A single unverified link breaks the chain of trust.</p>
+                </div>
+            </div>
+
+            <h3>Common Pitfalls to Avoid</h3>
+            <table class="content-table">
+                <thead>
+                    <tr><th>Pitfall</th><th>Risk</th><th>Mitigation</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Storing private keys in code</td>
+                        <td>Keys leaked via source control</td>
+                        <td>Use secret managers or environment variables</td>
+                    </tr>
+                    <tr>
+                        <td>Sharing keys across environments</td>
+                        <td>Dev key compromise affects prod</td>
+                        <td>Separate keys per environment</td>
+                    </tr>
+                    <tr>
+                        <td>Ignoring key expiration</td>
+                        <td>Signatures become unverifiable</td>
+                        <td>Monitor and rotate before expiry</td>
+                    </tr>
+                    <tr>
+                        <td>Skipping timestamp verification</td>
+                        <td>Backdating attacks possible</td>
+                        <td>Always verify RFC 3161 timestamps</td>
+                    </tr>
+                    <tr>
+                        <td>Trusting all signers equally</td>
+                        <td>Unauthorized attestations accepted</td>
+                        <td>Implement identity-based policies</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Quick Reference -->
+        <section class="section" id="reference">
+            <h2>Quick Reference</h2>
+
+            <h3>Algorithm Identifiers</h3>
+            <table class="content-table">
+                <thead>
+                    <tr><th>Algorithm</th><th>JOSE Identifier</th><th>OID</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ECDSA P-256</td>
+                        <td><code>ES256</code></td>
+                        <td>1.2.840.10045.4.3.2</td>
+                    </tr>
+                    <tr>
+                        <td>ECDSA P-384</td>
+                        <td><code>ES384</code></td>
+                        <td>1.2.840.10045.4.3.3</td>
+                    </tr>
+                    <tr>
+                        <td>Ed25519</td>
+                        <td><code>EdDSA</code></td>
+                        <td>1.3.101.112</td>
+                    </tr>
+                    <tr>
+                        <td>RSA-PSS (SHA-256)</td>
+                        <td><code>PS256</code></td>
+                        <td>1.2.840.113549.1.1.10</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Related Specifications</h3>
+            <ul style="color: var(--text-muted); margin-left: 1.5rem;">
+                <li><a href="https://github.com/secure-systems-lab/dsse" target="_blank">DSSE (Dead Simple Signing Envelope)</a> — Envelope format</li>
+                <li><a href="https://github.com/in-toto/attestation" target="_blank">in-toto Attestation Framework</a> — Statement format</li>
+                <li><a href="https://www.rfc-editor.org/rfc/rfc3161" target="_blank">RFC 3161</a> — Timestamp protocol</li>
+                <li><a href="https://docs.sigstore.dev/" target="_blank">Sigstore Documentation</a> — Keyless signing</li>
+                <li><a href="https://slsa.dev/spec/v1.0/verifying-artifacts" target="_blank">SLSA Verification</a> — Related verification guidance</li>
+            </ul>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://slsa.dev" target="_blank">Inspired by SLSA →</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

@@ -1,0 +1,68 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "dataset:customer_transactions_2025q4",
+      "digest": {
+        "sha256": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+        "recordCount": "1847293",
+        "merkleRoot": "def456789012345678901234567890abcdef1234567890abcdef1234567890ab"
+      }
+    }
+  ],
+  "predicateType": "https://makoto.dev/origin/v1",
+  "predicate": {
+    "origin": {
+      "source": "https://api.partner-bank.com/v2/transactions",
+      "sourceType": "api",
+      "collectionMethod": "scheduled-pull",
+      "collectionTimestamp": "2025-12-20T08:00:00Z",
+      "geography": "US-WEST-2",
+      "consent": {
+        "type": "contractual",
+        "reference": "https://legal.example.com/dpa/partner-bank-2025",
+        "obtained": "2025-01-15T00:00:00Z"
+      }
+    },
+    "collector": {
+      "id": "https://expanso.io/collectors/prod-west-collector-01",
+      "version": {
+        "expanso-cli": "1.4.2",
+        "collector-plugin": "2.1.0"
+      },
+      "environment": "production"
+    },
+    "schema": {
+      "format": "json-lines",
+      "schemaRef": "https://schemas.example.com/transactions/v2.3",
+      "schemaDigest": {
+        "sha256": "schema_hash_here"
+      }
+    },
+    "metadata": {
+      "collectionDuration": "PT45M",
+      "bytesCollected": 2847293847,
+      "recordsCollected": 1847293,
+      "recordsDropped": 0,
+      "errorRate": 0.0
+    },
+    "dtaCompliance": {
+      "standardsVersion": "1.0.0",
+      "sourceStandard": {
+        "datasetTitle": "Partner Bank Transaction Feed",
+        "datasetIssuer": "Partner Bank Inc.",
+        "description": "Daily transaction feed for fraud detection model training"
+      },
+      "provenanceStandard": {
+        "dataOriginGeography": "US",
+        "method": "API Pull - OAuth2 authenticated",
+        "dataFormat": "JSON Lines"
+      },
+      "useStandard": {
+        "confidentialityClassification": "confidential",
+        "intendedDataUse": "ML model training for fraud detection",
+        "license": "Proprietary - contractual use only"
+      }
+    }
+  }
+}

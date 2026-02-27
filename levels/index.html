@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Makoto Levels | Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="./" class="nav-item active">Understanding Levels</a>
+            <a href="#overview" class="nav-item nav-item-sub">Overview</a>
+            <a href="#level-1" class="nav-item nav-item-sub">Level 1</a>
+            <a href="#level-2" class="nav-item nav-item-sub">Level 2</a>
+            <a href="#level-3" class="nav-item nav-item-sub">Level 3</a>
+            <a href="#adoption" class="nav-item nav-item-sub">Adoption Path</a>
+            <a href="../spec/l1-requirements.html" class="nav-item nav-item-sub">L1 Requirements</a>
+            <a href="../spec/l2-requirements.html" class="nav-item nav-item-sub">L2 Requirements</a>
+            <a href="../spec/l3-requirements.html" class="nav-item nav-item-sub">L3 Requirements</a>
+            <a href="../spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+            <a href="../comparison/w3c-prov.html" class="nav-item">W3C PROV Comparison</a>
+            <a href="../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">Understanding Makoto Levels</h1>
+
+            <p>
+                Makoto defines three progressive security levels for data supply chains. Each level builds on the previous,
+                providing stronger guarantees about data provenance and integrity. This page explains what each level means,
+                what's required to achieve it, and how to choose the right level for your use case.
+            </p>
+
+            <div class="card" style="background: #eff6ff; border-color: #bfdbfe;">
+                <p style="margin: 0;"><strong>Key Principle:</strong> Start at Level 1 and progress as your security requirements mature.
+                Each level is valuable on its own—you don't need L3 to benefit from provenance tracking.</p>
+            </div>
+        </section>
+
+        <!-- Visual Overview -->
+        <section class="section" id="overview">
+            <h2>Levels at a Glance</h2>
+
+            <!-- Diagram placeholder - will be replaced with zealous-dolphin's SVG -->
+            <div class="diagram-container" style="margin: 2rem 0; text-align: center;">
+                <img src="../assets/images/makoto-levels.svg" alt="Makoto Levels comparison chart showing L1, L2, and L3 requirements" style="max-width: 100%; height: auto;">
+            </div>
+
+            <div class="card-grid">
+                <div class="card">
+                    <span class="level-badge l1">Level 1</span>
+                    <h3 style="margin: 0.75rem 0 0.5rem;">Provenance Exists</h3>
+                    <p class="text-muted" style="margin-bottom: 0.5rem;">
+                        Documentation that data origin and processing are recorded in machine-readable format.
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        <strong>Effort:</strong> Low | <strong>Trust:</strong> Self-attested
+                    </p>
+                </div>
+                <div class="card">
+                    <span class="level-badge l2">Level 2</span>
+                    <h3 style="margin: 0.75rem 0 0.5rem;">Provenance is Authentic</h3>
+                    <p class="text-muted" style="margin-bottom: 0.5rem;">
+                        Attestations are cryptographically signed with verifiable identity binding.
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        <strong>Effort:</strong> Medium | <strong>Trust:</strong> Signed
+                    </p>
+                </div>
+                <div class="card">
+                    <span class="level-badge l3">Level 3</span>
+                    <h3 style="margin: 0.75rem 0 0.5rem;">Provenance is Unforgeable</h3>
+                    <p class="text-muted" style="margin-bottom: 0.5rem;">
+                        Attestations generated by isolated infrastructure that processing code cannot influence.
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        <strong>Effort:</strong> High | <strong>Trust:</strong> Hardware-backed
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Level 1 Deep Dive -->
+        <section class="section" id="level-1">
+            <h2><span class="level-badge l1">L1</span> Provenance Exists</h2>
+
+            <blockquote style="border-left: 4px solid #10b981; padding-left: 1rem; margin: 1.5rem 0; font-style: italic;">
+                "The data pipeline produces attestations that document data origin and processing."
+            </blockquote>
+
+            <p>
+                Level 1 establishes the foundation: machine-readable documentation of where data came from and what
+                happened to it. At this level, attestations may be self-reported by the data producer—the goal is
+                simply to have provenance information exist in a structured format.
+            </p>
+
+            <h3>Requirements</h3>
+            <table class="content-table">
+                <thead>
+                    <tr><th>Requirement</th><th>Description</th><th>Verification</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Attestation Exists</strong></td>
+                        <td>Machine-readable attestation accompanies the data artifact</td>
+                        <td>Check attestation file exists and parses correctly</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Origin Documented</strong></td>
+                        <td>Source of data is recorded (API, database, file, etc.)</td>
+                        <td>Verify <code>origin.source</code> field is populated</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Transforms Documented</strong></td>
+                        <td>Processing steps are listed (best-effort completeness)</td>
+                        <td>Check transform attestations exist for each stage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Format Compliance</strong></td>
+                        <td>Uses Makoto attestation schema with valid predicate type</td>
+                        <td>Validate against JSON schema</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Threats Mitigated</h3>
+            <ul>
+                <li><strong>D1: Source Falsification (partial)</strong> — Origin claims are documented, though not cryptographically verified</li>
+                <li><strong>D3: Transform Opacity (partial)</strong> — Processing steps are visible, enabling audit trails</li>
+            </ul>
+
+            <h3>Use Cases</h3>
+            <ul>
+                <li>Internal data governance and cataloging</li>
+                <li>Compliance documentation for auditors</li>
+                <li>Basic lineage tracking for debugging</li>
+                <li>Getting started with data provenance</li>
+            </ul>
+
+            <h3>Implementation Example</h3>
+            <div class="code-block">
+<pre>{
+  <span class="hl-key">"_type"</span>: <span class="hl-string">"https://in-toto.io/Statement/v1"</span>,
+  <span class="hl-key">"subject"</span>: [{
+    <span class="hl-key">"name"</span>: <span class="hl-string">"dataset:sales_2025q1"</span>,
+    <span class="hl-key">"digest"</span>: { <span class="hl-key">"sha256"</span>: <span class="hl-string">"abc123..."</span> }
+  }],
+  <span class="hl-key">"predicateType"</span>: <span class="hl-string">"https://makoto.dev/origin/v1"</span>,
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-key">"origin"</span>: {
+      <span class="hl-key">"source"</span>: <span class="hl-string">"https://crm.example.com/api/sales"</span>,
+      <span class="hl-key">"collectionTimestamp"</span>: <span class="hl-string">"2025-01-15T10:00:00Z"</span>
+    },
+    <span class="hl-key">"collector"</span>: {
+      <span class="hl-key">"id"</span>: <span class="hl-string">"data-team/etl-pipeline-v2"</span>
+    }
+  }
+}</pre>
+            </div>
+        </section>
+
+        <!-- Level 2 Deep Dive -->
+        <section class="section" id="level-2" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2><span class="level-badge l2">L2</span> Provenance is Authentic</h2>
+
+                <blockquote style="border-left: 4px solid #f59e0b; padding-left: 1rem; margin: 1.5rem 0; font-style: italic;">
+                    "Attestations are cryptographically signed by the data processor and cannot be tampered with after creation."
+                </blockquote>
+
+                <p>
+                    Level 2 adds cryptographic guarantees. Attestations are digitally signed, allowing consumers to verify
+                    they haven't been modified and came from a known identity. This prevents attestation forgery and
+                    provides non-repudiation.
+                </p>
+
+                <h3>Requirements</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr><th>Requirement</th><th>Description</th><th>Verification</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>All L1 Requirements</strong></td>
+                            <td>Plus additional controls below</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Signed Attestations</strong></td>
+                            <td>Digital signatures using ECDSA P-256, Ed25519, or equivalent</td>
+                            <td>Verify DSSE envelope signature</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Identity Binding</strong></td>
+                            <td>Signing identity is verifiable (X.509 cert, Sigstore, etc.)</td>
+                            <td>Validate certificate chain or OIDC identity</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tamper-Evident</strong></td>
+                            <td>Consumers can detect if attestation was modified</td>
+                            <td>Signature verification fails if content changed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Timestamp Binding</strong></td>
+                            <td>Attestations include verifiable timestamps (RFC 3161 or similar)</td>
+                            <td>Verify timestamp authority signature</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hash Chaining</strong></td>
+                            <td>Transform attestations reference cryptographic hash of inputs</td>
+                            <td>Verify input hashes match previous outputs</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Threats Mitigated</h3>
+                <ul>
+                    <li><strong>D1: Source Falsification</strong> — Signed origin claims tied to verifiable identity</li>
+                    <li><strong>D2: Collection Tampering</strong> — Signed attestations detect post-collection modification</li>
+                    <li><strong>D3: Transform Opacity</strong> — Signed transform records with input/output hashes</li>
+                    <li><strong>D4: Lineage Forgery (partial)</strong> — Hash chaining prevents insertion of fake history</li>
+                    <li><strong>D8: Time Manipulation</strong> — Trusted timestamps prevent backdating</li>
+                </ul>
+
+                <h3>Use Cases</h3>
+                <ul>
+                    <li>Data sharing with external partners</li>
+                    <li>Regulatory compliance requiring audit trails (GDPR, CCPA)</li>
+                    <li>AI/ML training data provenance for model governance</li>
+                    <li>Data marketplace trust and verification</li>
+                </ul>
+
+                <h3>Implementation Options</h3>
+                <div class="card-grid" style="margin-top: 1rem;">
+                    <div class="card">
+                        <h4 style="margin-top: 0;">Sigstore (Recommended)</h4>
+                        <p class="text-muted">Keyless signing with OIDC identity. No key management required.</p>
+                        <code class="code-inline">cosign sign-blob --bundle attestation.json</code>
+                    </div>
+                    <div class="card">
+                        <h4 style="margin-top: 0;">X.509 Certificates</h4>
+                        <p class="text-muted">Traditional PKI with certificate chain. Requires key management.</p>
+                        <code class="code-inline">openssl dgst -sign key.pem attestation.json</code>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1.5rem; background: #eff6ff; border-color: #bfdbfe;">
+                    <p style="margin: 0;"><strong>Formal Requirements:</strong> For the complete list of MUST/SHOULD requirements
+                    for producers, platforms, and verifiers, see the <a href="../spec/l2-requirements.html">L2 Formal Requirements</a> specification.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Level 3 Deep Dive -->
+        <section class="section" id="level-3">
+            <h2><span class="level-badge l3">L3</span> Provenance is Unforgeable</h2>
+
+            <blockquote style="border-left: 4px solid #ef4444; padding-left: 1rem; margin: 1.5rem 0; font-style: italic;">
+                "Attestations are generated by isolated infrastructure that data processing logic cannot influence."
+            </blockquote>
+
+            <p>
+                Level 3 provides the strongest guarantees by removing the data processor from the trust boundary.
+                Attestations are generated by the platform itself—using hardware security modules (HSM), trusted
+                execution environments (TEE), or isolated signing infrastructure—ensuring that even a compromised
+                processing pipeline cannot forge provenance claims.
+            </p>
+
+            <h3>Requirements</h3>
+            <table class="content-table">
+                <thead>
+                    <tr><th>Requirement</th><th>Description</th><th>Verification</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>All L2 Requirements</strong></td>
+                        <td>Plus additional controls below</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Isolated Signing</strong></td>
+                        <td>Signing keys stored in HSM/TEE, inaccessible to user code</td>
+                        <td>Platform attestation of key isolation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Platform-Generated</strong></td>
+                        <td>Attestations created by trusted control plane, not tenant code</td>
+                        <td>Verify attestation origin is platform, not user</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deterministic Hashing</strong></td>
+                        <td>Data hashes computed by platform infrastructure</td>
+                        <td>Hash computation in isolated environment</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Immutable Audit Trail</strong></td>
+                        <td>All attestation operations logged to append-only store</td>
+                        <td>Verify audit log integrity and completeness</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Non-Repudiation</strong></td>
+                        <td>Producer cannot deny generating attested data</td>
+                        <td>Cryptographic proof of origin</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Threats Mitigated</h3>
+            <ul>
+                <li><strong>D1-D4: All provenance threats</strong> — Platform-generated attestations cannot be forged</li>
+                <li><strong>D5: Stream Injection</strong> — Platform validates all records entering the stream</li>
+                <li><strong>D6: Aggregation Manipulation</strong> — Aggregates computed in isolated environment</li>
+                <li><strong>D8: Time Manipulation</strong> — Platform controls timestamp generation</li>
+            </ul>
+
+            <h3>Use Cases</h3>
+            <ul>
+                <li>Financial services with regulatory requirements (SOX, MiFID II)</li>
+                <li>Healthcare data with HIPAA compliance</li>
+                <li>Government and defense data handling</li>
+                <li>High-stakes AI training data for regulated models</li>
+            </ul>
+
+            <h3>Platform Requirements</h3>
+            <div class="card" style="background: #fef3c7; border-color: #fcd34d;">
+                <p style="margin: 0;"><strong>Note:</strong> Level 3 requires platform support. The data processing
+                infrastructure must provide isolated signing capabilities. Examples include cloud confidential computing
+                (AWS Nitro, Azure Confidential Computing), dedicated HSM services, or platforms like Expanso that
+                implement L3 natively.</p>
+            </div>
+        </section>
+
+        <!-- Adoption Path -->
+        <section class="section" id="adoption" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Choosing and Progressing Through Levels</h2>
+
+                <h3>Decision Framework</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>If you need...</th>
+                            <th>Start with</th>
+                            <th>Consider upgrading when...</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Basic lineage tracking</td>
+                            <td><span class="level-badge l1">L1</span></td>
+                            <td>You share data externally or face audits</td>
+                        </tr>
+                        <tr>
+                            <td>Partner trust & compliance</td>
+                            <td><span class="level-badge l2">L2</span></td>
+                            <td>You handle regulated data or high-value assets</td>
+                        </tr>
+                        <tr>
+                            <td>Maximum security guarantees</td>
+                            <td><span class="level-badge l3">L3</span></td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Migration Path: L1 → L2</h3>
+                <ol>
+                    <li><strong>Establish key management</strong> — Set up signing keys (or use Sigstore for keyless)</li>
+                    <li><strong>Add signing to pipeline</strong> — Wrap attestations in DSSE envelope with signature</li>
+                    <li><strong>Implement hash chaining</strong> — Reference input hashes in transform attestations</li>
+                    <li><strong>Add timestamp service</strong> — Integrate RFC 3161 or equivalent</li>
+                    <li><strong>Publish verification keys</strong> — Make public keys available for consumers</li>
+                </ol>
+
+                <h3>Migration Path: L2 → L3</h3>
+                <ol>
+                    <li><strong>Evaluate platform options</strong> — Choose HSM/TEE-capable infrastructure</li>
+                    <li><strong>Migrate signing to platform</strong> — Move signing keys to isolated environment</li>
+                    <li><strong>Enable platform attestation</strong> — Configure platform to generate attestations</li>
+                    <li><strong>Verify isolation</strong> — Audit that user code cannot access signing keys</li>
+                    <li><strong>Set up audit logging</strong> — Configure immutable attestation audit trail</li>
+                </ol>
+
+                <h3>Level Comparison Summary</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th><span class="level-badge l1">L1</span></th>
+                            <th><span class="level-badge l2">L2</span></th>
+                            <th><span class="level-badge l3">L3</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Attestation signed?</td>
+                            <td>No</td>
+                            <td>Yes (by producer)</td>
+                            <td>Yes (by platform)</td>
+                        </tr>
+                        <tr>
+                            <td>Tamper detection</td>
+                            <td>Hash comparison</td>
+                            <td>Signature verification</td>
+                            <td>Platform verification</td>
+                        </tr>
+                        <tr>
+                            <td>Trust model</td>
+                            <td>Trust producer</td>
+                            <td>Trust producer identity</td>
+                            <td>Trust platform only</td>
+                        </tr>
+                        <tr>
+                            <td>Key compromise impact</td>
+                            <td>N/A</td>
+                            <td>Can forge attestations</td>
+                            <td>Cannot forge (isolated)</td>
+                        </tr>
+                        <tr>
+                            <td>Implementation effort</td>
+                            <td>Hours to days</td>
+                            <td>Days to weeks</td>
+                            <td>Weeks to months</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Next Steps -->
+        <section class="section">
+            <h2>Next Steps</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3 style="margin-top: 0;">View Examples</h3>
+                    <p class="text-muted">See complete attestation examples for origin, transform, and streaming use cases.</p>
+                    <a href="../examples/">Browse examples →</a>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top: 0;">Understand Threats</h3>
+                    <p class="text-muted">Learn about data supply chain threats and how each level mitigates them.</p>
+                    <a href="../threats/">View threat model →</a>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top: 0;">Get Started</h3>
+                    <p class="text-muted">Implement Makoto in your pipeline with Expanso or other tools.</p>
+                    <a href="../expanso/">Expanso integration →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://slsa.dev" target="_blank">Inspired by SLSA →</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>
