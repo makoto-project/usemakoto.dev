@@ -1,0 +1,79 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "stream:iot_sensors:window_20251220_100000",
+      "digest": {
+        "merkleRoot": "window_merkle_abc123def456789012345678901234567890abcdef12",
+        "windowStart": "2025-12-20T10:00:00Z",
+        "windowEnd": "2025-12-20T10:01:00Z",
+        "recordCount": "847293"
+      }
+    }
+  ],
+  "predicateType": "https://makoto.dev/stream-window/v1",
+  "predicate": {
+    "stream": {
+      "id": "iot_sensors",
+      "source": "mqtt://sensors.factory.example.com:1883",
+      "topic": "sensors/+/readings",
+      "partitions": [
+        "sensors/temp/readings",
+        "sensors/pressure/readings",
+        "sensors/vibration/readings"
+      ]
+    },
+    "window": {
+      "type": "tumbling",
+      "duration": "PT1M",
+      "alignment": "wall-clock",
+      "watermark": "2025-12-20T09:59:55Z",
+      "allowedLateness": "PT5S"
+    },
+    "integrity": {
+      "merkleTree": {
+        "algorithm": "sha256",
+        "leafHashAlgorithm": "sha256",
+        "leafCount": 847293,
+        "treeHeight": 20,
+        "root": "window_merkle_abc123def456789012345678901234567890abcdef12"
+      },
+      "chain": {
+        "previousWindowId": "stream:iot_sensors:window_20251220_095900",
+        "previousMerkleRoot": "previous_window_merkle_xyz789012345678901234567890",
+        "chainLength": 600,
+        "genesisWindowId": "stream:iot_sensors:window_20251220_000000"
+      }
+    },
+    "aggregates": {
+      "checksum": "aggregate_checksum_value",
+      "statistics": {
+        "minTimestamp": "2025-12-20T10:00:00.001Z",
+        "maxTimestamp": "2025-12-20T10:00:59.998Z",
+        "avgIntervalMs": 70.8,
+        "sensors": {
+          "temp": {"count": 282431, "avgValue": 72.3},
+          "pressure": {"count": 282431, "avgValue": 101.2},
+          "vibration": {"count": 282431, "avgValue": 0.03}
+        }
+      }
+    },
+    "collector": {
+      "id": "https://expanso.io/edge/factory-edge-01",
+      "version": {
+        "expanso-edge": "1.2.0"
+      },
+      "location": "factory-floor-section-a"
+    },
+    "metadata": {
+      "processingLatency": "PT0.5S",
+      "lateRecords": 12,
+      "droppedRecords": 0,
+      "backpressureEvents": 0
+    },
+    "verification": {
+      "merkleProofAvailable": true,
+      "proofEndpoint": "https://attestations.example.com/proofs/window_20251220_100000"
+    }
+  }
+}

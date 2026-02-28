@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Model - Makoto Levels | Makoto</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .threat-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+
+        .threat-table th,
+        .threat-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .threat-table th {
+            background: var(--bg-dark);
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .threat-table tr:hover {
+            background: var(--bg-light);
+        }
+
+        .threat-id {
+            font-weight: 700;
+            color: var(--primary);
+            font-family: monospace;
+        }
+
+        .severity-critical {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .severity-high {
+            background: #fff7ed;
+            color: #ea580c;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .severity-medium {
+            background: #fefce8;
+            color: #ca8a04;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .severity-low {
+            background: #f0fdf4;
+            color: #16a34a;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .mitigation-badge {
+            display: inline-block;
+            background: #6d28d9;
+            color: white;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.1rem;
+        }
+
+        .threat-category {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .threat-category:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.1);
+        }
+
+        .threat-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .threat-details {
+            flex: 1;
+        }
+
+        .threat-details h3 {
+            margin: 0 0 0.25rem;
+            color: var(--text);
+        }
+
+        .threat-details p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .comparison-section {
+            margin: 3rem 0;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comparison-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+        }
+
+        .comparison-header.slsa {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .comparison-header.dsla {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .comparison-body {
+            padding: 1.5rem;
+        }
+
+        .comparison-body ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .comparison-body li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-muted);
+        }
+
+        .comparison-body li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .attack-flow {
+            margin: 2rem 0;
+        }
+
+        .level-coverage {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .level-coverage {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .coverage-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .coverage-card.l1 {
+            border-color: #fbbf24;
+        }
+
+        .coverage-card.l2 {
+            border-color: #f97316;
+        }
+
+        .coverage-card.l3 {
+            border-color: #10b981;
+        }
+
+        .coverage-level {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .coverage-card.l1 .coverage-level { color: #fbbf24; }
+        .coverage-card.l2 .coverage-level { color: #f97316; }
+        .coverage-card.l3 .coverage-level { color: #10b981; }
+
+        .coverage-threats {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .threat-badge {
+            background: var(--bg-dark);
+            color: var(--text);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .threat-badge.mitigated {
+            background: #dcfce7;
+            color: #16a34a;
+            text-decoration: line-through;
+        }
+
+        .threat-badge.partial {
+            background: #fef3c7;
+            color: #d97706;
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="../spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="../comparison/w3c-prov.html" class="nav-item">W3C PROV Comparison</a>
+            <a href="../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../demos/" class="nav-item">Demos</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="./" class="nav-item active">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">Data Supply Chain Threat Model</h1>
+            <p>Understanding the unique threats to data integrity, provenance, and privacy that Makoto Levels (DPL) is designed to address.</p>
+        </section>
+
+        <!-- Threat Categories -->
+        <section class="section">
+            <div class="container">
+                <h2>Threat Categories</h2>
+                <p>
+                    Data supply chains face unique threats beyond traditional software supply chain attacks.
+                    Makoto Levels defines eight primary threat categories specific to data workflows.
+                </p>
+
+                <div class="threat-category">
+                    <div class="threat-icon">🎭</div>
+                    <div class="threat-details">
+                        <h3>D1: Source Impersonation</h3>
+                        <p>
+                            Attacker claims data originates from a trusted source when it doesn't.
+                            Examples: Fake sensor readings, forged API responses, spoofed device IDs.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="threat-category">
+                    <div class="threat-icon">✏️</div>
+                    <div class="threat-details">
+                        <h3>D2: Data Tampering</h3>
+                        <p>
+                            Unauthorized modification of data in transit or at rest.
+                            Examples: Man-in-the-middle attacks, database manipulation, log injection.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="threat-category">
+                    <div class="threat-icon">🔗</div>
+                    <div class="threat-details">
+                        <h3>D3: Lineage Falsification</h3>
+                        <p>
+                            Creating false records of data transformations or processing history.
+                            Examples: Fake processing timestamps, fabricated transformation chains.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="threat-category">
+                    <div class="threat-icon">⏰</div>
+                    <div class="threat-details">
+                        <h3>D4: Timestamp Manipulation</h3>
+                        <p>
+                            Altering temporal metadata to misrepresent when data was collected or processed.
+                            Examples: Backdating readings, reordering events, replay attacks.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="threat-category">
+                    <div class="threat-icon">👤</div>
+                    <div class="threat-details">
+                        <h3>D5: Unauthorized Attribution</h3>
+                        <p>
+                            Falsely attributing data processing to legitimate processors or systems.
+                            Examples: Stolen signing keys, compromised service accounts.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="threat-category">
+                    <div class="threat-icon">💾</div>
+                    <div class="threat-details">
+                        <h3>D6: Attestation Forgery</h3>
+                        <p>
+                            Creating fake attestation documents that appear valid.
+                            Examples: Signature bypass, hash collision attacks, certificate forgery.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="threat-category">
+                    <div class="threat-icon">🔒</div>
+                    <div class="threat-details">
+                        <h3>D7: Privacy Violation</h3>
+                        <p>
+                            Extracting sensitive information from attestations or processing metadata.
+                            Examples: Correlation attacks, metadata analysis, timing attacks.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="threat-category">
+                    <div class="threat-icon">🌊</div>
+                    <div class="threat-details">
+                        <h3>D8: Stream Injection</h3>
+                        <p>
+                            Inserting malicious events into high-throughput data streams.
+                            Examples: Event spoofing, sequence manipulation, window pollution.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Threat Matrix -->
+        <section class="section" style="background: var(--bg-light);">
+            <div class="container">
+                <h2>Threat Matrix</h2>
+                <p>
+                    This matrix maps each threat to its severity, attack vectors, and the DPL
+                    level required to mitigate it.
+                </p>
+
+                <div style="overflow-x: auto;">
+                    <table class="threat-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Threat</th>
+                                <th>Severity</th>
+                                <th>Attack Vector</th>
+                                <th>Mitigated By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="threat-id">D1</span></td>
+                                <td>Source Impersonation</td>
+                                <td><span class="severity-critical">Critical</span></td>
+                                <td>Spoofed source identifiers, fake device credentials</td>
+                                <td>
+                                    <span class="mitigation-badge">L1</span>
+                                    <span class="mitigation-badge">L2</span>
+                                    <span class="mitigation-badge">L3</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="threat-id">D2</span></td>
+                                <td>Data Tampering</td>
+                                <td><span class="severity-critical">Critical</span></td>
+                                <td>MITM attacks, storage compromise, injection</td>
+                                <td>
+                                    <span class="mitigation-badge">L1</span>
+                                    <span class="mitigation-badge">L2</span>
+                                    <span class="mitigation-badge">L3</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="threat-id">D3</span></td>
+                                <td>Lineage Falsification</td>
+                                <td><span class="severity-high">High</span></td>
+                                <td>Fabricated transform attestations, log manipulation</td>
+                                <td>
+                                    <span class="mitigation-badge">L2</span>
+                                    <span class="mitigation-badge">L3</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="threat-id">D4</span></td>
+                                <td>Timestamp Manipulation</td>
+                                <td><span class="severity-high">High</span></td>
+                                <td>Clock skew exploitation, replay attacks</td>
+                                <td>
+                                    <span class="mitigation-badge">L2</span>
+                                    <span class="mitigation-badge">L3</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="threat-id">D5</span></td>
+                                <td>Unauthorized Attribution</td>
+                                <td><span class="severity-high">High</span></td>
+                                <td>Key theft, service account compromise</td>
+                                <td>
+                                    <span class="mitigation-badge">L2</span>
+                                    <span class="mitigation-badge">L3</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="threat-id">D6</span></td>
+                                <td>Attestation Forgery</td>
+                                <td><span class="severity-critical">Critical</span></td>
+                                <td>Signature bypass, collision attacks, cert forgery</td>
+                                <td>
+                                    <span class="mitigation-badge">L3</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="threat-id">D7</span></td>
+                                <td>Privacy Violation</td>
+                                <td><span class="severity-medium">Medium</span></td>
+                                <td>Metadata analysis, correlation attacks</td>
+                                <td>
+                                    <span class="mitigation-badge">Privacy</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="threat-id">D8</span></td>
+                                <td>Stream Injection</td>
+                                <td><span class="severity-high">High</span></td>
+                                <td>Event spoofing, window manipulation</td>
+                                <td>
+                                    <span class="mitigation-badge">L2</span>
+                                    <span class="mitigation-badge">L3</span>
+                                    <span class="mitigation-badge">Stream</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Attack Flow Diagram -->
+        <section class="section">
+            <div class="container">
+                <h2>Attack Surface Visualization</h2>
+                <p>
+                    Data supply chains have multiple attack surfaces at each stage of the pipeline.
+                    DPL attestations provide verification points to detect and prevent attacks.
+                </p>
+
+                <svg viewBox="0 0 900 450" class="diagram-svg" style="margin: 2rem 0;">
+                    <!-- Pipeline stages -->
+                    <g transform="translate(50, 100)">
+                        <!-- Source -->
+                        <rect width="120" height="80" rx="10" fill="white" stroke="#7c3aed" stroke-width="2"/>
+                        <text x="60" y="35" text-anchor="middle" fill="#7c3aed" font-weight="600" font-size="12">Data Source</text>
+                        <text x="60" y="55" text-anchor="middle" fill="#64748b" font-size="10">Origin point</text>
+
+                        <!-- Attack D1 -->
+                        <g transform="translate(0, -60)">
+                            <rect width="100" height="40" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+                            <text x="50" y="18" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="600">D1: Impersonation</text>
+                            <text x="50" y="32" text-anchor="middle" fill="#dc2626" font-size="9">Fake source ID</text>
+                        </g>
+                        <line x1="50" y1="40" x2="50" y2="100" stroke="#dc2626" stroke-width="1" stroke-dasharray="3,3"/>
+                    </g>
+
+                    <!-- Transport -->
+                    <g transform="translate(220, 100)">
+                        <rect width="120" height="80" rx="10" fill="white" stroke="#7c3aed" stroke-width="2"/>
+                        <text x="60" y="35" text-anchor="middle" fill="#7c3aed" font-weight="600" font-size="12">Transport</text>
+                        <text x="60" y="55" text-anchor="middle" fill="#64748b" font-size="10">In transit</text>
+
+                        <!-- Attack D2 -->
+                        <g transform="translate(10, -60)">
+                            <rect width="100" height="40" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+                            <text x="50" y="18" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="600">D2: Tampering</text>
+                            <text x="50" y="32" text-anchor="middle" fill="#dc2626" font-size="9">MITM attack</text>
+                        </g>
+                        <line x1="60" y1="40" x2="60" y2="100" stroke="#dc2626" stroke-width="1" stroke-dasharray="3,3"/>
+                    </g>
+
+                    <!-- Processing -->
+                    <g transform="translate(390, 100)">
+                        <rect width="120" height="80" rx="10" fill="white" stroke="#7c3aed" stroke-width="2"/>
+                        <text x="60" y="35" text-anchor="middle" fill="#7c3aed" font-weight="600" font-size="12">Processing</text>
+                        <text x="60" y="55" text-anchor="middle" fill="#64748b" font-size="10">Transform</text>
+
+                        <!-- Attack D3/D5 -->
+                        <g transform="translate(10, -60)">
+                            <rect width="100" height="40" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+                            <text x="50" y="18" text-anchor="middle" fill="#ea580c" font-size="10" font-weight="600">D3/D5: Lineage</text>
+                            <text x="50" y="32" text-anchor="middle" fill="#ea580c" font-size="9">False attribution</text>
+                        </g>
+                        <line x1="60" y1="40" x2="60" y2="100" stroke="#ea580c" stroke-width="1" stroke-dasharray="3,3"/>
+                    </g>
+
+                    <!-- Storage -->
+                    <g transform="translate(560, 100)">
+                        <rect width="120" height="80" rx="10" fill="white" stroke="#7c3aed" stroke-width="2"/>
+                        <text x="60" y="35" text-anchor="middle" fill="#7c3aed" font-weight="600" font-size="12">Storage</text>
+                        <text x="60" y="55" text-anchor="middle" fill="#64748b" font-size="10">At rest</text>
+
+                        <!-- Attack D4/D6 -->
+                        <g transform="translate(10, -60)">
+                            <rect width="100" height="40" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+                            <text x="50" y="18" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="600">D6: Forgery</text>
+                            <text x="50" y="32" text-anchor="middle" fill="#dc2626" font-size="9">Fake attestation</text>
+                        </g>
+                        <line x1="60" y1="40" x2="60" y2="100" stroke="#dc2626" stroke-width="1" stroke-dasharray="3,3"/>
+                    </g>
+
+                    <!-- Consumer -->
+                    <g transform="translate(730, 100)">
+                        <rect width="120" height="80" rx="10" fill="white" stroke="#7c3aed" stroke-width="2"/>
+                        <text x="60" y="35" text-anchor="middle" fill="#7c3aed" font-weight="600" font-size="12">Consumer</text>
+                        <text x="60" y="55" text-anchor="middle" fill="#64748b" font-size="10">End user</text>
+
+                        <!-- Attack D7 -->
+                        <g transform="translate(10, -60)">
+                            <rect width="100" height="40" rx="6" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5"/>
+                            <text x="50" y="18" text-anchor="middle" fill="#ca8a04" font-size="10" font-weight="600">D7: Privacy</text>
+                            <text x="50" y="32" text-anchor="middle" fill="#ca8a04" font-size="9">Data leakage</text>
+                        </g>
+                        <line x1="60" y1="40" x2="60" y2="100" stroke="#ca8a04" stroke-width="1" stroke-dasharray="3,3"/>
+                    </g>
+
+                    <!-- Flow arrows -->
+                    <defs>
+                        <marker id="arrow-flow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#7c3aed"/>
+                        </marker>
+                    </defs>
+
+                    <path d="M175,140 L210,140" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-flow)"/>
+                    <path d="M345,140 L380,140" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-flow)"/>
+                    <path d="M515,140 L550,140" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-flow)"/>
+                    <path d="M685,140 L720,140" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-flow)"/>
+
+                    <!-- DPL Protection Layer -->
+                    <g transform="translate(50, 220)">
+                        <rect width="800" height="100" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,5"/>
+                        <text x="400" y="30" text-anchor="middle" fill="#7c3aed" font-weight="700" font-size="14">Makoto Attestation Protection Layer</text>
+
+                        <g transform="translate(50, 45)">
+                            <rect width="140" height="40" rx="6" fill="white" stroke="#7c3aed" stroke-width="1.5"/>
+                            <text x="70" y="18" text-anchor="middle" fill="#7c3aed" font-size="11" font-weight="600">L1: Origin</text>
+                            <text x="70" y="33" text-anchor="middle" fill="#64748b" font-size="9">Provenance exists</text>
+                        </g>
+
+                        <g transform="translate(220, 45)">
+                            <rect width="140" height="40" rx="6" fill="white" stroke="#7c3aed" stroke-width="1.5"/>
+                            <text x="70" y="18" text-anchor="middle" fill="#7c3aed" font-size="11" font-weight="600">L2: Signed</text>
+                            <text x="70" y="33" text-anchor="middle" fill="#64748b" font-size="9">Authentic provenance</text>
+                        </g>
+
+                        <g transform="translate(390, 45)">
+                            <rect width="140" height="40" rx="6" fill="white" stroke="#7c3aed" stroke-width="1.5"/>
+                            <text x="70" y="18" text-anchor="middle" fill="#7c3aed" font-size="11" font-weight="600">L3: Hardware</text>
+                            <text x="70" y="33" text-anchor="middle" fill="#64748b" font-size="9">Unforgeable</text>
+                        </g>
+
+                        <g transform="translate(560, 45)">
+                            <rect width="140" height="40" rx="6" fill="white" stroke="#7c3aed" stroke-width="1.5"/>
+                            <text x="70" y="18" text-anchor="middle" fill="#7c3aed" font-size="11" font-weight="600">Privacy Layer</text>
+                            <text x="70" y="33" text-anchor="middle" fill="#64748b" font-size="9">ZK + Redaction</text>
+                        </g>
+                    </g>
+
+                    <!-- Stream specific -->
+                    <g transform="translate(50, 350)">
+                        <rect width="800" height="60" rx="10" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5"/>
+                        <text x="20" y="25" fill="#ca8a04" font-weight="600" font-size="12">D8: Stream Injection</text>
+                        <text x="20" y="45" fill="#ca8a04" font-size="10">High-throughput streams require Merkle windowing for efficient attestation at scale</text>
+
+                        <g transform="translate(550, 10)">
+                            <rect width="220" height="40" rx="6" fill="white" stroke="#ca8a04" stroke-width="1.5"/>
+                            <text x="110" y="17" text-anchor="middle" fill="#ca8a04" font-size="10" font-weight="600">Stream Window Attestation</text>
+                            <text x="110" y="32" text-anchor="middle" fill="#64748b" font-size="9">Merkle roots + individual proofs</text>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Level Coverage -->
+        <section class="section" style="background: var(--bg-light);">
+            <div class="container">
+                <h2>Threat Coverage by Level</h2>
+                <p>
+                    Each DPL level provides progressive protection against the threat categories.
+                    Higher levels include all protections from lower levels plus additional guarantees.
+                </p>
+
+                <div class="level-coverage">
+                    <div class="coverage-card l1">
+                        <div class="coverage-level">Level 1</div>
+                        <div style="font-weight: 600; color: var(--text);">Provenance Exists</div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 1rem 0;">
+                            Basic detection through content hashing and metadata capture
+                        </p>
+                        <div class="coverage-threats">
+                            <span class="threat-badge partial">D1 Partial</span>
+                            <span class="threat-badge partial">D2 Partial</span>
+                            <span class="threat-badge">D3</span>
+                            <span class="threat-badge">D4</span>
+                            <span class="threat-badge">D5</span>
+                            <span class="threat-badge">D6</span>
+                            <span class="threat-badge">D7</span>
+                            <span class="threat-badge">D8</span>
+                        </div>
+                    </div>
+
+                    <div class="coverage-card l2">
+                        <div class="coverage-level">Level 2</div>
+                        <div style="font-weight: 600; color: var(--text);">Authentic Provenance</div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 1rem 0;">
+                            Cryptographic signatures bind identity to attestations
+                        </p>
+                        <div class="coverage-threats">
+                            <span class="threat-badge mitigated">D1 ✓</span>
+                            <span class="threat-badge mitigated">D2 ✓</span>
+                            <span class="threat-badge mitigated">D3 ✓</span>
+                            <span class="threat-badge mitigated">D4 ✓</span>
+                            <span class="threat-badge mitigated">D5 ✓</span>
+                            <span class="threat-badge partial">D6 Partial</span>
+                            <span class="threat-badge">D7</span>
+                            <span class="threat-badge mitigated">D8 ✓</span>
+                        </div>
+                    </div>
+
+                    <div class="coverage-card l3">
+                        <div class="coverage-level">Level 3</div>
+                        <div style="font-weight: 600; color: var(--text);">Unforgeable Provenance</div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 1rem 0;">
+                            Hardware-backed attestation prevents key compromise
+                        </p>
+                        <div class="coverage-threats">
+                            <span class="threat-badge mitigated">D1 ✓</span>
+                            <span class="threat-badge mitigated">D2 ✓</span>
+                            <span class="threat-badge mitigated">D3 ✓</span>
+                            <span class="threat-badge mitigated">D4 ✓</span>
+                            <span class="threat-badge mitigated">D5 ✓</span>
+                            <span class="threat-badge mitigated">D6 ✓</span>
+                            <span class="threat-badge partial">D7 + Privacy</span>
+                            <span class="threat-badge mitigated">D8 ✓</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLSA Comparison -->
+        <section class="section">
+            <div class="container">
+                <h2>SLSA vs DPL Threat Comparison</h2>
+                <p>
+                    While SLSA focuses on software build integrity, Makoto Levels addresses the unique threats
+                    in data pipelines. Both frameworks share common security principles but differ
+                    in their threat focus.
+                </p>
+
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <div class="comparison-header slsa">SLSA Threats (Software)</div>
+                        <div class="comparison-body">
+                            <ul>
+                                <li>Compromised source repository</li>
+                                <li>Modified source after checkout</li>
+                                <li>Compromised build platform</li>
+                                <li>Uploaded modified package</li>
+                                <li>Compromised package registry</li>
+                                <li>Dependency confusion</li>
+                                <li>Compromised build dependencies</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="comparison-card">
+                        <div class="comparison-header dsla">Makoto Threats (Data)</div>
+                        <div class="comparison-body">
+                            <ul>
+                                <li>D1: Source impersonation</li>
+                                <li>D2: Data tampering in transit/rest</li>
+                                <li>D3: Lineage falsification</li>
+                                <li>D4: Timestamp manipulation</li>
+                                <li>D5: Unauthorized processor attribution</li>
+                                <li>D6: Attestation forgery</li>
+                                <li>D7: Privacy leakage from metadata</li>
+                                <li>D8: Stream injection attacks</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 2rem; background: var(--primary-light); border: 1px solid var(--primary);">
+                    <h3 style="color: var(--primary);">Shared Principles</h3>
+                    <p style="margin-bottom: 1rem;">
+                        Both SLSA and DPL share core security principles:
+                    </p>
+                    <ul style="color: var(--text-muted);">
+                        <li><strong>Progressive levels:</strong> Start simple, increase security as needed</li>
+                        <li><strong>Attestation-based:</strong> Verifiable claims about provenance</li>
+                        <li><strong>in-toto compatible:</strong> Use DSSE envelope format</li>
+                        <li><strong>Non-forgeable at highest level:</strong> Hardware-backed guarantees</li>
+                        <li><strong>Tamper-evident:</strong> Modifications are detectable</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mitigation Strategies -->
+        <section class="section" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white;">
+            <div class="container">
+                <h2 style="color: white;">Defense in Depth</h2>
+                <p style="color: rgba(255,255,255,0.9); max-width: 700px; margin: 0 auto 2rem;">
+                    Makoto Levels implements multiple layers of defense. Start with Level 1 for visibility,
+                    then progressively enhance security based on your threat model.
+                </p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                    <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem;">
+                        <h4 style="color: white; margin-bottom: 0.5rem;">🔍 Detection</h4>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                            Content hashing enables detection of any unauthorized modifications
+                        </p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem;">
+                        <h4 style="color: white; margin-bottom: 0.5rem;">✍️ Authentication</h4>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                            Cryptographic signatures prove who created or transformed data
+                        </p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem;">
+                        <h4 style="color: white; margin-bottom: 0.5rem;">🔐 Non-repudiation</h4>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                            Hardware-backed keys prevent denial of attestation creation
+                        </p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem;">
+                        <h4 style="color: white; margin-bottom: 0.5rem;">🕵️ Privacy</h4>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                            Zero-knowledge proofs and redaction protect sensitive metadata
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                Makoto brings SLSA-style assurance levels to data supply chains.
+                <a href="https://slsa.dev" target="_blank">Learn about SLSA →</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

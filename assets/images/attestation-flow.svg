@@ -1,0 +1,236 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="dataGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f5e9"/>
+      <stop offset="100%" style="stop-color:#a5d6a7"/>
+    </linearGradient>
+    <linearGradient id="attestGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff3e0"/>
+      <stop offset="100%" style="stop-color:#ffcc80"/>
+    </linearGradient>
+    <linearGradient id="transformGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e3f2fd"/>
+      <stop offset="100%" style="stop-color:#90caf9"/>
+    </linearGradient>
+    <linearGradient id="dbomGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f3e5f5"/>
+      <stop offset="100%" style="stop-color:#ce93d8"/>
+    </linearGradient>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#546e7a"/>
+    </marker>
+    <marker id="arrowheadOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ef6c00"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="650" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="500" y="40" text-anchor="middle" font-size="26" font-weight="700" fill="#1a1a2e">
+    Makoto Attestation Flow
+  </text>
+  <text x="500" y="65" text-anchor="middle" font-size="13" fill="#666">
+    How attestations propagate through a data pipeline
+  </text>
+
+  <!-- Legend -->
+  <g transform="translate(720, 85)">
+    <rect x="0" y="0" width="260" height="90" rx="8" fill="white" stroke="#ddd"/>
+    <text x="10" y="20" font-size="11" font-weight="600" fill="#333">Legend</text>
+    <rect x="10" y="30" width="16" height="12" rx="2" fill="url(#dataGrad)" stroke="#4caf50"/>
+    <text x="32" y="40" font-size="10" fill="#444">Data</text>
+    <rect x="80" y="30" width="16" height="12" rx="2" fill="url(#attestGrad)" stroke="#ef6c00"/>
+    <text x="102" y="40" font-size="10" fill="#444">Attestation</text>
+    <rect x="170" y="30" width="16" height="12" rx="2" fill="url(#transformGrad)" stroke="#1976d2"/>
+    <text x="192" y="40" font-size="10" fill="#444">Transform</text>
+    <line x1="10" y1="60" x2="40" y2="60" stroke="#546e7a" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="50" y="64" font-size="10" fill="#444">Data flow</text>
+    <line x1="120" y1="60" x2="150" y2="60" stroke="#ef6c00" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#arrowheadOrange)"/>
+    <text x="160" y="64" font-size="10" fill="#444">Attestation ref</text>
+  </g>
+
+  <!-- STAGE 1: Data Source -->
+  <g transform="translate(40, 120)">
+    <text x="80" y="0" text-anchor="middle" font-size="12" font-weight="600" fill="#666">STAGE 1: Origin</text>
+
+    <!-- External Source -->
+    <g filter="url(#shadow)">
+      <rect x="20" y="20" width="120" height="60" rx="8" fill="#eceff1" stroke="#78909c" stroke-width="1.5"/>
+    </g>
+    <text x="80" y="48" text-anchor="middle" font-size="11" font-weight="600" fill="#37474f">External</text>
+    <text x="80" y="63" text-anchor="middle" font-size="10" fill="#546e7a">Data Source</text>
+
+    <!-- Arrow to collected data -->
+    <line x1="80" y1="85" x2="80" y2="115" stroke="#546e7a" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+    <!-- Collected Data -->
+    <g filter="url(#shadow)">
+      <rect x="20" y="120" width="120" height="70" rx="8" fill="url(#dataGrad)" stroke="#4caf50" stroke-width="1.5"/>
+    </g>
+    <text x="80" y="148" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Raw Dataset</text>
+    <text x="80" y="165" text-anchor="middle" font-size="9" fill="#558b2f">sha256: abc123...</text>
+    <text x="80" y="178" text-anchor="middle" font-size="9" fill="#558b2f">1M records</text>
+
+    <!-- Origin Attestation -->
+    <g filter="url(#shadow)">
+      <rect x="20" y="220" width="120" height="90" rx="8" fill="url(#attestGrad)" stroke="#ef6c00" stroke-width="1.5"/>
+    </g>
+    <text x="80" y="245" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">Origin</text>
+    <text x="80" y="258" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">Attestation</text>
+    <text x="80" y="278" text-anchor="middle" font-size="8" fill="#bf360c">source: api.partner.com</text>
+    <text x="80" y="290" text-anchor="middle" font-size="8" fill="#bf360c">collected: 2025-12-20</text>
+    <text x="80" y="302" text-anchor="middle" font-size="8" fill="#bf360c">geography: US-WEST</text>
+
+    <!-- Link from data to attestation -->
+    <line x1="80" y1="195" x2="80" y2="215" stroke="#ef6c00" stroke-width="1.5" stroke-dasharray="4,2"/>
+  </g>
+
+  <!-- Arrow to Transform 1 -->
+  <line x1="165" y1="295" x2="230" y2="295" stroke="#546e7a" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- STAGE 2: Transform 1 -->
+  <g transform="translate(235, 120)">
+    <text x="90" y="0" text-anchor="middle" font-size="12" font-weight="600" fill="#666">STAGE 2: Transform</text>
+
+    <!-- Transform Box -->
+    <g filter="url(#shadow)">
+      <rect x="20" y="20" width="140" height="70" rx="8" fill="url(#transformGrad)" stroke="#1976d2" stroke-width="1.5"/>
+    </g>
+    <text x="90" y="45" text-anchor="middle" font-size="11" font-weight="600" fill="#0d47a1">PII Removal</text>
+    <text x="90" y="60" text-anchor="middle" font-size="9" fill="#1565c0">Pipeline v1.2.0</text>
+    <text x="90" y="78" text-anchor="middle" font-size="8" fill="#1976d2">fields: email, phone, ssn</text>
+
+    <!-- Output Data -->
+    <g filter="url(#shadow)">
+      <rect x="20" y="120" width="140" height="70" rx="8" fill="url(#dataGrad)" stroke="#4caf50" stroke-width="1.5"/>
+    </g>
+    <text x="90" y="148" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Anonymized</text>
+    <text x="90" y="165" text-anchor="middle" font-size="9" fill="#558b2f">sha256: def456...</text>
+    <text x="90" y="178" text-anchor="middle" font-size="9" fill="#558b2f">1M records</text>
+
+    <!-- Transform Attestation -->
+    <g filter="url(#shadow)">
+      <rect x="10" y="220" width="160" height="110" rx="8" fill="url(#attestGrad)" stroke="#ef6c00" stroke-width="1.5"/>
+    </g>
+    <text x="90" y="245" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">Transform</text>
+    <text x="90" y="258" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">Attestation</text>
+    <line x1="25" y1="268" x2="155" y2="268" stroke="#ef6c00" stroke-width="0.5" opacity="0.3"/>
+    <text x="25" y="283" font-size="8" fill="#bf360c">input: abc123...</text>
+    <text x="25" y="295" font-size="8" fill="#bf360c">output: def456...</text>
+    <text x="25" y="307" font-size="8" fill="#bf360c">transform: anonymization</text>
+    <text x="25" y="319" font-size="8" fill="#bf360c">inputRef: origin_attest</text>
+
+    <!-- Link from data to attestation -->
+    <line x1="90" y1="195" x2="90" y2="215" stroke="#ef6c00" stroke-width="1.5" stroke-dasharray="4,2"/>
+
+    <!-- Link to previous attestation -->
+    <path d="M25 310 L-30 310 L-30 370 L-90 370" stroke="#ef6c00" stroke-width="1.5" stroke-dasharray="4,2" fill="none" marker-end="url(#arrowheadOrange)"/>
+  </g>
+
+  <!-- Arrow to Transform 2 -->
+  <line x1="410" y1="295" x2="475" y2="295" stroke="#546e7a" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- STAGE 3: Transform 2 -->
+  <g transform="translate(480, 120)">
+    <text x="90" y="0" text-anchor="middle" font-size="12" font-weight="600" fill="#666">STAGE 3: Transform</text>
+
+    <!-- Transform Box -->
+    <g filter="url(#shadow)">
+      <rect x="20" y="20" width="140" height="70" rx="8" fill="url(#transformGrad)" stroke="#1976d2" stroke-width="1.5"/>
+    </g>
+    <text x="90" y="45" text-anchor="middle" font-size="11" font-weight="600" fill="#0d47a1">Feature Eng.</text>
+    <text x="90" y="60" text-anchor="middle" font-size="9" fill="#1565c0">ML Pipeline v2.0</text>
+    <text x="90" y="78" text-anchor="middle" font-size="8" fill="#1976d2">aggregates + encoding</text>
+
+    <!-- Output Data -->
+    <g filter="url(#shadow)">
+      <rect x="20" y="120" width="140" height="70" rx="8" fill="url(#dataGrad)" stroke="#4caf50" stroke-width="1.5"/>
+    </g>
+    <text x="90" y="148" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">ML Features</text>
+    <text x="90" y="165" text-anchor="middle" font-size="9" fill="#558b2f">sha256: ghi789...</text>
+    <text x="90" y="178" text-anchor="middle" font-size="9" fill="#558b2f">1M records</text>
+
+    <!-- Transform Attestation -->
+    <g filter="url(#shadow)">
+      <rect x="10" y="220" width="160" height="110" rx="8" fill="url(#attestGrad)" stroke="#ef6c00" stroke-width="1.5"/>
+    </g>
+    <text x="90" y="245" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">Transform</text>
+    <text x="90" y="258" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">Attestation</text>
+    <line x1="25" y1="268" x2="155" y2="268" stroke="#ef6c00" stroke-width="0.5" opacity="0.3"/>
+    <text x="25" y="283" font-size="8" fill="#bf360c">input: def456...</text>
+    <text x="25" y="295" font-size="8" fill="#bf360c">output: ghi789...</text>
+    <text x="25" y="307" font-size="8" fill="#bf360c">transform: feature_eng</text>
+    <text x="25" y="319" font-size="8" fill="#bf360c">inputRef: transform_1</text>
+
+    <!-- Link from data to attestation -->
+    <line x1="90" y1="195" x2="90" y2="215" stroke="#ef6c00" stroke-width="1.5" stroke-dasharray="4,2"/>
+
+    <!-- Link to previous attestation -->
+    <path d="M25 310 L-30 310 L-30 370 L-90 370" stroke="#ef6c00" stroke-width="1.5" stroke-dasharray="4,2" fill="none" marker-end="url(#arrowheadOrange)"/>
+  </g>
+
+  <!-- Arrow to DBOM -->
+  <line x1="655" y1="295" x2="720" y2="295" stroke="#546e7a" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- STAGE 4: DBOM -->
+  <g transform="translate(725, 120)">
+    <text x="115" y="0" text-anchor="middle" font-size="12" font-weight="600" fill="#666">OUTPUT: DBOM</text>
+
+    <!-- Final Dataset -->
+    <g filter="url(#shadow)">
+      <rect x="20" y="20" width="180" height="80" rx="8" fill="url(#dataGrad)" stroke="#4caf50" stroke-width="2"/>
+    </g>
+    <text x="110" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#2e7d32">Final Dataset</text>
+    <text x="110" y="68" text-anchor="middle" font-size="10" fill="#558b2f">ml_training_v3.parquet</text>
+    <text x="110" y="85" text-anchor="middle" font-size="9" fill="#558b2f">sha256: ghi789...</text>
+
+    <!-- DBOM -->
+    <g filter="url(#shadow)">
+      <rect x="10" y="130" width="200" height="200" rx="8" fill="url(#dbomGrad)" stroke="#7b1fa2" stroke-width="2"/>
+    </g>
+    <text x="110" y="155" text-anchor="middle" font-size="12" font-weight="700" fill="#4a148c">Data Bill of Materials</text>
+    <line x1="25" y1="168" x2="195" y2="168" stroke="#7b1fa2" stroke-width="0.5" opacity="0.4"/>
+
+    <text x="25" y="188" font-size="9" font-weight="600" fill="#6a1b9a">Sources:</text>
+    <text x="30" y="202" font-size="8" fill="#4a148c">• customer_transactions (L2)</text>
+
+    <text x="25" y="222" font-size="9" font-weight="600" fill="#6a1b9a">Transformations:</text>
+    <text x="30" y="236" font-size="8" fill="#4a148c">1. PII Removal</text>
+    <text x="30" y="248" font-size="8" fill="#4a148c">2. Feature Engineering</text>
+
+    <text x="25" y="268" font-size="9" font-weight="600" fill="#6a1b9a">Attestation Chain:</text>
+    <text x="30" y="282" font-size="8" fill="#4a148c">origin → transform₁ → transform₂</text>
+
+    <text x="25" y="302" font-size="9" font-weight="600" fill="#6a1b9a">Makoto Level:</text>
+    <rect x="110" y="292" width="30" height="16" rx="4" fill="#7b1fa2"/>
+    <text x="125" y="304" text-anchor="middle" font-size="9" font-weight="600" fill="white">L2</text>
+    <text x="148" y="304" font-size="8" fill="#4a148c">Authentic</text>
+
+    <!-- Link from data to DBOM -->
+    <line x1="110" y1="105" x2="110" y2="125" stroke="#7b1fa2" stroke-width="1.5" stroke-dasharray="4,2"/>
+  </g>
+
+  <!-- Verification callout -->
+  <g transform="translate(40, 500)">
+    <rect x="0" y="0" width="920" height="80" rx="8" fill="white" stroke="#78909c" stroke-dasharray="4,2"/>
+    <text x="20" y="25" font-size="12" font-weight="600" fill="#37474f">Verification Flow</text>
+    <text x="20" y="45" font-size="10" fill="#546e7a">1. Consumer receives dataset + DBOM</text>
+    <text x="250" y="45" font-size="10" fill="#546e7a">2. Hash dataset, compare to DBOM</text>
+    <text x="480" y="45" font-size="10" fill="#546e7a">3. Verify each attestation signature</text>
+    <text x="710" y="45" font-size="10" fill="#546e7a">4. Traverse lineage chain</text>
+    <text x="20" y="65" font-size="10" fill="#546e7a">→</text>
+    <text x="250" y="65" font-size="10" fill="#546e7a">→</text>
+    <text x="480" y="65" font-size="10" fill="#546e7a">→</text>
+    <text x="710" y="65" font-size="10" fill="#2e7d32" font-weight="600">✓ Provenance Verified</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="500" y="620" text-anchor="middle" font-size="11" fill="#999">
+    誠 Makoto — Data flows left to right; attestation references point to inputs
+  </text>
+</svg>

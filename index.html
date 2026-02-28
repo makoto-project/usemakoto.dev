@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Makoto (誠) - Data Integrity Framework</title>
+    <!-- Shared Expanso CSS (loaded first, demo styles override) -->
+    <!-- Demo-specific styles -->
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="/" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item active">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="spec/" class="nav-item">Makoto v0.1</a>
+            <a href="levels/" class="nav-item">Understanding Levels</a>
+            <a href="spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="examples/" class="nav-item">Examples</a>
+            <a href="demos/" class="nav-item">Demos</a>
+            <a href="privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero with decorative curves -->
+        <section class="hero">
+            <div class="hero-decoration">
+                <svg viewBox="0 0 1200 600" preserveAspectRatio="none">
+                    <!-- Decorative curves - visible on dark purple hero background -->
+                    <path d="M-100,200 Q300,100 600,250 T1300,200" stroke="rgba(196, 181, 253, 0.4)" stroke-width="2" fill="none"/>
+                    <path d="M-100,350 Q400,200 700,400 T1300,300" stroke="rgba(196, 181, 253, 0.3)" stroke-width="2" fill="none"/>
+                    <path d="M-100,450 Q200,350 500,500 T1300,400" stroke="rgba(196, 181, 253, 0.25)" stroke-width="2" fill="none"/>
+                    <!-- Decorative circles -->
+                    <circle cx="580" cy="80" r="8" fill="rgba(196, 181, 253, 0.5)"/>
+                    <circle cx="620" cy="380" r="6" fill="rgba(196, 181, 253, 0.4)"/>
+                    <circle cx="1050" cy="180" r="10" fill="rgba(196, 181, 253, 0.35)"/>
+                </svg>
+            </div>
+            <div class="hero-content">
+                <h1>Safeguarding data integrity across any data supply chain</h1>
+                <p style="font-size: 1.15rem; color: rgba(255, 255, 255, 0.85); margin: 1.5rem 0 2rem; max-width: 600px;">
+                    Makoto brings SLSA-style assurance levels to data pipelines, producing cryptographically signed DBOMs (Data Bills of Materials) to prove chain of custody.
+                </p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="spec/" class="btn btn-primary" style="background: var(--accent); color: var(--primary-dark);">Read the Specification</a>
+                    <a href="demos/" class="btn btn-primary" style="background: var(--primary); color: white;">Try the live demos &rarr;</a>
+                    <a href="examples/" class="btn btn-outline" style="border-color: var(--accent); color: var(--accent);">View Examples</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accent Banner -->
+        <section class="accent-banner">
+            <h2>What is Makoto?</h2>
+            <p>
+                Makoto (誠 — "sincerity, truth") brings SLSA-style assurance levels to data supply chains. The Makoto Levels
+                specification defines incremental security guarantees for data origin, lineage, and transformations.
+                A DBOM (Data Bill of Materials) is the signed record your pipeline produces to prove compliance.
+            </p>
+        </section>
+
+        <!-- Understanding Makoto Levels -->
+        <section class="section">
+            <h2>Understanding Makoto Levels</h2>
+            <p>
+                These pages provide an overview of Makoto Levels, how they protect against common data supply chain
+                attacks, and common use cases. If you're new to Makoto or data supply chain security, start here.
+            </p>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Page</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="spec/#about">About Makoto Levels</a></td>
+                        <td>An introductory guide to the Makoto specification</td>
+                    </tr>
+                    <tr>
+                        <td><a href="threats/">Data supply chain threats</a></td>
+                        <td>An introduction to data supply chain threats</td>
+                    </tr>
+                    <tr>
+                        <td><a href="spec/#use-cases">Use cases</a></td>
+                        <td>Common use cases for data attestation</td>
+                    </tr>
+                    <tr>
+                        <td><a href="spec/#guiding-principles">Guiding principles</a></td>
+                        <td>The core principles behind Makoto's design</td>
+                    </tr>
+                    <tr>
+                        <td><a href="privacy/">Privacy techniques</a></td>
+                        <td>Techniques for privacy-preserving attestations</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Provenance Levels</h3>
+            <p>
+                These pages describe the provenance level requirements. If you want to achieve
+                a particular Makoto level (L1, L2, or L3), these are the requirements you'll need to meet.
+            </p>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Page</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="spec/#levels">Provenance levels overview</a></td>
+                        <td>Overview of L1, L2, and L3 provenance levels</td>
+                    </tr>
+                    <tr>
+                        <td><a href="spec/#producing">Producing DBOMs</a></td>
+                        <td>How to produce DBOMs for your data pipelines</td>
+                    </tr>
+                    <tr>
+                        <td><a href="spec/#verifying">Verifying DBOMs</a></td>
+                        <td>How to verify Data Bills of Materials</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Attestation Formats</h3>
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Page</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="examples/#origin">Origin attestation</a></td>
+                        <td>Attestation format for data origin/provenance</td>
+                    </tr>
+                    <tr>
+                        <td><a href="examples/#transform">Transform attestation</a></td>
+                        <td>Attestation format for data transformations</td>
+                    </tr>
+                    <tr>
+                        <td><a href="examples/#stream">Stream window attestation</a></td>
+                        <td>Attestation format for high-throughput streams</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Sample Pipeline -->
+        <section class="section section-wide" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Sample Attestation Pipeline</h2>
+                <p>
+                    A typical data pipeline with Makoto attestations at each stage. Each stage generates an
+                    attestation that can be independently verified, ultimately producing a DBOM.
+                </p>
+
+                <div class="pipeline-diagram">
+                    <div class="pipeline-stages">
+                        <div class="pipeline-stage">
+                            <div class="pipeline-stage-icon">📡</div>
+                            <div class="pipeline-stage-label">Source</div>
+                        </div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-stage">
+                            <div class="pipeline-stage-icon">📥</div>
+                            <div class="pipeline-stage-label">Ingest</div>
+                        </div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-stage">
+                            <div class="pipeline-stage-icon">⚙️</div>
+                            <div class="pipeline-stage-label">Transform</div>
+                        </div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-stage">
+                            <div class="pipeline-stage-icon">💾</div>
+                            <div class="pipeline-stage-label">Store</div>
+                        </div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-stage">
+                            <div class="pipeline-stage-icon">📊</div>
+                            <div class="pipeline-stage-label">Consume</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample attestation -->
+                <h3>Example Origin Attestation</h3>
+                <div class="code-block">
+<pre>{
+  <span class="hl-key">"_type"</span>: <span class="hl-string">"https://makoto.dev/origin/v0.1"</span>,
+  <span class="hl-key">"subject"</span>: [{
+    <span class="hl-key">"name"</span>: <span class="hl-string">"sensor-readings-2025-01-15.parquet"</span>,
+    <span class="hl-key">"digest"</span>: { <span class="hl-key">"sha256"</span>: <span class="hl-string">"a1b2c3d4..."</span> }
+  }],
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-key">"source"</span>: {
+      <span class="hl-key">"type"</span>: <span class="hl-string">"iot-device"</span>,
+      <span class="hl-key">"id"</span>: <span class="hl-string">"sensor-cluster-west-01"</span>
+    },
+    <span class="hl-key">"timestamp"</span>: <span class="hl-string">"2025-01-15T10:30:00Z"</span>,
+    <span class="hl-key">"metadata"</span>: {
+      <span class="hl-key">"format"</span>: <span class="hl-string">"parquet"</span>,
+      <span class="hl-key">"records"</span>: <span class="hl-number">1250000</span>
+    }
+  }
+}</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Provenance Levels Preview -->
+        <section class="section">
+            <h2>Makoto Levels</h2>
+            <p>
+                Makoto defines three levels with increasing guarantees. Start with Level 1 for basic
+                provenance tracking, then progressively enhance security based on your requirements.
+            </p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <span class="level-badge l1">Level 1</span>
+                    <h3 style="margin: 0.75rem 0 0.5rem;">Provenance Exists</h3>
+                    <p class="text-muted" style="margin-bottom: 0;">
+                        Documentation that data provenance exists. Enables detection of tampering through
+                        content hashing.
+                    </p>
+                </div>
+                <div class="card">
+                    <span class="level-badge l2">Level 2</span>
+                    <h3 style="margin: 0.75rem 0 0.5rem;">Authentic Provenance</h3>
+                    <p class="text-muted" style="margin-bottom: 0;">
+                        Cryptographically signed attestations with identity binding. Prevents attestation
+                        forgery.
+                    </p>
+                </div>
+                <div class="card">
+                    <span class="level-badge l3">Level 3</span>
+                    <h3 style="margin: 0.75rem 0 0.5rem;">Unforgeable Provenance</h3>
+                    <p class="text-muted" style="margin-bottom: 0;">
+                        Hardware-backed attestations using TEE or HSM. Provides non-repudiation even if
+                        systems are compromised.
+                    </p>
+                </div>
+            </div>
+
+            <p style="margin-top: 1.5rem;">
+                <a href="spec/#levels">Learn more about provenance levels →</a>
+            </p>
+        </section>
+
+        <!-- Relationship to SLSA -->
+        <section class="section" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Relationship to SLSA</h2>
+                <p>
+                    Makoto brings <a href="https://slsa.dev" target="_blank">SLSA</a>-style assurance levels
+                    to data supply chains. While SLSA focuses on software build provenance, Makoto
+                    addresses the unique challenges of data pipelines.
+                </p>
+
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>SLSA</th>
+                            <th>Makoto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Focus</strong></td>
+                            <td>Software artifacts</td>
+                            <td>Data artifacts</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Provenance</strong></td>
+                            <td>Build provenance</td>
+                            <td>Origin + Transform provenance</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scale</strong></td>
+                            <td>Individual builds</td>
+                            <td>Batch files + high-throughput streams</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Privacy</strong></td>
+                            <td>Public metadata</td>
+                            <td>Privacy-preserving options</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Output</strong></td>
+                            <td>SBOM</td>
+                            <td>DBOM (Data Bill of Materials)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Format</strong></td>
+                            <td>in-toto/DSSE</td>
+                            <td>in-toto/DSSE (compatible)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>
+                    Just as SLSA defines levels for build provenance, Makoto defines levels for data provenance.
+                    Both frameworks share the same attestation envelope format (DSSE) and progressive
+                    level approach, making them complementary for organizations that need to
+                    secure both software and data supply chains.
+                </p>
+            </div>
+        </section>
+
+        <!-- Get Started CTA -->
+        <section class="section" style="text-align: center; padding: 4rem 3rem;">
+            <h2>Get Started with Makoto</h2>
+            <p style="max-width: 600px; margin: 0 auto 2rem;">
+                Ready to bring data integrity to your pipelines? Start with Level 1 attestations
+                and progressively enhance security as your needs grow.
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="spec/" class="btn btn-primary">Read the Specification</a>
+                <a href="examples/" class="btn btn-outline">Explore Examples</a>
+                <a href="https://github.com/makoto-project/makoto" class="btn btn-outline" target="_blank">View on GitHub</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://slsa.dev" target="_blank">Inspired by SLSA →</a>
+            </p>
+            <p style="margin-top: 0.5rem;">
+                Built in collaboration with the supply chain security community.
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

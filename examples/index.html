@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examples - Makoto Levels | Makoto</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .example-section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 2rem;
+        }
+        .example-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        .example-section .subtitle {
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+        }
+        .example-section p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        .json-viewer {
+            background: #0d0d0d;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 24px 0;
+        }
+        .json-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+        }
+        .json-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .json-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .json-dots span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .json-dots span:nth-child(1) { background: #ff5f57; }
+        .json-dots span:nth-child(2) { background: #febc2e; }
+        .json-dots span:nth-child(3) { background: #28c840; }
+        .json-title {
+            font-size: 0.8rem;
+            color: #888;
+            font-family: var(--font-mono);
+        }
+        .json-level {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .json-level.l2 { background: #6d28d9; color: white; }
+        .json-body {
+            padding: 20px;
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .json-body pre {
+            margin: 0;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+        .json-key { color: #89b4fa; }
+        .json-string { color: #a6e3a1; }
+        .json-number { color: #fab387; }
+        .json-boolean { color: #89b4fa; }
+        .json-null { color: #f87171; }
+        .field-explanation {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .field-explanation h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+        .field-list {
+            display: grid;
+            gap: 8px;
+        }
+        .field-item {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 12px;
+            font-size: 0.85rem;
+        }
+        .field-item code {
+            font-family: var(--font-mono);
+            color: var(--primary);
+            background: #f3e8ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .field-item span {
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="../spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="../comparison/w3c-prov.html" class="nav-item">W3C PROV Comparison</a>
+            <a href="../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="./" class="nav-item active">Examples</a>
+            <a href="#origin" class="nav-item nav-item-sub">Origin Attestation</a>
+            <a href="#transform" class="nav-item nav-item-sub">Transform Attestation</a>
+            <a href="#stream" class="nav-item nav-item-sub">Stream Window</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">Attestation Examples</h1>
+            <p>Complete examples of Makoto Levels (Makoto) attestations with field-by-field explanations.</p>
+        </section>
+
+        <section class="section">
+                    <!-- Origin Attestation -->
+                    <section class="example-section" id="origin">
+                        <h2>Origin Attestation</h2>
+                        <div class="subtitle">makoto.dev/origin/v1</div>
+                        <p>Documents where data came from, how it was collected, consent status, and geographic origin. This is the starting point for any data lineage chain.</p>
+
+                        <div class="json-viewer">
+                            <div class="json-header">
+                                <div class="json-header-left">
+                                    <div class="json-dots"><span></span><span></span><span></span></div>
+                                    <span class="json-title">origin-attestation.json</span>
+                                </div>
+                                <span class="json-level l2">Makoto L2</span>
+                            </div>
+                            <div class="json-body">
+<pre>{
+  <span class="json-key">"_type"</span>: <span class="json-string">"https://in-toto.io/Statement/v1"</span>,
+  <span class="json-key">"subject"</span>: [{
+    <span class="json-key">"name"</span>: <span class="json-string">"dataset:customer_transactions_2025q4"</span>,
+    <span class="json-key">"digest"</span>: {
+      <span class="json-key">"sha256"</span>: <span class="json-string">"a1b2c3d4e5f6789012345678901234567890abcdef..."</span>,
+      <span class="json-key">"recordCount"</span>: <span class="json-string">"1847293"</span>,
+      <span class="json-key">"merkleRoot"</span>: <span class="json-string">"def456789012345678901234567890abcdef..."</span>
+    }
+  }],
+  <span class="json-key">"predicateType"</span>: <span class="json-string">"https://makoto.dev/origin/v1"</span>,
+  <span class="json-key">"predicate"</span>: {
+    <span class="json-key">"origin"</span>: {
+      <span class="json-key">"source"</span>: <span class="json-string">"https://api.partner-bank.com/v2/transactions"</span>,
+      <span class="json-key">"sourceType"</span>: <span class="json-string">"api"</span>,
+      <span class="json-key">"collectionMethod"</span>: <span class="json-string">"scheduled-pull"</span>,
+      <span class="json-key">"collectionTimestamp"</span>: <span class="json-string">"2025-12-20T08:00:00Z"</span>,
+      <span class="json-key">"geography"</span>: <span class="json-string">"US-WEST-2"</span>,
+      <span class="json-key">"consent"</span>: {
+        <span class="json-key">"type"</span>: <span class="json-string">"contractual"</span>,
+        <span class="json-key">"reference"</span>: <span class="json-string">"https://legal.example.com/dpa/2025"</span>
+      }
+    },
+    <span class="json-key">"collector"</span>: {
+      <span class="json-key">"id"</span>: <span class="json-string">"https://expanso.io/collectors/prod-west-01"</span>,
+      <span class="json-key">"version"</span>: {
+        <span class="json-key">"expanso-cli"</span>: <span class="json-string">"1.4.2"</span>
+      }
+    },
+    <span class="json-key">"schema"</span>: {
+      <span class="json-key">"format"</span>: <span class="json-string">"json-lines"</span>,
+      <span class="json-key">"schemaRef"</span>: <span class="json-string">"https://schemas.example.com/transactions/v2"</span>
+    }
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="field-explanation">
+                            <h4>Key Fields Explained</h4>
+                            <div class="field-list">
+                                <div class="field-item">
+                                    <code>origin.source</code>
+                                    <span>URI identifying the data source (API endpoint, database, etc.)</span>
+                                </div>
+                                <div class="field-item">
+                                    <code>origin.geography</code>
+                                    <span>Geographic region where data was collected (for compliance)</span>
+                                </div>
+                                <div class="field-item">
+                                    <code>origin.consent</code>
+                                    <span>Consent or legal basis for data collection</span>
+                                </div>
+                                <div class="field-item">
+                                    <code>collector.id</code>
+                                    <span>Identifier of the system that collected the data</span>
+                                </div>
+                                <div class="field-item">
+                                    <code>digest.merkleRoot</code>
+                                    <span>Merkle tree root for efficient partial verification</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Transform Attestation -->
+                    <section class="example-section" id="transform">
+                        <h2>Transform Attestation</h2>
+                        <div class="subtitle">makoto.dev/transform/v1</div>
+                        <p>Documents what processing was applied to data, linking to input attestations to form a complete lineage chain.</p>
+
+                        <div class="json-viewer">
+                            <div class="json-header">
+                                <div class="json-header-left">
+                                    <div class="json-dots"><span></span><span></span><span></span></div>
+                                    <span class="json-title">transform-attestation.json</span>
+                                </div>
+                                <span class="json-level l2">Makoto L2</span>
+                            </div>
+                            <div class="json-body">
+<pre>{
+  <span class="json-key">"_type"</span>: <span class="json-string">"https://in-toto.io/Statement/v1"</span>,
+  <span class="json-key">"subject"</span>: [{
+    <span class="json-key">"name"</span>: <span class="json-string">"dataset:customer_transactions_anonymized"</span>,
+    <span class="json-key">"digest"</span>: {
+      <span class="json-key">"sha256"</span>: <span class="json-string">"xyz789012345678901234567890abcdef..."</span>,
+      <span class="json-key">"recordCount"</span>: <span class="json-string">"1847293"</span>
+    }
+  }],
+  <span class="json-key">"predicateType"</span>: <span class="json-string">"https://makoto.dev/transform/v1"</span>,
+  <span class="json-key">"predicate"</span>: {
+    <span class="json-key">"inputs"</span>: [{
+      <span class="json-key">"name"</span>: <span class="json-string">"dataset:customer_transactions_2025q4"</span>,
+      <span class="json-key">"digest"</span>: { <span class="json-key">"sha256"</span>: <span class="json-string">"a1b2c3d4..."</span> },
+      <span class="json-key">"attestationRef"</span>: <span class="json-string">"https://attestations.example.com/origin/a1b2c3d4"</span>
+    }],
+    <span class="json-key">"transform"</span>: {
+      <span class="json-key">"type"</span>: <span class="json-string">"https://makoto.dev/transforms/anonymization"</span>,
+      <span class="json-key">"name"</span>: <span class="json-string">"PII Anonymization Pipeline"</span>,
+      <span class="json-key">"version"</span>: <span class="json-string">"1.2.0"</span>,
+      <span class="json-key">"parameters"</span>: {
+        <span class="json-key">"fieldsRemoved"</span>: [<span class="json-string">"email"</span>, <span class="json-string">"phone"</span>, <span class="json-string">"address"</span>],
+        <span class="json-key">"fieldsHashed"</span>: [<span class="json-string">"customer_id"</span>],
+        <span class="json-key">"kAnonymity"</span>: <span class="json-number">5</span>
+      },
+      <span class="json-key">"codeRef"</span>: {
+        <span class="json-key">"uri"</span>: <span class="json-string">"git+https://github.com/example/pipelines@v1.2.0"</span>,
+        <span class="json-key">"digest"</span>: { <span class="json-key">"sha256"</span>: <span class="json-string">"pipeline_hash..."</span> }
+      }
+    },
+    <span class="json-key">"executor"</span>: {
+      <span class="json-key">"id"</span>: <span class="json-string">"https://expanso.io/pipelines/prod-cluster-01"</span>,
+      <span class="json-key">"platform"</span>: <span class="json-string">"expanso"</span>
+    },
+    <span class="json-key">"metadata"</span>: {
+      <span class="json-key">"startedOn"</span>: <span class="json-string">"2025-12-20T08:00:45Z"</span>,
+      <span class="json-key">"finishedOn"</span>: <span class="json-string">"2025-12-20T08:15:32Z"</span>,
+      <span class="json-key">"recordsInput"</span>: <span class="json-number">1847293</span>,
+      <span class="json-key">"recordsOutput"</span>: <span class="json-number">1847293</span>
+    }
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="field-explanation">
+                            <h4>Key Fields Explained</h4>
+                            <div class="field-list">
+                                <div class="field-item">
+                                    <code>inputs[].attestationRef</code>
+                                    <span>Reference to input data's attestation (creates lineage chain)</span>
+                                </div>
+                                <div class="field-item">
+                                    <code>transform.parameters</code>
+                                    <span>Configuration used for this transformation</span>
+                                </div>
+                                <div class="field-item">
+                                    <code>transform.codeRef</code>
+                                    <span>Git reference to the transformation code for reproducibility</span>
+                                </div>
+                                <div class="field-item">
+                                    <code>executor.platform</code>
+                                    <span>Platform that executed the transformation</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Stream Window -->
+                    <section class="example-section" id="stream">
+                        <h2>Stream Window Attestation</h2>
+                        <div class="subtitle">makoto.dev/stream-window/v1</div>
+                        <p>For high-throughput streaming: attests to time-bounded windows using Merkle trees for efficiency. Enables attestation at millions of events per second.</p>
+
+                        <div class="json-viewer">
+                            <div class="json-header">
+                                <div class="json-header-left">
+                                    <div class="json-dots"><span></span><span></span><span></span></div>
+                                    <span class="json-title">stream-window-attestation.json</span>
+                                </div>
+                                <span class="json-level l2">Makoto L2</span>
+                            </div>
+                            <div class="json-body">
+<pre>{
+  <span class="json-key">"_type"</span>: <span class="json-string">"https://in-toto.io/Statement/v1"</span>,
+  <span class="json-key">"subject"</span>: [{
+    <span class="json-key">"name"</span>: <span class="json-string">"stream:iot_sensors:window_20251220_100000"</span>,
+    <span class="json-key">"digest"</span>: {
+      <span class="json-key">"merkleRoot"</span>: <span class="json-string">"abc123def456..."</span>,
+      <span class="json-key">"windowStart"</span>: <span class="json-string">"2025-12-20T10:00:00Z"</span>,
+      <span class="json-key">"windowEnd"</span>: <span class="json-string">"2025-12-20T10:01:00Z"</span>,
+      <span class="json-key">"recordCount"</span>: <span class="json-string">"847293"</span>
+    }
+  }],
+  <span class="json-key">"predicateType"</span>: <span class="json-string">"https://makoto.dev/stream-window/v1"</span>,
+  <span class="json-key">"predicate"</span>: {
+    <span class="json-key">"stream"</span>: {
+      <span class="json-key">"id"</span>: <span class="json-string">"iot_sensors"</span>,
+      <span class="json-key">"source"</span>: <span class="json-string">"mqtt://sensors.factory.example.com:1883"</span>,
+      <span class="json-key">"partitions"</span>: [<span class="json-string">"temp"</span>, <span class="json-string">"pressure"</span>, <span class="json-string">"vibration"</span>]
+    },
+    <span class="json-key">"window"</span>: {
+      <span class="json-key">"type"</span>: <span class="json-string">"tumbling"</span>,
+      <span class="json-key">"duration"</span>: <span class="json-string">"PT1M"</span>,
+      <span class="json-key">"watermark"</span>: <span class="json-string">"2025-12-20T09:59:55Z"</span>
+    },
+    <span class="json-key">"integrity"</span>: {
+      <span class="json-key">"merkleTree"</span>: {
+        <span class="json-key">"algorithm"</span>: <span class="json-string">"sha256"</span>,
+        <span class="json-key">"leafCount"</span>: <span class="json-number">847293</span>,
+        <span class="json-key">"treeHeight"</span>: <span class="json-number">20</span>
+      },
+      <span class="json-key">"chain"</span>: {
+        <span class="json-key">"previousWindowId"</span>: <span class="json-string">"window_20251220_095900"</span>,
+        <span class="json-key">"previousMerkleRoot"</span>: <span class="json-string">"xyz789..."</span>
+      }
+    }
+  }
+}</pre>
+                            </div>
+                        </div>
+
+                        <!-- Merkle Tree Diagram -->
+                        <div class="field-explanation" style="background: white;">
+                            <h4>Merkle Tree Structure</h4>
+                            <svg viewBox="0 0 600 200" fill="none" style="width: 100%; max-width: 500px; margin: 16px auto; display: block;">
+                                <!-- Root -->
+                                <rect x="250" y="10" width="100" height="36" rx="6" fill="#7c3aed"/>
+                                <text x="300" y="33" text-anchor="middle" fill="white" font-size="11" font-weight="600">Root Hash</text>
+                                <text x="300" y="60" text-anchor="middle" fill="#7c3aed" font-size="10">← Signed</text>
+
+                                <!-- Level 1 -->
+                                <line x1="275" y1="46" x2="175" y2="90" stroke="#d4d4d8" stroke-width="2"/>
+                                <line x1="325" y1="46" x2="425" y2="90" stroke="#d4d4d8" stroke-width="2"/>
+                                <rect x="125" y="90" width="100" height="30" rx="4" fill="#f5f3ff" stroke="#7c3aed"/>
+                                <text x="175" y="110" text-anchor="middle" fill="#7c3aed" font-size="10">Hash(L+R)</text>
+                                <rect x="375" y="90" width="100" height="30" rx="4" fill="#f5f3ff" stroke="#7c3aed"/>
+                                <text x="425" y="110" text-anchor="middle" fill="#7c3aed" font-size="10">Hash(L+R)</text>
+
+                                <!-- Level 2 -->
+                                <line x1="150" y1="120" x2="100" y2="150" stroke="#d4d4d8" stroke-width="2"/>
+                                <line x1="200" y1="120" x2="250" y2="150" stroke="#d4d4d8" stroke-width="2"/>
+                                <line x1="400" y1="120" x2="350" y2="150" stroke="#d4d4d8" stroke-width="2"/>
+                                <line x1="450" y1="120" x2="500" y2="150" stroke="#d4d4d8" stroke-width="2"/>
+
+                                <rect x="60" y="150" width="80" height="26" rx="4" fill="#f0fdf4" stroke="#22c55e"/>
+                                <text x="100" y="168" text-anchor="middle" fill="#166534" font-size="9">Record 1-N</text>
+                                <rect x="210" y="150" width="80" height="26" rx="4" fill="#f0fdf4" stroke="#22c55e"/>
+                                <text x="250" y="168" text-anchor="middle" fill="#166534" font-size="9">Record N+1...</text>
+                                <rect x="310" y="150" width="80" height="26" rx="4" fill="#f0fdf4" stroke="#22c55e"/>
+                                <text x="350" y="168" text-anchor="middle" fill="#166534" font-size="9">Record ...</text>
+                                <rect x="460" y="150" width="80" height="26" rx="4" fill="#f0fdf4" stroke="#22c55e"/>
+                                <text x="500" y="168" text-anchor="middle" fill="#166534" font-size="9">Record M</text>
+                            </svg>
+                            <p style="text-align: center; color: var(--gray-600); font-size: 0.85rem; margin-top: 12px;">
+                                Only the root hash is signed. Individual records can be verified with O(log n) proof.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- DBOM -->
+                    <section class="example-section" id="dbom">
+                        <h2>Data Bill of Materials</h2>
+                        <div class="subtitle">Complete lineage document</div>
+                        <p>A DBOM aggregates all attestations for a dataset into a single document, similar to an SBOM for software.</p>
+
+                        <div class="json-viewer">
+                            <div class="json-header">
+                                <div class="json-header-left">
+                                    <div class="json-dots"><span></span><span></span><span></span></div>
+                                    <span class="json-title">dbom.json</span>
+                                </div>
+                            </div>
+                            <div class="json-body">
+<pre>{
+  <span class="json-key">"dbomVersion"</span>: <span class="json-string">"1.0.0"</span>,
+  <span class="json-key">"dataset"</span>: {
+    <span class="json-key">"name"</span>: <span class="json-string">"ml_training_dataset_v3"</span>,
+    <span class="json-key">"version"</span>: <span class="json-string">"3.0.0"</span>,
+    <span class="json-key">"created"</span>: <span class="json-string">"2025-12-20T12:00:00Z"</span>,
+    <span class="json-key">"makotoLevel"</span>: <span class="json-string">"L2"</span>
+  },
+  <span class="json-key">"sources"</span>: [
+    {
+      <span class="json-key">"name"</span>: <span class="json-string">"customer_transactions"</span>,
+      <span class="json-key">"attestationRef"</span>: <span class="json-string">"https://attestations.example.com/origin/abc"</span>,
+      <span class="json-key">"makotoLevel"</span>: <span class="json-string">"L2"</span>,
+      <span class="json-key">"geography"</span>: <span class="json-string">"US"</span>
+    },
+    {
+      <span class="json-key">"name"</span>: <span class="json-string">"public_weather_data"</span>,
+      <span class="json-key">"attestationRef"</span>: <span class="json-string">"https://attestations.example.com/origin/def"</span>,
+      <span class="json-key">"makotoLevel"</span>: <span class="json-string">"L1"</span>,
+      <span class="json-key">"license"</span>: <span class="json-string">"CC-BY-4.0"</span>
+    }
+  ],
+  <span class="json-key">"transformations"</span>: [
+    { <span class="json-key">"order"</span>: <span class="json-number">1</span>, <span class="json-key">"name"</span>: <span class="json-string">"Join datasets"</span>, <span class="json-key">"attestationRef"</span>: <span class="json-string">"..."</span> },
+    { <span class="json-key">"order"</span>: <span class="json-number">2</span>, <span class="json-key">"name"</span>: <span class="json-string">"Anonymize PII"</span>, <span class="json-key">"attestationRef"</span>: <span class="json-string">"..."</span> },
+    { <span class="json-key">"order"</span>: <span class="json-number">3</span>, <span class="json-key">"name"</span>: <span class="json-string">"Feature engineering"</span>, <span class="json-key">"attestationRef"</span>: <span class="json-string">"..."</span> }
+  ]
+}</pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Signed Envelope -->
+                    <section class="example-section" id="signed">
+                        <h2>Signed Envelope (L2+)</h2>
+                        <div class="subtitle">DSSE format</div>
+                        <p>At L2 and above, attestations are wrapped in a DSSE (Dead Simple Signing Envelope) with cryptographic signatures.</p>
+
+                        <div class="json-viewer">
+                            <div class="json-header">
+                                <div class="json-header-left">
+                                    <div class="json-dots"><span></span><span></span><span></span></div>
+                                    <span class="json-title">signed-attestation.json</span>
+                                </div>
+                                <span class="json-level l2">Makoto L2</span>
+                            </div>
+                            <div class="json-body">
+<pre>{
+  <span class="json-key">"payloadType"</span>: <span class="json-string">"application/vnd.in-toto+json"</span>,
+  <span class="json-key">"payload"</span>: <span class="json-string">"eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjEi..."</span>,
+  <span class="json-key">"signatures"</span>: [{
+    <span class="json-key">"keyid"</span>: <span class="json-string">"https://expanso.io/keys/prod-signer-01"</span>,
+    <span class="json-key">"sig"</span>: <span class="json-string">"MEUCIQD2qN3..."</span>
+  }]
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="callout callout-info">
+                            <p><strong>Note:</strong> The <code>payload</code> is base64-encoded attestation JSON. Signers sign the payload bytes, enabling verification without parsing.</p>
+                        </div>
+                    </section>
+                </section>
+            </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Makoto brings SLSA-style assurance levels to data supply chains. <a href="https://slsa.dev" target="_blank">Learn about SLSA →</a></p>
+        </footer>
+    </main>
+</body>
+</html>

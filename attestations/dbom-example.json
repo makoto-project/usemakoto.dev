@@ -1,0 +1,148 @@
+{
+  "dbomVersion": "1.0.0",
+  "dbomId": "urn:dbom:example.com:fraud-detection-training-v3",
+  "dataset": {
+    "name": "fraud_detection_training_dataset_v3",
+    "version": "3.0.0",
+    "description": "ML training dataset for fraud detection model, combining transaction data with weather patterns",
+    "created": "2025-12-20T12:00:00Z",
+    "creator": {
+      "organization": "Example Corp Data Engineering",
+      "contact": "data-governance@example.com"
+    },
+    "digest": {
+      "sha256": "final_dataset_hash_123456789abcdef",
+      "recordCount": "1847293",
+      "format": "parquet"
+    },
+    "makotoLevel": "L2"
+  },
+  "sources": [
+    {
+      "name": "customer_transactions_2025q4",
+      "description": "Q4 2025 customer transaction records from partner bank",
+      "attestationRef": "https://attestations.example.com/origin/a1b2c3d4",
+      "attestationType": "https://makoto.dev/origin/v1",
+      "makotoLevel": "L2",
+      "geography": "US-WEST-2",
+      "consent": {
+        "type": "contractual",
+        "reference": "https://legal.example.com/dpa/partner-bank-2025"
+      },
+      "contribution": {
+        "recordCount": 1847293,
+        "recordPercentage": 65.2
+      }
+    },
+    {
+      "name": "public_weather_data_2025q4",
+      "description": "NOAA weather station data for correlation analysis",
+      "attestationRef": "https://attestations.example.com/origin/weather_xyz789",
+      "attestationType": "https://makoto.dev/origin/v1",
+      "makotoLevel": "L1",
+      "geography": "US",
+      "license": {
+        "type": "public-domain",
+        "identifier": "CC0-1.0",
+        "reference": "https://www.noaa.gov/information-technology/open-data"
+      },
+      "contribution": {
+        "recordCount": 986432,
+        "recordPercentage": 34.8
+      }
+    }
+  ],
+  "transformations": [
+    {
+      "order": 1,
+      "name": "PII Anonymization",
+      "description": "Remove and hash personally identifiable information",
+      "attestationRef": "https://attestations.example.com/transform/anon_def456",
+      "attestationType": "https://makoto.dev/transform/v1",
+      "makotoLevel": "L2",
+      "inputs": ["customer_transactions_2025q4"],
+      "outputs": ["customer_transactions_anonymized_2025q4"],
+      "transformType": "https://makoto.dev/transforms/anonymization"
+    },
+    {
+      "order": 2,
+      "name": "Weather Data Enrichment",
+      "description": "Join transaction data with weather conditions at transaction time/location",
+      "attestationRef": "https://attestations.example.com/transform/join_ghi789",
+      "attestationType": "https://makoto.dev/transform/v1",
+      "makotoLevel": "L2",
+      "inputs": [
+        "customer_transactions_anonymized_2025q4",
+        "public_weather_data_2025q4"
+      ],
+      "outputs": ["transactions_with_weather_2025q4"],
+      "transformType": "https://makoto.dev/transforms/join"
+    },
+    {
+      "order": 3,
+      "name": "Feature Engineering",
+      "description": "Compute ML features: transaction velocity, amount patterns, weather correlation scores",
+      "attestationRef": "https://attestations.example.com/transform/features_jkl012",
+      "attestationType": "https://makoto.dev/transform/v1",
+      "makotoLevel": "L2",
+      "inputs": ["transactions_with_weather_2025q4"],
+      "outputs": ["fraud_detection_training_dataset_v3"],
+      "transformType": "https://makoto.dev/transforms/feature-engineering"
+    }
+  ],
+  "lineageGraph": {
+    "format": "graphviz-dot",
+    "content": "digraph lineage {\n  rankdir=LR;\n  node [shape=box];\n  \n  // Sources\n  txn [label=\"customer_transactions\\n(L2 Origin)\"];\n  weather [label=\"public_weather_data\\n(L1 Origin)\"];\n  \n  // Transforms\n  anon [label=\"PII Anonymization\\n(L2 Transform)\" shape=ellipse];\n  join [label=\"Weather Enrichment\\n(L2 Transform)\" shape=ellipse];\n  features [label=\"Feature Engineering\\n(L2 Transform)\" shape=ellipse];\n  \n  // Output\n  output [label=\"fraud_detection_training_v3\\n(L2 Final Dataset)\" style=filled fillcolor=lightgreen];\n  \n  // Edges\n  txn -> anon;\n  anon -> join;\n  weather -> join;\n  join -> features;\n  features -> output;\n}"
+  },
+  "compliance": {
+    "overallMakotoLevel": "L2",
+    "levelJustification": "All source data has L1+ attestations; all transformations are cryptographically signed",
+    "privacyAssessment": {
+      "piiRemoved": true,
+      "anonymizationVerified": true,
+      "kAnonymity": 5,
+      "lDiversity": 3
+    },
+    "regulatoryCompliance": [
+      {
+        "regulation": "GDPR Article 35",
+        "status": "compliant",
+        "notes": "DPIA completed, anonymization verified"
+      },
+      {
+        "regulation": "EU AI Act Article 10",
+        "status": "compliant",
+        "notes": "Training data provenance documented"
+      }
+    ],
+    "dtaCompliance": {
+      "standardsVersion": "1.0.0",
+      "allFieldsPresent": true
+    }
+  },
+  "verification": {
+    "chainVerified": true,
+    "allSignaturesValid": true,
+    "attestationCount": 6,
+    "verificationTimestamp": "2025-12-20T12:05:00Z",
+    "verifier": {
+      "tool": "makoto-verify",
+      "version": "0.1.0"
+    }
+  },
+  "metadata": {
+    "generator": {
+      "tool": "makoto-dbom-generator",
+      "version": "0.1.0"
+    },
+    "created": "2025-12-20T12:05:00Z",
+    "validUntil": "2026-12-20T12:05:00Z",
+    "accessControl": {
+      "visibility": "internal",
+      "allowedConsumers": [
+        "ml-team@example.com",
+        "data-governance@example.com"
+      ]
+    }
+  }
+}

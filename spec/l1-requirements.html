@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 1 Requirements | Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="./" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="./l1-requirements.html" class="nav-item active">L1 Requirements</a>
+            <a href="#producer" class="nav-item nav-item-sub">Producer</a>
+            <a href="#platform" class="nav-item nav-item-sub">Platform</a>
+            <a href="#verification" class="nav-item nav-item-sub">Verification</a>
+            <a href="#conformance" class="nav-item nav-item-sub">Conformance</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../demos/" class="nav-item">Demos</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <div class="status-box">
+                <div class="status-label">Level</div>
+                <div class="status-value"><span class="level-badge l1">L1</span></div>
+            </div>
+
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">Level 1: Provenance Exists</h1>
+
+            <p>
+                This document specifies the formal requirements for achieving <strong>Makoto Level 1 (L1)</strong>.
+                L1 establishes the foundation for data provenance by requiring machine-readable documentation
+                of data origin and processing. At this level, attestations may be self-reported—the goal is
+                ensuring provenance information <em>exists</em> in a structured, parseable format.
+            </p>
+
+            <blockquote style="border-left: 4px solid #eab308; padding-left: 1rem; margin: 1.5rem 0; font-style: italic; color: var(--text-muted);">
+                "The data pipeline produces attestations that document data origin and processing."
+            </blockquote>
+
+            <div class="card" style="background: #fef3c7; border-color: #fcd34d;">
+                <p style="margin: 0;"><strong>Key Principle:</strong> L1 is intentionally achievable with minimal tooling.
+                Any organization can reach L1 by generating structured JSON attestations—no cryptographic infrastructure required.
+                This enables progressive adoption where teams start documenting provenance immediately.</p>
+            </div>
+        </section>
+
+        <!-- Summary Table -->
+        <section class="section" id="summary">
+            <h2>Requirements Summary</h2>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Requirement</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="3"><strong>Producer</strong></td>
+                        <td>Attestation Generation</td>
+                        <td>Generate machine-readable attestation for each data artifact</td>
+                    </tr>
+                    <tr>
+                        <td>Origin Documentation</td>
+                        <td>Document data source with sufficient detail for identification</td>
+                    </tr>
+                    <tr>
+                        <td>Transform Documentation</td>
+                        <td>Document processing steps applied to the data</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><strong>Platform</strong></td>
+                        <td>Format Support</td>
+                        <td>Support generation and storage of Makoto attestation format</td>
+                    </tr>
+                    <tr>
+                        <td>Attestation Delivery</td>
+                        <td>Deliver attestations alongside or linked to data artifacts</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><strong>Verification</strong></td>
+                        <td>Schema Validation</td>
+                        <td>Validate attestation conforms to Makoto schema</td>
+                    </tr>
+                    <tr>
+                        <td>Completeness Check</td>
+                        <td>Verify required fields are present and non-empty</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Producer Requirements -->
+        <section class="section" id="producer" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Producer Requirements</h2>
+                <p>
+                    <strong>Data producers</strong> are entities that collect, generate, or transform data.
+                    At L1, producers must generate attestations documenting their data artifacts.
+                </p>
+
+                <h3>P1: Attestation Generation</h3>
+                <div class="card">
+                    <p><strong>Requirement:</strong> The producer MUST generate a machine-readable attestation for each data artifact that claims L1 compliance.</p>
+
+                    <table class="content-table">
+                        <thead>
+                            <tr><th>Aspect</th><th>Specification</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Format</td>
+                                <td>JSON document conforming to <a href="https://github.com/in-toto/attestation" target="_blank">in-toto Statement v1</a></td>
+                            </tr>
+                            <tr>
+                                <td>Predicate Type</td>
+                                <td>One of: <code class="code-inline">https://makoto.dev/origin/v1</code>, <code class="code-inline">https://makoto.dev/transform/v1</code>, or <code class="code-inline">https://makoto.dev/stream-window/v1</code></td>
+                            </tr>
+                            <tr>
+                                <td>Encoding</td>
+                                <td>UTF-8 encoded JSON</td>
+                            </tr>
+                            <tr>
+                                <td>Timing</td>
+                                <td>Attestation SHOULD be generated at the time of data production or as close as practical</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>P2: Origin Documentation</h3>
+                <div class="card">
+                    <p><strong>Requirement:</strong> For data collection/ingestion, the producer MUST document the data source using the <code class="code-inline">origin/v1</code> predicate type.</p>
+
+                    <table class="content-table">
+                        <thead>
+                            <tr><th>Field</th><th>Required</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>origin.source</code></td>
+                                <td>REQUIRED</td>
+                                <td>URI or identifier of the data source (API endpoint, database, file path, etc.)</td>
+                            </tr>
+                            <tr>
+                                <td><code>origin.sourceType</code></td>
+                                <td>RECOMMENDED</td>
+                                <td>Type of source: <code>api</code>, <code>database</code>, <code>file</code>, <code>stream</code>, <code>manual</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>origin.collectionTimestamp</code></td>
+                                <td>REQUIRED</td>
+                                <td>ISO 8601 timestamp when data was collected</td>
+                            </tr>
+                            <tr>
+                                <td><code>origin.collectionMethod</code></td>
+                                <td>RECOMMENDED</td>
+                                <td>How data was obtained: <code>pull</code>, <code>push</code>, <code>export</code>, <code>manual</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>collector.id</code></td>
+                                <td>REQUIRED</td>
+                                <td>Identifier for the collecting system or process</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 style="margin-top: 1.5rem;">Example Origin Attestation</h4>
+                    <div class="code-block">
+<pre>{
+  <span class="hl-key">"_type"</span>: <span class="hl-string">"https://in-toto.io/Statement/v1"</span>,
+  <span class="hl-key">"subject"</span>: [{
+    <span class="hl-key">"name"</span>: <span class="hl-string">"dataset:customer_orders_2025q1"</span>,
+    <span class="hl-key">"digest"</span>: {
+      <span class="hl-key">"sha256"</span>: <span class="hl-string">"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"</span>
+    }
+  }],
+  <span class="hl-key">"predicateType"</span>: <span class="hl-string">"https://makoto.dev/origin/v1"</span>,
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-key">"origin"</span>: {
+      <span class="hl-key">"source"</span>: <span class="hl-string">"https://erp.example.com/api/v2/orders"</span>,
+      <span class="hl-key">"sourceType"</span>: <span class="hl-string">"api"</span>,
+      <span class="hl-key">"collectionTimestamp"</span>: <span class="hl-string">"2025-01-15T08:00:00Z"</span>,
+      <span class="hl-key">"collectionMethod"</span>: <span class="hl-string">"pull"</span>
+    },
+    <span class="hl-key">"collector"</span>: {
+      <span class="hl-key">"id"</span>: <span class="hl-string">"data-platform/ingestion-service-v3"</span>
+    }
+  }
+}</pre>
+                    </div>
+                </div>
+
+                <h3>P3: Transform Documentation</h3>
+                <div class="card">
+                    <p><strong>Requirement:</strong> For data transformations (ETL, filtering, aggregation, etc.), the producer MUST document each processing step using the <code class="code-inline">transform/v1</code> predicate type.</p>
+
+                    <table class="content-table">
+                        <thead>
+                            <tr><th>Field</th><th>Required</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>inputs</code></td>
+                                <td>REQUIRED</td>
+                                <td>Array of input data artifacts with names and digests</td>
+                            </tr>
+                            <tr>
+                                <td><code>transform.type</code></td>
+                                <td>REQUIRED</td>
+                                <td>URI identifying the type of transformation</td>
+                            </tr>
+                            <tr>
+                                <td><code>transform.name</code></td>
+                                <td>RECOMMENDED</td>
+                                <td>Human-readable name for the transformation</td>
+                            </tr>
+                            <tr>
+                                <td><code>transform.parameters</code></td>
+                                <td>RECOMMENDED</td>
+                                <td>Configuration parameters used (sanitized of secrets)</td>
+                            </tr>
+                            <tr>
+                                <td><code>executor.id</code></td>
+                                <td>REQUIRED</td>
+                                <td>Identifier for the system executing the transform</td>
+                            </tr>
+                            <tr>
+                                <td><code>metadata.startedOn</code></td>
+                                <td>RECOMMENDED</td>
+                                <td>ISO 8601 timestamp when processing started</td>
+                            </tr>
+                            <tr>
+                                <td><code>metadata.finishedOn</code></td>
+                                <td>RECOMMENDED</td>
+                                <td>ISO 8601 timestamp when processing completed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 style="margin-top: 1.5rem;">Example Transform Attestation</h4>
+                    <div class="code-block">
+<pre>{
+  <span class="hl-key">"_type"</span>: <span class="hl-string">"https://in-toto.io/Statement/v1"</span>,
+  <span class="hl-key">"subject"</span>: [{
+    <span class="hl-key">"name"</span>: <span class="hl-string">"dataset:customer_orders_anonymized"</span>,
+    <span class="hl-key">"digest"</span>: {
+      <span class="hl-key">"sha256"</span>: <span class="hl-string">"a1b2c3d4e5f6..."</span>
+    }
+  }],
+  <span class="hl-key">"predicateType"</span>: <span class="hl-string">"https://makoto.dev/transform/v1"</span>,
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-key">"inputs"</span>: [{
+      <span class="hl-key">"name"</span>: <span class="hl-string">"dataset:customer_orders_2025q1"</span>,
+      <span class="hl-key">"digest"</span>: { <span class="hl-key">"sha256"</span>: <span class="hl-string">"e3b0c44298fc1c149..."</span> }
+    }],
+    <span class="hl-key">"transform"</span>: {
+      <span class="hl-key">"type"</span>: <span class="hl-string">"https://makoto.dev/transforms/anonymization"</span>,
+      <span class="hl-key">"name"</span>: <span class="hl-string">"PII Removal"</span>,
+      <span class="hl-key">"parameters"</span>: {
+        <span class="hl-key">"fields_removed"</span>: [<span class="hl-string">"email"</span>, <span class="hl-string">"phone"</span>],
+        <span class="hl-key">"fields_hashed"</span>: [<span class="hl-string">"customer_id"</span>]
+      }
+    },
+    <span class="hl-key">"executor"</span>: {
+      <span class="hl-key">"id"</span>: <span class="hl-string">"data-platform/etl-pipeline-v2"</span>
+    },
+    <span class="hl-key">"metadata"</span>: {
+      <span class="hl-key">"startedOn"</span>: <span class="hl-string">"2025-01-15T09:00:00Z"</span>,
+      <span class="hl-key">"finishedOn"</span>: <span class="hl-string">"2025-01-15T09:15:00Z"</span>
+    }
+  }
+}</pre>
+                    </div>
+                </div>
+
+                <h3>P4: Subject Binding</h3>
+                <div class="card">
+                    <p><strong>Requirement:</strong> Each attestation MUST identify the data artifact it describes via the <code class="code-inline">subject</code> field.</p>
+
+                    <table class="content-table">
+                        <thead>
+                            <tr><th>Field</th><th>Required</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>subject[].name</code></td>
+                                <td>REQUIRED</td>
+                                <td>Identifier for the data artifact (dataset name, file path, stream ID)</td>
+                            </tr>
+                            <tr>
+                                <td><code>subject[].digest.sha256</code></td>
+                                <td>REQUIRED</td>
+                                <td>SHA-256 hash of the data artifact content</td>
+                            </tr>
+                            <tr>
+                                <td><code>subject[].digest.recordCount</code></td>
+                                <td>RECOMMENDED</td>
+                                <td>Number of records in the dataset (for tabular data)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p class="text-muted" style="margin-top: 1rem;">
+                        <strong>Note:</strong> The digest provides content binding—if data changes, the digest changes.
+                        This allows verification that attestations match their referenced data.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platform Requirements -->
+        <section class="section" id="platform">
+            <h2>Platform Requirements</h2>
+            <p>
+                <strong>Platforms</strong> are systems that host or execute data processing (ETL tools, data warehouses,
+                streaming platforms, etc.). At L1, platforms must support attestation generation and delivery.
+            </p>
+
+            <h3>PL1: Attestation Format Support</h3>
+            <div class="card">
+                <p><strong>Requirement:</strong> The platform MUST support generation of attestations in the Makoto format.</p>
+
+                <ul>
+                    <li>Generate valid JSON conforming to in-toto Statement v1 schema</li>
+                    <li>Support all three Makoto predicate types (origin, transform, stream-window)</li>
+                    <li>Compute SHA-256 digests of data artifacts</li>
+                    <li>Generate ISO 8601 timestamps</li>
+                </ul>
+
+                <p class="text-muted" style="margin-top: 1rem;">
+                    <strong>Implementation Note:</strong> Platforms may implement attestation generation natively,
+                    via plugins, or through external tooling. The mechanism is not specified—only the output format.
+                </p>
+            </div>
+
+            <h3>PL2: Attestation Storage</h3>
+            <div class="card">
+                <p><strong>Requirement:</strong> The platform MUST provide a mechanism to store attestations persistently.</p>
+
+                <table class="content-table">
+                    <thead>
+                        <tr><th>Option</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sidecar File</td>
+                            <td>Store attestation alongside data with predictable naming</td>
+                            <td><code>data.json</code> → <code>data.json.attestation</code></td>
+                        </tr>
+                        <tr>
+                            <td>Attestation Registry</td>
+                            <td>Centralized service for attestation storage and retrieval</td>
+                            <td>REST API at <code>/attestations/{digest}</code></td>
+                        </tr>
+                        <tr>
+                            <td>Metadata Store</td>
+                            <td>Store attestations in data catalog or metadata system</td>
+                            <td>DataHub, Amundsen, or similar</td>
+                        </tr>
+                        <tr>
+                            <td>Embedded</td>
+                            <td>Include attestation within data package</td>
+                            <td>ZIP archive with <code>ATTESTATION.json</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>PL3: Attestation Delivery</h3>
+            <div class="card">
+                <p><strong>Requirement:</strong> The platform MUST provide a mechanism for consumers to retrieve attestations for data they receive.</p>
+
+                <ul>
+                    <li>Attestations SHOULD be discoverable from the data artifact (via naming convention, metadata, or registry lookup)</li>
+                    <li>Attestation retrieval SHOULD NOT require special permissions beyond data access</li>
+                    <li>The platform SHOULD document the attestation discovery mechanism</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Verification Requirements -->
+        <section class="section" id="verification" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Verification Requirements</h2>
+                <p>
+                    <strong>Verification</strong> describes what consumers can check to confirm L1 compliance.
+                    At L1, verification focuses on attestation presence and format—not cryptographic authenticity.
+                </p>
+
+                <h3>V1: Attestation Presence</h3>
+                <div class="card">
+                    <p><strong>Check:</strong> Verify that a machine-readable attestation exists for the data artifact.</p>
+
+                    <div class="pipeline-diagram">
+                        <div class="pipeline-stages">
+                            <div class="pipeline-stage">
+                                <div class="pipeline-stage-label">Locate Attestation</div>
+                            </div>
+                            <div class="pipeline-arrow">→</div>
+                            <div class="pipeline-stage">
+                                <div class="pipeline-stage-label">Parse JSON</div>
+                            </div>
+                            <div class="pipeline-arrow">→</div>
+                            <div class="pipeline-stage">
+                                <div class="pipeline-stage-label">Validate Schema</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul>
+                        <li><strong>PASS:</strong> Attestation file exists and is valid JSON</li>
+                        <li><strong>FAIL:</strong> No attestation found, or attestation is not valid JSON</li>
+                    </ul>
+                </div>
+
+                <h3>V2: Schema Compliance</h3>
+                <div class="card">
+                    <p><strong>Check:</strong> Verify that the attestation conforms to the Makoto schema.</p>
+
+                    <table class="content-table">
+                        <thead>
+                            <tr><th>Field</th><th>Validation</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>_type</code></td>
+                                <td>MUST equal <code>"https://in-toto.io/Statement/v1"</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>subject</code></td>
+                                <td>MUST be non-empty array with at least one entry</td>
+                            </tr>
+                            <tr>
+                                <td><code>subject[].name</code></td>
+                                <td>MUST be non-empty string</td>
+                            </tr>
+                            <tr>
+                                <td><code>subject[].digest.sha256</code></td>
+                                <td>MUST be valid SHA-256 hex string (64 characters)</td>
+                            </tr>
+                            <tr>
+                                <td><code>predicateType</code></td>
+                                <td>MUST be valid Makoto predicate type URL</td>
+                            </tr>
+                            <tr>
+                                <td><code>predicate</code></td>
+                                <td>MUST be object conforming to predicate type schema</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p class="text-muted" style="margin-top: 1rem;">
+                        JSON Schema files for validation are available in the
+                        <a href="https://github.com/makoto-project/makoto/tree/main/schemas" target="_blank">schemas directory</a>.
+                    </p>
+                </div>
+
+                <h3>V3: Subject Binding Verification</h3>
+                <div class="card">
+                    <p><strong>Check:</strong> Verify that the attestation subject matches the actual data.</p>
+
+                    <ol>
+                        <li>Compute SHA-256 hash of the data artifact</li>
+                        <li>Compare computed hash to <code>subject[].digest.sha256</code> in attestation</li>
+                        <li><strong>PASS:</strong> Hashes match</li>
+                        <li><strong>FAIL:</strong> Hashes do not match (data may have been modified)</li>
+                    </ol>
+
+                    <div class="code-block">
+<pre><span class="hl-comment"># Example verification (bash)</span>
+EXPECTED=$(jq -r '.subject[0].digest.sha256' attestation.json)
+ACTUAL=$(sha256sum data.json | cut -d' ' -f1)
+
+if [ "$EXPECTED" = "$ACTUAL" ]; then
+  echo "PASS: Data matches attestation"
+else
+  echo "FAIL: Data hash mismatch"
+fi</pre>
+                    </div>
+                </div>
+
+                <h3>V4: Required Field Completeness</h3>
+                <div class="card">
+                    <p><strong>Check:</strong> Verify that all required fields for the predicate type are present and non-empty.</p>
+
+                    <h4>For <code>origin/v1</code>:</h4>
+                    <ul>
+                        <li><code>predicate.origin.source</code> — non-empty string</li>
+                        <li><code>predicate.origin.collectionTimestamp</code> — valid ISO 8601 timestamp</li>
+                        <li><code>predicate.collector.id</code> — non-empty string</li>
+                    </ul>
+
+                    <h4>For <code>transform/v1</code>:</h4>
+                    <ul>
+                        <li><code>predicate.inputs</code> — non-empty array</li>
+                        <li><code>predicate.transform.type</code> — non-empty string (URI)</li>
+                        <li><code>predicate.executor.id</code> — non-empty string</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Threat Mitigations -->
+        <section class="section" id="threats">
+            <h2>Threat Mitigations</h2>
+            <p>
+                L1 provides <strong>partial mitigation</strong> against the following data supply chain threats.
+                For full mitigation, see <a href="../levels/#level-2">L2</a> and <a href="../levels/#level-3">L3</a> requirements.
+            </p>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Threat</th>
+                        <th>Description</th>
+                        <th>L1 Mitigation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="threat-id">D1</span></td>
+                        <td><strong>Source Falsification</strong> — Claiming data came from an authoritative source when it didn't</td>
+                        <td><span class="level-badge l1">Partial</span> Origin is documented, but claims are self-attested (not cryptographically verified)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-id">D3</span></td>
+                        <td><strong>Transform Opacity</strong> — Hiding what transformations were applied to data</td>
+                        <td><span class="level-badge l1">Partial</span> Transforms are documented, enabling audit trails and lineage visibility</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="card" style="background: #fef3c7; border-color: #fcd34d; margin-top: 1.5rem;">
+                <p style="margin: 0;"><strong>Important:</strong> L1 does NOT mitigate threats requiring cryptographic verification:
+                D2 (Collection Tampering), D4 (Lineage Forgery), D5 (Stream Injection), D6 (Aggregation Manipulation), D8 (Time Manipulation).
+                These require <a href="../levels/#level-2">L2</a> or higher.</p>
+            </div>
+        </section>
+
+        <!-- Conformance -->
+        <section class="section" id="conformance" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Conformance Checklist</h2>
+                <p>
+                    Use this checklist to verify L1 compliance. All items must pass for a data artifact to claim Makoto L1.
+                </p>
+
+                <div class="card">
+                    <h3 style="margin-top: 0;">Producer Checklist</h3>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li>☐ Attestation is generated for each data artifact</li>
+                        <li>☐ Attestation uses in-toto Statement v1 format</li>
+                        <li>☐ Predicate type is a valid Makoto type URL</li>
+                        <li>☐ Subject includes artifact name and SHA-256 digest</li>
+                        <li>☐ Origin attestations include source and collection timestamp</li>
+                        <li>☐ Transform attestations include inputs and transform type</li>
+                        <li>☐ All required fields are present and non-empty</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-top: 0;">Platform Checklist</h3>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li>☐ Platform can generate Makoto-compliant attestations</li>
+                        <li>☐ Platform stores attestations persistently</li>
+                        <li>☐ Consumers can discover and retrieve attestations</li>
+                        <li>☐ Attestation discovery mechanism is documented</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-top: 0;">Verification Checklist</h3>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li>☐ Attestation exists and parses as valid JSON</li>
+                        <li>☐ Attestation validates against Makoto JSON Schema</li>
+                        <li>☐ Data artifact hash matches attestation subject digest</li>
+                        <li>☐ All required fields for predicate type are present</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Next Steps -->
+        <section class="section">
+            <h2>Next Steps</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3 style="margin-top: 0;">View Examples</h3>
+                    <p class="text-muted">See complete L1 attestation examples for origin, transform, and streaming.</p>
+                    <a href="../examples/">Browse examples →</a>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top: 0;">Upgrade to L2</h3>
+                    <p class="text-muted">Add cryptographic signatures for tamper-evident provenance.</p>
+                    <a href="../levels/#level-2">L2 requirements →</a>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top: 0;">Get Started</h3>
+                    <p class="text-muted">Implement L1 in your pipeline with Expanso or other tools.</p>
+                    <a href="../expanso/">Expanso integration →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://slsa.dev" target="_blank">Inspired by SLSA →</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

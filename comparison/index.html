@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLSA vs Makoto Comparison | Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="../spec/signature-guide.html" class="nav-item">Signature Guide</a>
+
+            <div class="nav-section">Comparisons</div>
+            <a href="./" class="nav-item active">SLSA Comparison</a>
+            <a href="./open-lineage.html" class="nav-item">OpenLineage Comparison</a>
+            <a href="./w3c-prov.html" class="nav-item">W3C PROV Comparison</a>
+            <a href="decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../demos/" class="nav-item">Demos</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">SLSA vs Makoto</h1>
+
+            <p>
+                Makoto is a sibling framework to <a href="https://slsa.dev" target="_blank">SLSA</a>, not an extension.
+                While SLSA secures the software supply chain, Makoto addresses the fundamentally different challenges
+                of data supply chains. Both frameworks share a common philosophy: progressive security levels,
+                attestation-based verification, and threat-focused design.
+            </p>
+
+            <div class="card" style="background: #eff6ff; border-color: #bfdbfe;">
+                <p style="margin: 0;"><strong>Complementary, not competing:</strong> Organizations securing both code and data
+                can use SLSA for software artifacts and Makoto for data artifacts. Both use the same attestation format
+                (in-toto/DSSE) and level philosophy.</p>
+            </div>
+        </section>
+
+        <!-- Visual Mapping -->
+        <section class="section" id="mapping">
+            <h2>Concept Mapping</h2>
+
+            <!-- Diagram placeholder -->
+            <div class="diagram-container" style="margin: 2rem 0; text-align: center;">
+                <img src="../assets/images/slsa-makoto-mapping.svg" alt="SLSA to Makoto concept mapping diagram" style="max-width: 100%; height: auto;">
+            </div>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>SLSA Concept</th>
+                        <th>Makoto Equivalent</th>
+                        <th>Key Difference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Software Artifact</strong></td>
+                        <td><strong>Data Artifact</strong></td>
+                        <td>Data includes streams and batches, not just files</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Build</strong></td>
+                        <td><strong>Transform</strong></td>
+                        <td>Data has multi-stage ETL, not single build step</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Source</strong></td>
+                        <td><strong>Origin</strong></td>
+                        <td>Data sources may be external APIs, sensors, humans</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SBOM</strong></td>
+                        <td><strong>DBOM</strong></td>
+                        <td>DBOM tracks transformation chain, not dependencies</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Build Provenance</strong></td>
+                        <td><strong>Origin + Transform Provenance</strong></td>
+                        <td>Data needs separate attestation types per stage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Builder</strong></td>
+                        <td><strong>Collector / Executor</strong></td>
+                        <td>Separated roles for ingestion vs processing</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Fundamental Differences -->
+        <section class="section" id="differences" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Why Data Needs Its Own Framework</h2>
+
+                <p>
+                    Data pipelines differ from software builds in fundamental ways. These differences require
+                    different attestation types, different threat models, and different verification approaches.
+                </p>
+
+                <h3>Characteristic Comparison</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>Dimension</th>
+                            <th>Software (SLSA)</th>
+                            <th>Data (Makoto)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Artifact Type</strong></td>
+                            <td>Discrete builds (binaries, packages)</td>
+                            <td>Continuous streams AND large batches</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Transformations</strong></td>
+                            <td>Single build step</td>
+                            <td>Multi-stage ETL pipelines (N stages)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Granularity</strong></td>
+                            <td>File or package level</td>
+                            <td>Record, row, window, table, or dataset</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Privacy</strong></td>
+                            <td>Generally public metadata</td>
+                            <td>May contain PII, requires privacy controls</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Velocity</strong></td>
+                            <td>Per-release (hours to days)</td>
+                            <td>Millions of events per second</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lineage Depth</strong></td>
+                            <td>Source → Binary</td>
+                            <td>Source → T₁ → T₂ → ... → Tₙ</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reproducibility</strong></td>
+                            <td>Often reproducible</td>
+                            <td>Often non-reproducible (time-dependent)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Data-Specific Challenges</h3>
+                <div class="card-grid" style="margin-top: 1.5rem;">
+                    <div class="card">
+                        <h4 style="margin-top: 0;">Streaming Scale</h4>
+                        <p class="text-muted">
+                            Attesting millions of records per second requires different approaches than
+                            per-build attestation. Makoto introduces window-based Merkle tree attestations.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h4 style="margin-top: 0;">Privacy Requirements</h4>
+                        <p class="text-muted">
+                            Data attestations must not leak sensitive information. Makoto supports
+                            privacy-preserving techniques like aggregate proofs and blinded hashes.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h4 style="margin-top: 0;">Transform Chains</h4>
+                        <p class="text-muted">
+                            Data passes through many transformations. Each stage needs its own attestation
+                            with hash chaining to prove lineage integrity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Level Comparison -->
+        <section class="section" id="levels">
+            <h2>Level Comparison</h2>
+
+            <p>
+                Both frameworks use three progressive levels with similar philosophies but different requirements.
+            </p>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>SLSA</th>
+                        <th>Makoto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>L1</strong></td>
+                        <td>
+                            <em>Provenance Exists</em><br>
+                            Build provenance generated by hosted build platform
+                        </td>
+                        <td>
+                            <em>Provenance Exists</em><br>
+                            Origin + transform attestations in Makoto schema
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>L2</strong></td>
+                        <td>
+                            <em>Authenticated Provenance</em><br>
+                            Signed provenance from authenticated build service
+                        </td>
+                        <td>
+                            <em>Provenance is Authentic</em><br>
+                            Signed attestations with hash chaining between stages
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>L3</strong></td>
+                        <td>
+                            <em>Hardened Build</em><br>
+                            Isolated build environment, ephemeral credentials
+                        </td>
+                        <td>
+                            <em>Provenance is Unforgeable</em><br>
+                            Platform-generated attestations, HSM/TEE signing
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Key Level Differences</h3>
+            <ul>
+                <li><strong>L1:</strong> SLSA requires hosted build; Makoto allows any attestation producer</li>
+                <li><strong>L2:</strong> Makoto adds hash chaining between transform stages (not in SLSA)</li>
+                <li><strong>L3:</strong> Both require isolation, but Makoto emphasizes platform-level attestation generation</li>
+            </ul>
+        </section>
+
+        <!-- Threat Model Comparison -->
+        <section class="section" id="threats" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Threat Model Comparison</h2>
+
+                <p>Makoto extends SLSA's threat model with data-specific threats:</p>
+
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>SLSA Threat</th>
+                            <th>Makoto Equivalent</th>
+                            <th>Data-Specific Considerations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>(A) Submit unauthorized change</td>
+                            <td>D1: Source Falsification</td>
+                            <td>Data sources may be external APIs, not just repos</td>
+                        </tr>
+                        <tr>
+                            <td>(B) Compromise source repo</td>
+                            <td>D2: Collection Tampering</td>
+                            <td>Data can be modified during ingestion</td>
+                        </tr>
+                        <tr>
+                            <td>(E) Compromise build process</td>
+                            <td>D3: Transform Opacity</td>
+                            <td>Multi-stage transforms need per-stage attestation</td>
+                        </tr>
+                        <tr>
+                            <td>(F) Upload modified package</td>
+                            <td>D4: Lineage Forgery</td>
+                            <td>Fabricating data history across transform chain</td>
+                        </tr>
+                        <tr>
+                            <td>—</td>
+                            <td>D5: Stream Injection</td>
+                            <td><strong>New:</strong> Inserting records into streams</td>
+                        </tr>
+                        <tr>
+                            <td>—</td>
+                            <td>D6: Aggregation Manipulation</td>
+                            <td><strong>New:</strong> Tampering with computed statistics</td>
+                        </tr>
+                        <tr>
+                            <td>—</td>
+                            <td>D7: Privacy Leakage</td>
+                            <td><strong>New:</strong> Attestation metadata exposing PII</td>
+                        </tr>
+                        <tr>
+                            <td>—</td>
+                            <td>D8: Time Manipulation</td>
+                            <td><strong>New:</strong> Backdating or falsifying timestamps</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Attestation Format -->
+        <section class="section" id="attestation">
+            <h2>Attestation Format Compatibility</h2>
+
+            <p>
+                Both SLSA and Makoto use the <a href="https://github.com/in-toto/attestation" target="_blank">in-toto attestation framework</a>.
+                This means attestations from both frameworks can be:
+            </p>
+
+            <ul>
+                <li>Stored in the same attestation registries</li>
+                <li>Verified using the same signature verification tools</li>
+                <li>Combined in unified verification policies</li>
+            </ul>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0;">
+                <div>
+                    <h4>SLSA Build Provenance</h4>
+                    <div class="code-block">
+<pre>{
+  <span class="hl-key">"_type"</span>: <span class="hl-string">"https://in-toto.io/Statement/v1"</span>,
+  <span class="hl-key">"predicateType"</span>: <span class="hl-string">"https://slsa.dev/provenance/v1"</span>,
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-key">"buildDefinition"</span>: {...},
+    <span class="hl-key">"runDetails"</span>: {...}
+  }
+}</pre>
+                    </div>
+                </div>
+                <div>
+                    <h4>Makoto Origin Attestation</h4>
+                    <div class="code-block">
+<pre>{
+  <span class="hl-key">"_type"</span>: <span class="hl-string">"https://in-toto.io/Statement/v1"</span>,
+  <span class="hl-key">"predicateType"</span>: <span class="hl-string">"https://makoto.dev/origin/v1"</span>,
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-key">"origin"</span>: {...},
+    <span class="hl-key">"collector"</span>: {...}
+  }
+}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Predicate Types</h3>
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Framework</th>
+                        <th>Predicate Type</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SLSA</td>
+                        <td><code class="code-inline">slsa.dev/provenance/v1</code></td>
+                        <td>Software build provenance</td>
+                    </tr>
+                    <tr>
+                        <td>Makoto</td>
+                        <td><code class="code-inline">makoto.dev/origin/v1</code></td>
+                        <td>Data origin/collection</td>
+                    </tr>
+                    <tr>
+                        <td>Makoto</td>
+                        <td><code class="code-inline">makoto.dev/transform/v1</code></td>
+                        <td>Data transformation</td>
+                    </tr>
+                    <tr>
+                        <td>Makoto</td>
+                        <td><code class="code-inline">makoto.dev/stream-window/v1</code></td>
+                        <td>Stream window attestation</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- When to Use Each -->
+        <section class="section" id="usage" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>When to Use Each Framework</h2>
+
+                <div class="card-grid" style="margin: 1.5rem 0;">
+                    <div class="card">
+                        <h3 style="margin-top: 0; color: #4f46e5;">Use SLSA for...</h3>
+                        <ul style="margin-bottom: 0;">
+                            <li>Container image builds</li>
+                            <li>Package publishing (npm, PyPI, etc.)</li>
+                            <li>Binary compilation</li>
+                            <li>CI/CD pipeline artifacts</li>
+                            <li>Infrastructure-as-code deployments</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 style="margin-top: 0; color: #059669;">Use Makoto for...</h3>
+                        <ul style="margin-bottom: 0;">
+                            <li>ETL pipeline outputs</li>
+                            <li>ML training datasets</li>
+                            <li>Real-time streaming data</li>
+                            <li>Data warehouse tables</li>
+                            <li>Analytics and reporting data</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Use Both When...</h3>
+                <p>
+                    Many organizations need both frameworks. For example, an ML pipeline might use:
+                </p>
+                <ul>
+                    <li><strong>SLSA</strong> for the training code and model binary</li>
+                    <li><strong>Makoto</strong> for the training data and feature datasets</li>
+                </ul>
+                <p>
+                    The attestations can be stored together and verified as a combined provenance chain,
+                    proving both the software and data integrity of the final model.
+                </p>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="section">
+            <h2>Summary</h2>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>SLSA</th>
+                        <th>Makoto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Focus</strong></td>
+                        <td>Software supply chain</td>
+                        <td>Data supply chain</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Primary artifact</strong></td>
+                        <td>Build outputs (binaries, packages)</td>
+                        <td>Data outputs (datasets, streams)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Provenance type</strong></td>
+                        <td>Build provenance</td>
+                        <td>Origin + Transform provenance</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scale</strong></td>
+                        <td>Per-build</td>
+                        <td>Per-record to per-window</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Privacy</strong></td>
+                        <td>Generally public</td>
+                        <td>Privacy-preserving options</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Output artifact</strong></td>
+                        <td>SBOM</td>
+                        <td>DBOM</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Attestation format</strong></td>
+                        <td>in-toto/DSSE</td>
+                        <td>in-toto/DSSE (compatible)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="margin-top: 1.5rem;">
+                <a href="../levels/">Learn about Makoto Levels →</a> |
+                <a href="https://slsa.dev" target="_blank">Learn about SLSA →</a>
+            </p>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://slsa.dev" target="_blank">Inspired by SLSA →</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

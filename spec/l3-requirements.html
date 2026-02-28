@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Makoto L3 Requirements | Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .req-id {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding: 0.125rem 0.375rem;
+            background: var(--bg-light);
+            border-radius: 4px;
+            margin-right: 0.5rem;
+        }
+        .req-level {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+        }
+        .req-must {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        .req-should {
+            background: #fefce8;
+            color: #ca8a04;
+            border: 1px solid #fef08a;
+        }
+        .req-may {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+        .req-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .req-title {
+            font-weight: 600;
+        }
+        .section-anchor {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-left: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        h2:hover .section-anchor,
+        h3:hover .section-anchor {
+            opacity: 1;
+        }
+        .verification-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .verification-box h4 {
+            margin: 0 0 0.5rem 0;
+            color: #16a34a;
+            font-size: 0.9rem;
+        }
+        .threat-ref {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--bg-light);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-right: 0.25rem;
+        }
+        .toc-section {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        .toc-section h3 {
+            margin-top: 0;
+        }
+        .toc-section ul {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+        .toc-section li {
+            margin-bottom: 0.375rem;
+        }
+        .toc-section a {
+            color: var(--text-secondary);
+        }
+        .isolation-diagram {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 1.5rem;
+            color: #e2e8f0;
+            font-family: monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+        .isolation-diagram .comment {
+            color: #64748b;
+        }
+        .isolation-diagram .highlight {
+            color: #22d3ee;
+        }
+        .isolation-diagram .boundary {
+            color: #f472b6;
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="./" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="l1-requirements.html" class="nav-item nav-item-sub">L1 Requirements</a>
+            <a href="l2-requirements.html" class="nav-item nav-item-sub">L2 Requirements</a>
+            <a href="l3-requirements.html" class="nav-item nav-item-sub active">L3 Requirements</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../demos/" class="nav-item">Demos</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <div class="status-box">
+                <div class="status-label">Status</div>
+                <div class="status-value">Draft v0.1</div>
+            </div>
+
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">
+                <span class="level-badge l3">L3</span> Formal Requirements
+            </h1>
+
+            <p>
+                This document specifies the formal requirements for achieving <strong>Makoto Level 3: Provenance is Unforgeable</strong>.
+                Level 3 builds upon <a href="l2-requirements.html">Level 2</a> by adding infrastructure isolation guarantees—attestations
+                are generated by a trusted platform that user code cannot compromise, making provenance unforgeable even by
+                malicious or compromised data producers.
+            </p>
+
+            <div class="card" style="background: #dbeafe; border-color: #3b82f6;">
+                <p style="margin: 0;"><strong>Summary:</strong> L3 requires platform-isolated attestation generation where signing keys
+                and hash computation are controlled by trusted infrastructure outside the data processing tenant's control.
+                Even a fully compromised producer cannot forge attestations—they can only refuse to produce data.</p>
+            </div>
+        </section>
+
+        <!-- Table of Contents -->
+        <section class="toc-section">
+            <h3>Contents</h3>
+            <ul>
+                <li><a href="#terminology">Terminology</a></li>
+                <li><a href="#isolation-model">Isolation Model</a></li>
+                <li><a href="#producer-requirements">Producer Requirements</a>
+                    <ul>
+                        <li><a href="#platform-integration">Platform Integration</a></li>
+                        <li><a href="#data-handoff">Data Handoff</a></li>
+                    </ul>
+                </li>
+                <li><a href="#platform-requirements">Platform Requirements</a>
+                    <ul>
+                        <li><a href="#attestation-generation">Attestation Generation</a></li>
+                        <li><a href="#key-isolation">Key Isolation</a></li>
+                        <li><a href="#hash-computation">Hash Computation</a></li>
+                        <li><a href="#audit-logging">Audit Logging</a></li>
+                        <li><a href="#trusted-execution">Trusted Execution (Optional)</a></li>
+                    </ul>
+                </li>
+                <li><a href="#verification-requirements">Verification Requirements</a>
+                    <ul>
+                        <li><a href="#platform-identity">Platform Identity Verification</a></li>
+                        <li><a href="#isolation-verification">Isolation Verification</a></li>
+                        <li><a href="#audit-verification">Audit Trail Verification</a></li>
+                    </ul>
+                </li>
+                <li><a href="#threats-mitigated">Threats Mitigated</a></li>
+                <li><a href="#conformance">Conformance Checklist</a></li>
+            </ul>
+        </section>
+
+        <!-- Terminology -->
+        <section class="section" id="terminology">
+            <h2>Terminology <a href="#terminology" class="section-anchor">#</a></h2>
+
+            <p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT",
+            "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in
+            <a href="https://www.rfc-editor.org/rfc/rfc2119" target="_blank">RFC 2119</a>.</p>
+
+            <table class="content-table">
+                <thead>
+                    <tr><th>Term</th><th>Definition</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Producer</strong></td>
+                        <td>Entity that creates data attestations. At L3, producers delegate attestation generation to the platform.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Platform</strong></td>
+                        <td>Trusted infrastructure that executes data pipelines and generates attestations on behalf of producers.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Control Plane</strong></td>
+                        <td>The privileged layer of the platform that manages attestation generation, isolated from tenant code.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Plane</strong></td>
+                        <td>The layer where tenant data processing code executes, with no access to signing keys.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tenant</strong></td>
+                        <td>A user or organization running data pipelines on the platform. Tenants cannot access control plane resources.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HSM</strong></td>
+                        <td>Hardware Security Module—tamper-resistant hardware for secure key storage and cryptographic operations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TEE</strong></td>
+                        <td>Trusted Execution Environment—hardware-isolated execution environment (e.g., Intel SGX, ARM TrustZone).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Isolation Boundary</strong></td>
+                        <td>The security perimeter separating tenant code from platform attestation infrastructure.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Isolation Model -->
+        <section class="section" id="isolation-model">
+            <h2>Isolation Model <a href="#isolation-model" class="section-anchor">#</a></h2>
+
+            <p>L3 security relies on a clear separation between the <strong>data plane</strong> (where tenant code runs)
+            and the <strong>control plane</strong> (where attestations are generated). This isolation ensures that even
+            a fully compromised tenant cannot forge attestations.</p>
+
+            <div class="isolation-diagram">
+<pre><span class="comment">┌─────────────────────────────────────────────────────────────────────┐</span>
+<span class="comment">│</span>  <span class="boundary">CONTROL PLANE (Trusted Platform)</span>                                  <span class="comment">│</span>
+<span class="comment">│</span>  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐  <span class="comment">│</span>
+<span class="comment">│</span>  │ <span class="highlight">Signing Service</span>  │  │ <span class="highlight">Hash Computer</span>    │  │ <span class="highlight">Audit Logger</span>     │  <span class="comment">│</span>
+<span class="comment">│</span>  │  (HSM-backed)    │  │  (Deterministic) │  │  (Immutable)     │  <span class="comment">│</span>
+<span class="comment">│</span>  └────────┬─────────┘  └────────┬─────────┘  └────────┬─────────┘  <span class="comment">│</span>
+<span class="comment">│</span>           │                     │                     │            <span class="comment">│</span>
+<span class="comment">│</span>           └──────────┬──────────┴──────────┬──────────┘            <span class="comment">│</span>
+<span class="comment">│</span>                      ▼                     ▼                       <span class="comment">│</span>
+<span class="comment">│</span>              ┌──────────────────────────────────┐                  <span class="comment">│</span>
+<span class="comment">│</span>              │   <span class="highlight">Attestation Generator</span>          │                  <span class="comment">│</span>
+<span class="comment">│</span>              │   (Platform-controlled)          │                  <span class="comment">│</span>
+<span class="comment">│</span>              └──────────────┬───────────────────┘                  <span class="comment">│</span>
+<span class="comment">├─────────────────────────────┼───────────────────────────────────────┤</span>
+<span class="comment">│</span>                             │ <span class="boundary">ISOLATION BOUNDARY</span>                    <span class="comment">│</span>
+<span class="comment">├─────────────────────────────┼───────────────────────────────────────┤</span>
+<span class="comment">│</span>  <span class="boundary">DATA PLANE (Tenant Code)</span>   ▼                                      <span class="comment">│</span>
+<span class="comment">│</span>  ┌──────────────────────────────────────────────────────────────┐  <span class="comment">│</span>
+<span class="comment">│</span>  │  ┌────────────┐    ┌────────────┐    ┌────────────┐         │  <span class="comment">│</span>
+<span class="comment">│</span>  │  │ Input Data │ -> │ Transform  │ -> │ Output Data│         │  <span class="comment">│</span>
+<span class="comment">│</span>  │  │            │    │ (User Code)│    │            │         │  <span class="comment">│</span>
+<span class="comment">│</span>  │  └────────────┘    └────────────┘    └────────────┘         │  <span class="comment">│</span>
+<span class="comment">│</span>  │                                                              │  <span class="comment">│</span>
+<span class="comment">│</span>  │  <span class="comment">No access to: signing keys, attestation generation,</span>         │  <span class="comment">│</span>
+<span class="comment">│</span>  │  <span class="comment">             hash computation, audit logs</span>                    │  <span class="comment">│</span>
+<span class="comment">│</span>  └──────────────────────────────────────────────────────────────┘  <span class="comment">│</span>
+<span class="comment">└─────────────────────────────────────────────────────────────────────┘</span></pre>
+            </div>
+
+            <p style="margin-top: 1rem;">
+                <strong>Key principle:</strong> The tenant can control <em>what</em> data is processed, but the platform
+                controls <em>how</em> that processing is attested. A compromised tenant can produce garbage data, but
+                cannot claim it came from a legitimate source or went through legitimate transformations.
+            </p>
+        </section>
+
+        <!-- Producer Requirements -->
+        <section class="section" id="producer-requirements" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Producer Requirements <a href="#producer-requirements" class="section-anchor">#</a></h2>
+
+                <p>Producers MUST meet all <a href="l2-requirements.html">L2 requirements</a> plus the following additional requirements.
+                Note that at L3, many L2 producer responsibilities shift to the platform.</p>
+
+                <!-- Platform Integration -->
+                <h3 id="platform-integration">Platform Integration <a href="#platform-integration" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.P.1</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Execute on L3-compliant platform</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Data processing pipelines MUST execute on a platform that meets L3 platform requirements.
+                        Self-hosted infrastructure does not qualify for L3 unless it implements the required isolation
+                        controls and is independently audited.
+                    </p>
+                    <div class="verification-box">
+                        <h4>Verification</h4>
+                        <p style="margin: 0;">Verifiers check that the attestation's <code>executor.platform</code> identifies an L3-compliant platform
+                        and that the signing identity belongs to the platform, not the tenant.</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.P.2</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Use platform-provided attestation mechanisms</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Producers MUST NOT generate or sign attestations directly. All attestation generation
+                        MUST be delegated to the platform's control plane. Producers MAY provide metadata
+                        (such as transform descriptions) but MUST NOT control signing.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.P.3</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Declare pipeline configuration</span>
+                    </div>
+                    <p>
+                        Producers MUST declare their pipeline configuration (inputs, transforms, outputs) in a
+                        platform-readable format. The platform uses this declaration to generate accurate attestations.
+                    </p>
+                    <div class="code-block">
+<pre>{
+  <span class="hl-key">"pipeline"</span>: {
+    <span class="hl-key">"id"</span>: <span class="hl-string">"customer-etl-v2"</span>,
+    <span class="hl-key">"inputs"</span>: [{
+      <span class="hl-key">"source"</span>: <span class="hl-string">"kafka://broker/raw_customers"</span>,
+      <span class="hl-key">"expectedOriginLevel"</span>: <span class="hl-string">"L2"</span>
+    }],
+    <span class="hl-key">"transform"</span>: {
+      <span class="hl-key">"type"</span>: <span class="hl-string">"https://makoto.dev/transforms/anonymization"</span>,
+      <span class="hl-key">"codeRef"</span>: <span class="hl-string">"git+https://github.com/example/pipelines@v1.0.0"</span>
+    },
+    <span class="hl-key">"outputs"</span>: [{
+      <span class="hl-key">"destination"</span>: <span class="hl-string">"kafka://broker/processed_customers"</span>
+    }]
+  }
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Data Handoff -->
+                <h3 id="data-handoff">Data Handoff <a href="#data-handoff" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.P.4</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Route data through platform-controlled channels</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        All data ingress and egress MUST pass through platform-controlled channels where the platform
+                        can compute hashes and generate attestations. Direct data access that bypasses the platform
+                        is not permitted for L3 attestation.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.P.5</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Use deterministic transforms</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Producers SHOULD use deterministic transformation logic where the same input always produces
+                        the same output. This enables verification that the declared transform matches actual behavior.
+                        Non-deterministic transforms (e.g., using current time, random values) SHOULD document their
+                        non-determinism in the pipeline declaration.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platform Requirements -->
+        <section class="section" id="platform-requirements">
+            <h2>Platform Requirements <a href="#platform-requirements" class="section-anchor">#</a></h2>
+
+            <p>Platforms supporting L3 attestation MUST implement the following isolation and security controls.
+            These requirements are the core differentiator between L2 and L3.</p>
+
+            <!-- Attestation Generation -->
+            <h3 id="attestation-generation">Attestation Generation <a href="#attestation-generation" class="section-anchor">#</a></h3>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.1</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Generate attestations in isolated control plane</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    All attestation generation MUST occur in a control plane that is isolated from tenant code.
+                    The isolation MUST prevent tenant code from:
+                </p>
+                <ul style="margin-bottom: 0;">
+                    <li>Directly invoking attestation generation with arbitrary content</li>
+                    <li>Modifying attestations after generation</li>
+                    <li>Accessing or exfiltrating signing keys</li>
+                    <li>Tampering with hash computation</li>
+                </ul>
+                <div class="verification-box">
+                    <h4>Verification</h4>
+                    <p style="margin: 0;">Platform undergoes independent security audit confirming isolation controls.
+                    Audit attestation is published and referenced in platform documentation.</p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.2</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Bind attestations to observed behavior</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    Attestations MUST reflect the platform's observation of actual data flow, not tenant-provided
+                    claims. The platform MUST independently determine:
+                </p>
+                <ul style="margin-bottom: 0;">
+                    <li>Input data sources and their digests (computed by platform)</li>
+                    <li>Output data destinations and their digests (computed by platform)</li>
+                    <li>Transform code that was actually executed</li>
+                    <li>Timestamps of actual execution</li>
+                </ul>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.3</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Sign with platform identity</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    Attestations MUST be signed with a platform-controlled identity, not a tenant identity.
+                    The signing identity MUST be verifiable as belonging to the platform (e.g., via X.509 certificate
+                    with platform-specific attributes, or Sigstore identity bound to platform OIDC issuer).
+                </p>
+            </div>
+
+            <!-- Key Isolation -->
+            <h3 id="key-isolation">Key Isolation <a href="#key-isolation" class="section-anchor">#</a></h3>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.4</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Store signing keys in hardware security module</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    Platform signing keys MUST be stored in a Hardware Security Module (HSM) or equivalent
+                    hardware-backed secure storage. Keys MUST NOT be extractable from the HSM. Acceptable options:
+                </p>
+                <ul style="margin-bottom: 0;">
+                    <li><strong>Cloud HSM</strong> — AWS CloudHSM, Azure Dedicated HSM, GCP Cloud HSM</li>
+                    <li><strong>Cloud KMS with HSM backing</strong> — AWS KMS, Azure Key Vault HSM, GCP Cloud KMS</li>
+                    <li><strong>On-premises HSM</strong> — FIPS 140-2 Level 3 or higher certified devices</li>
+                </ul>
+                <div class="verification-box">
+                    <h4>Verification</h4>
+                    <p style="margin: 0;">Platform publishes HSM attestation or provides audit report confirming
+                    HSM-backed key storage. Key material provenance is documented.</p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.5</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Prevent key access from data plane</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    The platform MUST ensure that tenant code running in the data plane has no mechanism to:
+                </p>
+                <ul style="margin-bottom: 0;">
+                    <li>Read signing key material</li>
+                    <li>Request signatures on arbitrary data</li>
+                    <li>Enumerate or discover signing keys</li>
+                    <li>Influence key selection for signing operations</li>
+                </ul>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.6</span>
+                    <span class="req-level req-should">SHOULD</span>
+                    <span class="req-title">Rotate signing keys regularly</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    Platform signing keys SHOULD be rotated at least annually. Key rotation MUST NOT invalidate
+                    previously generated attestations. The platform SHOULD maintain a verifiable history of
+                    signing keys and their validity periods.
+                </p>
+            </div>
+
+            <!-- Hash Computation -->
+            <h3 id="hash-computation">Hash Computation <a href="#hash-computation" class="section-anchor">#</a></h3>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.7</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Compute hashes in control plane</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    All cryptographic hashes of input and output data MUST be computed by the platform control plane,
+                    not by tenant code. This prevents tenants from providing false hash values. Hash computation
+                    MUST occur at data ingress/egress points controlled by the platform.
+                </p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.8</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Use deterministic hashing</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    Hash computation MUST be deterministic—the same data MUST always produce the same hash.
+                    For structured data, the platform MUST define and document the canonical serialization
+                    format used for hashing (e.g., canonical JSON, sorted keys, specific encoding).
+                </p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.9</span>
+                    <span class="req-level req-should">SHOULD</span>
+                    <span class="req-title">Support streaming hash computation</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    For streaming data, the platform SHOULD support incremental hash computation (e.g., Merkle trees)
+                    that allows verification of individual records or windows without reprocessing entire datasets.
+                </p>
+            </div>
+
+            <!-- Audit Logging -->
+            <h3 id="audit-logging">Audit Logging <a href="#audit-logging" class="section-anchor">#</a></h3>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.10</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Log all attestation operations</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    The platform MUST maintain an immutable audit log of all attestation operations. Each log entry MUST include:
+                </p>
+                <ul style="margin-bottom: 0;">
+                    <li>Timestamp of attestation generation</li>
+                    <li>Attestation digest (hash of the generated attestation)</li>
+                    <li>Pipeline identifier and version</li>
+                    <li>Tenant identifier</li>
+                    <li>Input and output data digests</li>
+                </ul>
+                <div class="verification-box">
+                    <h4>Verification</h4>
+                    <p style="margin: 0;">Verifiers can request audit log entries corresponding to an attestation
+                    to confirm it was generated through legitimate platform operations.</p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.11</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Protect audit log integrity</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    Audit logs MUST be append-only and tamper-evident. Acceptable implementations include:
+                </p>
+                <ul style="margin-bottom: 0;">
+                    <li>Transparency log (e.g., Sigstore Rekor, Trillian)</li>
+                    <li>Blockchain or distributed ledger</li>
+                    <li>Cryptographically chained log entries with third-party witnesses</li>
+                    <li>Write-once storage with integrity verification</li>
+                </ul>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.12</span>
+                    <span class="req-level req-must">MUST</span>
+                    <span class="req-title">Retain audit logs</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    Audit logs MUST be retained for a minimum of 18 months. The platform SHOULD provide a mechanism
+                    for tenants to request extended retention. Logs MUST remain verifiable throughout the retention period.
+                </p>
+            </div>
+
+            <!-- Trusted Execution -->
+            <h3 id="trusted-execution">Trusted Execution (Optional) <a href="#trusted-execution" class="section-anchor">#</a></h3>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.13</span>
+                    <span class="req-level req-may">MAY</span>
+                    <span class="req-title">Use hardware-based isolation</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    Platforms MAY use Trusted Execution Environments (TEEs) to provide hardware-enforced isolation
+                    between tenant code and attestation infrastructure. TEE-based implementations provide additional
+                    assurance against privileged software attacks. Supported TEE technologies include:
+                </p>
+                <ul style="margin-bottom: 0;">
+                    <li><strong>Intel SGX/TDX</strong> — Enclave-based isolation</li>
+                    <li><strong>AMD SEV-SNP</strong> — Confidential VMs</li>
+                    <li><strong>ARM TrustZone/CCA</strong> — Secure world isolation</li>
+                    <li><strong>AWS Nitro Enclaves</strong> — Cloud-native isolation</li>
+                </ul>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="req-row">
+                    <span class="req-id">L3.PL.14</span>
+                    <span class="req-level req-should">SHOULD</span>
+                    <span class="req-title">Provide remote attestation for TEE</span>
+                </div>
+                <p style="margin-bottom: 0;">
+                    If using TEE-based isolation, the platform SHOULD support remote attestation that allows
+                    verifiers to confirm the attestation infrastructure is running in a genuine TEE with
+                    expected code measurements.
+                </p>
+            </div>
+        </section>
+
+        <!-- Verification Requirements -->
+        <section class="section" id="verification-requirements" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Verification Requirements <a href="#verification-requirements" class="section-anchor">#</a></h2>
+
+                <p>Verifiers (data consumers) MUST perform the following checks to confirm L3 compliance,
+                in addition to all <a href="l2-requirements.html#verification-requirements">L2 verification requirements</a>.</p>
+
+                <!-- Platform Identity -->
+                <h3 id="platform-identity">Platform Identity Verification <a href="#platform-identity" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.V.1</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Verify platform signing identity</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers MUST confirm that the attestation was signed by a known L3-compliant platform,
+                        not by a tenant identity. This requires:
+                    </p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Checking the signing certificate belongs to the platform (not tenant)</li>
+                        <li>Verifying the platform identity against a trust policy of approved L3 platforms</li>
+                        <li>Confirming the certificate was valid at attestation time</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.V.2</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Verify platform L3 compliance</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers MUST confirm the signing platform is L3-compliant. Acceptable evidence includes:
+                    </p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Platform is listed in a trusted registry of L3-compliant platforms</li>
+                        <li>Platform provides a valid L3 compliance attestation from an accredited auditor</li>
+                        <li>Platform publishes machine-readable L3 compliance claims that can be verified</li>
+                    </ul>
+                </div>
+
+                <!-- Isolation Verification -->
+                <h3 id="isolation-verification">Isolation Verification <a href="#isolation-verification" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.V.3</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Verify HSM-backed signing</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers SHOULD confirm that the platform uses HSM-backed signing. This MAY be verified through:
+                    </p>
+                    <ul style="margin-bottom: 0;">
+                        <li>HSM attestation certificates included with signatures</li>
+                        <li>Platform audit reports documenting HSM usage</li>
+                        <li>Key provenance documentation showing HSM origin</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.V.4</span>
+                        <span class="req-level req-may">MAY</span>
+                        <span class="req-title">Verify TEE attestation</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        If the platform claims TEE-based isolation, verifiers MAY request and verify remote
+                        attestation quotes to confirm the attestation infrastructure is running in a genuine TEE.
+                    </p>
+                </div>
+
+                <!-- Audit Verification -->
+                <h3 id="audit-verification">Audit Trail Verification <a href="#audit-verification" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.V.5</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Verify audit log inclusion</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers SHOULD confirm that the attestation appears in the platform's audit log.
+                        For transparency log implementations, this means verifying an inclusion proof.
+                        Absence from the audit log indicates potential forgery.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.V.6</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Cross-reference audit entries</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        For high-assurance use cases, verifiers SHOULD cross-reference audit log entries with
+                        attestation content to confirm consistency (matching digests, timestamps, pipeline identifiers).
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.V.7</span>
+                        <span class="req-level req-must">MUST</span>
+                        <span class="req-title">Apply L3 trust policy</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers MUST apply a trust policy that explicitly requires L3 compliance for use cases
+                        that need unforgeable provenance. The policy MUST reject attestations that:
+                    </p>
+                    <ul style="margin-bottom: 0;">
+                        <li>Are signed by tenant identities (not platform identities)</li>
+                        <li>Come from platforms not recognized as L3-compliant</li>
+                        <li>Cannot be verified against the platform's audit log</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Threats Mitigated -->
+        <section class="section" id="threats-mitigated">
+            <h2>Threats Mitigated <a href="#threats-mitigated" class="section-anchor">#</a></h2>
+
+            <p>L3 compliance mitigates all threats from the <a href="../threats/">Makoto threat model</a>,
+            including threats only partially addressed by L2:</p>
+
+            <table class="content-table">
+                <thead>
+                    <tr><th>Threat</th><th>Description</th><th>L3 Mitigation</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="threat-ref">D1</span></td>
+                        <td><strong>Source Falsification</strong></td>
+                        <td>Platform-verified origin claims. Tenant cannot forge source attestations—only the platform can attest to observed data sources.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D2</span></td>
+                        <td><strong>Collection Tampering</strong></td>
+                        <td>Platform computes hashes at ingress. Tenant cannot provide false hashes for modified data.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D3</span></td>
+                        <td><strong>Transform Opacity</strong></td>
+                        <td>Platform observes and attests actual transform execution. Tenant cannot claim different transforms than those executed.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D4</span></td>
+                        <td><strong>Lineage Forgery</strong></td>
+                        <td>Platform generates chained attestations. Tenant cannot insert fake history—all lineage is platform-attested.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D5</span></td>
+                        <td><strong>Stream Injection</strong></td>
+                        <td>Platform controls stream ingress. Unauthorized records cannot enter streams without platform attestation.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D6</span></td>
+                        <td><strong>Aggregation Manipulation</strong></td>
+                        <td>Platform computes and attests aggregates. Tenant cannot claim false statistics—platform observes actual computation.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D8</span></td>
+                        <td><strong>Time Manipulation</strong></td>
+                        <td>Platform controls timestamps. Combined with L2 trusted timestamping, attestation times are unforgeable.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="card" style="background: #dbeafe; border-color: #3b82f6; margin-top: 1.5rem;">
+                <p style="margin: 0;"><strong>Key difference from L2:</strong> At L2, a compromised producer can forge attestations using their own signing keys.
+                At L3, even a fully compromised tenant cannot forge attestations—they can only refuse to produce data or produce garbage data
+                that will be accurately attested as coming from them.</p>
+            </div>
+
+            <div class="card" style="background: #fef3c7; border-color: #fcd34d; margin-top: 1rem;">
+                <p style="margin: 0;"><strong>Note:</strong> L3 does not mitigate threat D7 (Privacy Leakage). Privacy-preserving attestation
+                techniques are orthogonal to the provenance level and should be applied based on data sensitivity requirements.
+                See <a href="../privacy/">Privacy Techniques</a> for guidance.</p>
+            </div>
+        </section>
+
+        <!-- Conformance Checklist -->
+        <section class="section" id="conformance" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Conformance Checklist <a href="#conformance" class="section-anchor">#</a></h2>
+
+                <p>Use this checklist to verify L3 compliance. All L2 requirements must also be met.</p>
+
+                <h3>Producer Checklist</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr><th style="width: 4rem;">Req</th><th>Requirement</th><th style="width: 5rem;">Level</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>L3.P.1</td><td>Executing on L3-compliant platform</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.P.2</td><td>Using platform-provided attestation mechanisms (no direct signing)</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.P.3</td><td>Pipeline configuration declared in platform-readable format</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.P.4</td><td>Data routed through platform-controlled channels</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.P.5</td><td>Using deterministic transforms where possible</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Platform Checklist</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr><th style="width: 4rem;">Req</th><th>Requirement</th><th style="width: 5rem;">Level</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="3" style="background: #f1f5f9; font-weight: 600;">Attestation Generation</td></tr>
+                        <tr><td>L3.PL.1</td><td>Attestations generated in isolated control plane</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.PL.2</td><td>Attestations bound to observed behavior (not tenant claims)</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.PL.3</td><td>Signed with platform identity (not tenant identity)</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td colspan="3" style="background: #f1f5f9; font-weight: 600;">Key Isolation</td></tr>
+                        <tr><td>L3.PL.4</td><td>Signing keys stored in HSM</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.PL.5</td><td>No key access from data plane</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.PL.6</td><td>Annual key rotation</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                        <tr><td colspan="3" style="background: #f1f5f9; font-weight: 600;">Hash Computation</td></tr>
+                        <tr><td>L3.PL.7</td><td>Hashes computed in control plane</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.PL.8</td><td>Deterministic hashing with documented canonicalization</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.PL.9</td><td>Streaming hash computation support (Merkle trees)</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                        <tr><td colspan="3" style="background: #f1f5f9; font-weight: 600;">Audit Logging</td></tr>
+                        <tr><td>L3.PL.10</td><td>All attestation operations logged</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.PL.11</td><td>Audit log integrity protected (append-only, tamper-evident)</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.PL.12</td><td>18-month minimum audit log retention</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td colspan="3" style="background: #f1f5f9; font-weight: 600;">Trusted Execution (Optional)</td></tr>
+                        <tr><td>L3.PL.13</td><td>Hardware-based isolation (TEE)</td><td><span class="req-level req-may">MAY</span></td></tr>
+                        <tr><td>L3.PL.14</td><td>Remote attestation for TEE</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Verifier Checklist</h3>
+                <table class="content-table">
+                    <thead>
+                        <tr><th style="width: 4rem;">Req</th><th>Requirement</th><th style="width: 5rem;">Level</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>L3.V.1</td><td>Platform signing identity verified (not tenant)</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.V.2</td><td>Platform L3 compliance verified</td><td><span class="req-level req-must">MUST</span></td></tr>
+                        <tr><td>L3.V.3</td><td>HSM-backed signing confirmed</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                        <tr><td>L3.V.4</td><td>TEE attestation verified (if claimed)</td><td><span class="req-level req-may">MAY</span></td></tr>
+                        <tr><td>L3.V.5</td><td>Audit log inclusion verified</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                        <tr><td>L3.V.6</td><td>Audit entries cross-referenced with attestation</td><td><span class="req-level req-should">SHOULD</span></td></tr>
+                        <tr><td>L3.V.7</td><td>L3 trust policy applied</td><td><span class="req-level req-must">MUST</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Navigation -->
+        <section class="section">
+            <h2>Related Documents</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3 style="margin-top: 0;">L1 Requirements</h3>
+                    <p class="text-muted">Foundation level—provenance documentation exists.</p>
+                    <a href="l1-requirements.html">View L1 requirements →</a>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top: 0;">L2 Requirements</h3>
+                    <p class="text-muted">Signed attestations with verifiable identity.</p>
+                    <a href="l2-requirements.html">View L2 requirements →</a>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top: 0;">Threat Model</h3>
+                    <p class="text-muted">Understand the threats each level addresses.</p>
+                    <a href="../threats/">View threat model →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://slsa.dev" target="_blank">Inspired by SLSA →</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

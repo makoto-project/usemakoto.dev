@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expanso Integration Concept - Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .concept-banner {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .concept-banner strong {
+            color: #92400e;
+        }
+
+        .concept-banner p {
+            color: #78350f;
+            margin: 0;
+        }
+
+        .pipeline-demo {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .pipeline-demo h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .pipeline-yaml {
+            background: #0d0d0d;
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .pipeline-yaml pre {
+            margin: 0;
+            color: #e2e8f0;
+        }
+
+        .yaml-key { color: #89b4fa; }
+        .yaml-string { color: #a6e3a1; }
+        .yaml-comment { color: #6c7086; font-style: italic; }
+        .yaml-number { color: #fab387; }
+        .yaml-bool { color: #cba6f7; }
+
+        .what-is-expanso {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .what-is-expanso h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .expanso-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .expanso-feature {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .expanso-feature strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .expanso-feature span {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .integration-idea {
+            background: white;
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .integration-idea h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .idea-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .idea-list li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .idea-list li:last-child {
+            border-bottom: none;
+        }
+
+        .idea-list li::before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+
+        .use-case-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .use-case-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="../spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="../comparison/w3c-prov.html" class="nav-item">W3C PROV Comparison</a>
+            <a href="../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../demos/" class="nav-item">Demos</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="./" class="nav-item active">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">Expanso + Makoto Integration Concept</h1>
+
+            <div class="concept-banner">
+                <p><strong>Note:</strong> This page explores how Makoto Levels (Makoto) attestation concepts <em>could</em> be implemented using a data pipeline platform like Expanso. This is a conceptual integration proposal demonstrating one possible approach. <strong>Other platforms and tools could provide similar capabilities</strong>—the concepts here are not tied to any specific vendor.</p>
+            </div>
+
+            <p>
+                This document explores the potential for integrating Makoto attestation capabilities
+                with <a href="https://expanso.io" target="_blank">Expanso</a>, a distributed data pipeline platform.
+                The goal is to show how pipeline primitives could be extended to support
+                data provenance and DBOM generation. While we use Expanso as an example, these patterns
+                could be implemented with any capable data pipeline or stream processing platform.
+            </p>
+        </section>
+
+        <!-- What is Expanso -->
+        <section class="section">
+            <div class="what-is-expanso">
+                <h3>What is Expanso?</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    Expanso is a data pipeline platform for processing data at the edge. It uses a
+                    declarative YAML configuration with inputs, processors, and outputs.
+                </p>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    Expanso and similar platforms offer powerful primitives for building data pipelines that can address
+                    a wide range of attestation and provenance needs. Example pipelines could include: cryptographic
+                    <strong>data signatures</strong> computed at the edge for tamper detection; <strong>firmware attestation</strong>
+                    using TPM-backed hardware verification; complete <strong>data lineage</strong> tracking from source through
+                    every transformation; <strong>provenance metadata</strong> capturing who, what, when, and where for each
+                    data point; and <strong>AI/ML integration</strong> for anomaly detection, quality scoring, and automated
+                    classification. These capabilities aren't unique to Expanso—platforms like Apache NiFi, Kafka Streams,
+                    Flink, or custom solutions built on message queues could achieve similar results. We present Expanso
+                    as one illustrative example, not as a required choice.
+                </p>
+                <div class="expanso-features">
+                    <div class="expanso-feature">
+                        <strong>Edge Processing</strong>
+                        <span>Run pipelines close to data sources</span>
+                    </div>
+                    <div class="expanso-feature">
+                        <strong>Bloblang</strong>
+                        <span>Powerful transformation language</span>
+                    </div>
+                    <div class="expanso-feature">
+                        <strong>200+ Connectors</strong>
+                        <span>Kafka, MQTT, S3, databases, etc.</span>
+                    </div>
+                    <div class="expanso-feature">
+                        <strong>PII Detection</strong>
+                        <span>Built-in data governance tools</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Integration Ideas -->
+        <section class="section" style="background: var(--bg-light);">
+            <h2>Potential Integration Approaches</h2>
+            <p>
+                Makoto attestation could be added to Expanso pipelines through several approaches,
+                ranging from simple Bloblang mappings to dedicated processor plugins.
+            </p>
+
+            <div class="integration-idea">
+                <h3>Integration Options</h3>
+                <ul class="idea-list">
+                    <li>
+                        <strong>Bloblang Mappings</strong> — Use existing mapping processors to add
+                        attestation metadata and compute content hashes. Works today with no changes to Expanso.
+                    </li>
+                    <li>
+                        <strong>Command Processor</strong> — Shell out to external signing tools (e.g.,
+                        cosign, sigstore) for L2 cryptographic signatures.
+                    </li>
+                    <li>
+                        <strong>Custom Processor Plugin</strong> — Build a dedicated DPL processor that
+                        handles attestation generation, signature, and DBOM verification natively.
+                    </li>
+                    <li>
+                        <strong>Platform Integration</strong> — Deep integration at the Expanso platform
+                        level for automatic DBOM generation for all pipeline outputs.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Pipeline Examples -->
+        <section class="section">
+            <h2>Conceptual Pipeline Examples</h2>
+            <p>
+                These examples show how Makoto attestation metadata <em>could</em> be added to Expanso
+                pipelines using existing Bloblang capabilities. The YAML syntax is valid Expanso
+                configuration, but the Makoto-specific fields are conceptual.
+            </p>
+
+            <!-- L1 Pipeline -->
+            <div class="pipeline-demo">
+                <h3>Concept: L1 Origin Attestation (DBOM)</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    Adding provenance metadata to incoming sensor data using Bloblang mappings
+                </p>
+                <div class="pipeline-yaml">
+<pre><span class="yaml-comment"># Conceptual: Adding Makoto metadata via Bloblang</span>
+<span class="yaml-comment"># This uses real Expanso syntax with conceptual DPL fields</span>
+
+<span class="yaml-key">input</span>:
+  <span class="yaml-key">mqtt</span>:
+    <span class="yaml-key">urls</span>: [<span class="yaml-string">"mqtt://sensors.example.com:1883"</span>]
+    <span class="yaml-key">topics</span>: [<span class="yaml-string">"sensors/+/temperature"</span>]
+
+<span class="yaml-key">pipeline</span>:
+  <span class="yaml-key">processors</span>:
+    <span class="yaml-comment"># Add origin attestation metadata</span>
+    - <span class="yaml-key">mapping</span>: |
+        root = this
+        root.dpl = {
+          "type": "origin/v1",
+          "level": 1,
+          "source": meta("mqtt_topic"),
+          "timestamp": now(),
+          "content_hash": this.hash("sha256")
+        }
+
+<span class="yaml-key">output</span>:
+  <span class="yaml-key">aws_s3</span>:
+    <span class="yaml-key">bucket</span>: <span class="yaml-string">"sensor-data-lake"</span>
+    <span class="yaml-key">path</span>: <span class="yaml-string">'data/${!timestamp_unix()}.json'</span></pre>
+                </div>
+            </div>
+
+            <!-- L2 Pipeline -->
+            <div class="pipeline-demo">
+                <h3>Concept: L2 Signed Transform</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    Adding cryptographic signatures via external signing tool
+                </p>
+                <div class="pipeline-yaml">
+<pre><span class="yaml-comment"># Conceptual: L2 with external signing</span>
+<span class="yaml-comment"># Uses command processor to invoke signing tool</span>
+
+<span class="yaml-key">input</span>:
+  <span class="yaml-key">kafka</span>:
+    <span class="yaml-key">addresses</span>: [<span class="yaml-string">"kafka:9092"</span>]
+    <span class="yaml-key">topics</span>: [<span class="yaml-string">"raw-data"</span>]
+
+<span class="yaml-key">pipeline</span>:
+  <span class="yaml-key">processors</span>:
+    <span class="yaml-comment"># Transform data</span>
+    - <span class="yaml-key">mapping</span>: |
+        root = this
+        root.user_id = this.user_id.hash("xxhash64")
+
+    <span class="yaml-comment"># Add transform attestation</span>
+    - <span class="yaml-key">mapping</span>: |
+        root.dpl = {
+          "type": "transform/v1",
+          "level": 2,
+          "transforms": ["pii_hash"],
+          "content_hash": this.hash("sha256")
+        }
+
+    <span class="yaml-comment"># Sign with external tool (conceptual)</span>
+    - <span class="yaml-key">command</span>:
+        <span class="yaml-key">name</span>: <span class="yaml-string">"cosign"</span>
+        <span class="yaml-key">args_mapping</span>: <span class="yaml-string">'["sign-blob", "--yes", "-"]'</span>
+
+<span class="yaml-key">output</span>:
+  <span class="yaml-key">sql_insert</span>:
+    <span class="yaml-key">driver</span>: <span class="yaml-string">"postgres"</span>
+    <span class="yaml-key">dsn</span>: <span class="yaml-string">"${DATABASE_URL}"</span>
+    <span class="yaml-key">table</span>: <span class="yaml-string">"processed_data"</span></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- What Would Be Needed -->
+        <section class="section" style="background: var(--bg-light);">
+            <h2>What Would Be Needed</h2>
+            <p>
+                To make Makoto a first-class feature of Expanso, the following would need to be developed:
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+                <div class="use-case-card">
+                    <h4>Makoto Processor Plugin</h4>
+                    <p style="color: var(--text-muted);">
+                        A native Expanso processor that generates Makoto-compliant attestations,
+                        handles key management, and supports all three provenance levels.
+                    </p>
+                </div>
+
+                <div class="use-case-card">
+                    <h4>Signing Integration</h4>
+                    <p style="color: var(--text-muted);">
+                        Built-in support for Sigstore/cosign, Vault transit, or HSM-based signing
+                        without shelling out to external commands.
+                    </p>
+                </div>
+
+                <div class="use-case-card">
+                    <h4>Attestation Storage</h4>
+                    <p style="color: var(--text-muted);">
+                        Output connector for attestation registries (Rekor, custom stores)
+                        with automatic sidecar attestation publishing.
+                    </p>
+                </div>
+
+                <div class="use-case-card">
+                    <h4>Verification Input</h4>
+                    <p style="color: var(--text-muted);">
+                        Input processor that validates incoming data has valid DBOMs
+                        before allowing it into the pipeline.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases -->
+        <section class="section">
+            <h2>Potential Use Cases</h2>
+            <p>
+                If Makoto were integrated with Expanso, it could enable DBOM generation and data provenance tracking
+                for various industries:
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+                <div class="use-case-card">
+                    <h4>IoT & Manufacturing</h4>
+                    <p style="color: var(--text-muted);">
+                        Track sensor data provenance from factory floor to analytics platform.
+                        Verify measurements haven't been tampered with.
+                    </p>
+                </div>
+
+                <div class="use-case-card">
+                    <h4>Healthcare Data</h4>
+                    <p style="color: var(--text-muted);">
+                        HIPAA-compliant data sharing with attestations that prove transformations
+                        maintained integrity without exposing PHI.
+                    </p>
+                </div>
+
+                <div class="use-case-card">
+                    <h4>Financial Services</h4>
+                    <p style="color: var(--text-muted);">
+                        Audit-ready transaction logs with unforgeable attestations for
+                        regulatory compliance.
+                    </p>
+                </div>
+
+                <div class="use-case-card">
+                    <h4>Supply Chain</h4>
+                    <p style="color: var(--text-muted);">
+                        End-to-end visibility for product journey with cryptographic proof
+                        at each handoff.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="section" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white;">
+            <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: white;">Interested in This Integration?</h2>
+                <p style="color: rgba(255,255,255,0.9); margin: 1rem 0 2rem;">
+                    This is a conceptual proposal. If you're interested in seeing Makoto support
+                    in Expanso, reach out to discuss collaboration opportunities.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://expanso.io" class="btn" style="background: white; color: var(--primary);">
+                        Learn About Expanso
+                    </a>
+                    <a href="../spec/" class="btn" style="background: transparent; border: 2px solid white; color: white;">
+                        Read Makoto Spec
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Makoto brings SLSA-style assurance levels to data supply chains. <a href="https://slsa.dev" target="_blank">Learn about SLSA →</a></p>
+        </footer>
+    </main>
+</body>
+</html>

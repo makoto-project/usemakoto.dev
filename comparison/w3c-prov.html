@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W3C PROV vs Makoto Comparison | Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="./" class="nav-item">SLSA Comparison</a>
+            <a href="./w3c-prov.html" class="nav-item active">W3C PROV Comparison</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../demos/" class="nav-item">Demos</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 1rem;">W3C PROV vs Makoto</h1>
+
+            <p>
+                <a href="https://www.w3.org/TR/prov-overview/" target="_blank">W3C PROV</a> is a family of specifications
+                for representing provenance information on the Web. While both PROV and Makoto address data provenance,
+                they serve different purposes and operate at different abstraction levels.
+            </p>
+
+            <div class="card" style="background: #f0fdf4; border-color: #bbf7d0;">
+                <p style="margin: 0;"><strong>Complementary standards:</strong> W3C PROV provides a semantic data model
+                for describing provenance relationships. Makoto provides an operational framework with cryptographic
+                attestations and security levels. Makoto's lineage graphs can be informed by PROV concepts.</p>
+            </div>
+        </section>
+
+        <!-- Core Philosophy Comparison -->
+        <section class="section" id="philosophy">
+            <h2>Different Goals, Different Approaches</h2>
+
+            <div class="card-grid" style="margin: 1.5rem 0;">
+                <div class="card">
+                    <h3 style="margin-top: 0; color: #0369a1;">W3C PROV</h3>
+                    <p class="text-muted"><strong>Goal:</strong> Enable interoperable provenance interchange</p>
+                    <ul style="margin-bottom: 0; color: var(--text-muted);">
+                        <li>Semantic data model (RDF/OWL)</li>
+                        <li>Describes "what happened"</li>
+                        <li>Focuses on interoperability</li>
+                        <li>No security requirements</li>
+                        <li>Human and machine readable</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top: 0; color: #059669;">Makoto</h3>
+                    <p class="text-muted"><strong>Goal:</strong> Cryptographically verifiable data integrity</p>
+                    <ul style="margin-bottom: 0; color: var(--text-muted);">
+                        <li>Attestation framework (in-toto/DSSE)</li>
+                        <li>Proves "this is trustworthy"</li>
+                        <li>Focuses on verification</li>
+                        <li>Progressive security levels</li>
+                        <li>Machine verifiable signatures</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p>
+                Think of it this way: PROV tells you <em>"Entity X was generated by Activity Y, which was attributed
+                to Agent Z."</em> Makoto tells you <em>"Here's cryptographic proof that this data came from where it
+                claims, hasn't been tampered with, and meets security level L2."</em>
+            </p>
+        </section>
+
+        <!-- Core Concepts Mapping -->
+        <section class="section" id="concepts" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>Core Concept Mapping</h2>
+
+                <p>
+                    W3C PROV defines three core concepts. Here's how they relate to Makoto's model:
+                </p>
+
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>PROV Concept</th>
+                            <th>Definition</th>
+                            <th>Makoto Equivalent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Entity</strong></td>
+                            <td>A physical, digital, or conceptual thing</td>
+                            <td><strong>Subject</strong> - The data artifact being attested (with digest)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Activity</strong></td>
+                            <td>Something that occurs over time and acts upon entities</td>
+                            <td><strong>Transform</strong> - A data processing operation with attestation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Agent</strong></td>
+                            <td>Something that bears responsibility for an activity</td>
+                            <td><strong>Collector/Executor</strong> - The system performing the operation</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>PROV Relations in Makoto</h3>
+
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>PROV Relation</th>
+                            <th>Meaning</th>
+                            <th>Makoto Implementation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="code-inline">wasGeneratedBy</code></td>
+                            <td>Entity was created by Activity</td>
+                            <td>Transform attestation's <code class="code-inline">subject</code> field</td>
+                        </tr>
+                        <tr>
+                            <td><code class="code-inline">used</code></td>
+                            <td>Activity consumed Entity</td>
+                            <td>Transform attestation's <code class="code-inline">inputs</code> array</td>
+                        </tr>
+                        <tr>
+                            <td><code class="code-inline">wasAttributedTo</code></td>
+                            <td>Entity is attributed to Agent</td>
+                            <td>Origin attestation's <code class="code-inline">collector</code> field</td>
+                        </tr>
+                        <tr>
+                            <td><code class="code-inline">wasDerivedFrom</code></td>
+                            <td>Entity derived from another Entity</td>
+                            <td>Hash-chained attestations via <code class="code-inline">attestationRef</code></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code-inline">wasAssociatedWith</code></td>
+                            <td>Activity was associated with Agent</td>
+                            <td>Transform attestation's <code class="code-inline">executor</code> field</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Data Model Comparison -->
+        <section class="section" id="datamodel">
+            <h2>Data Model Comparison</h2>
+
+            <p>
+                PROV and Makoto represent provenance information very differently:
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0;">
+                <div>
+                    <h4>PROV-N Notation</h4>
+                    <div class="code-block">
+<pre><span class="hl-comment">// PROV expresses relationships semantically</span>
+<span class="hl-key">entity</span>(dataset:transactions_2025)
+<span class="hl-key">entity</span>(dataset:transactions_anonymized)
+
+<span class="hl-key">activity</span>(transform:anonymize,
+  2025-12-20T10:05:00,
+  2025-12-20T10:15:00)
+
+<span class="hl-key">agent</span>(expanso:pipeline-prod-1)
+
+<span class="hl-key">wasGeneratedBy</span>(
+  dataset:transactions_anonymized,
+  transform:anonymize)
+
+<span class="hl-key">used</span>(transform:anonymize,
+  dataset:transactions_2025)
+
+<span class="hl-key">wasAssociatedWith</span>(
+  transform:anonymize,
+  expanso:pipeline-prod-1)</pre>
+                    </div>
+                </div>
+                <div>
+                    <h4>Makoto Attestation</h4>
+                    <div class="code-block">
+<pre><span class="hl-comment">// Makoto provides signed, verifiable proof</span>
+{
+  <span class="hl-key">"_type"</span>: <span class="hl-string">"in-toto.io/Statement/v1"</span>,
+  <span class="hl-key">"predicateType"</span>: <span class="hl-string">"makoto.dev/transform/v1"</span>,
+  <span class="hl-key">"subject"</span>: [{
+    <span class="hl-key">"digest"</span>: {<span class="hl-key">"sha256"</span>: <span class="hl-string">"xyz..."</span>}
+  }],
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-key">"inputs"</span>: [{
+      <span class="hl-key">"digest"</span>: {<span class="hl-key">"sha256"</span>: <span class="hl-string">"abc..."</span>}
+    }],
+    <span class="hl-key">"executor"</span>: {
+      <span class="hl-key">"id"</span>: <span class="hl-string">"expanso.io/pipelines/prod-1"</span>
+    }
+  }
+}
+<span class="hl-comment">// + DSSE signature envelope</span></pre>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Key Differences</h3>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>W3C PROV</th>
+                        <th>Makoto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Serialization</strong></td>
+                        <td>RDF, PROV-N, PROV-JSON, PROV-XML</td>
+                        <td>JSON with DSSE signature envelope</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Identity</strong></td>
+                        <td>URIs (semantic web style)</td>
+                        <td>Cryptographic digests (sha256, merkle roots)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Integrity</strong></td>
+                        <td>None built-in</td>
+                        <td>Hash binding + digital signatures</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Validation</strong></td>
+                        <td>PROV-CONSTRAINTS (logical)</td>
+                        <td>Signature verification + hash verification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Querying</strong></td>
+                        <td>SPARQL (semantic queries)</td>
+                        <td>Attestation chain traversal</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- What Each Does Best -->
+        <section class="section" id="strengths" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>What Each Does Best</h2>
+
+                <div class="card-grid" style="margin: 1.5rem 0;">
+                    <div class="card">
+                        <h4 style="margin-top: 0; color: #0369a1;">W3C PROV Excels At</h4>
+                        <ul style="margin-bottom: 0;">
+                            <li><strong>Rich semantics</strong> - Express complex provenance relationships</li>
+                            <li><strong>Interoperability</strong> - Standard vocabularies, multiple serializations</li>
+                            <li><strong>Querying</strong> - SPARQL enables complex provenance queries</li>
+                            <li><strong>Human readability</strong> - PROV-N is designed to be readable</li>
+                            <li><strong>Extensibility</strong> - Easy to add domain-specific terms via OWL</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4 style="margin-top: 0; color: #059669;">Makoto Excels At</h4>
+                        <ul style="margin-bottom: 0;">
+                            <li><strong>Verification</strong> - Cryptographic proof of integrity</li>
+                            <li><strong>Trust levels</strong> - Progressive security requirements (L1-L3)</li>
+                            <li><strong>Streaming</strong> - Window-based attestation for high-throughput</li>
+                            <li><strong>Tamper evidence</strong> - Hash chaining detects modifications</li>
+                            <li><strong>Automation</strong> - Machine-verifiable without human interpretation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Use Case Guidance</h3>
+
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>Use Case</th>
+                            <th>Better Fit</th>
+                            <th>Why</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Scientific reproducibility</td>
+                            <td>W3C PROV</td>
+                            <td>Rich description of methodology and dependencies</td>
+                        </tr>
+                        <tr>
+                            <td>Supply chain security</td>
+                            <td>Makoto</td>
+                            <td>Cryptographic verification, tamper detection</td>
+                        </tr>
+                        <tr>
+                            <td>Regulatory compliance (GDPR)</td>
+                            <td>Both</td>
+                            <td>PROV for documentation, Makoto for audit proof</td>
+                        </tr>
+                        <tr>
+                            <td>ML training data lineage</td>
+                            <td>Makoto + PROV</td>
+                            <td>Makoto for integrity, PROV for rich metadata</td>
+                        </tr>
+                        <tr>
+                            <td>Real-time streaming</td>
+                            <td>Makoto</td>
+                            <td>Window-based attestation handles scale</td>
+                        </tr>
+                        <tr>
+                            <td>Provenance visualization</td>
+                            <td>W3C PROV</td>
+                            <td>Semantic structure maps well to graphs</td>
+                        </tr>
+                        <tr>
+                            <td>Zero-trust environments</td>
+                            <td>Makoto</td>
+                            <td>Signature verification doesn't require trust</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Using Them Together -->
+        <section class="section" id="together">
+            <h2>Using PROV and Makoto Together</h2>
+
+            <p>
+                These standards are complementary. A sophisticated data governance system might use both:
+            </p>
+
+            <div class="technique-card">
+                <div class="technique-header">
+                    <h3>Hybrid Architecture Pattern</h3>
+                </div>
+                <div class="technique-body">
+                    <div>
+                        <h4 style="margin-top: 0;">Makoto Layer (Verification)</h4>
+                        <ul class="text-muted">
+                            <li>Cryptographic attestations at each pipeline stage</li>
+                            <li>Hash-chained lineage for tamper detection</li>
+                            <li>Security level enforcement (L1/L2/L3)</li>
+                            <li>Automated verification at data consumption</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="margin-top: 0;">PROV Layer (Documentation)</h4>
+                        <ul class="text-muted">
+                            <li>Rich semantic provenance metadata</li>
+                            <li>SPARQL-queryable provenance store</li>
+                            <li>Human-readable lineage documentation</li>
+                            <li>Integration with knowledge graphs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Integration Example</h3>
+
+            <p>A Makoto attestation could embed PROV concepts or reference a PROV document:</p>
+
+            <div class="code-block">
+<pre>{
+  <span class="hl-key">"_type"</span>: <span class="hl-string">"https://in-toto.io/Statement/v1"</span>,
+  <span class="hl-key">"predicateType"</span>: <span class="hl-string">"https://makoto.dev/transform/v1"</span>,
+  <span class="hl-key">"subject"</span>: [{
+    <span class="hl-key">"name"</span>: <span class="hl-string">"dataset:customer_analysis_v3"</span>,
+    <span class="hl-key">"digest"</span>: {<span class="hl-key">"sha256"</span>: <span class="hl-string">"abc123..."</span>}
+  }],
+  <span class="hl-key">"predicate"</span>: {
+    <span class="hl-key">"transform"</span>: {
+      <span class="hl-key">"type"</span>: <span class="hl-string">"aggregation"</span>,
+      <span class="hl-key">"name"</span>: <span class="hl-string">"Customer Behavior Analysis"</span>
+    },
+    <span class="hl-comment">// Reference to detailed PROV document</span>
+    <span class="hl-key">"provenance"</span>: {
+      <span class="hl-key">"type"</span>: <span class="hl-string">"prov:Bundle"</span>,
+      <span class="hl-key">"location"</span>: <span class="hl-string">"https://prov.example.com/bundles/abc123"</span>,
+      <span class="hl-key">"digest"</span>: {<span class="hl-key">"sha256"</span>: <span class="hl-string">"def456..."</span>}
+    },
+    <span class="hl-key">"metadata"</span>: {
+      <span class="hl-comment">// PROV-inspired fields</span>
+      <span class="hl-key">"prov:wasAssociatedWith"</span>: <span class="hl-string">"https://expanso.io/agents/etl-prod"</span>,
+      <span class="hl-key">"prov:generatedAtTime"</span>: <span class="hl-string">"2025-12-20T10:15:00Z"</span>
+    }
+  }
+}</pre>
+            </div>
+        </section>
+
+        <!-- PROV Family Overview -->
+        <section class="section" id="prov-family" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <h2>W3C PROV Family Overview</h2>
+
+                <p>
+                    The PROV family includes 12 specifications. Here's how they relate to Makoto's concerns:
+                </p>
+
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>PROV Spec</th>
+                            <th>Purpose</th>
+                            <th>Makoto Relevance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>PROV-DM</strong></td>
+                            <td>Core data model</td>
+                            <td>Conceptual foundation for lineage graphs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PROV-O</strong></td>
+                            <td>OWL2 ontology</td>
+                            <td>Could extend for semantic Makoto queries</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PROV-N</strong></td>
+                            <td>Human-readable notation</td>
+                            <td>Useful for documentation, not verification</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PROV-CONSTRAINTS</strong></td>
+                            <td>Validity rules</td>
+                            <td>Similar goal to Makoto schema validation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PROV-AQ</strong></td>
+                            <td>Access and query</td>
+                            <td>Could inform attestation registry APIs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PROV-LINKS</strong></td>
+                            <td>Bundle connections</td>
+                            <td>Similar to attestation references/chaining</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="section" id="summary">
+            <h2>Summary Comparison</h2>
+
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>W3C PROV</th>
+                        <th>Makoto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Primary purpose</strong></td>
+                        <td>Interoperable provenance representation</td>
+                        <td>Verifiable data integrity</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data model</strong></td>
+                        <td>Entity-Activity-Agent (semantic)</td>
+                        <td>Attestation statements (cryptographic)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Serialization</strong></td>
+                        <td>RDF, JSON, XML, PROV-N</td>
+                        <td>JSON + DSSE signature</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Security</strong></td>
+                        <td>None built-in</td>
+                        <td>Digital signatures, security levels</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Verification</strong></td>
+                        <td>Logical constraints (PROV-CONSTRAINTS)</td>
+                        <td>Cryptographic signature + hash verification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Streaming support</strong></td>
+                        <td>Not designed for streaming</td>
+                        <td>Window-based attestation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Trust model</strong></td>
+                        <td>Implicit (trust the source)</td>
+                        <td>Explicit (verify signatures)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Standards body</strong></td>
+                        <td>W3C (Recommendation since 2013)</td>
+                        <td>Building on in-toto (OpenSSF)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="card" style="margin-top: 2rem; background: #eff6ff; border-color: #bfdbfe;">
+                <h4 style="margin-top: 0;">Bottom Line</h4>
+                <p style="margin-bottom: 0;">
+                    Use <strong>W3C PROV</strong> when you need rich semantic provenance documentation, interoperability
+                    with semantic web systems, or human-readable provenance descriptions. Use <strong>Makoto</strong>
+                    when you need cryptographically verifiable data integrity, tamper detection, or security level
+                    compliance. Use <strong>both</strong> when you need comprehensive data governance with both
+                    documentation and verification.
+                </p>
+            </div>
+
+            <p style="margin-top: 1.5rem;">
+                <a href="./">SLSA Comparison →</a> |
+                <a href="https://www.w3.org/TR/prov-overview/" target="_blank">W3C PROV Specification →</a>
+            </p>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://www.w3.org/TR/prov-overview/" target="_blank">W3C PROV →</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>
