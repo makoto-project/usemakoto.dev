@@ -1,0 +1,27 @@
+{
+  "name": "@makoto/sdk",
+  "version": "0.1.0",
+  "description": "Generate and verify Makoto Data Bills of Materials (DBOMs)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.js"
+    }
+  },
+  "main": "./src/index.js",
+  "files": ["src/"],
+  "keywords": ["makoto", "dbom", "data-provenance", "supply-chain"],
+  "license": "Apache-2.0",
+  "homepage": "https://usemakoto.dev/sdk/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/makoto-project/makoto"
+  },
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

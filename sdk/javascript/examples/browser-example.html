@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Makoto SDK — Browser Example</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    pre { background: #f5f5f5; padding: 1rem; border-radius: 6px; overflow: auto; }
+    .valid { color: #16a34a; font-weight: 600; }
+    .invalid { color: #dc2626; font-weight: 600; }
+    button { padding: 0.5rem 1.2rem; background: #4f46e5; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+    button:hover { background: #4338ca; }
+    label { font-weight: 600; }
+    input { margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Makoto SDK — Browser Demo</h1>
+  <p>Select a file to generate and verify a DBOM in your browser using the Makoto SDK.</p>
+
+  <div>
+    <label for="fileInput">Choose a file:</label><br>
+    <input type="file" id="fileInput">
+  </div>
+  <br>
+  <div>
+    <label for="signer">Signer identity:</label><br>
+    <input type="text" id="signer" value="github:example-user" size="30">
+  </div>
+  <br>
+  <button onclick="run()">Generate & Verify DBOM</button>
+  <br><br>
+
+  <div id="status"></div>
+  <pre id="output" style="display:none"></pre>
+
+  <script type="module">
+    // Import directly from source (works with a local server or bundler)
+    // In production you'd use: import { generate, verify } from "@makoto/sdk"
+    import { generate, verify } from "../src/index.js";
+
+    window.run = async function() {
+      const fileInput = document.getElementById("fileInput");
+      const signer = document.getElementById("signer").value;
+      const status = document.getElementById("status");
+      const output = document.getElementById("output");
+
+      if (!fileInput.files.length) {
+        status.textContent = "Please select a file first.";
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const buffer = await file.arrayBuffer();
+
+      status.textContent = "Generating DBOM...";
+      output.style.display = "none";
+
+      try {
+        const dbom = await generate({
+          fileBuffer: buffer,
+          fileName: file.name,
+          signer: signer || "github:example-user",
+          format: file.name.split(".").pop(),
+        });
+
+        // Verify
+        const result = await verify(dbom, buffer);
+
+        const validLine = result.valid
+          ? `<span class="valid">✓ DBOM is valid</span>`
+          : `<span class="invalid">✗ ${result.errors.join("; ")}</span>`;
+
+        status.innerHTML = validLine;
+        output.textContent = JSON.stringify(dbom, null, 2);
+        output.style.display = "block";
+      } catch (err) {
+        status.innerHTML = `<span class="invalid">Error: ${err.message}</span>`;
+      }
+    };
+  </script>
+</body>
+</html>

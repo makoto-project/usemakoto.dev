@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDKs - Makoto (誠)</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <style>
+        .sdk-section {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .sdk-section h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+        .install-block {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            position: relative;
+            overflow: auto;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #cdd6f4;
+            border-radius: 4px;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.2); }
+        code.inline {
+            background: #f0f0f0;
+            padding: 0.1em 0.4em;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+        }
+        .schema-note {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            font-size: 0.95rem;
+            margin: 2rem 0;
+        }
+        .schema-note a { color: #16a34a; }
+        .lang-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        .readme-link {
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="/spec/" class="nav-item">Makoto v0.1</a>
+            <a href="/levels/" class="nav-item">Understanding Levels</a>
+            <a href="/spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="/comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="/comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="/examples/" class="nav-item">Examples</a>
+            <a href="/demos/" class="nav-item">Demos</a>
+            <a href="/sdk/" class="nav-item active">SDKs</a>
+            <a href="/privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="/threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="/expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <div class="content-inner">
+            <h1>SDKs — Generate and Verify DBOMs in 3 Lines</h1>
+            <p class="lead">Official libraries for Python and JavaScript. Both SDKs generate schema-valid <a href="https://usemakoto.dev/spec/">Makoto DBOM</a> records and verify them with a single function call.</p>
+
+            <div class="schema-note">
+                🔒 All DBOMs are validated against the canonical schema at
+                <a href="https://usemakoto.dev/schema/v0.1.json"><code>https://usemakoto.dev/schema/v0.1.json</code></a>.
+                A bundled copy is included in each SDK for offline use.
+            </div>
+
+            <!-- Python SDK -->
+            <div class="sdk-section">
+                <h2><span class="lang-badge">Python</span> makoto</h2>
+                <p>Works with Python 3.8+. Install via <code class="inline">uv</code> or <code class="inline">pip</code>.</p>
+
+                <strong>Install</strong>
+                <div class="install-block">
+                    <button class="copy-btn" onclick="copy(this)">Copy</button>
+                    uv add makoto
+                </div>
+
+                <strong>Quick Start</strong>
+                <div class="install-block" style="white-space: pre;">
+                    <button class="copy-btn" onclick="copy(this)">Copy</button>
+from makoto import generate, verify
+
+# Generate a DBOM
+dbom = generate("data/sales.csv", signer="github:you")
+
+# Verify it
+result = verify(dbom, file_path="data/sales.csv")
+print("Valid" if result.valid else result.errors)
+                </div>
+                <p class="readme-link">→ <a href="https://github.com/makoto-project/makoto/tree/main/sdk/python">Full README &amp; API reference</a></p>
+            </div>
+
+            <!-- JavaScript SDK -->
+            <div class="sdk-section">
+                <h2><span class="lang-badge" style="background:#f7df1e;color:#222;">JS</span> @makoto/sdk</h2>
+                <p>Works in Node.js 18+ and modern browsers. ES modules only.</p>
+
+                <strong>Install</strong>
+                <div class="install-block">
+                    <button class="copy-btn" onclick="copy(this)">Copy</button>
+                    npm install @makoto/sdk
+                </div>
+
+                <strong>Quick Start — Node.js</strong>
+                <div class="install-block" style="white-space: pre;">
+                    <button class="copy-btn" onclick="copy(this)">Copy</button>
+import { generate, verify } from "@makoto/sdk";
+
+const dbom = await generate({ filePath: "sales.csv", signer: "github:you", fileName: "sales.csv" });
+const result = await verify(dbom);
+console.log(result.valid ? "✓ Valid" : result.errors);
+                </div>
+
+                <strong>Quick Start — Browser</strong>
+                <div class="install-block" style="white-space: pre;">
+                    <button class="copy-btn" onclick="copy(this)">Copy</button>
+import { generate, verify } from "@makoto/sdk";
+
+const buffer = await file.arrayBuffer();
+const dbom = await generate({ fileBuffer: buffer, fileName: file.name, signer: "github:you" });
+const result = await verify(dbom, buffer);
+                </div>
+                <p class="readme-link">→ <a href="https://github.com/makoto-project/makoto/tree/main/sdk/javascript">Full README &amp; API reference</a></p>
+            </div>
+
+            <h2>Schema</h2>
+            <p>The DBOM JSON Schema is published at:</p>
+            <div class="install-block">
+                https://usemakoto.dev/schema/v0.1.json<br>
+                https://usemakoto.dev/schema/latest.json
+            </div>
+            <p>Both URLs serve the same v0.1 schema. Both SDKs fetch it at runtime and fall back to a bundled copy when offline.</p>
+        </div>
+    </main>
+
+    <script>
+        function copy(btn) {
+            const block = btn.parentElement;
+            const text = block.textContent.replace("Copy", "").trim();
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = "Copied!";
+                setTimeout(() => { btn.textContent = "Copy"; }, 1500);
+            });
+        }
+    </script>
+</body>
+</html>
