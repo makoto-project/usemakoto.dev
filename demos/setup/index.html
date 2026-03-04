@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Guide - Makoto (誠)</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <style>
+        .setup-hero {
+            background: linear-gradient(135deg, #09090b 0%, #18181b 50%, #312e81 100%);
+            color: white;
+            padding: 4rem 3rem;
+        }
+        .setup-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+        .setup-hero p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+        .step-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .step-header h3 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .os-tabs {
+            display: flex;
+            gap: 0;
+            margin: 1rem 0 0;
+        }
+        .os-tab {
+            padding: 0.5rem 1.25rem;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+        .os-tab:first-child {
+            border-radius: 6px 0 0 6px;
+        }
+        .os-tab:last-child {
+            border-radius: 0 6px 6px 0;
+            border-left: none;
+        }
+        .os-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .os-content {
+            display: none;
+        }
+        .os-content.active {
+            display: block;
+        }
+        .terminal {
+            background: #0d0d0d;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .terminal-bar {
+            background: #1a1a1a;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .terminal-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .terminal-dots span:nth-child(1) { background: #ff5f57; }
+        .terminal-dots span:nth-child(2) { background: #febc2e; }
+        .terminal-dots span:nth-child(3) { background: #28c840; }
+        .terminal-copy {
+            background: none;
+            border: 1px solid #333;
+            color: #888;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            transition: all 0.2s;
+        }
+        .terminal-copy:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .terminal-body {
+            padding: 1rem 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: #e2e8f0;
+            overflow-x: auto;
+        }
+        .terminal-body .prompt {
+            color: #22c55e;
+            user-select: none;
+        }
+        .terminal-body .cmd {
+            color: #e2e8f0;
+        }
+        .callout {
+            background: var(--accent-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+            color: var(--primary-dark);
+        }
+        .troubleshoot-item {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin: 0.75rem 0;
+        }
+        .troubleshoot-item code {
+            background: #0d0d0d;
+            color: #e2e8f0;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        .troubleshoot-item strong {
+            color: var(--text);
+        }
+        .next-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .next-link {
+            display: block;
+            padding: 1rem 1.25rem;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .next-link:hover {
+            border-color: var(--primary);
+            text-decoration: none;
+        }
+        .next-link .demo-num {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .next-link .demo-title {
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="/" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="/spec/" class="nav-item">Makoto v0.1</a>
+            <a href="/levels/" class="nav-item">Understanding Levels</a>
+            <a href="/spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="/comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="/comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="/examples/" class="nav-item">Examples</a>
+            <a href="/demos/" class="nav-item">Demos</a>
+            <a href="/demos/setup/" class="nav-item nav-item-sub active">Setup Guide</a>
+            <a href="/demos/01/" class="nav-item nav-item-sub">01 &mdash; Poisoned Pipeline</a>
+            <a href="/demos/02/" class="nav-item nav-item-sub">02 &mdash; Reproducibility Gap</a>
+            <a href="/demos/03/" class="nav-item nav-item-sub">03 &mdash; GitHub Action</a>
+            <a href="/demos/04/" class="nav-item nav-item-sub">04 &mdash; Config Postmortem</a>
+            <a href="/demos/05/" class="nav-item nav-item-sub">05 &mdash; AI Dataset Verification</a>
+            <a href="/privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="/threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="/expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="setup-hero">
+            <h1>Setup Guide</h1>
+            <p>Get the Makoto demos running in under 5 minutes</p>
+        </section>
+
+        <section class="section" style="max-width: 960px;">
+
+            <!-- Step 1: Install git -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h3>Install git</h3>
+                </div>
+                <p style="color: var(--text-muted); line-height: 1.7;">Git is required to clone the Makoto repository. Most systems already have it installed.</p>
+
+                <div class="os-tabs" data-group="git">
+                    <div class="os-tab active" onclick="switchTab(this, 'git', 'mac')">macOS</div>
+                    <div class="os-tab" onclick="switchTab(this, 'git', 'linux')">Linux</div>
+                    <div class="os-tab" onclick="switchTab(this, 'git', 'windows')">Windows</div>
+                </div>
+
+                <div class="os-content active" data-group="git" data-os="mac">
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <button class="terminal-copy" onclick="copyCommands(this)" data-commands="brew install git">Copy</button>
+                        </div>
+                        <div class="terminal-body">
+                            <div><span class="prompt">$ </span><span class="cmd">brew install git</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="os-content" data-group="git" data-os="linux">
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <button class="terminal-copy" onclick="copyCommands(this)" data-commands="sudo apt install git">Copy</button>
+                        </div>
+                        <div class="terminal-body">
+                            <div><span class="prompt">$ </span><span class="cmd">sudo apt install git</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="os-content" data-group="git" data-os="windows">
+                    <p style="color: var(--text-muted); margin-top: 1rem;">Download and install from <a href="https://git-scm.com" target="_blank">git-scm.com</a></p>
+                </div>
+            </div>
+
+            <!-- Step 2: Install uv -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h3>Install uv</h3>
+                </div>
+                <p style="color: var(--text-muted); line-height: 1.7;"><strong>uv</strong> is a fast Python package manager that handles virtual environments and Python version selection automatically. All Makoto demos use uv.</p>
+
+                <div class="os-tabs" data-group="uv">
+                    <div class="os-tab active" onclick="switchTab(this, 'uv', 'unix')">macOS / Linux</div>
+                    <div class="os-tab" onclick="switchTab(this, 'uv', 'win')">Windows</div>
+                </div>
+
+                <div class="os-content active" data-group="uv" data-os="unix">
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <button class="terminal-copy" onclick="copyCommands(this)" data-commands="curl -LsSf https://astral.sh/uv/install.sh | sh&#10;source $HOME/.local/bin/env">Copy</button>
+                        </div>
+                        <div class="terminal-body">
+                            <div><span class="prompt">$ </span><span class="cmd">curl -LsSf https://astral.sh/uv/install.sh | sh</span></div>
+                            <div><span class="prompt">$ </span><span class="cmd">source $HOME/.local/bin/env</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="os-content" data-group="uv" data-os="win">
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <button class="terminal-copy" onclick="copyCommands(this)" data-commands="powershell -ExecutionPolicy ByPass -c &quot;irm https://astral.sh/uv/install.ps1 | iex&quot;">Copy</button>
+                        </div>
+                        <div class="terminal-body">
+                            <div><span class="prompt">&gt; </span><span class="cmd">powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="color: var(--text-muted); margin-top: 1rem;">Verify the installation:</p>
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <div class="terminal-dots"><span></span><span></span><span></span></div>
+                        <button class="terminal-copy" onclick="copyCommands(this)" data-commands="uv --version">Copy</button>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="prompt">$ </span><span class="cmd">uv --version</span></div>
+                        <div style="color: #a1a1aa;">uv 0.5.x</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Clone the repo -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h3>Clone the repo</h3>
+                </div>
+                <p style="color: var(--text-muted); line-height: 1.7;">Clone the Makoto repository from GitHub.</p>
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <div class="terminal-dots"><span></span><span></span><span></span></div>
+                        <button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/makoto&#10;cd makoto">Copy</button>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/makoto-project/makoto</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">cd makoto</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Run your first demo -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <h3>Run your first demo</h3>
+                </div>
+                <p style="color: var(--text-muted); line-height: 1.7;">Try the AI Dataset Verification demo to see Makoto in action.</p>
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <div class="terminal-dots"><span></span><span></span><span></span></div>
+                        <button class="terminal-copy" onclick="copyCommands(this)" data-commands="cd demos/05-ai-dataset-verification&#10;uv run demo.py">Copy</button>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="prompt">$ </span><span class="cmd">cd demos/05-ai-dataset-verification</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">uv run demo.py</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Callout -->
+            <div class="callout">
+                <strong>Why uv?</strong> uv automatically handles virtual environments and Python version selection. All Makoto demos use Python stdlib only &mdash; <code>uv run</code> works with zero extra configuration.
+            </div>
+
+            <!-- Troubleshooting -->
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">Troubleshooting</h2>
+
+            <div class="troubleshoot-item">
+                <p style="margin: 0;"><strong><code>uv: command not found</code></strong></p>
+                <p style="margin: 0.5rem 0 0; color: var(--text-muted);">Restart your terminal, or run: <code>source $HOME/.local/bin/env</code></p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <p style="margin: 0;"><strong><code>bash: run.sh: Permission denied</code></strong></p>
+                <p style="margin: 0.5rem 0 0; color: var(--text-muted);">Run: <code>chmod +x run.sh</code></p>
+            </div>
+
+            <div class="troubleshoot-item">
+                <p style="margin: 0;"><strong>Wrong Python version</strong></p>
+                <p style="margin: 0.5rem 0 0; color: var(--text-muted);">uv automatically selects Python 3.8+, no action needed.</p>
+            </div>
+
+            <!-- Next Steps -->
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">Next Steps</h2>
+            <p style="color: var(--text-muted);">You're all set. Pick a demo and see Makoto in action:</p>
+
+            <div class="next-links">
+                <a href="/demos/01/" class="next-link">
+                    <div class="demo-num">Demo 01</div>
+                    <div class="demo-title">The Poisoned Pipeline</div>
+                </a>
+                <a href="/demos/02/" class="next-link">
+                    <div class="demo-num">Demo 02</div>
+                    <div class="demo-title">The Reproducibility Gap</div>
+                </a>
+                <a href="/demos/03/" class="next-link">
+                    <div class="demo-num">Demo 03</div>
+                    <div class="demo-title">GitHub Action</div>
+                </a>
+                <a href="/demos/04/" class="next-link">
+                    <div class="demo-num">Demo 04</div>
+                    <div class="demo-title">Config Postmortem</div>
+                </a>
+                <a href="/demos/05/" class="next-link">
+                    <div class="demo-num">Demo 05</div>
+                    <div class="demo-title">AI Dataset Verification</div>
+                </a>
+            </div>
+
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://github.com/makoto-project/makoto" target="_blank">View on GitHub &rarr;</a>
+            </p>
+        </footer>
+    </main>
+
+    <script>
+    function switchTab(el, group, os) {
+        document.querySelectorAll('.os-tab[data-group="' + group + '"], .os-tabs[data-group="' + group + '"] .os-tab').forEach(function(tab) {
+            tab.classList.remove('active');
+        });
+        // Get the parent os-tabs and mark the clicked tab active
+        el.classList.add('active');
+        document.querySelectorAll('.os-content[data-group="' + group + '"]').forEach(function(c) {
+            c.classList.remove('active');
+        });
+        document.querySelector('.os-content[data-group="' + group + '"][data-os="' + os + '"]').classList.add('active');
+    }
+
+    function copyCommands(btn) {
+        var commands = btn.getAttribute('data-commands').replace(/&#10;/g, '\n');
+        navigator.clipboard.writeText(commands).then(function() {
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+        });
+    }
+    </script>
+</body>
+</html>
