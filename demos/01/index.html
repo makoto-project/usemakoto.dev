@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo 01: The Poisoned Pipeline - Makoto (誠)</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <style>
+        .demo-hero {
+            background: linear-gradient(135deg, #09090b 0%, #18181b 50%, #312e81 100%);
+            color: white;
+            padding: 4rem 3rem;
+        }
+        .demo-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+        .demo-hero p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+        .demo-pill {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            margin-bottom: 1rem;
+        }
+        .time-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+        .flow-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        .flow-badge .problem {
+            background: rgba(220,38,38,0.2);
+            color: #fca5a5;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+        }
+        .flow-badge .arrow { color: rgba(255,255,255,0.5); }
+        .flow-badge .solution {
+            background: rgba(22,163,74,0.2);
+            color: #86efac;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+        }
+        .terminal {
+            background: #0d0d0d;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .terminal-bar {
+            background: #1a1a1a;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .terminal-dots { display: flex; gap: 6px; }
+        .terminal-dots span { width: 10px; height: 10px; border-radius: 50%; }
+        .terminal-dots span:nth-child(1) { background: #ff5f57; }
+        .terminal-dots span:nth-child(2) { background: #febc2e; }
+        .terminal-dots span:nth-child(3) { background: #28c840; }
+        .terminal-copy {
+            background: none;
+            border: 1px solid #333;
+            color: #888;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            transition: all 0.2s;
+        }
+        .terminal-copy:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .terminal-body {
+            padding: 1rem 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: #e2e8f0;
+            overflow-x: auto;
+        }
+        .terminal-body .prompt {
+            color: #22c55e;
+            user-select: none;
+        }
+        .terminal-body .cmd { color: #e2e8f0; }
+        .terminal-output {
+            padding: 1rem 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .callout {
+            background: var(--accent-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+            color: var(--primary-dark);
+        }
+        .subsection-label {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+        .prev-next {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+        .prev-next a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.25rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .prev-next a:hover {
+            border-color: var(--primary);
+            text-decoration: none;
+        }
+        .handles-list {
+            list-style: none;
+            padding: 0;
+        }
+        .handles-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .handles-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="/" class="sidebar-logo">
+            <span class="sidebar-logo-icon">誠</span>
+            Makoto
+        </a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="/spec/" class="nav-item">Makoto v0.1</a>
+            <a href="/levels/" class="nav-item">Understanding Levels</a>
+            <a href="/spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="/comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="/comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="/examples/" class="nav-item">Examples</a>
+            <a href="/demos/" class="nav-item">Demos</a>
+            <a href="/demos/setup/" class="nav-item nav-item-sub">Setup Guide</a>
+            <a href="/demos/01/" class="nav-item nav-item-sub active">01 &mdash; Poisoned Pipeline</a>
+            <a href="/demos/02/" class="nav-item nav-item-sub">02 &mdash; Reproducibility Gap</a>
+            <a href="/demos/03/" class="nav-item nav-item-sub">03 &mdash; GitHub Action</a>
+            <a href="/demos/04/" class="nav-item nav-item-sub">04 &mdash; Config Postmortem</a>
+            <a href="/demos/05/" class="nav-item nav-item-sub">05 &mdash; AI Dataset Verification</a>
+            <a href="/privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="/threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="/expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="demo-hero">
+            <div>
+                <span class="demo-pill">Demo 01</span>
+                <span class="time-badge">~3 min</span>
+            </div>
+            <h1>The Poisoned Pipeline</h1>
+            <p>See what happens when corrupted sensor data hits an unprotected pipeline — then watch Makoto stop it cold.</p>
+            <div class="flow-badge">
+                <span class="problem">Corrupted data accepted silently</span>
+                <span class="arrow">&rarr;</span>
+                <span class="solution">Unsigned data rejected at intake</span>
+            </div>
+        </section>
+
+        <section class="section" style="max-width: 960px;">
+
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin-bottom: 1rem;">The Problem</h2>
+            <p>Your IoT pipeline ingests CSV files from partner devices — temperature sensors, humidity monitors, industrial gauges. Every hour, new data arrives and flows straight into your analytics database. Nobody checks where the files came from or whether they've been tampered with. The pipeline trusts everything it receives.</p>
+            <p>One morning, a corrupted file slips through. It contains SQL injection payloads hidden in sensor IDs, physically impossible temperature readings, and NaN values where numbers should be. Your analytics silently absorbs all of it. Dashboards show garbage data, alerts fire for phantom anomalies, and your team spends two days tracking down the source — because there's no record of who sent the file, when it was created, or whether it was ever valid.</p>
+
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">What You Will See</h2>
+
+            <div class="subsection-label">Without Makoto</div>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <div class="terminal-dots"><span></span><span></span><span></span></div>
+                </div>
+                <div class="terminal-output">━━━ PART 1: Pipeline WITHOUT DBOM ━━━
+
+📥 Ingesting sensors_corrupted.csv (no provenance check)...
+
+Data quality scan:
+  ⚠️  Row [SENSOR-004 @ 2025-01-15T10:03:00Z]: temperature='nan' is not a valid number
+  ⚠️  Row [SENSOR-005 @ 2025-01-15T10:04:00Z]: temperature='9999.99' is physically impossible
+  ⚠️  Row [SENSOR-006 @ 2025-01-15T10:05:00Z]: temperature='-273.16' is physically impossible
+  ⚠️  Row [SENSOR-007 @ 2025-01-15T10:06:00Z]: humidity=150.00% exceeds 100%
+
+Pipeline result: processed 10 rows
+❌ Corrupted data was accepted — no gate, no check, no trail.
+   SQL injection payload, NaN values, and impossible readings all passed through.</div>
+            </div>
+
+            <div class="subsection-label" style="margin-top: 2rem;">With Makoto</div>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <div class="terminal-dots"><span></span><span></span><span></span></div>
+                </div>
+                <div class="terminal-output">━━━ PART 2: Pipeline WITH DBOM Gate ━━━
+
+📥 Attempting to ingest sensors_corrupted.csv...
+❌ REJECTED: No DBOM file found for sensors_corrupted.csv
+   This file has no provenance. Unsigned data is not trusted.
+
+📥 Attempting to ingest sensors_clean.csv...
+✅ DBOM found: sensors_clean.dbom.json
+🔍 Verifying DBOM...
+   Source URI:  s3://iot-ingest/sensors/2025-01-15/sensors_clean.csv
+   Hash:        a1b2c3d4... (sha256)
+   Signer:      github:data-eng-team
+✅ Hash verified — file matches DBOM
+✅ Signer trusted — data accepted</div>
+            </div>
+
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">Run It</h2>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <div class="terminal-dots"><span></span><span></span><span></span></div>
+                    <button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/makoto&#10;cd makoto/demos/01-poisoned-pipeline&#10;./run.sh">Copy</button>
+                </div>
+                <div class="terminal-body">
+                    <div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/makoto-project/makoto</span></div>
+                    <div><span class="prompt">$ </span><span class="cmd">cd makoto/demos/01-poisoned-pipeline</span></div>
+                    <div><span class="prompt">$ </span><span class="cmd">./run.sh</span></div>
+                </div>
+            </div>
+
+            <div class="callout">
+                <strong>Key Insight:</strong> Without provenance, your pipeline has no immune system — it accepts everything, including poison.
+            </div>
+
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">What Else This Handles</h2>
+            <ul class="handles-list">
+                <li>Third-party data feeds where you can't inspect the source infrastructure</li>
+                <li>Regulatory environments requiring data lineage documentation (GDPR, SOX)</li>
+                <li>Multi-team pipelines where one team's output is another team's input</li>
+                <li>Automated data exchanges between organizations with different trust levels</li>
+            </ul>
+
+            <div class="prev-next">
+                <a href="/demos/setup/">&larr; Setup Guide</a>
+                <a href="/demos/02/">Demo 02: Reproducibility Gap &rarr;</a>
+            </div>
+
+        </section>
+
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://github.com/makoto-project/makoto" target="_blank">View on GitHub &rarr;</a>
+            </p>
+        </footer>
+    </main>
+
+    <script>
+    function copyCommands(btn) {
+        var commands = btn.getAttribute('data-commands').replace(/&#10;/g, '\n');
+        navigator.clipboard.writeText(commands).then(function() {
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+        });
+    }
+    </script>
+</body>
+</html>
