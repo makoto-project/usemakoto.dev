@@ -415,63 +415,15 @@ for f in *.dbom.json; do ./validate-dbom.sh "$f" || exit 1; done</pre>
                         <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
                     </div>
                     <div class="code-body"><pre>#!/usr/bin/env python3
-"""Validates a DBOM JSON file against the published Makoto schema.
-Fetches schema at runtime; falls back to bundled copy when offline."""
+"""Validates a DBOM JSON file against the published Makoto schema."""
 
 import json, sys
 from pathlib import Path
 import jsonschema, requests
 
 SCHEMA_URL = "https://usemakoto.dev/schema/v0.1.json"
-
-BUNDLED_SCHEMA = {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://usemakoto.dev/schema/v0.1.json",
-    "title": "Makoto DBOM Schema",
-    "type": "object",
-    "required": ["schema_version", "id", "created_at", "source", "signature", "lineage"],
-    "properties": {
-        "schema_version": {"type": "string", "const": "0.1"},
-        "id":             {"type": "string", "pattern": "^dbom-"},
-        "created_at":     {"type": "string", "format": "date-time"},
-        "source": {
-            "type": "object", "required": ["uri", "hash", "format"],
-            "properties": {
-                "uri":  {"type": "string"},
-                "hash": {
-                    "type": "object", "required": ["algorithm", "value"],
-                    "properties": {
-                        "algorithm": {"type": "string", "enum": ["sha256"]},
-                        "value":     {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-                    },
-                },
-                "format": {"type": "string"},
-            },
-        },
-        "signature": {
-            "type": "object", "required": ["algorithm", "value", "signer"],
-            "properties": {
-                "algorithm": {"type": "string", "enum": ["sha256"]},
-                "value":     {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-                "signer":    {"type": "string"},
-            },
-        },
-        "lineage": {
-            "type": "array", "minItems": 1,
-            "items": {
-                "type": "object",
-                "required": ["step", "description", "tool", "input_hash", "output_hash"],
-                "properties": {
-                    "step":        {"type": "integer", "minimum": 1},
-                    "description": {"type": "string"},
-                    "tool":        {"type": "string"},
-                    "input_hash":  {"type": "string"},
-                    "output_hash": {"type": "string"},
-                },
-            },
-        },
-    },
-}
+# Offline? Pre-download: curl -o schema.json https://usemakoto.dev/schema/v0.1.json
+OFFLINE_SCHEMA = Path("schema.json")
 
 def fetch_schema(url, timeout=5):
     try:
@@ -479,8 +431,10 @@ def fetch_schema(url, timeout=5):
         r.raise_for_status()
         return r.json()
     except Exception as e:
-        print(f"  Warning: could not fetch schema ({e}), using bundled copy", file=sys.stderr)
-        return BUNDLED_SCHEMA
+        if OFFLINE_SCHEMA.exists():
+            print(f"  Warning: network error ({e}), using local schema.json", file=sys.stderr)
+            return json.loads(OFFLINE_SCHEMA.read_text())
+        raise RuntimeError(f"Cannot fetch schema and no local schema.json found: {e}")
 
 def validate(dbom_path):
     schema = fetch_schema(SCHEMA_URL)
@@ -646,61 +600,14 @@ if __name__ == "__main__":
                     </div>
                     <div class="code-body"><pre>#!/usr/bin/env node
 // Usage: node validate-dbom.mjs example.dbom.json
+// Offline? Pre-download: curl -o schema.json https://usemakoto.dev/schema/v0.1.json
 
 import Ajv2020    from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 
-const SCHEMA_URL = "https://usemakoto.dev/schema/v0.1.json";
-
-const BUNDLED_SCHEMA = {
-  $schema: "https://json-schema.org/draft/2020-12/schema",
-  $id:     "https://usemakoto.dev/schema/v0.1.json",
-  title:   "Makoto DBOM Schema",
-  type:    "object",
-  required: ["schema_version","id","created_at","source","signature","lineage"],
-  properties: {
-    schema_version: { type: "string", const: "0.1" },
-    id:             { type: "string", pattern: "^dbom-" },
-    created_at:     { type: "string", format: "date-time" },
-    source: {
-      type: "object", required: ["uri","hash","format"],
-      properties: {
-        uri:  { type: "string" },
-        hash: {
-          type: "object", required: ["algorithm","value"],
-          properties: {
-            algorithm: { type: "string", enum: ["sha256"] },
-            value:     { type: "string", pattern: "^[a-f0-9]{64}$" },
-          },
-        },
-        format: { type: "string" },
-      },
-    },
-    signature: {
-      type: "object", required: ["algorithm","value","signer"],
-      properties: {
-        algorithm: { type: "string", enum: ["sha256"] },
-        value:     { type: "string", pattern: "^[a-f0-9]{64}$" },
-        signer:    { type: "string" },
-      },
-    },
-    lineage: {
-      type: "array", minItems: 1,
-      items: {
-        type: "object",
-        required: ["step","description","tool","input_hash","output_hash"],
-        properties: {
-          step:        { type: "integer", minimum: 1 },
-          description: { type: "string" },
-          tool:        { type: "string" },
-          input_hash:  { type: "string" },
-          output_hash: { type: "string" },
-        },
-      },
-    },
-  },
-};
+const SCHEMA_URL    = "https://usemakoto.dev/schema/v0.1.json";
+const OFFLINE_SCHEMA = "schema.json";
 
 async function fetchSchema(url) {
   try {
@@ -708,8 +615,11 @@ async function fetchSchema(url) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
-    console.warn(`  Warning: could not fetch schema (${err.message}), using bundled copy`);
-    return BUNDLED_SCHEMA;
+    if (existsSync(OFFLINE_SCHEMA)) {
+      console.warn(`  Warning: network error (${err.message}), using local schema.json`);
+      return JSON.parse(readFileSync(OFFLINE_SCHEMA, "utf8"));
+    }
+    throw new Error(`Cannot fetch schema and no local schema.json found: ${err.message}`);
   }
 }
 
@@ -762,6 +672,7 @@ for f in *.dbom.json; do node validate-dbom.mjs "$f" || exit 1; done</pre>
                         <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
                     </div>
                     <div class="code-body"><pre>// Usage: go run validate_dbom.go example.dbom.json
+// Offline? Pre-download: curl -o schema.json https://usemakoto.dev/schema/v0.1.json
 package main
 
 import (
@@ -769,64 +680,15 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-const schemaURL = "https://usemakoto.dev/schema/v0.1.json"
+const schemaURL    = "https://usemakoto.dev/schema/v0.1.json"
+const offlineFile  = "schema.json"
 
-const bundledSchema = `{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id":     "https://usemakoto.dev/schema/v0.1.json",
-  "title":   "Makoto DBOM Schema",
-  "type":    "object",
-  "required": ["schema_version","id","created_at","source","signature","lineage"],
-  "properties": {
-    "schema_version": {"type":"string","const":"0.1"},
-    "id":             {"type":"string","pattern":"^dbom-"},
-    "created_at":     {"type":"string","format":"date-time"},
-    "source": {
-      "type":"object","required":["uri","hash","format"],
-      "properties": {
-        "uri":  {"type":"string"},
-        "hash": {
-          "type":"object","required":["algorithm","value"],
-          "properties": {
-            "algorithm": {"type":"string","enum":["sha256"]},
-            "value":     {"type":"string","pattern":"^[a-f0-9]{64}$"}
-          }
-        },
-        "format": {"type":"string"}
-      }
-    },
-    "signature": {
-      "type":"object","required":["algorithm","value","signer"],
-      "properties": {
-        "algorithm": {"type":"string","enum":["sha256"]},
-        "value":     {"type":"string","pattern":"^[a-f0-9]{64}$"},
-        "signer":    {"type":"string"}
-      }
-    },
-    "lineage": {
-      "type":"array","minItems":1,
-      "items": {
-        "type":"object",
-        "required":["step","description","tool","input_hash","output_hash"],
-        "properties": {
-          "step":        {"type":"integer","minimum":1},
-          "description": {"type":"string"},
-          "tool":        {"type":"string"},
-          "input_hash":  {"type":"string"},
-          "output_hash": {"type":"string"}
-        }
-      }
-    }
-  }
-}`
-
-func fetchSchema() (io.Reader, error) {
+func fetchSchema() (io.ReadCloser, error) {
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Get(schemaURL)
 	if err != nil {
@@ -841,11 +703,18 @@ func fetchSchema() (io.Reader, error) {
 
 func compileSchema() (*jsonschema.Schema, error) {
 	c := jsonschema.NewCompiler()
+
 	r, err := fetchSchema()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "  Warning: could not fetch schema (%v), using bundled copy\n", err)
-		r = strings.NewReader(bundledSchema)
+		fmt.Fprintf(os.Stderr, "  Warning: network error (%v), trying local %s\n", err, offlineFile)
+		f, ferr := os.Open(offlineFile)
+		if ferr != nil {
+			return nil, fmt.Errorf("cannot fetch schema and no local %s found: %w", offlineFile, err)
+		}
+		r = f
 	}
+	defer r.Close()
+
 	if err := c.AddResource(schemaURL, r); err != nil {
 		return nil, fmt.Errorf("adding schema: %w", err)
 	}
