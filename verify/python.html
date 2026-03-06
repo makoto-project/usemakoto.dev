@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Verifier — Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .back-link{display:inline-flex;align-items:center;gap:0.4rem;color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem;text-decoration:none;}
+        .back-link:hover{color:var(--primary);}
+        .code-block{background:#0d0d0d;border-radius:12px;overflow:hidden;margin:1.5rem 0;}
+        .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #2a2a2a;}
+        .code-header-left{display:flex;align-items:center;gap:12px;}
+        .code-dots{display:flex;gap:6px;}
+        .code-dots span{width:10px;height:10px;border-radius:50%;}
+        .code-dots span:nth-child(1){background:#ff5f57;}
+        .code-dots span:nth-child(2){background:#febc2e;}
+        .code-dots span:nth-child(3){background:#28c840;}
+        .code-filename{color:#888;font-size:0.82rem;font-family:var(--font-mono);}
+        .copy-btn{background:none;border:1px solid #444;color:#888;font-size:0.78rem;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .15s;}
+        .copy-btn:hover{border-color:#888;color:#ccc;}
+        .copy-btn.copied{border-color:#28c840;color:#28c840;}
+        .code-body pre{margin:0;padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:0.84rem;color:#e8e8e8;overflow-x:auto;line-height:1.6;tab-size:4;}
+        .lang-badge{display:inline-flex;align-items:center;color:white;font-size:0.72rem;font-weight:700;padding:0.2rem 0.65rem;border-radius:4px;letter-spacing:.03em;background:#3572A5;}
+    </style>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span>Makoto</a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="../spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../demos/" class="nav-item">Demos</a>
+            <a href="../sdk/" class="nav-item">SDKs</a>
+            <a href="../validate/" class="nav-item">Tool Validation</a>
+            <a href="./" class="nav-item active">Verifying a Document</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+    <main class="main-content">
+        <div class="section section-wide">
+            <a href="./" class="back-link">← Verifying a Document</a>
+            <h1 style="font-size:2.25rem;font-weight:400;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.75rem;">
+                <span class="lang-badge">PYTHON</span> Python verifier
+            </h1>
+            <p style="color:var(--text-muted);margin-bottom:2rem;">
+                Uses <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">Draft202012Validator</code> with a live schema fetch. Exits <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">0</code> on pass, <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">1</code> on any failure.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">verify_dbom.py</span></div>
+                    <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                </div>
+                <div class="code-body"><pre>#!/usr/bin/env python3
+"""
+verify_dbom.py — Usage: python verify_dbom.py example.dbom.json
+Exits 0 on pass, 1 on any failure.
+"""
+
+import json, sys
+from pathlib import Path
+import jsonschema, requests
+
+SCHEMA_URL = "https://usemakoto.dev/schema/v0.1.json"
+
+
+def load_schema() -&gt; dict:
+    resp = requests.get(SCHEMA_URL, timeout=10)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def verify_structure(dbom: dict, schema: dict) -&gt; list[str]:
+    validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
+    return [
+        f"[{' → '.join(str(p) for p in e.absolute_path) or 'root'}] {e.message}"
+        for e in validator.iter_errors(dbom)
+    ]
+
+
+def verify_provenance(dbom: dict) -&gt; list[str]:
+    errors, steps = [], dbom.get("lineage", [])
+    if not steps:
+        return ["lineage is empty"]
+    if steps[0].get("input_hash") != "n/a":
+        errors.append(f'step 1 input_hash should be "n/a", got "{steps[0].get("input_hash")}"')
+    for i in range(1, len(steps)):
+        if steps[i - 1].get("output_hash") != steps[i].get("input_hash"):
+            errors.append(
+                f"step {steps[i]['step']} input_hash does not match "
+                f"step {steps[i-1]['step']} output_hash"
+            )
+    if steps[-1].get("output_hash") != dbom.get("source", {}).get("hash", {}).get("value"):
+        errors.append("final step output_hash does not match source.hash.value")
+    return errors
+
+
+def verify(path: str) -&gt; bool:
+    dbom, schema, all_errors = json.loads(Path(path).read_text()), load_schema(), []
+    print(f"\nVerifying: {path}")
+    for label, errs in [
+        ("[1/2] Structural",  verify_structure(dbom, schema)),
+        ("[2/2] Provenance",  verify_provenance(dbom)),
+    ]:
+        print(f"\n{label}")
+        if errs:
+            all_errors.extend(errs)
+            for e in errs: print(f" ✗ {e}", file=sys.stderr)
+        else:
+            print(f" ✓ {'conforms to schema' if '1' in label else 'hash chain is consistent'}")
+    print()
+    if not all_errors: print("✓ PASSED"); return True
+    print(f"✗ FAILED ({len(all_errors)} error(s))", file=sys.stderr); return False
+
+
+if __name__ == "__main__":
+    sys.exit(0 if verify(sys.argv[1] if len(sys.argv) &gt; 1 else "example.dbom.json") else 1)</pre></div>
+            </div>
+        </div>
+    </main>
+    <script>
+        function copyBlock(btn) {
+            const pre = btn.closest('.code-block').querySelector('pre');
+            const text = pre.innerHTML.replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+            navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);});
+        }
+    </script>
+</body>
+</html>

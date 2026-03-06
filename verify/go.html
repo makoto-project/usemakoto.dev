@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Verifier — Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .back-link{display:inline-flex;align-items:center;gap:0.4rem;color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem;text-decoration:none;}
+        .back-link:hover{color:var(--primary);}
+        .code-block{background:#0d0d0d;border-radius:12px;overflow:hidden;margin:1.5rem 0;}
+        .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #2a2a2a;}
+        .code-header-left{display:flex;align-items:center;gap:12px;}
+        .code-dots{display:flex;gap:6px;}
+        .code-dots span{width:10px;height:10px;border-radius:50%;}
+        .code-dots span:nth-child(1){background:#ff5f57;}
+        .code-dots span:nth-child(2){background:#febc2e;}
+        .code-dots span:nth-child(3){background:#28c840;}
+        .code-filename{color:#888;font-size:0.82rem;font-family:var(--font-mono);}
+        .copy-btn{background:none;border:1px solid #444;color:#888;font-size:0.78rem;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .15s;}
+        .copy-btn:hover{border-color:#888;color:#ccc;}
+        .copy-btn.copied{border-color:#28c840;color:#28c840;}
+        .code-body pre{margin:0;padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:0.84rem;color:#e8e8e8;overflow-x:auto;line-height:1.6;tab-size:4;}
+        .lang-badge{display:inline-flex;align-items:center;color:white;font-size:0.72rem;font-weight:700;padding:0.2rem 0.65rem;border-radius:4px;letter-spacing:.03em;background:#00add8;}
+    </style>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span>Makoto</a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="../spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../demos/" class="nav-item">Demos</a>
+            <a href="../sdk/" class="nav-item">SDKs</a>
+            <a href="../validate/" class="nav-item">Tool Validation</a>
+            <a href="./" class="nav-item active">Verifying a Document</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+    <main class="main-content">
+        <div class="section section-wide">
+            <a href="./" class="back-link">← Verifying a Document</a>
+            <h1 style="font-size:2.25rem;font-weight:400;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.75rem;">
+                <span class="lang-badge">GO</span> Go verifier
+            </h1>
+            <p style="color:var(--text-muted);margin-bottom:2rem;">
+                Uses <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">gojsonschema</code>, which fetches the schema URI over HTTP directly — no local copy.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">verify_dbom.go</span></div>
+                    <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                </div>
+                <div class="code-body"><pre>// verify_dbom.go — Usage: go run verify_dbom.go example.dbom.json
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+
+	"github.com/xeipuuv/gojsonschema"
+)
+
+const schemaURL = "https://usemakoto.dev/schema/v0.1.json"
+
+type dbomDoc struct {
+	Source  struct{ Hash struct{ Value string `json:"value"` } `json:"hash"` } `json:"source"`
+	Lineage []struct {
+		Step       int    `json:"step"`
+		InputHash  string `json:"input_hash"`
+		OutputHash string `json:"output_hash"`
+	} `json:"lineage"`
+}
+
+func verifyStructure(path string) []string {
+	result, err := gojsonschema.Validate(
+		gojsonschema.NewReferenceLoader(schemaURL),
+		gojsonschema.NewReferenceLoader("file://"+path),
+	)
+	if err != nil { return []string{err.Error()} }
+	if result.Valid() { return nil }
+	errs := make([]string, len(result.Errors()))
+	for i, e := range result.Errors() { errs[i] = fmt.Sprintf("[%s] %s", e.Field(), e.Description()) }
+	return errs
+}
+
+func verifyProvenance(raw []byte) []string {
+	var doc dbomDoc
+	if err := json.Unmarshal(raw, &amp;doc); err != nil { return []string{err.Error()} }
+
+	var errors []string
+	steps := doc.Lineage
+	if len(steps) == 0 { return []string{"lineage is empty"} }
+	if steps[0].InputHash != "n/a" {
+		errors = append(errors, fmt.Sprintf(`step 1 input_hash should be "n/a", got %q`, steps[0].InputHash))
+	}
+	for i := 1; i &lt; len(steps); i++ {
+		if steps[i].InputHash != steps[i-1].OutputHash {
+			errors = append(errors, fmt.Sprintf(
+				"step %d input_hash does not match step %d output_hash",
+				steps[i].Step, steps[i-1].Step,
+			))
+		}
+	}
+	if steps[len(steps)-1].OutputHash != doc.Source.Hash.Value {
+		errors = append(errors, "final step output_hash does not match source.hash.value")
+	}
+	return errors
+}
+
+func verify(path string) bool {
+	raw, _ := os.ReadFile(path)
+	fmt.Printf("\nVerifying: %s\n", path)
+	var all []string
+
+	fmt.Println("\n[1/2] Structural")
+	if errs := verifyStructure(path); len(errs) &gt; 0 {
+		all = append(all, errs...)
+		for _, e := range errs { fmt.Fprintf(os.Stderr, " ✗ %s\n", e) }
+	} else { fmt.Println(" ✓ conforms to schema") }
+
+	fmt.Println("\n[2/2] Provenance")
+	if errs := verifyProvenance(raw); len(errs) &gt; 0 {
+		all = append(all, errs...)
+		for _, e := range errs { fmt.Fprintf(os.Stderr, " ✗ %s\n", e) }
+	} else { fmt.Println(" ✓ hash chain is consistent") }
+
+	fmt.Println()
+	if len(all) == 0 { fmt.Println("✓ PASSED"); return true }
+	fmt.Fprintf(os.Stderr, "✗ FAILED (%d error(s))\n", len(all)); return false
+}
+
+func main() {
+	path := "example.dbom.json"
+	if len(os.Args) &gt; 1 { path = os.Args[1] }
+	if !verify(path) { os.Exit(1) }
+}</pre></div>
+            </div>
+        </div>
+    </main>
+    <script>
+        function copyBlock(btn) {
+            const pre = btn.closest('.code-block').querySelector('pre');
+            const text = pre.innerHTML.replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+            navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);});
+        }
+    </script>
+</body>
+</html>
