@@ -33,7 +33,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             font-size: 0.9rem;
             margin: 1rem 0;
             position: relative;
-            overflow: auto;
+            overflow-x: auto;
         }
         .copy-btn {
             position: absolute;
@@ -121,8 +121,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </nav>
     </aside>
 
-    <main class="content">
-        <div class="content-inner">
+    <main class="main-content">
+        <div class="section section-wide">
             <h1>SDKs — Generate and Verify DBOMs in 3 Lines</h1>
             <p class="lead">Official libraries for Python and JavaScript. Both SDKs generate schema-valid <a href="https://usemakoto.dev/spec/">Makoto DBOM</a> records and verify them with a single function call.</p>
 
@@ -198,7 +198,7 @@ const result = await verify(dbom, buffer);
                 https://usemakoto.dev/schema/latest.json
             </div>
             <p>Both URLs serve the same v0.1 schema. Both SDKs fetch it at runtime and fall back to a bundled copy when offline.</p>
-        </div>
+        </div><!-- /section -->
     </main>
 
     <script>
