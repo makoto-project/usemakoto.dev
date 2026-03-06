@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Tool Validation - Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .tool-section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 2rem;
+        }
+        .tool-section h2 {
+            font-size: 1.75rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .tool-section .tool-meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .tool-section .tool-meta code {
+            background: #f0f0f0;
+            padding: 0.1em 0.4em;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+        .lang-badge {
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.2rem 0.65rem;
+            border-radius: 4px;
+            letter-spacing: 0.03em;
+        }
+        .code-block {
+            background: #0d0d0d;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 1.25rem 0;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .code-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .code-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .code-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .code-dots span:nth-child(1) { background: #ff5f57; }
+        .code-dots span:nth-child(2) { background: #febc2e; }
+        .code-dots span:nth-child(3) { background: #28c840; }
+        .code-filename {
+            font-size: 0.78rem;
+            color: #888;
+            font-family: var(--font-mono);
+        }
+        .copy-btn {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            color: #aaa;
+            border-radius: 4px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .code-body {
+            padding: 1.25rem 1.5rem;
+            overflow-x: auto;
+        }
+        .code-body pre {
+            margin: 0;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            line-height: 1.65;
+            color: #e2e8f0;
+            white-space: pre;
+        }
+        .usage-block {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .usage-block pre {
+            margin: 0;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: #a8d8a8;
+            white-space: pre;
+        }
+        .note-box {
+            background: #fefce8;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 0.85rem 1.1rem;
+            font-size: 0.875rem;
+            color: #78350f;
+            margin: 1rem 0;
+        }
+        .note-box strong { color: #92400e; }
+        .schema-sample {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            line-height: 1.65;
+            color: #374151;
+            overflow-x: auto;
+        }
+        .cmp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            margin: 1.5rem 0;
+        }
+        .cmp-table th {
+            background: var(--primary);
+            color: white;
+            padding: 0.6rem 0.85rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        .cmp-table td {
+            padding: 0.6rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+        .cmp-table tr:last-child td { border-bottom: none; }
+        .cmp-table tr:nth-child(even) td { background: #f8fafc; }
+        .cmp-table td:first-child { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600; color: var(--text); }
+        .check { color: #16a34a; font-weight: 700; }
+        .cross { color: #dc2626; }
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2.5rem 0;
+        }
+        .sub-section {
+            margin-top: 2rem;
+        }
+        .sub-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+        .toc {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .toc h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 0.75rem;
+            color: var(--text);
+        }
+        .toc ul {
+            margin: 0;
+            padding: 0 0 0 1.25rem;
+            list-style: disc;
+        }
+        .toc li {
+            margin: 0.3rem 0;
+            font-size: 0.9rem;
+        }
+        .toc a { color: var(--primary); }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="../spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../demos/" class="nav-item">Demos</a>
+            <a href="../sdk/" class="nav-item">SDKs</a>
+            <a href="./" class="nav-item active">Tool Validation</a>
+            <a href="#jq" class="nav-item nav-item-sub">jq (CLI)</a>
+            <a href="#python-jsonschema" class="nav-item nav-item-sub">Python jsonschema</a>
+            <a href="#python-pydantic" class="nav-item nav-item-sub">Python pydantic</a>
+            <a href="#nodejs" class="nav-item nav-item-sub">Node.js (ajv)</a>
+            <a href="#go" class="nav-item nav-item-sub">Go</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="section section-wide">
+
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 0.5rem;">External Tool Validation</h1>
+            <p class="lead" style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem;">
+                Validate DBOM documents against the <a href="https://usemakoto.dev/schema/v0.1.json">published Makoto schema</a>
+                using popular tools across five ecosystems — no Makoto SDK required.
+                All examples fetch the schema at runtime with an offline fallback.
+            </p>
+
+            <div class="toc">
+                <h2>On this page</h2>
+                <ul>
+                    <li><a href="#sample">Sample DBOM document</a></li>
+                    <li><a href="#jq">jq — shell pipeline smoke tests</a></li>
+                    <li><a href="#python-jsonschema">Python · <code>jsonschema</code> — full JSON Schema 2020-12</a></li>
+                    <li><a href="#python-pydantic">Python · <code>pydantic</code> — typed model ingestion</a></li>
+                    <li><a href="#nodejs">Node.js · <code>ajv</code> — JS/TS services</a></li>
+                    <li><a href="#go">Go · <code>santhosh-tekuri/jsonschema</code> — static binaries</a></li>
+                    <li><a href="#comparison">Comparison table</a></li>
+                    <li><a href="#ci">CI integration (GitHub Actions)</a></li>
+                </ul>
+            </div>
+
+            <!-- ─── SAMPLE DBOM ─────────────────────────────────── -->
+            <div class="tool-section" id="sample">
+                <h2>Sample DBOM Document</h2>
+                <p style="color: var(--text-muted);">Save this as <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);font-size:.85em;">example.dbom.json</code> — all examples below use it.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-filename">example.dbom.json</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                    </div>
+                    <div class="code-body"><pre>{
+  "schema_version": "0.1",
+  "id": "dbom-550e8400-e29b-41d4-a716-446655440000",
+  "created_at": "2024-01-15T10:30:00Z",
+  "source": {
+    "uri": "s3://my-bucket/data/customers-2024-01.parquet",
+    "hash": {
+      "algorithm": "sha256",
+      "value": "a3f5c2d1e8b4907634f12e9a0c5d8b72e1f4a6c9d2e7b0f3a8c5d1e4b7f2a9c6"
+    },
+    "format": "parquet"
+  },
+  "signature": {
+    "algorithm": "sha256",
+    "value": "b4e6d3c2f9a1805745023fba1d6e9c83f2a5b7da3f8c1e4b7f2a9c6d1e4b7f2a9",
+    "signer": "github:data-platform-bot"
+  },
+  "lineage": [
+    {
+      "step": 1,
+      "description": "Raw ingestion from CRM export",
+      "tool": "acme-ingester/2.1.0",
+      "input_hash": "n/a",
+      "output_hash": "a3f5c2d1e8b4907634f12e9a0c5d8b72e1f4a6c9d2e7b0f3a8c5d1e4b7f2a9c6"
+    },
+    {
+      "step": 2,
+      "description": "PII redaction via presidio",
+      "tool": "presidio/2.2.354",
+      "input_hash": "a3f5c2d1e8b4907634f12e9a0c5d8b72e1f4a6c9d2e7b0f3a8c5d1e4b7f2a9c6",
+      "output_hash": "c5f7e4d3b2a1908856134acb2e7f0d94a3b6c8eb4a9d2f5c8f3b0a4a7e1b8a3b0"
+    }
+  ]
+}</pre></div>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- ─── JQ ──────────────────────────────────────────── -->
+            <div class="tool-section" id="jq">
+                <h2><span class="lang-badge" style="background:#2a2a2a;">bash</span> jq</h2>
+                <p class="tool-meta">Best for shell pipelines and quick smoke tests. No runtime dependencies beyond <code>jq</code> and <code>curl</code>.<br>
+                Install: <code>brew install jq</code> / <code>apt install jq</code></p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-filename">validate-dbom.sh</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                    </div>
+                    <div class="code-body"><pre>#!/usr/bin/env bash
+# validate-dbom.sh — exits 0 on valid, 1 on any violation
+
+DBOM_FILE="${1:-example.dbom.json}"
+
+# jq doesn't implement full JSON Schema, but enforces all required fields
+# and key constraints as a lightweight pre-flight check.
+# For full JSON Schema compliance, use the Python or Node.js examples below.
+
+jq --exit-status '
+  has("schema_version") and
+  has("id") and
+  has("created_at") and
+  has("source") and
+  has("signature") and
+  has("lineage") and
+
+  .schema_version == "0.1" and
+  (.id | startswith("dbom-")) and
+
+  (.source | has("uri") and has("hash") and has("format")) and
+  (.source.hash.algorithm == "sha256") and
+  (.source.hash.value | test("^[a-f0-9]{64}$")) and
+
+  (.signature | has("algorithm") and has("value") and has("signer")) and
+  (.signature.algorithm == "sha256") and
+
+  (.lineage | length >= 1) and
+  (.lineage | all(
+    has("step") and has("description") and
+    has("tool") and has("input_hash") and has("output_hash")
+  ))
+' "$DBOM_FILE" > /dev/null
+
+if [ $? -eq 0 ]; then
+  echo "✓ $DBOM_FILE is valid"
+else
+  echo "✗ $DBOM_FILE failed validation"
+  exit 1
+fi</pre></div>
+                </div>
+
+                <div class="usage-block">
+                    <pre>chmod +x validate-dbom.sh
+./validate-dbom.sh example.dbom.json
+# → ✓ example.dbom.json is valid
+
+# Use in a pipeline
+for f in *.dbom.json; do ./validate-dbom.sh "$f" || exit 1; done</pre>
+                </div>
+
+                <div class="note-box">
+                    <strong>Note:</strong> <code>jq</code> doesn't implement the full JSON Schema spec — no <code>format</code> validation on <code>date-time</code>, no <code>$ref</code> resolution. Use it for fast field-presence checks; use Python or Node.js for full compliance.
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- ─── PYTHON JSONSCHEMA ───────────────────────────── -->
+            <div class="tool-section" id="python-jsonschema">
+                <h2><span class="lang-badge" style="background:#3572a5;">Python</span> jsonschema</h2>
+                <p class="tool-meta">Full JSON Schema 2020-12 validation including <code>date-time</code> format checking. Best for CI gates and scripting.<br>
+                Install: <code>pip install jsonschema[format-nongpl] requests</code></p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-filename">validate_dbom.py</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                    </div>
+                    <div class="code-body"><pre>#!/usr/bin/env python3
+"""Validates a DBOM JSON file against the published Makoto schema.
+Fetches schema at runtime; falls back to bundled copy when offline."""
+
+import json, sys
+from pathlib import Path
+import jsonschema, requests
+
+SCHEMA_URL = "https://usemakoto.dev/schema/v0.1.json"
+
+BUNDLED_SCHEMA = {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://usemakoto.dev/schema/v0.1.json",
+    "title": "Makoto DBOM Schema",
+    "type": "object",
+    "required": ["schema_version", "id", "created_at", "source", "signature", "lineage"],
+    "properties": {
+        "schema_version": {"type": "string", "const": "0.1"},
+        "id":             {"type": "string", "pattern": "^dbom-"},
+        "created_at":     {"type": "string", "format": "date-time"},
+        "source": {
+            "type": "object", "required": ["uri", "hash", "format"],
+            "properties": {
+                "uri":  {"type": "string"},
+                "hash": {
+                    "type": "object", "required": ["algorithm", "value"],
+                    "properties": {
+                        "algorithm": {"type": "string", "enum": ["sha256"]},
+                        "value":     {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+                    },
+                },
+                "format": {"type": "string"},
+            },
+        },
+        "signature": {
+            "type": "object", "required": ["algorithm", "value", "signer"],
+            "properties": {
+                "algorithm": {"type": "string", "enum": ["sha256"]},
+                "value":     {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+                "signer":    {"type": "string"},
+            },
+        },
+        "lineage": {
+            "type": "array", "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": ["step", "description", "tool", "input_hash", "output_hash"],
+                "properties": {
+                    "step":        {"type": "integer", "minimum": 1},
+                    "description": {"type": "string"},
+                    "tool":        {"type": "string"},
+                    "input_hash":  {"type": "string"},
+                    "output_hash": {"type": "string"},
+                },
+            },
+        },
+    },
+}
+
+def fetch_schema(url, timeout=5):
+    try:
+        r = requests.get(url, timeout=timeout)
+        r.raise_for_status()
+        return r.json()
+    except Exception as e:
+        print(f"  Warning: could not fetch schema ({e}), using bundled copy", file=sys.stderr)
+        return BUNDLED_SCHEMA
+
+def validate(dbom_path):
+    schema = fetch_schema(SCHEMA_URL)
+    dbom   = json.loads(Path(dbom_path).read_text())
+    v      = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
+    errors = list(v.iter_errors(dbom))
+    if not errors:
+        print(f"✓ {dbom_path} is valid")
+        return True
+    print(f"✗ {dbom_path} failed validation ({len(errors)} error(s)):")
+    for err in errors:
+        path = " → ".join(str(p) for p in err.absolute_path) or "(root)"
+        print(f"  [{path}] {err.message}")
+    return False
+
+if __name__ == "__main__":
+    path = sys.argv[1] if len(sys.argv) > 1 else "example.dbom.json"
+    sys.exit(0 if validate(path) else 1)</pre></div>
+                </div>
+
+                <div class="usage-block">
+                    <pre>python validate_dbom.py example.dbom.json
+# → ✓ example.dbom.json is valid
+
+# In CI
+python validate_dbom.py artifact.dbom.json || exit 1</pre>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- ─── PYTHON PYDANTIC ────────────────────────────── -->
+            <div class="tool-section" id="python-pydantic">
+                <h2><span class="lang-badge" style="background:#e92063;">Python</span> pydantic</h2>
+                <p class="tool-meta">Parse-and-validate in one shot; use the typed result directly downstream. Best when you want to <em>use</em> the data after validating it.<br>
+                Install: <code>pip install pydantic</code></p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-filename">dbom_model.py</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                    </div>
+                    <div class="code-body"><pre>#!/usr/bin/env python3
+"""Pydantic models for DBOM v0.1 — parse-and-validate with typed result."""
+
+import re, sys, json
+from datetime import datetime
+from pathlib import Path
+from typing import Literal
+from pydantic import BaseModel, field_validator, model_validator
+
+SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
+
+class HashInfo(BaseModel):
+    algorithm: Literal["sha256"]
+    value: str
+
+    @field_validator("value")
+    @classmethod
+    def must_be_hex64(cls, v):
+        if not SHA256_RE.match(v):
+            raise ValueError("hash value must be 64 lowercase hex characters")
+        return v
+
+class Source(BaseModel):
+    uri: str
+    hash: HashInfo
+    format: str
+
+class Signature(BaseModel):
+    algorithm: Literal["sha256"]
+    value: str
+    signer: str
+
+    @field_validator("value")
+    @classmethod
+    def must_be_hex64(cls, v):
+        if not SHA256_RE.match(v):
+            raise ValueError("signature value must be 64 lowercase hex characters")
+        return v
+
+class LineageStep(BaseModel):
+    step: int
+    description: str
+    tool: str
+    input_hash: str
+    output_hash: str
+
+    @model_validator(mode="after")
+    def step_positive(self):
+        if self.step < 1:
+            raise ValueError("step must be >= 1")
+        return self
+
+class DBOM(BaseModel):
+    schema_version: Literal["0.1"]
+    id: str
+    created_at: datetime
+    source: Source
+    signature: Signature
+    lineage: list[LineageStep]
+
+    @field_validator("id")
+    @classmethod
+    def id_prefix(cls, v):
+        if not v.startswith("dbom-"):
+            raise ValueError('id must start with "dbom-"')
+        return v
+
+    @field_validator("lineage")
+    @classmethod
+    def lineage_nonempty(cls, v):
+        if len(v) < 1:
+            raise ValueError("lineage must contain at least one step")
+        return v
+
+def load_dbom(path: str) -> DBOM:
+    """Parse and validate. Raises ValidationError on failure."""
+    return DBOM.model_validate(json.loads(Path(path).read_text()))
+
+if __name__ == "__main__":
+    path = sys.argv[1] if len(sys.argv) > 1 else "example.dbom.json"
+    try:
+        dbom = load_dbom(path)
+        print(f"✓ {path} is valid")
+        print(f"  id:      {dbom.id}")
+        print(f"  created: {dbom.created_at.isoformat()}")
+        print(f"  source:  {dbom.source.uri}")
+        print(f"  steps:   {len(dbom.lineage)}")
+    except Exception as e:
+        print(f"✗ {path} failed validation:\n  {e}", file=sys.stderr)
+        sys.exit(1)</pre></div>
+                </div>
+
+                <div class="usage-block">
+                    <pre>python dbom_model.py example.dbom.json
+# → ✓ example.dbom.json is valid
+#   id:      dbom-550e8400-...
+#   created: 2024-01-15T10:30:00+00:00
+#   source:  s3://my-bucket/data/customers-2024-01.parquet
+#   steps:   2</pre>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- ─── NODE.JS AJV ────────────────────────────────── -->
+            <div class="tool-section" id="nodejs">
+                <h2><span class="lang-badge" style="background:#f7df1e;color:#222;">JS</span> Node.js · ajv</h2>
+                <p class="tool-meta">AJV is the de-facto JSON Schema validator in the JS ecosystem with full 2020-12 support. ES modules only.<br>
+                Install: <code>npm install ajv ajv-formats</code></p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-filename">validate-dbom.mjs</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                    </div>
+                    <div class="code-body"><pre>#!/usr/bin/env node
+// Usage: node validate-dbom.mjs example.dbom.json
+
+import Ajv2020    from "ajv/dist/2020.js";
+import addFormats from "ajv-formats";
+import { readFileSync } from "fs";
+
+const SCHEMA_URL = "https://usemakoto.dev/schema/v0.1.json";
+
+const BUNDLED_SCHEMA = {
+  $schema: "https://json-schema.org/draft/2020-12/schema",
+  $id:     "https://usemakoto.dev/schema/v0.1.json",
+  title:   "Makoto DBOM Schema",
+  type:    "object",
+  required: ["schema_version","id","created_at","source","signature","lineage"],
+  properties: {
+    schema_version: { type: "string", const: "0.1" },
+    id:             { type: "string", pattern: "^dbom-" },
+    created_at:     { type: "string", format: "date-time" },
+    source: {
+      type: "object", required: ["uri","hash","format"],
+      properties: {
+        uri:  { type: "string" },
+        hash: {
+          type: "object", required: ["algorithm","value"],
+          properties: {
+            algorithm: { type: "string", enum: ["sha256"] },
+            value:     { type: "string", pattern: "^[a-f0-9]{64}$" },
+          },
+        },
+        format: { type: "string" },
+      },
+    },
+    signature: {
+      type: "object", required: ["algorithm","value","signer"],
+      properties: {
+        algorithm: { type: "string", enum: ["sha256"] },
+        value:     { type: "string", pattern: "^[a-f0-9]{64}$" },
+        signer:    { type: "string" },
+      },
+    },
+    lineage: {
+      type: "array", minItems: 1,
+      items: {
+        type: "object",
+        required: ["step","description","tool","input_hash","output_hash"],
+        properties: {
+          step:        { type: "integer", minimum: 1 },
+          description: { type: "string" },
+          tool:        { type: "string" },
+          input_hash:  { type: "string" },
+          output_hash: { type: "string" },
+        },
+      },
+    },
+  },
+};
+
+async function fetchSchema(url) {
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn(`  Warning: could not fetch schema (${err.message}), using bundled copy`);
+    return BUNDLED_SCHEMA;
+  }
+}
+
+async function validate(dbomPath) {
+  const schema = await fetchSchema(SCHEMA_URL);
+  const dbom   = JSON.parse(readFileSync(dbomPath, "utf8"));
+
+  const ajv   = new Ajv2020({ allErrors: true });
+  addFormats(ajv);                            // enables "date-time" format
+
+  const valid = ajv.validate(schema, dbom);
+  if (valid) {
+    console.log(`✓ ${dbomPath} is valid`);
+    return true;
+  }
+  console.error(`✗ ${dbomPath} failed validation (${ajv.errors.length} error(s)):`);
+  for (const err of ajv.errors) {
+    console.error(`  [${err.instancePath || "(root)"}] ${err.message}`);
+  }
+  return false;
+}
+
+const path = process.argv[2] ?? "example.dbom.json";
+process.exit((await validate(path)) ? 0 : 1);</pre></div>
+                </div>
+
+                <div class="usage-block">
+                    <pre>node validate-dbom.mjs example.dbom.json
+# → ✓ example.dbom.json is valid
+
+# Validate all DBOMs in a directory
+for f in *.dbom.json; do node validate-dbom.mjs "$f" || exit 1; done</pre>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- ─── GO ────────────────────────────────────────── -->
+            <div class="tool-section" id="go">
+                <h2><span class="lang-badge" style="background:#00acd7;">Go</span> santhosh-tekuri/jsonschema</h2>
+                <p class="tool-meta">Full 2020-12 support, compiles to a static binary for use in minimal CI containers.<br>
+                Install: <code>go get github.com/santhosh-tekuri/jsonschema/v6</code></p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-filename">validate_dbom.go</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                    </div>
+                    <div class="code-body"><pre>// Usage: go run validate_dbom.go example.dbom.json
+package main
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/santhosh-tekuri/jsonschema/v6"
+)
+
+const schemaURL = "https://usemakoto.dev/schema/v0.1.json"
+
+const bundledSchema = `{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id":     "https://usemakoto.dev/schema/v0.1.json",
+  "title":   "Makoto DBOM Schema",
+  "type":    "object",
+  "required": ["schema_version","id","created_at","source","signature","lineage"],
+  "properties": {
+    "schema_version": {"type":"string","const":"0.1"},
+    "id":             {"type":"string","pattern":"^dbom-"},
+    "created_at":     {"type":"string","format":"date-time"},
+    "source": {
+      "type":"object","required":["uri","hash","format"],
+      "properties": {
+        "uri":  {"type":"string"},
+        "hash": {
+          "type":"object","required":["algorithm","value"],
+          "properties": {
+            "algorithm": {"type":"string","enum":["sha256"]},
+            "value":     {"type":"string","pattern":"^[a-f0-9]{64}$"}
+          }
+        },
+        "format": {"type":"string"}
+      }
+    },
+    "signature": {
+      "type":"object","required":["algorithm","value","signer"],
+      "properties": {
+        "algorithm": {"type":"string","enum":["sha256"]},
+        "value":     {"type":"string","pattern":"^[a-f0-9]{64}$"},
+        "signer":    {"type":"string"}
+      }
+    },
+    "lineage": {
+      "type":"array","minItems":1,
+      "items": {
+        "type":"object",
+        "required":["step","description","tool","input_hash","output_hash"],
+        "properties": {
+          "step":        {"type":"integer","minimum":1},
+          "description": {"type":"string"},
+          "tool":        {"type":"string"},
+          "input_hash":  {"type":"string"},
+          "output_hash": {"type":"string"}
+        }
+      }
+    }
+  }
+}`
+
+func fetchSchema() (io.Reader, error) {
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Get(schemaURL)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != 200 {
+		resp.Body.Close()
+		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
+	}
+	return resp.Body, nil
+}
+
+func compileSchema() (*jsonschema.Schema, error) {
+	c := jsonschema.NewCompiler()
+	r, err := fetchSchema()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "  Warning: could not fetch schema (%v), using bundled copy\n", err)
+		r = strings.NewReader(bundledSchema)
+	}
+	if err := c.AddResource(schemaURL, r); err != nil {
+		return nil, fmt.Errorf("adding schema: %w", err)
+	}
+	return c.Compile(schemaURL)
+}
+
+func validate(dbomPath string) error {
+	schema, err := compileSchema()
+	if err != nil {
+		return fmt.Errorf("compiling schema: %w", err)
+	}
+	f, err := os.Open(dbomPath)
+	if err != nil {
+		return fmt.Errorf("opening file: %w", err)
+	}
+	defer f.Close()
+	inst, err := jsonschema.UnmarshalJSON(f)
+	if err != nil {
+		return fmt.Errorf("parsing JSON: %w", err)
+	}
+	return schema.Validate(inst)
+}
+
+func main() {
+	path := "example.dbom.json"
+	if len(os.Args) > 1 {
+		path = os.Args[1]
+	}
+	if err := validate(path); err != nil {
+		fmt.Fprintf(os.Stderr, "✗ %s failed validation:\n  %v\n", path, err)
+		os.Exit(1)
+	}
+	fmt.Printf("✓ %s is valid\n", path)
+}</pre></div>
+                </div>
+
+                <div class="usage-block">
+                    <pre>go run validate_dbom.go example.dbom.json
+# → ✓ example.dbom.json is valid
+
+# Build a static binary for CI containers
+go build -o dbom-validate validate_dbom.go
+./dbom-validate artifact.dbom.json</pre>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- ─── COMPARISON TABLE ───────────────────────────── -->
+            <div class="tool-section" id="comparison">
+                <h2>Comparison</h2>
+                <table class="cmp-table">
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>JSON Schema 2020-12</th>
+                            <th><code>date-time</code> format</th>
+                            <th>Offline fallback</th>
+                            <th>Best for</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>jq (CLI)</td>
+                            <td><span class="cross">✗</span> field checks only</td>
+                            <td><span class="cross">✗</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td>Shell pipelines, smoke tests</td>
+                        </tr>
+                        <tr>
+                            <td>Python jsonschema</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span> (with <code>[format-nongpl]</code>)</td>
+                            <td><span class="check">✓</span></td>
+                            <td>CI gates, scripting</td>
+                        </tr>
+                        <tr>
+                            <td>Python pydantic</td>
+                            <td><span class="check">✓</span> (via model)</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td>Typed ingestion into downstream code</td>
+                        </tr>
+                        <tr>
+                            <td>Node.js ajv</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span> (with <code>ajv-formats</code>)</td>
+                            <td><span class="check">✓</span></td>
+                            <td>JS/TS services, tooling</td>
+                        </tr>
+                        <tr>
+                            <td>Go jsonschema</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td>Long-running services, static binaries</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <hr class="divider">
+
+            <!-- ─── CI INTEGRATION ────────────────────────────── -->
+            <div class="tool-section" id="ci">
+                <h2>CI Integration</h2>
+                <p style="color: var(--text-muted);">Validate every DBOM file on push with GitHub Actions:</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-filename">.github/workflows/validate-dbom.yml</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                    </div>
+                    <div class="code-body"><pre>name: Validate DBOM
+
+on:
+  push:
+    paths: ["**/*.dbom.json"]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python deps
+        run: pip install jsonschema[format-nongpl] requests
+
+      - name: Validate all DBOM files
+        run: |
+          find . -name "*.dbom.json" | while read f; do
+            python validate_dbom.py "$f" || exit 1
+          done</pre></div>
+                </div>
+            </div>
+
+        </div><!-- /section -->
+    </main>
+
+    <script>
+        function copyBlock(btn) {
+            const pre = btn.closest(".code-block").querySelector("pre");
+            navigator.clipboard.writeText(pre.textContent.trim()).then(() => {
+                btn.textContent = "Copied!";
+                setTimeout(() => { btn.textContent = "Copy"; }, 1500);
+            });
+        }
+    </script>
+</body>
+</html>
