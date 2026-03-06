@@ -134,6 +134,7 @@ body {
     line-height: 1.6;
     color: var(--text);
     background: var(--bg-white);
+    overflow-x: hidden;
 }
 
 a {
@@ -821,8 +822,6 @@ code {
 
 .json-viewer-content {
     padding: 1.5rem;
-    max-height: 500px;
-    overflow-y: auto;
     color: #e2e8f0;
 }
 
