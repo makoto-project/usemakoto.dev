@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying a DBOM Document - Makoto (誠)</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        /* ── page-level overrides ───────────────────────────── */
+        .tool-section {
+            margin-bottom: 3.5rem;
+            scroll-margin-top: 2rem;
+        }
+        .tool-section h2 {
+            font-size: 1.75rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .tool-section .tool-meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .tool-section .tool-meta code {
+            background: #f0f0f0;
+            padding: 0.1em 0.4em;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+        .lang-badge {
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.2rem 0.65rem;
+            border-radius: 4px;
+            letter-spacing: 0.03em;
+        }
+        .code-block {
+            background: #0d0d0d;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 1.25rem 0;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .code-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+        .code-dots span:nth-child(1) { background: #ff5f57; }
+        .code-dots span:nth-child(2) { background: #febc2e; }
+        .code-dots span:nth-child(3) { background: #28c840; }
+        .code-filename { color: #888; font-size: 0.82rem; font-family: var(--font-mono); }
+        .copy-btn {
+            background: none;
+            border: 1px solid #444;
+            color: #888;
+            font-size: 0.78rem;
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .copy-btn:hover { border-color: #888; color: #ccc; }
+        .copy-btn.copied { border-color: #28c840; color: #28c840; }
+        .code-body pre {
+            margin: 0;
+            padding: 1.25rem 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.84rem;
+            color: #e8e8e8;
+            overflow-x: auto;
+            line-height: 1.6;
+            tab-size: 2;
+        }
+        .install-block {
+            background: #f6f8fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #333;
+        }
+        .install-block strong { color: #555; font-size: 0.75rem; font-family: var(--font-sans, sans-serif); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.35rem; }
+
+        /* ── toc ─────────────────────────────────────────────── */
+        .toc {
+            background: #f9f9fb;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .toc h2 { font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.75rem; }
+        .toc ul { margin: 0; padding-left: 1.2rem; list-style: disc; }
+        .toc li { margin: 0.3rem 0; font-size: 0.9rem; }
+        .toc a { color: var(--primary); }
+
+        /* ── verification layers ─────────────────────────────── */
+        .layers {
+            display: flex;
+            gap: 0;
+            margin: 2rem 0;
+            border: 1px solid #e4e4e4;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .layer {
+            flex: 1;
+            padding: 1.25rem 1.5rem;
+            border-right: 1px solid #e4e4e4;
+            position: relative;
+        }
+        .layer:last-child { border-right: none; }
+        .layer-num {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .layer h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+        .layer p { font-size: 0.875rem; color: var(--text-muted); margin: 0; }
+        .layer-arrow {
+            position: absolute;
+            right: -14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            background: white;
+            border: 1px solid #e4e4e4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 1;
+        }
+        .layer.stub { background: #fafafa; }
+        .layer.stub h3 { color: var(--text-muted); }
+        .layer-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.55rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        .badge-ready { background: #e6f4ea; color: #1a7f37; }
+        .badge-stub  { background: #f0f0f0; color: #888; }
+
+        /* ── sample flow cards ───────────────────────────────── */
+        .flow-section {
+            margin: 2.5rem 0;
+        }
+        .flow-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+        .flow-tab {
+            padding: 0.45rem 1rem;
+            border-radius: 8px;
+            border: 1.5px solid #e0e0e0;
+            background: white;
+            font-size: 0.875rem;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            transition: all 0.15s;
+            color: #444;
+        }
+        .flow-tab:hover { border-color: var(--primary); color: var(--primary); }
+        .flow-tab.active { border-color: var(--primary); background: var(--primary); color: white; }
+        .flow-tab.tab-pass.active { background: #1a7f37; border-color: #1a7f37; }
+        .flow-tab.tab-fail-struct.active { background: #cf222e; border-color: #cf222e; }
+        .flow-tab.tab-fail-prov.active  { background: #9a6700; border-color: #9a6700; }
+
+        .flow-panel { display: none; }
+        .flow-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        @media (max-width: 860px) {
+            .flow-panel.active { grid-template-columns: 1fr; }
+        }
+
+        .flow-card {
+            border: 1px solid #e4e4e4;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .flow-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.65rem 1rem;
+            background: #f6f8fa;
+            border-bottom: 1px solid #e4e4e4;
+            font-size: 0.82rem;
+            font-family: var(--font-mono);
+            color: #555;
+            font-weight: 600;
+        }
+        .flow-card-header .badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.55rem;
+            border-radius: 4px;
+        }
+        .badge-input   { background: #e8f0fe; color: #1a56db; }
+        .badge-output  { background: #f0f0f0; color: #555; }
+        .badge-output-pass { background: #e6f4ea; color: #1a7f37; }
+        .badge-output-fail { background: #ffeef0; color: #cf222e; }
+        .badge-output-warn { background: #fff8c5; color: #9a6700; }
+
+        .flow-card-body {
+            padding: 1rem 1.1rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            line-height: 1.7;
+            background: #0d0d0d;
+            color: #e8e8e8;
+            min-height: 200px;
+            overflow-x: auto;
+        }
+        .flow-card-body.light {
+            background: #fafafa;
+            color: #333;
+        }
+        .out-pass  { color: #3fb950; }
+        .out-fail  { color: #f85149; }
+        .out-warn  { color: #e3b341; }
+        .out-dim   { color: #888; }
+        .out-bold  { font-weight: 700; }
+        .out-section { color: #79c0ff; font-weight: 600; }
+
+        /* annotation overlay on json */
+        .json-line { display: flex; gap: 0.5rem; }
+        .json-ann  { min-width: 1.1rem; text-align: center; }
+        .ann-err   { color: #f85149; }
+        .ann-ok    { color: #3fb950; }
+        .ann-brk   { color: #e3b341; }
+
+        /* ── provenance rules ─────────────────────────────────── */
+        .rules-grid {
+            display: grid;
+            grid-template-columns: 2rem 1fr;
+            gap: 0.1rem 0.75rem;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+        .rules-icon { padding-top: 0.1rem; font-size: 1rem; }
+
+        /* ── install strip ───────────────────────────────────── */
+        .install-strip {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 0.75rem 0 1.5rem;
+        }
+        .install-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #f0f0f0;
+            border-radius: 6px;
+            padding: 0.3rem 0.7rem;
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <span class="sidebar-logo-icon">誠</span>
+                Makoto
+            </a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../levels/" class="nav-item">Understanding Levels</a>
+            <a href="../spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="../comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../examples/" class="nav-item">Examples</a>
+            <a href="../demos/" class="nav-item">Demos</a>
+            <a href="../sdk/" class="nav-item">SDKs</a>
+            <a href="../validate/" class="nav-item">Tool Validation</a>
+            <a href="./" class="nav-item active">Verifying a Document</a>
+            <a href="#samples" class="nav-item nav-item-sub">Sample documents</a>
+            <a href="#how-it-works" class="nav-item nav-item-sub">How it works</a>
+            <a href="#bash" class="nav-item nav-item-sub">Bash / curl</a>
+            <a href="#python" class="nav-item nav-item-sub">Python</a>
+            <a href="#nodejs" class="nav-item nav-item-sub">Node.js</a>
+            <a href="#go" class="nav-item nav-item-sub">Go</a>
+            <a href="../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Implementations</div>
+            <a href="../expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="section section-wide">
+
+            <h1 style="font-size:2.5rem;font-weight:400;margin-bottom:0.5rem;">Verifying a DBOM Document</h1>
+            <p class="lead" style="color:var(--text-muted);font-size:1.1rem;margin-bottom:2rem;">
+                How to check that a DBOM is well-formed, has an unbroken hash chain, and (when signing is finalised) is cryptographically attested — with ready-to-run code for Bash, Python, Node.js, and Go.
+            </p>
+
+            <div class="toc">
+                <h2>On this page</h2>
+                <ul>
+                    <li><a href="#samples">Sample documents — three files to try right now</a></li>
+                    <li><a href="#how-it-works">How verification works</a></li>
+                    <li><a href="#provenance-rules">Provenance rules</a></li>
+                    <li><a href="#bash">Bash · <code>curl</code> + <code>jsonschema</code> CLI</a></li>
+                    <li><a href="#python">Python · <code>jsonschema</code> + <code>requests</code></a></li>
+                    <li><a href="#nodejs">Node.js · <code>ajv</code></a></li>
+                    <li><a href="#go">Go · <code>gojsonschema</code></a></li>
+                    <li><a href="#crypto-stub">Cryptographic verification (stub)</a></li>
+                </ul>
+            </div>
+
+            <!-- ─── SAMPLE DOCUMENTS ──────────────────────────────── -->
+            <div class="tool-section" id="samples">
+                <h2>Sample documents</h2>
+                <p style="color:var(--text-muted);margin-bottom:1.5rem;">
+                    Three files you can run through any verifier below. Select one to see the document and its expected output side by side.
+                </p>
+
+                <div class="flow-section">
+                    <div class="flow-tabs">
+                        <button class="flow-tab tab-pass active" onclick="showFlow('pass', this)">valid.dbom.json ✓</button>
+                        <button class="flow-tab tab-fail-struct" onclick="showFlow('struct', this)">invalid-structural.dbom.json ✗</button>
+                        <button class="flow-tab tab-fail-prov" onclick="showFlow('prov', this)">invalid-provenance.dbom.json ✗</button>
+                    </div>
+
+                    <!-- PASS -->
+                    <div class="flow-panel active" id="flow-pass">
+                        <div class="flow-card">
+                            <div class="flow-card-header">
+                                valid.dbom.json
+                                <span class="badge badge-input">input</span>
+                            </div>
+                            <div class="flow-card-body"><pre>{
+  "schema_version": "0.1",
+  "id": "dbom-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "created_at": "2024-06-01T12:00:00Z",
+  "source": {
+    "uri": "s3://acme-data/exports/transactions.parquet",
+    "hash": {
+      "algorithm": "sha256",
+      "value": "3b4c5d6e7f8a9b0c..."
+    },
+    "format": "parquet"
+  },
+  "signature": {
+    "algorithm": "sha256",
+    "value": "4c5d6e7f8a9b0c1d...",
+    "signer": "github:acme-data-platform"
+  },
+  "lineage": [
+    {
+      "step": 1,
+      "description": "Raw export from payments DB",
+      "tool": "acme-exporter/1.4.2",
+      "input_hash": "n/a",
+      "output_hash": "1a2b3c4d5e6f7a8b..."
+    },
+    {
+      "step": 2,
+      "description": "PII redaction",
+      "tool": "presidio/2.2.354",
+      "input_hash": "1a2b3c4d5e6f7a8b...",
+      "output_hash": "3b4c5d6e7f8a9b0c..."
+    }
+  ]
+}</pre></div>
+                        </div>
+                        <div class="flow-card">
+                            <div class="flow-card-header">
+                                terminal output
+                                <span class="badge badge-output-pass">✓ PASSED</span>
+                            </div>
+                            <div class="flow-card-body"><pre><span class="out-dim">Verifying: valid.dbom.json</span>
+
+<span class="out-section">[1/2] Structural</span>
+  <span class="out-pass">✓ conforms to schema</span>
+
+<span class="out-section">[2/2] Provenance</span>
+  <span class="out-pass">✓ step 1 input_hash is n/a</span>
+  <span class="out-pass">✓ step 2 input_hash matches step 1 output_hash</span>
+  <span class="out-pass">✓ final step output_hash matches source.hash.value</span>
+
+<span class="out-pass out-bold">✓ PASSED</span></pre></div>
+                        </div>
+                    </div>
+
+                    <!-- STRUCTURAL FAIL -->
+                    <div class="flow-panel" id="flow-struct">
+                        <div class="flow-card">
+                            <div class="flow-card-header">
+                                invalid-structural.dbom.json
+                                <span class="badge badge-input">input</span>
+                            </div>
+                            <div class="flow-card-body"><pre>{
+  <span class="out-fail">"schema_version": "0.2",</span>      <span class="out-dim">← should be "0.1"</span>
+  "id": "dbom-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "created_at": "2024-06-01T12:00:00Z",
+  "source": {
+    "uri": "s3://acme-data/exports/transactions.parquet",
+    "hash": {
+      <span class="out-fail">"algorithm": "md5",</span>           <span class="out-dim">← not in ['sha256']</span>
+      "value": "3b4c5d6e7f8a9b0c..."
+    },
+    "format": "parquet"
+  },
+  "signature": { ... },
+  "lineage": [
+    {
+      "step": 1,
+      "description": "Raw export from payments DB",
+      "tool": "acme-exporter/1.4.2",
+      "input_hash": "n/a",
+      "output_hash": "3b4c5d6e7f8a9b0c..."
+    }
+  ]
+}</pre></div>
+                        </div>
+                        <div class="flow-card">
+                            <div class="flow-card-header">
+                                terminal output
+                                <span class="badge badge-output-fail">✗ FAILED</span>
+                            </div>
+                            <div class="flow-card-body"><pre><span class="out-dim">Verifying: invalid-structural.dbom.json</span>
+
+<span class="out-section">[1/2] Structural</span>
+  <span class="out-fail">✗ [root] Expected '0.1'</span>
+  <span class="out-fail">✗ [source → hash → algorithm] 'md5' is not one of ['sha256']</span>
+
+<span class="out-section">[2/2] Provenance</span>
+  <span class="out-pass">✓ hash chain is consistent</span>
+  <span class="out-dim">(structure errors don't block provenance check)</span>
+
+<span class="out-fail out-bold">✗ FAILED (2 error(s))</span></pre></div>
+                        </div>
+                    </div>
+
+                    <!-- PROVENANCE FAIL -->
+                    <div class="flow-panel" id="flow-prov">
+                        <div class="flow-card">
+                            <div class="flow-card-header">
+                                invalid-provenance.dbom.json
+                                <span class="badge badge-input">input</span>
+                            </div>
+                            <div class="flow-card-body"><pre>{
+  "schema_version": "0.1",        <span class="out-pass out-dim">← valid</span>
+  ...
+  "source": {
+    "hash": {
+      "algorithm": "sha256",
+      "value": "3b4c5d6e7f8a9b0c..."  <span class="out-dim">← expected final hash</span>
+    }
+  },
+  "lineage": [
+    {
+      "step": 1,
+      "input_hash": "n/a",
+      "output_hash": "1a2b3c4d5e6f7a8b..."
+    },
+    {
+      "step": 2,
+      <span class="out-fail">"input_hash": "aaaaaaaaaaaaaaaa...",</span>  <span class="out-dim">← should be 1a2b3c4d...</span>
+      <span class="out-fail">"output_hash": "bbbbbbbbbbbbbbbb..."</span>  <span class="out-dim">← should be 3b4c5d6e...</span>
+    }
+  ]
+}</pre></div>
+                        </div>
+                        <div class="flow-card">
+                            <div class="flow-card-header">
+                                terminal output
+                                <span class="badge badge-output-warn">✗ FAILED</span>
+                            </div>
+                            <div class="flow-card-body"><pre><span class="out-dim">Verifying: invalid-provenance.dbom.json</span>
+
+<span class="out-section">[1/2] Structural</span>
+  <span class="out-pass">✓ conforms to schema</span>
+
+<span class="out-section">[2/2] Provenance</span>
+  <span class="out-fail">✗ step 2 input_hash does not match step 1 output_hash</span>
+  <span class="out-fail">✗ final step output_hash does not match source.hash.value</span>
+
+<span class="out-fail out-bold">✗ FAILED (2 error(s))</span></pre></div>
+                        </div>
+                    </div>
+                </div><!-- /flow-section -->
+
+                <p style="color:var(--text-muted);font-size:0.9rem;">
+                    Save the full JSON for any sample using the code blocks in the verifier sections below, or <a href="https://github.com/makoto-project/makoto/tree/main/examples" target="_blank">browse the examples on GitHub</a>.
+                </p>
+            </div>
+
+            <!-- ─── HOW IT WORKS ──────────────────────────────────── -->
+            <div class="tool-section" id="how-it-works">
+                <h2>How verification works</h2>
+                <p style="color:var(--text-muted);margin-bottom:1.5rem;">Three layers, always run in order. Failing layer 1 doesn't skip layer 2 — you get all errors at once.</p>
+
+                <div class="layers">
+                    <div class="layer">
+                        <div class="layer-num">Layer 1</div>
+                        <span class="layer-badge badge-ready">Available</span>
+                        <h3>Structural</h3>
+                        <p>Fetch the schema from <code style="font-family:var(--font-mono);font-size:0.82em;background:#f0f0f0;padding:.1em .4em;border-radius:4px;">usemakoto.dev/schema/v0.1.json</code> and validate the document against it. Catches wrong field types, unsupported enum values, and missing required fields.</p>
+                        <div class="layer-arrow">→</div>
+                    </div>
+                    <div class="layer">
+                        <div class="layer-num">Layer 2</div>
+                        <span class="layer-badge badge-ready">Available</span>
+                        <h3>Provenance</h3>
+                        <p>Walk the <code style="font-family:var(--font-mono);font-size:0.82em;background:#f0f0f0;padding:.1em .4em;border-radius:4px;">lineage</code> array and verify each step's <code style="font-family:var(--font-mono);font-size:0.82em;background:#f0f0f0;padding:.1em .4em;border-radius:4px;">input_hash</code> matches the previous step's <code style="font-family:var(--font-mono);font-size:0.82em;background:#f0f0f0;padding:.1em .4em;border-radius:4px;">output_hash</code>. The final hash must equal <code style="font-family:var(--font-mono);font-size:0.82em;background:#f0f0f0;padding:.1em .4em;border-radius:4px;">source.hash.value</code>.</p>
+                        <div class="layer-arrow">→</div>
+                    </div>
+                    <div class="layer stub">
+                        <div class="layer-num">Layer 3</div>
+                        <span class="layer-badge badge-stub">Coming soon</span>
+                        <h3>Cryptographic</h3>
+                        <p>Verify the <code style="font-family:var(--font-mono);font-size:0.82em;background:#f0f0f0;padding:.1em .4em;border-radius:4px;">signature.value</code> against a public key resolved from <code style="font-family:var(--font-mono);font-size:0.82em;background:#f0f0f0;padding:.1em .4em;border-radius:4px;">signature.signer</code>. The signing spec is not yet published — see the <a href="#crypto-stub">stub below</a>.</p>
+                    </div>
+                </div>
+
+                <p style="color:var(--text-muted);font-size:0.875rem;">The schema is always fetched at runtime from the canonical URL. There is no bundled copy.</p>
+            </div>
+
+            <!-- ─── PROVENANCE RULES ───────────────────────────────── -->
+            <div class="tool-section" id="provenance-rules">
+                <h2>Provenance rules</h2>
+                <div class="rules-grid">
+                    <div class="rules-icon">①</div>
+                    <div><code style="font-family:var(--font-mono);font-size:0.85em;">lineage[0].input_hash</code> must be <code style="font-family:var(--font-mono);font-size:0.85em;">"n/a"</code> — the first step has no predecessor.</div>
+
+                    <div class="rules-icon">②</div>
+                    <div>Each step's <code style="font-family:var(--font-mono);font-size:0.85em;">input_hash</code> must equal the previous step's <code style="font-family:var(--font-mono);font-size:0.85em;">output_hash</code>.</div>
+
+                    <div class="rules-icon">③</div>
+                    <div>The final step's <code style="font-family:var(--font-mono);font-size:0.85em;">output_hash</code> must equal <code style="font-family:var(--font-mono);font-size:0.85em;">source.hash.value</code>.</div>
+                </div>
+                <p style="color:var(--text-muted);font-size:0.875rem;margin-top:0.75rem;">A document with one lineage step is valid as long as rule ① and ③ both hold.</p>
+            </div>
+
+            <!-- ─── BASH ───────────────────────────────────────────── -->
+            <div class="tool-section" id="bash">
+                <h2><span class="lang-badge">BASH</span> curl + jsonschema CLI</h2>
+                <p class="tool-meta">
+                    <code>jq</code> can't do real JSON Schema validation. Use the <code>jsonschema</code> CLI (ships with the Python package), which fetches and resolves schemas from a URL natively.
+                </p>
+                <div class="install-strip">
+                    <div class="install-pill">pip install jsonschema[format-nongpl]</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-filename">verify-dbom.sh</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                    </div>
+                    <div class="code-body"><pre>#!/usr/bin/env bash
+# verify-dbom.sh
+# Usage: ./verify-dbom.sh example.dbom.json
+
+set -euo pipefail
+
+SCHEMA_URL="https://usemakoto.dev/schema/v0.1.json"
+DBOM_FILE="${1:?Usage: $0 &lt;dbom-file&gt;}"
+ERRORS=0
+
+fail() { echo " ✗ $*" &gt;&amp;2; ERRORS=$((ERRORS + 1)); }
+pass() { echo " ✓ $*"; }
+
+echo "Verifying: $DBOM_FILE"
+
+# ── 1. Structural ─────────────────────────────────────────────────────────────
+echo ""
+echo "[1/2] Structural"
+
+if jsonschema --instance "$DBOM_FILE" "$SCHEMA_URL" 2&gt;/tmp/jsonschema-errors; then
+  pass "conforms to schema"
+else
+  fail "schema validation failed:"
+  cat /tmp/jsonschema-errors &gt;&amp;2
+fi
+
+# ── 2. Provenance chain ───────────────────────────────────────────────────────
+echo ""
+echo "[2/2] Provenance"
+
+DOC=$(cat "$DBOM_FILE")
+
+FIRST_INPUT=$(echo "$DOC" | jq -r '.lineage[0].input_hash')
+if [ "$FIRST_INPUT" = "n/a" ]; then
+  pass "step 1 input_hash is n/a"
+else
+  fail "step 1 input_hash should be \"n/a\", got \"$FIRST_INPUT\""
+fi
+
+echo "$DOC" | jq -r '
+  .lineage as $steps |
+  range(1; ($steps | length)) |
+  . as $i |
+  if $steps[$i].input_hash != $steps[$i-1].output_hash then
+    "FAIL step \($steps[$i].step) input_hash does not match step \($steps[$i-1].step) output_hash"
+  else
+    "PASS step \($steps[$i].step) input_hash matches step \($steps[$i-1].step) output_hash"
+  end
+' | while IFS=' ' read -r result rest; do
+  if [ "$result" = "PASS" ]; then pass "$rest"
+  else fail "$rest"; fi
+done
+
+FINAL_OUT=$(echo "$DOC" | jq -r '.lineage[-1].output_hash')
+SOURCE_HASH=$(echo "$DOC" | jq -r '.source.hash.value')
+if [ "$FINAL_OUT" = "$SOURCE_HASH" ]; then
+  pass "final step output_hash matches source.hash.value"
+else
+  fail "final step output_hash does not match source.hash.value"
+fi
+
+# ── Result ────────────────────────────────────────────────────────────────────
+echo ""
+if [ "$ERRORS" -eq 0 ]; then
+  echo "✓ PASSED"; exit 0
+else
+  echo "✗ FAILED ($ERRORS error(s))"; exit 1
+fi</pre></div>
+                </div>
+            </div>
+
+            <!-- ─── PYTHON ─────────────────────────────────────────── -->
+            <div class="tool-section" id="python">
+                <h2><span class="lang-badge" style="background:#3572A5;">PYTHON</span> jsonschema + requests</h2>
+                <p class="tool-meta">Uses <code>Draft202012Validator</code> with a live schema fetch. Exits <code>0</code> on pass, <code>1</code> on any failure.</p>
+                <div class="install-strip">
+                    <div class="install-pill">pip install jsonschema[format-nongpl] requests</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-filename">verify_dbom.py</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                    </div>
+                    <div class="code-body"><pre>#!/usr/bin/env python3
+"""
+verify_dbom.py
+Usage: python verify_dbom.py example.dbom.json
+Exits 0 on pass, 1 on any failure.
+"""
+
+import json
+import sys
+from pathlib import Path
+
+import jsonschema
+import requests
+
+SCHEMA_URL = "https://usemakoto.dev/schema/v0.1.json"
+
+
+def load_schema() -&gt; dict:
+    resp = requests.get(SCHEMA_URL, timeout=10)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def verify_structure(dbom: dict, schema: dict) -&gt; list[str]:
+    validator = jsonschema.Draft202012Validator(
+        schema,
+        format_checker=jsonschema.FormatChecker(),
+    )
+    return [
+        f"[{' → '.join(str(p) for p in e.absolute_path) or 'root'}] {e.message}"
+        for e in validator.iter_errors(dbom)
+    ]
+
+
+def verify_provenance(dbom: dict) -&gt; list[str]:
+    errors = []
+    steps = dbom.get("lineage", [])
+
+    if not steps:
+        return ["lineage is empty"]
+
+    if steps[0].get("input_hash") != "n/a":
+        errors.append(
+            f"step 1 input_hash should be \"n/a\", got \"{steps[0].get('input_hash')}\""
+        )
+
+    for i in range(1, len(steps)):
+        prev_out = steps[i - 1].get("output_hash")
+        curr_in  = steps[i].get("input_hash")
+        if prev_out != curr_in:
+            errors.append(
+                f"step {steps[i]['step']} input_hash ({curr_in!r}) "
+                f"does not match step {steps[i-1]['step']} output_hash ({prev_out!r})"
+            )
+
+    final_out   = steps[-1].get("output_hash")
+    source_hash = dbom.get("source", {}).get("hash", {}).get("value")
+    if final_out != source_hash:
+        errors.append(
+            f"final step output_hash ({final_out!r}) "
+            f"does not match source.hash.value ({source_hash!r})"
+        )
+
+    return errors
+
+
+def verify(path: str) -&gt; bool:
+    dbom   = json.loads(Path(path).read_text())
+    schema = load_schema()
+    all_errors = []
+
+    print(f"\nVerifying: {path}")
+
+    print("\n[1/2] Structural")
+    errs = verify_structure(dbom, schema)
+    if errs:
+        all_errors.extend(errs)
+        for e in errs:
+            print(f" ✗ {e}", file=sys.stderr)
+    else:
+        print(" ✓ conforms to schema")
+
+    print("\n[2/2] Provenance")
+    errs = verify_provenance(dbom)
+    if errs:
+        all_errors.extend(errs)
+        for e in errs:
+            print(f" ✗ {e}", file=sys.stderr)
+    else:
+        print(" ✓ hash chain is consistent")
+
+    print()
+    if not all_errors:
+        print("✓ PASSED")
+        return True
+    print(f"✗ FAILED ({len(all_errors)} error(s))", file=sys.stderr)
+    return False
+
+
+if __name__ == "__main__":
+    path = sys.argv[1] if len(sys.argv) &gt; 1 else "example.dbom.json"
+    sys.exit(0 if verify(path) else 1)</pre></div>
+                </div>
+            </div>
+
+            <!-- ─── NODE.JS ────────────────────────────────────────── -->
+            <div class="tool-section" id="nodejs">
+                <h2><span class="lang-badge" style="background:#f7df1e;color:#000;">JS</span> Node.js · ajv</h2>
+                <p class="tool-meta">
+                    <code>compileAsync</code> + <code>loadSchema</code> fetches the schema (and any <code>$ref</code>s) at validation time. No local copy needed.
+                </p>
+                <div class="install-strip">
+                    <div class="install-pill">npm install ajv ajv-formats</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-filename">verify-dbom.mjs</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                    </div>
+                    <div class="code-body"><pre>#!/usr/bin/env node
+// verify-dbom.mjs
+// Usage: node verify-dbom.mjs example.dbom.json
+
+import Ajv2020   from "ajv/dist/2020.js";
+import addFormats from "ajv-formats";
+import { readFileSync } from "fs";
+
+const SCHEMA_URL = "https://usemakoto.dev/schema/v0.1.json";
+
+async function loadSchema(uri) {
+  const res = await fetch(uri, { signal: AbortSignal.timeout(10_000) });
+  if (!res.ok) throw new Error(`Failed to fetch schema: HTTP ${res.status}`);
+  return res.json();
+}
+
+async function buildValidator() {
+  const ajv = new Ajv2020({ allErrors: true, loadSchema });
+  addFormats(ajv);
+  const schema = await loadSchema(SCHEMA_URL);
+  return ajv.compileAsync(schema);
+}
+
+function verifyProvenance(dbom) {
+  const errors = [];
+  const steps  = dbom.lineage ?? [];
+
+  if (steps.length === 0) return ["lineage is empty"];
+
+  if (steps[0].input_hash !== "n/a") {
+    errors.push(`step 1 input_hash should be "n/a", got "${steps[0].input_hash}"`);
+  }
+
+  for (let i = 1; i &lt; steps.length; i++) {
+    const prevOut = steps[i - 1].output_hash;
+    const currIn  = steps[i].input_hash;
+    if (prevOut !== currIn) {
+      errors.push(
+        `step ${steps[i].step} input_hash ("${currIn}") ` +
+        `does not match step ${steps[i - 1].step} output_hash ("${prevOut}")`
+      );
+    }
+  }
+
+  const finalOut   = steps.at(-1).output_hash;
+  const sourceHash = dbom.source?.hash?.value;
+  if (finalOut !== sourceHash) {
+    errors.push(
+      `final step output_hash ("${finalOut}") ` +
+      `does not match source.hash.value ("${sourceHash}")`
+    );
+  }
+
+  return errors;
+}
+
+async function verify(filePath) {
+  const dbom     = JSON.parse(readFileSync(filePath, "utf8"));
+  const validate = await buildValidator();
+  const allErrors = [];
+
+  console.log(`\nVerifying: ${filePath}`);
+
+  console.log("\n[1/2] Structural");
+  if (!validate(dbom)) {
+    const errs = validate.errors.map(e =&gt; `[${e.instancePath || "root"}] ${e.message}`);
+    allErrors.push(...errs);
+    errs.forEach(e =&gt; console.error(` ✗ ${e}`));
+  } else {
+    console.log(" ✓ conforms to schema");
+  }
+
+  console.log("\n[2/2] Provenance");
+  const provErrs = verifyProvenance(dbom);
+  if (provErrs.length) {
+    allErrors.push(...provErrs);
+    provErrs.forEach(e =&gt; console.error(` ✗ ${e}`));
+  } else {
+    console.log(" ✓ hash chain is consistent");
+  }
+
+  console.log();
+  if (allErrors.length === 0) { console.log("✓ PASSED"); return true; }
+  console.error(`✗ FAILED (${allErrors.length} error(s))`);
+  return false;
+}
+
+const filePath = process.argv[2] ?? "example.dbom.json";
+process.exit((await verify(filePath)) ? 0 : 1);</pre></div>
+                </div>
+            </div>
+
+            <!-- ─── GO ─────────────────────────────────────────────── -->
+            <div class="tool-section" id="go">
+                <h2><span class="lang-badge" style="background:#00add8;">GO</span> gojsonschema</h2>
+                <p class="tool-meta">
+                    <code>gojsonschema</code> accepts a schema URI directly and fetches it over HTTP — pass the URL, not a file path.
+                </p>
+                <div class="install-strip">
+                    <div class="install-pill">go get github.com/xeipuuv/gojsonschema</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-header-left">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-filename">verify_dbom.go</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+                    </div>
+                    <div class="code-body"><pre>// verify_dbom.go
+// Usage: go run verify_dbom.go example.dbom.json
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+
+	"github.com/xeipuuv/gojsonschema"
+)
+
+const schemaURL = "https://usemakoto.dev/schema/v0.1.json"
+
+type dbomDoc struct {
+	Source struct {
+		Hash struct {
+			Value string `json:"value"`
+		} `json:"hash"`
+	} `json:"source"`
+	Lineage []struct {
+		Step       int    `json:"step"`
+		InputHash  string `json:"input_hash"`
+		OutputHash string `json:"output_hash"`
+	} `json:"lineage"`
+}
+
+func verifyStructure(path string) []string {
+	result, err := gojsonschema.Validate(
+		gojsonschema.NewReferenceLoader(schemaURL),
+		gojsonschema.NewReferenceLoader("file://"+path),
+	)
+	if err != nil {
+		return []string{fmt.Sprintf("validation error: %v", err)}
+	}
+	if result.Valid() {
+		return nil
+	}
+	errs := make([]string, len(result.Errors()))
+	for i, e := range result.Errors() {
+		errs[i] = fmt.Sprintf("[%s] %s", e.Field(), e.Description())
+	}
+	return errs
+}
+
+func verifyProvenance(raw []byte) []string {
+	var doc dbomDoc
+	if err := json.Unmarshal(raw, &amp;doc); err != nil {
+		return []string{fmt.Sprintf("could not parse document: %v", err)}
+	}
+
+	var errors []string
+	steps := doc.Lineage
+
+	if len(steps) == 0 {
+		return []string{"lineage is empty"}
+	}
+
+	if steps[0].InputHash != "n/a" {
+		errors = append(errors, fmt.Sprintf(
+			`step 1 input_hash should be "n/a", got %q`, steps[0].InputHash,
+		))
+	}
+
+	for i := 1; i &lt; len(steps); i++ {
+		if steps[i].InputHash != steps[i-1].OutputHash {
+			errors = append(errors, fmt.Sprintf(
+				"step %d input_hash (%q) does not match step %d output_hash (%q)",
+				steps[i].Step, steps[i].InputHash, steps[i-1].Step, steps[i-1].OutputHash,
+			))
+		}
+	}
+
+	if steps[len(steps)-1].OutputHash != doc.Source.Hash.Value {
+		errors = append(errors, fmt.Sprintf(
+			"final step output_hash (%q) does not match source.hash.value (%q)",
+			steps[len(steps)-1].OutputHash, doc.Source.Hash.Value,
+		))
+	}
+
+	return errors
+}
+
+func verify(path string) bool {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error reading file: %v\n", err)
+		return false
+	}
+
+	fmt.Printf("\nVerifying: %s\n", path)
+	var allErrors []string
+
+	fmt.Println("\n[1/2] Structural")
+	if errs := verifyStructure(path); len(errs) &gt; 0 {
+		allErrors = append(allErrors, errs...)
+		for _, e := range errs {
+			fmt.Fprintf(os.Stderr, " ✗ %s\n", e)
+		}
+	} else {
+		fmt.Println(" ✓ conforms to schema")
+	}
+
+	fmt.Println("\n[2/2] Provenance")
+	if errs := verifyProvenance(raw); len(errs) &gt; 0 {
+		allErrors = append(allErrors, errs...)
+		for _, e := range errs {
+			fmt.Fprintf(os.Stderr, " ✗ %s\n", e)
+		}
+	} else {
+		fmt.Println(" ✓ hash chain is consistent")
+	}
+
+	fmt.Println()
+	if len(allErrors) == 0 {
+		fmt.Println("✓ PASSED")
+		return true
+	}
+	fmt.Fprintf(os.Stderr, "✗ FAILED (%d error(s))\n", len(allErrors))
+	return false
+}
+
+func main() {
+	path := "example.dbom.json"
+	if len(os.Args) &gt; 1 {
+		path = os.Args[1]
+	}
+	if !verify(path) {
+		os.Exit(1)
+	}
+}</pre></div>
+                </div>
+            </div>
+
+            <!-- ─── CRYPTO STUB ────────────────────────────────────── -->
+            <div class="tool-section" id="crypto-stub">
+                <h2>Cryptographic signature verification</h2>
+                <div style="background:#fffbf0;border:1px solid #e3b341;border-radius:10px;padding:1.25rem 1.5rem;">
+                    <p style="margin:0 0 0.75rem;font-weight:600;">⚠️ Stub — not yet implementable</p>
+                    <p style="margin:0;color:var(--text-muted);font-size:0.9rem;">
+                        The <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">signature.value</code> field exists in the schema, but the Makoto spec does not yet define:
+                    </p>
+                    <ul style="color:var(--text-muted);font-size:0.9rem;margin:0.75rem 0 0;padding-left:1.25rem;">
+                        <li>What input is signed (which fields, in what canonical form)</li>
+                        <li>How verifiers resolve <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">signer</code> (e.g. <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">github:username</code>) to a public key</li>
+                    </ul>
+                    <p style="margin:0.75rem 0 0;color:var(--text-muted);font-size:0.9rem;">
+                        Once the signing spec is published at <a href="https://usemakoto.dev">usemakoto.dev</a>, this section will be updated with working implementations. Until then, a document that passes structural and provenance checks is <strong>well-formed</strong> but not <strong>cryptographically attested</strong>.
+                    </p>
+                </div>
+            </div>
+
+        </div><!-- /section -->
+    </main>
+
+    <script>
+        // tab switcher for sample documents
+        function showFlow(id, btn) {
+            document.querySelectorAll('.flow-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.flow-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('flow-' + id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // copy button
+        function copyBlock(btn) {
+            const pre = btn.closest('.code-block').querySelector('pre');
+            // strip HTML tags to get plain text
+            const text = pre.innerHTML
+                .replace(/<span[^>]*>/g, '')
+                .replace(/<\/span>/g, '')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&amp;/g, '&');
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+            });
+        }
+    </script>
+</body>
+</html>
