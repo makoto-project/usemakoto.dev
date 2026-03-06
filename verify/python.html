@@ -7,9 +7,13 @@
     <title>Python Verifier — Makoto (誠)</title>
     <link rel="stylesheet" href="../assets/styles.css">
     <style>
-        .back-link{display:inline-flex;align-items:center;gap:0.4rem;color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem;text-decoration:none;}
+        .back-link{display:inline-flex;align-items:center;gap:.4rem;color:var(--text-muted);font-size:.875rem;margin-bottom:2rem;text-decoration:none;}
         .back-link:hover{color:var(--primary);}
-        .code-block{background:#0d0d0d;border-radius:12px;overflow:hidden;margin:1.5rem 0;}
+        .lang-badge{display:inline-flex;align-items:center;color:white;font-size:.72rem;font-weight:700;padding:.2rem .65rem;border-radius:4px;letter-spacing:.03em;}
+        .step{display:flex;align-items:baseline;gap:.75rem;margin:1.5rem 0 .5rem;}
+        .step-num{flex-shrink:0;width:1.6rem;height:1.6rem;border-radius:50%;background:#3572A5;color:white;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+        .step-label{font-size:.9rem;font-weight:600;color:#333;}
+        .code-block{background:#0d0d0d;border-radius:12px;overflow:hidden;margin:.5rem 0 1.5rem;}
         .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #2a2a2a;}
         .code-header-left{display:flex;align-items:center;gap:12px;}
         .code-dots{display:flex;gap:6px;}
@@ -17,12 +21,11 @@
         .code-dots span:nth-child(1){background:#ff5f57;}
         .code-dots span:nth-child(2){background:#febc2e;}
         .code-dots span:nth-child(3){background:#28c840;}
-        .code-filename{color:#888;font-size:0.82rem;font-family:var(--font-mono);}
-        .copy-btn{background:none;border:1px solid #444;color:#888;font-size:0.78rem;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .15s;}
+        .code-filename{color:#888;font-size:.82rem;font-family:var(--font-mono);}
+        .copy-btn{background:none;border:1px solid #444;color:#888;font-size:.78rem;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .15s;}
         .copy-btn:hover{border-color:#888;color:#ccc;}
         .copy-btn.copied{border-color:#28c840;color:#28c840;}
-        .code-body pre{margin:0;padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:0.84rem;color:#e8e8e8;overflow-x:auto;line-height:1.6;tab-size:4;}
-        .lang-badge{display:inline-flex;align-items:center;color:white;font-size:0.72rem;font-weight:700;padding:0.2rem 0.65rem;border-radius:4px;letter-spacing:.03em;background:#3572A5;}
+        .code-body pre{margin:0;padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:.84rem;color:#e8e8e8;overflow-x:auto;line-height:1.65;tab-size:4;}
     </style>
 </head>
 <body>
@@ -58,91 +61,50 @@
     <main class="main-content">
         <div class="section section-wide">
             <a href="./" class="back-link">← Verifying a Document</a>
-            <h1 style="font-size:2.25rem;font-weight:400;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.75rem;">
-                <span class="lang-badge">PYTHON</span> Python verifier
+            <h1 style="font-size:2.25rem;font-weight:400;margin-bottom:.25rem;display:flex;align-items:center;gap:.75rem;">
+                <span class="lang-badge" style="background:#3572A5;">PYTHON</span> Python verifier
             </h1>
-            <p style="color:var(--text-muted);margin-bottom:2rem;">
-                Uses <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">Draft202012Validator</code> with a live schema fetch. Exits <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">0</code> on pass, <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">1</code> on any failure.
-            </p>
+            <p style="color:var(--text-muted);margin-bottom:2rem;">Uses <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">jsonschema</code> (Draft 2020-12) and <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">requests</code> to fetch the schema at runtime.</p>
 
+            <div class="step"><div class="step-num">1</div><div class="step-label">Install</div></div>
             <div class="code-block">
-                <div class="code-header">
-                    <div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">verify_dbom.py</span></div>
-                    <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
-                </div>
-                <div class="code-body"><pre>#!/usr/bin/env python3
-"""
-verify_dbom.py — Usage: python verify_dbom.py example.dbom.json
-Exits 0 on pass, 1 on any failure.
-"""
+                <div class="code-header"><div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div></div><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+                <div class="code-body"><pre>pip install jsonschema[format-nongpl] requests</pre></div>
+            </div>
 
-import json, sys
-from pathlib import Path
-import jsonschema, requests
+            <div class="step"><div class="step-num">2</div><div class="step-label">Verify</div></div>
+            <div class="code-block">
+                <div class="code-header"><div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">verify_dbom.py</span></div><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+                <div class="code-body"><pre>import json, sys, requests, jsonschema
 
 SCHEMA_URL = "https://usemakoto.dev/schema/v0.1.json"
 
+dbom   = json.load(open(sys.argv[1]))
+schema = requests.get(SCHEMA_URL, timeout=10).json()
+steps  = dbom["lineage"]
 
-def load_schema() -&gt; dict:
-    resp = requests.get(SCHEMA_URL, timeout=10)
-    resp.raise_for_status()
-    return resp.json()
+# structural
+errors = [
+    f"[{' → '.join(str(p) for p in e.absolute_path) or 'root'}] {e.message}"
+    for e in jsonschema.Draft202012Validator(schema).iter_errors(dbom)
+]
 
+# provenance
+for i in range(1, len(steps)):
+    if steps[i]["input_hash"] != steps[i-1]["output_hash"]:
+        errors.append(f"step {steps[i]['step']} input_hash does not match step {steps[i-1]['step']} output_hash")
+if steps[-1]["output_hash"] != dbom["source"]["hash"]["value"]:
+    errors.append("final output_hash does not match source.hash.value")
 
-def verify_structure(dbom: dict, schema: dict) -&gt; list[str]:
-    validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
-    return [
-        f"[{' → '.join(str(p) for p in e.absolute_path) or 'root'}] {e.message}"
-        for e in validator.iter_errors(dbom)
-    ]
-
-
-def verify_provenance(dbom: dict) -&gt; list[str]:
-    errors, steps = [], dbom.get("lineage", [])
-    if not steps:
-        return ["lineage is empty"]
-    if steps[0].get("input_hash") != "n/a":
-        errors.append(f'step 1 input_hash should be "n/a", got "{steps[0].get("input_hash")}"')
-    for i in range(1, len(steps)):
-        if steps[i - 1].get("output_hash") != steps[i].get("input_hash"):
-            errors.append(
-                f"step {steps[i]['step']} input_hash does not match "
-                f"step {steps[i-1]['step']} output_hash"
-            )
-    if steps[-1].get("output_hash") != dbom.get("source", {}).get("hash", {}).get("value"):
-        errors.append("final step output_hash does not match source.hash.value")
-    return errors
-
-
-def verify(path: str) -&gt; bool:
-    dbom, schema, all_errors = json.loads(Path(path).read_text()), load_schema(), []
-    print(f"\nVerifying: {path}")
-    for label, errs in [
-        ("[1/2] Structural",  verify_structure(dbom, schema)),
-        ("[2/2] Provenance",  verify_provenance(dbom)),
-    ]:
-        print(f"\n{label}")
-        if errs:
-            all_errors.extend(errs)
-            for e in errs: print(f" ✗ {e}", file=sys.stderr)
-        else:
-            print(f" ✓ {'conforms to schema' if '1' in label else 'hash chain is consistent'}")
-    print()
-    if not all_errors: print("✓ PASSED"); return True
-    print(f"✗ FAILED ({len(all_errors)} error(s))", file=sys.stderr); return False
-
-
-if __name__ == "__main__":
-    sys.exit(0 if verify(sys.argv[1] if len(sys.argv) &gt; 1 else "example.dbom.json") else 1)</pre></div>
+for e in errors: print(f"✗ {e}")
+sys.exit(1 if errors else 0)</pre></div>
             </div>
+
+            <p style="color:var(--text-muted);font-size:.875rem;">For production use with full error reporting, see <a href="https://github.com/makoto-project/makoto/tree/main/tools/verify" target="_blank">the GitHub repo →</a></p>
         </div>
     </main>
     <script>
-        function copyBlock(btn) {
-            const pre = btn.closest('.code-block').querySelector('pre');
-            const text = pre.innerHTML.replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
-            navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);});
-        }
+        function copyBlock(btn){const pre=btn.closest('.code-block').querySelector('pre');const text=pre.innerHTML.replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);});}
     </script>
 </body>
 </html>
