@@ -7,9 +7,13 @@
     <title>Node.js Verifier — Makoto (誠)</title>
     <link rel="stylesheet" href="../assets/styles.css">
     <style>
-        .back-link{display:inline-flex;align-items:center;gap:0.4rem;color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem;text-decoration:none;}
+        .back-link{display:inline-flex;align-items:center;gap:.4rem;color:var(--text-muted);font-size:.875rem;margin-bottom:2rem;text-decoration:none;}
         .back-link:hover{color:var(--primary);}
-        .code-block{background:#0d0d0d;border-radius:12px;overflow:hidden;margin:1.5rem 0;}
+        .lang-badge{display:inline-flex;align-items:center;font-size:.72rem;font-weight:700;padding:.2rem .65rem;border-radius:4px;letter-spacing:.03em;}
+        .step{display:flex;align-items:baseline;gap:.75rem;margin:1.5rem 0 .5rem;}
+        .step-num{flex-shrink:0;width:1.6rem;height:1.6rem;border-radius:50%;background:#c5a900;color:white;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+        .step-label{font-size:.9rem;font-weight:600;color:#333;}
+        .code-block{background:#0d0d0d;border-radius:12px;overflow:hidden;margin:.5rem 0 1.5rem;}
         .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #2a2a2a;}
         .code-header-left{display:flex;align-items:center;gap:12px;}
         .code-dots{display:flex;gap:6px;}
@@ -17,12 +21,11 @@
         .code-dots span:nth-child(1){background:#ff5f57;}
         .code-dots span:nth-child(2){background:#febc2e;}
         .code-dots span:nth-child(3){background:#28c840;}
-        .code-filename{color:#888;font-size:0.82rem;font-family:var(--font-mono);}
-        .copy-btn{background:none;border:1px solid #444;color:#888;font-size:0.78rem;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .15s;}
+        .code-filename{color:#888;font-size:.82rem;font-family:var(--font-mono);}
+        .copy-btn{background:none;border:1px solid #444;color:#888;font-size:.78rem;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .15s;}
         .copy-btn:hover{border-color:#888;color:#ccc;}
         .copy-btn.copied{border-color:#28c840;color:#28c840;}
-        .code-body pre{margin:0;padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:0.84rem;color:#e8e8e8;overflow-x:auto;line-height:1.6;tab-size:2;}
-        .lang-badge{display:inline-flex;align-items:center;color:#000;font-size:0.72rem;font-weight:700;padding:0.2rem 0.65rem;border-radius:4px;letter-spacing:.03em;background:#f7df1e;}
+        .code-body pre{margin:0;padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:.84rem;color:#e8e8e8;overflow-x:auto;line-height:1.65;tab-size:2;}
     </style>
 </head>
 <body>
@@ -58,82 +61,54 @@
     <main class="main-content">
         <div class="section section-wide">
             <a href="./" class="back-link">← Verifying a Document</a>
-            <h1 style="font-size:2.25rem;font-weight:400;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.75rem;">
-                <span class="lang-badge">JS</span> Node.js verifier
+            <h1 style="font-size:2.25rem;font-weight:400;margin-bottom:.25rem;display:flex;align-items:center;gap:.75rem;">
+                <span class="lang-badge" style="background:#f7df1e;color:#000;">JS</span> Node.js verifier
             </h1>
-            <p style="color:var(--text-muted);margin-bottom:2rem;">
-                Uses AJV's <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">compileAsync</code> to fetch the schema at validation time. No bundled copy.
-            </p>
+            <p style="color:var(--text-muted);margin-bottom:2rem;">Uses <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">ajv</code> with <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">loadSchema</code> to fetch the schema at validation time.</p>
 
+            <div class="step"><div class="step-num">1</div><div class="step-label">Install</div></div>
             <div class="code-block">
-                <div class="code-header">
-                    <div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">verify-dbom.mjs</span></div>
-                    <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
-                </div>
-                <div class="code-body"><pre>#!/usr/bin/env node
-// verify-dbom.mjs — Usage: node verify-dbom.mjs example.dbom.json
+                <div class="code-header"><div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div></div><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+                <div class="code-body"><pre>npm install ajv ajv-formats</pre></div>
+            </div>
 
-import Ajv2020    from "ajv/dist/2020.js";
+            <div class="step"><div class="step-num">2</div><div class="step-label">Verify</div></div>
+            <div class="code-block">
+                <div class="code-header"><div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">verify-dbom.mjs</span></div><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+                <div class="code-body"><pre>import Ajv2020    from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import { readFileSync } from "fs";
 
 const SCHEMA_URL = "https://usemakoto.dev/schema/v0.1.json";
+const load = uri =&gt; fetch(uri).then(r =&gt; r.json());
 
-async function loadSchema(uri) {
-  const res = await fetch(uri, { signal: AbortSignal.timeout(10_000) });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
+const dbom   = JSON.parse(readFileSync(process.argv[2], "utf8"));
+const ajv    = new Ajv2020({ allErrors: true, loadSchema: load });
+addFormats(ajv);
+const validate = await ajv.compileAsync(await load(SCHEMA_URL));
+const errors   = [];
 
-function verifyProvenance(dbom) {
-  const errors = [], steps = dbom.lineage ?? [];
-  if (!steps.length) return ["lineage is empty"];
-  if (steps[0].input_hash !== "n/a")
-    errors.push(`step 1 input_hash should be "n/a", got "${steps[0].input_hash}"`);
-  for (let i = 1; i &lt; steps.length; i++)
-    if (steps[i - 1].output_hash !== steps[i].input_hash)
-      errors.push(`step ${steps[i].step} input_hash does not match step ${steps[i-1].step} output_hash`);
-  if (steps.at(-1).output_hash !== dbom.source?.hash?.value)
-    errors.push("final step output_hash does not match source.hash.value");
-  return errors;
-}
+// structural
+if (!validate(dbom))
+  validate.errors.forEach(e =&gt; errors.push(`[${e.instancePath||"root"}] ${e.message}`));
 
-async function verify(filePath) {
-  const dbom = JSON.parse(readFileSync(filePath, "utf8"));
-  const ajv  = new Ajv2020({ allErrors: true, loadSchema });
-  addFormats(ajv);
-  const validate  = await ajv.compileAsync(await loadSchema(SCHEMA_URL));
-  const allErrors = [];
+// provenance
+const steps = dbom.lineage;
+for (let i = 1; i &lt; steps.length; i++)
+  if (steps[i].input_hash !== steps[i-1].output_hash)
+    errors.push(`step ${steps[i].step} input_hash does not match step ${steps[i-1].step} output_hash`);
+if (steps.at(-1).output_hash !== dbom.source.hash.value)
+  errors.push("final output_hash does not match source.hash.value");
 
-  console.log(`\nVerifying: ${filePath}`);
-
-  console.log("\n[1/2] Structural");
-  if (!validate(dbom)) {
-    const errs = validate.errors.map(e =&gt; `[${e.instancePath || "root"}] ${e.message}`);
-    allErrors.push(...errs); errs.forEach(e =&gt; console.error(` ✗ ${e}`));
-  } else { console.log(" ✓ conforms to schema"); }
-
-  console.log("\n[2/2] Provenance");
-  const provErrs = verifyProvenance(dbom);
-  if (provErrs.length) {
-    allErrors.push(...provErrs); provErrs.forEach(e =&gt; console.error(` ✗ ${e}`));
-  } else { console.log(" ✓ hash chain is consistent"); }
-
-  console.log();
-  if (!allErrors.length) { console.log("✓ PASSED"); return true; }
-  console.error(`✗ FAILED (${allErrors.length} error(s))`); return false;
-}
-
-process.exit((await verify(process.argv[2] ?? "example.dbom.json")) ? 0 : 1);</pre></div>
+errors.forEach(e =&gt; console.error(`✗ ${e}`));
+process.exit(errors.length ? 1 : 0);</pre></div>
             </div>
+
+            <p style="color:var(--text-muted);font-size:.875rem;">For production use with full error reporting, see <a href="https://github.com/makoto-project/makoto/tree/main/tools/verify" target="_blank">the GitHub repo →</a></p>
         </div>
     </main>
     <script>
-        function copyBlock(btn) {
-            const pre = btn.closest('.code-block').querySelector('pre');
-            const text = pre.innerHTML.replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
-            navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);});
-        }
+        function copyBlock(btn){const pre=btn.closest('.code-block').querySelector('pre');const text=pre.innerHTML.replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);});}
     </script>
 </body>
 </html>

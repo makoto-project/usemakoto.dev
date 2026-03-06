@@ -7,9 +7,13 @@
     <title>Bash Verifier — Makoto (誠)</title>
     <link rel="stylesheet" href="../assets/styles.css">
     <style>
-        .back-link { display:inline-flex;align-items:center;gap:0.4rem;color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem;text-decoration:none; }
+        .back-link{display:inline-flex;align-items:center;gap:.4rem;color:var(--text-muted);font-size:.875rem;margin-bottom:2rem;text-decoration:none;}
         .back-link:hover{color:var(--primary);}
-        .code-block{background:#0d0d0d;border-radius:12px;overflow:hidden;margin:1.5rem 0;}
+        .lang-badge{display:inline-flex;align-items:center;color:white;font-size:.72rem;font-weight:700;padding:.2rem .65rem;border-radius:4px;letter-spacing:.03em;}
+        .step{display:flex;align-items:baseline;gap:.75rem;margin:1.5rem 0 .5rem;}
+        .step-num{flex-shrink:0;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--primary);color:white;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+        .step-label{font-size:.9rem;font-weight:600;color:#333;}
+        .code-block{background:#0d0d0d;border-radius:12px;overflow:hidden;margin:.5rem 0 1.5rem;}
         .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#1a1a1a;border-bottom:1px solid #2a2a2a;}
         .code-header-left{display:flex;align-items:center;gap:12px;}
         .code-dots{display:flex;gap:6px;}
@@ -17,12 +21,12 @@
         .code-dots span:nth-child(1){background:#ff5f57;}
         .code-dots span:nth-child(2){background:#febc2e;}
         .code-dots span:nth-child(3){background:#28c840;}
-        .code-filename{color:#888;font-size:0.82rem;font-family:var(--font-mono);}
-        .copy-btn{background:none;border:1px solid #444;color:#888;font-size:0.78rem;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .15s;}
+        .code-filename{color:#888;font-size:.82rem;font-family:var(--font-mono);}
+        .copy-btn{background:none;border:1px solid #444;color:#888;font-size:.78rem;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .15s;}
         .copy-btn:hover{border-color:#888;color:#ccc;}
         .copy-btn.copied{border-color:#28c840;color:#28c840;}
-        .code-body pre{margin:0;padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:0.84rem;color:#e8e8e8;overflow-x:auto;line-height:1.6;tab-size:2;}
-        .lang-badge{display:inline-flex;align-items:center;background:var(--primary);color:white;font-size:0.72rem;font-weight:700;padding:0.2rem 0.65rem;border-radius:4px;letter-spacing:.03em;}
+        .code-body pre{margin:0;padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:.84rem;color:#e8e8e8;overflow-x:auto;line-height:1.65;tab-size:2;}
+        .dim{color:#666;}
     </style>
 </head>
 <body>
@@ -58,91 +62,44 @@
     <main class="main-content">
         <div class="section section-wide">
             <a href="./" class="back-link">← Verifying a Document</a>
-            <h1 style="font-size:2.25rem;font-weight:400;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.75rem;">
-                <span class="lang-badge">BASH</span> Bash verifier
+            <h1 style="font-size:2.25rem;font-weight:400;margin-bottom:.25rem;display:flex;align-items:center;gap:.75rem;">
+                <span class="lang-badge" style="background:var(--primary);">BASH</span> Bash verifier
             </h1>
-            <p style="color:var(--text-muted);margin-bottom:2rem;">
-                Uses the <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">jsonschema</code> CLI (Python package) for structural validation and <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">jq</code> for provenance chain walking.
-            </p>
+            <p style="color:var(--text-muted);margin-bottom:2rem;">Requires <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">jq</code> and the <code style="background:#f0f0f0;padding:.1em .4em;border-radius:4px;font-family:var(--font-mono);">jsonschema</code> Python CLI.</p>
 
+            <div class="step"><div class="step-num">1</div><div class="step-label">Install</div></div>
             <div class="code-block">
-                <div class="code-header">
-                    <div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">verify-dbom.sh</span></div>
-                    <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
-                </div>
-                <div class="code-body"><pre>#!/usr/bin/env bash
-# verify-dbom.sh — Usage: ./verify-dbom.sh example.dbom.json
-
-set -euo pipefail
-
-SCHEMA_URL="https://usemakoto.dev/schema/v0.1.json"
-DBOM_FILE="${1:?Usage: $0 &lt;dbom-file&gt;}"
-ERRORS=0
-
-fail() { echo " ✗ $*" &gt;&amp;2; ERRORS=$((ERRORS + 1)); }
-pass() { echo " ✓ $*"; }
-
-echo "Verifying: $DBOM_FILE"
-
-# ── 1. Structural ─────────────────────────────────────────────────────────────
-echo ""
-echo "[1/2] Structural"
-
-if jsonschema --instance "$DBOM_FILE" "$SCHEMA_URL" 2&gt;/tmp/jsonschema-errors; then
-  pass "conforms to schema"
-else
-  fail "schema validation failed:"
-  cat /tmp/jsonschema-errors &gt;&amp;2
-fi
-
-# ── 2. Provenance chain ───────────────────────────────────────────────────────
-echo ""
-echo "[2/2] Provenance"
-
-DOC=$(cat "$DBOM_FILE")
-
-FIRST_INPUT=$(echo "$DOC" | jq -r '.lineage[0].input_hash')
-if [ "$FIRST_INPUT" = "n/a" ]; then
-  pass "step 1 input_hash is n/a"
-else
-  fail "step 1 input_hash should be \"n/a\", got \"$FIRST_INPUT\""
-fi
-
-echo "$DOC" | jq -r '
-  .lineage as $steps |
-  range(1; ($steps | length)) |
-  . as $i |
-  if $steps[$i].input_hash != $steps[$i-1].output_hash then
-    "FAIL step \($steps[$i].step) input_hash does not match step \($steps[$i-1].step) output_hash"
-  else
-    "PASS step \($steps[$i].step) input_hash matches step \($steps[$i-1].step) output_hash"
-  end
-' | while IFS=' ' read -r result rest; do
-  if [ "$result" = "PASS" ]; then pass "$rest"
-  else fail "$rest"; fi
-done
-
-FINAL_OUT=$(echo "$DOC" | jq -r '.lineage[-1].output_hash')
-SOURCE_HASH=$(echo "$DOC" | jq -r '.source.hash.value')
-if [ "$FINAL_OUT" = "$SOURCE_HASH" ]; then
-  pass "final step output_hash matches source.hash.value"
-else
-  fail "final step output_hash does not match source.hash.value"
-fi
-
-# ── Result ────────────────────────────────────────────────────────────────────
-echo ""
-if [ "$ERRORS" -eq 0 ]; then echo "✓ PASSED"; exit 0
-else echo "✗ FAILED ($ERRORS error(s))"; exit 1; fi</pre></div>
+                <div class="code-header"><div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div></div><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+                <div class="code-body"><pre>pip install jsonschema[format-nongpl]</pre></div>
             </div>
+
+            <div class="step"><div class="step-num">2</div><div class="step-label">Structural check — validate against the published schema</div></div>
+            <div class="code-block">
+                <div class="code-header"><div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div></div><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+                <div class="code-body"><pre>jsonschema \
+  --instance my.dbom.json \
+  https://usemakoto.dev/schema/v0.1.json</pre></div>
+            </div>
+
+            <div class="step"><div class="step-num">3</div><div class="step-label">Provenance check — walk the hash chain with <code style="background:#1a1a1a;padding:.1em .35em;border-radius:3px;font-size:.85em;">jq</code></div></div>
+            <div class="code-block">
+                <div class="code-header"><div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div></div><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+                <div class="code-body"><pre>jq -r '
+  .lineage as $s |
+  range(1; ($s|length)) | . as $i |
+  if $s[$i].input_hash != $s[$i-1].output_hash
+  then "BROKEN at step \($s[$i].step)"
+  else empty end,
+  if $s[-1].output_hash != .source.hash.value
+  then "FINAL hash mismatch" else empty end
+' my.dbom.json</pre></div>
+            </div>
+
+            <p style="color:var(--text-muted);font-size:.875rem;">No output = chain is intact. For a complete script that combines both checks and exits <code style="background:#f0f0f0;padding:.1em .35em;border-radius:3px;font-family:var(--font-mono);font-size:.85em;">0</code>/<code style="background:#f0f0f0;padding:.1em .35em;border-radius:3px;font-family:var(--font-mono);font-size:.85em;">1</code>, see <a href="https://github.com/makoto-project/makoto/tree/main/tools/verify" target="_blank">the GitHub repo →</a></p>
         </div>
     </main>
     <script>
-        function copyBlock(btn) {
-            const pre = btn.closest('.code-block').querySelector('pre');
-            const text = pre.innerHTML.replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
-            navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);});
-        }
+        function copyBlock(btn){const pre=btn.closest('.code-block').querySelector('pre');const text=pre.innerHTML.replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);});}
     </script>
 </body>
 </html>
