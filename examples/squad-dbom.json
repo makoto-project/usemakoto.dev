@@ -1,0 +1,132 @@
+{
+  "dbom_version": "0.1.0",
+  "id": "dbom:rajpurkar/squad@1.0.0",
+  "created_at": "2026-03-07T00:00:00Z",
+  "created_by": {
+    "name": "Pranav Rajpurkar",
+    "identity": "https://github.com/rajpurkar.keys",
+    "affiliation": "Stanford University, Department of Computer Science"
+  },
+
+  "source": {
+    "name": "SQuAD: Stanford Question Answering Dataset",
+    "uri": "https://huggingface.co/datasets/rajpurkar/squad",
+    "version": "plain_text",
+    "license": "CC-BY-SA-4.0",
+    "homepage": "https://rajpurkar.github.io/SQuAD-explorer/"
+  },
+
+  "signature": {
+    "algorithm": "sha256",
+    "digest": "sha256:COMPUTE_FROM_plain_text_train_validation_parquet_files",
+    "signed_at": "2026-03-07T00:00:00Z",
+    "signed_by": "https://github.com/rajpurkar.keys",
+    "provenance_gap": true,
+    "note": "No canonical artifact hash has been published by the dataset authors. The HuggingFace-hosted Parquet files would need to be hashed at a specific commit to produce a stable digest."
+  },
+
+  "lineage": [
+    {
+      "step": 1,
+      "description": "English Wikipedia articles (October 2015 snapshot) were filtered to 536 articles covering a range of topics, then converted from raw MediaWiki markup to plain text.",
+      "tool": "Wikipedia Extractor",
+      "tool_version": null,
+      "repository": null,
+      "inputs": [
+        {
+          "name": "English Wikipedia dump",
+          "uri": "https://dumps.wikimedia.org/enwiki/",
+          "snapshot": "2015-10",
+          "digest": "sha256:NOT_PUBLISHED",
+          "provenance_gap": true,
+          "note": "The exact dump date and file used are not documented in the SQuAD paper or dataset card."
+        }
+      ],
+      "operations": [
+        "Selected 536 Wikipedia articles across diverse topics",
+        "Converted MediaWiki markup to plain text, stripping citations, tables, and infoboxes",
+        "Segmented articles into paragraphs for use as reading passages"
+      ],
+      "output_digest": "sha256:NOT_PUBLISHED",
+      "note": "Intermediate passage corpus was never published as a standalone artifact."
+    },
+    {
+      "step": 2,
+      "description": "Crowdworkers on Amazon Mechanical Turk were shown Wikipedia passages and asked to write question-answer pairs where the answer is a contiguous span from the passage.",
+      "tool": "Amazon Mechanical Turk",
+      "tool_version": null,
+      "repository": null,
+      "annotator_count": null,
+      "annotation_methodology": "Crowdworkers read a passage and authored questions whose answers are extractive spans. Each passage was shown to multiple workers to increase coverage. Unanswerability was not a criterion in v1.0 (added in SQuAD 2.0).",
+      "inputs": [
+        {
+          "name": "Passage corpus from step 1",
+          "uri": null,
+          "snapshot": null,
+          "digest": "sha256:NOT_PUBLISHED",
+          "provenance_gap": true
+        }
+      ],
+      "operations": [
+        "Crowdworkers authored question-answer pairs against each passage",
+        "Answers were constrained to be exact character spans from the passage",
+        "Multiple workers annotated each passage independently"
+      ],
+      "output_digest": "sha256:NOT_PUBLISHED",
+      "note": "Raw MTurk annotation output was never published. Annotator count and inter-annotator agreement metrics are not documented in the dataset card.",
+      "provenance_gap": true
+    },
+    {
+      "step": 3,
+      "description": "Annotated question-answer pairs were validated, deduplicated, and formatted into the final SQuAD JSON structure, then converted to Parquet for distribution on HuggingFace.",
+      "tool": "Custom Python scripts",
+      "tool_version": null,
+      "repository": "https://github.com/huggingface/datasets/tree/main/datasets/squad",
+      "inputs": [
+        {
+          "name": "Raw MTurk annotation output",
+          "uri": null,
+          "snapshot": null,
+          "digest": "sha256:NOT_PUBLISHED",
+          "provenance_gap": true
+        }
+      ],
+      "operations": [
+        "Validated that all answer spans are exact substrings of the corresponding passage",
+        "Deduplicated and quality-filtered question-answer pairs",
+        "Serialized to SQuAD JSON format (context, question, answers with answer_start offsets)",
+        "Split into train (87,599 examples) and validation (10,570 examples)",
+        "Converted to Parquet for HuggingFace Hub distribution"
+      ],
+      "output_digest": "sha256:COMPUTE_FROM_plain_text_train_validation_parquet_files",
+      "note": "Processing scripts on GitHub reflect the HuggingFace Datasets repackaging, not the original Stanford processing pipeline."
+    }
+  ],
+
+  "stats": {
+    "train_examples": 87599,
+    "validation_examples": 10570,
+    "source_articles": 536,
+    "download_size_bytes": 16278203,
+    "dataset_size_bytes": 89819092,
+    "language": "en",
+    "task": "extractive-question-answering"
+  },
+
+  "attestations": [],
+
+  "attestation_gaps": [
+    {
+      "type": "bias_audit",
+      "note": "No third-party bias audit has been conducted or signed against a specific dataset version. Known bias: Wikipedia over-represents certain topics, demographics, and writing styles."
+    },
+    {
+      "type": "regulatory_compliance",
+      "note": "No attestation for EU AI Act, CRA, or equivalent regulatory compliance exists for this dataset."
+    },
+    {
+      "type": "quality_certification",
+      "note": "No independent quality certification exists. The paper reports human-level F1 of 86.8 on validation, but this is a model benchmark, not a dataset quality attestation."
+    }
+  ]
+}
