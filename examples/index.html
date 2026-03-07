@@ -512,16 +512,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </section>
 
         <!-- Try It: A Real DBOM -->
-        <section class="section" id="try-it">
-            <h2 style="font-size: 1.8rem; font-weight: 400; margin-bottom: 1rem;">Try It: A Real DBOM</h2>
-            <p style="max-width: 720px; color: var(--text-muted); margin-bottom: 1.5rem;">The fastest way to understand what a DBOM actually looks like is to see one.</p>
-            <div style="background: var(--bg-light); border: 1px solid var(--border); border-radius: 8px; padding: 2rem; max-width: 760px;">
-                <p style="margin-bottom: 1rem;">We generated a DBOM for <a href="https://huggingface.co/datasets/rajpurkar/squad" target="_blank">rajpurkar/squad</a>, one of the most widely used NLP datasets on Hugging Face. SQuAD is a good example because its provenance is publicly documented: the source corpus is English Wikipedia, the annotation was done via Mechanical Turk, and the processing scripts are on GitHub. Three distinct steps, three distinct transformations, each with inputs and outputs that can be hashed.</p>
-                <p style="margin-bottom: 1.5rem;"><a href="../examples/squad-dbom.json" style="color: var(--accent); font-family: var(--font-mono); font-size: 0.9rem;">View the SQuAD DBOM example →</a></p>
-                <p style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.95rem;">A few things worth noting. The intermediate step digests are placeholders — because Rajpurkar never published hashes of the intermediate artifacts, only the final dataset. That gap is visible in the DBOM, which is the point. A DBOM doesn't just document what's there. It surfaces what's missing.</p>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">The <code>attestations</code> array is empty. No third party has certified this dataset for bias, quality, or regulatory compliance. In a world where that field is populated — where a bias audit firm signs a claim against a specific dataset hash, or a regulator attests to CRA or EU AI Act compliance — that signature travels with the data forever.</p>
-            </div>
-            <p style="margin-top: 1.5rem; font-size: 0.95rem;">Want to generate a DBOM for your own dataset? Use <a href="../prompts/dbom-generation-prompt.md" style="color: var(--accent);">this prompt</a> with any LLM. Point it at a Hugging Face dataset card and a paper, and it will produce a DBOM draft along with a list of the provenance gaps it couldn't fill. Those gaps are worth knowing about.</p>
+        <section class="section example-section" id="real-dbom">
+            <h2>
+                <a href="#real-dbom" style="color: inherit; text-decoration: none;" aria-label="Link to this section">A Real DBOM</a>
+            </h2>
+            <div class="subtitle">rajpurkar/squad · Hugging Face</div>
+            <p>The fastest way to understand what a DBOM looks like is to see one applied to a dataset you probably already know.</p>
+            <p>We generated a DBOM for <a href="https://huggingface.co/datasets/rajpurkar/squad" target="_blank">rajpurkar/squad</a> — one of the most widely used NLP benchmarks. SQuAD is a useful example because its provenance is publicly documented: the source corpus is English Wikipedia, annotation was collected via Mechanical Turk, and the processing scripts are on GitHub. Three distinct transformations. Each with inputs and outputs that can be hashed.</p>
+            <p><a href="/examples/squad-dbom.json" style="color: var(--accent); font-family: var(--font-mono); font-size: 0.9rem;">View squad-dbom.json →</a></p>
+            <p>The intermediate step digests are placeholders — Rajpurkar never published hashes for the intermediate artifacts, only the final dataset. That gap is visible in the DBOM. A well-formed DBOM doesn't just document what exists. It surfaces what's missing.</p>
+            <p>The <code>attestations</code> array is empty. No third party has certified this dataset for bias, quality, or regulatory compliance. In a world where that field is populated — where a bias audit firm signs a claim against a specific digest, or a regulator attests to CRA or EU AI Act compliance — that signature travels with the data permanently.</p>
+            <p style="margin-top: 1.5rem;">Want to generate a DBOM for your own dataset? Use <a href="/prompts/dbom-generation-prompt.md" style="color: var(--accent);">this prompt</a> with any LLM. Point it at a Hugging Face dataset card and a paper. It will produce a draft DBOM and a list of the provenance gaps it couldn't fill. Those gaps are signal.</p>
         </section>
 
         <!-- Footer -->
