@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Python Verifier — Makoto (誠)</title>
     <link rel="stylesheet" href="../assets/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <style>
         .back-link{display:inline-flex;align-items:center;gap:.4rem;color:var(--text-muted);font-size:.875rem;margin-bottom:2rem;text-decoration:none;}
         .back-link:hover{color:var(--primary);}
@@ -26,6 +27,10 @@
         .copy-btn:hover{border-color:#888;color:#ccc;}
         .copy-btn.copied{border-color:#28c840;color:#28c840;}
         .code-body pre{margin:0;padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:.84rem;color:#e8e8e8;overflow-x:auto;line-height:1.65;tab-size:4;}
+        /* prism reset */
+        pre[class*="language-"],
+        code[class*="language-"] { background: transparent !important; font-size: .84rem !important; line-height: 1.65 !important; font-family: var(--font-mono) !important; }
+        pre[class*="language-"]   { margin: 0 !important; padding: 1.25rem 1.5rem !important; overflow-x: auto; }
     </style>
 </head>
 <body>
@@ -69,13 +74,13 @@
             <div class="step"><div class="step-num">1</div><div class="step-label">Install</div></div>
             <div class="code-block">
                 <div class="code-header"><div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div></div><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
-                <div class="code-body"><pre>pip install jsonschema[format-nongpl] requests</pre></div>
+                <div class="code-body"><pre class="language-bash"><code class="language-bash">pip install jsonschema[format-nongpl] requests</code></pre></div>
             </div>
 
             <div class="step"><div class="step-num">2</div><div class="step-label">Verify</div></div>
             <div class="code-block">
                 <div class="code-header"><div class="code-header-left"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-filename">verify_dbom.py</span></div><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
-                <div class="code-body"><pre>import json, sys, requests, jsonschema
+                <div class="code-body"><pre class="language-python"><code class="language-python">import json, sys, requests, jsonschema
 
 SCHEMA_URL = "https://usemakoto.dev/schema/v0.1.json"
 
@@ -97,7 +102,7 @@ if steps[-1]["output_hash"] != dbom["source"]["hash"]["value"]:
     errors.append("final output_hash does not match source.hash.value")
 
 for e in errors: print(f"✗ {e}")
-sys.exit(1 if errors else 0)</pre></div>
+sys.exit(1 if errors else 0)</code></pre></div>
             </div>
 
             <p style="color:var(--text-muted);font-size:.875rem;">For production use with full error reporting, see <a href="https://github.com/makoto-project/makoto/tree/main/tools/verify" target="_blank">the GitHub repo →</a></p>
@@ -106,5 +111,7 @@ sys.exit(1 if errors else 0)</pre></div>
     <script>
         function copyBlock(btn){const pre=btn.closest('.code-block').querySelector('pre');const text=pre.innerHTML.replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);});}
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 </body>
 </html>

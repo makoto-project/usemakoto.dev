@@ -6,17 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifying a DBOM Document - Makoto (誠)</title>
     <link rel="stylesheet" href="../assets/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <style>
-        /* ── flow tabs ─────────────────────────────────────── */
-        .flow-tabs { display:flex; gap:0.5rem; margin-bottom:1.25rem; flex-wrap:wrap; }
-        .flow-tab {
-            padding:0.45rem 1rem; border-radius:8px; border:1.5px solid #e0e0e0;
-            background:white; font-size:0.875rem; cursor:pointer;
-            font-family:var(--font-mono); transition:all 0.15s; color:#444;
-        }
+        /* prism reset — use our container bg */
+        pre[class*="language-"],
+        code[class*="language-"] { background: transparent !important; font-size: .82rem !important; line-height: 1.65 !important; font-family: var(--font-mono) !important; }
+        pre[class*="language-"]   { margin: 0 !important; padding: 1.25rem 1.5rem !important; overflow-x: auto; }
+
+        /* flow tabs */
+        .flow-tabs { display:flex; gap:.5rem; margin-bottom:1.25rem; flex-wrap:wrap; }
+        .flow-tab { padding:.45rem 1rem; border-radius:8px; border:1.5px solid #e0e0e0; background:white; font-size:.875rem; cursor:pointer; font-family:var(--font-mono); transition:all .15s; color:#444; }
         .flow-tab:hover { border-color:var(--primary); color:var(--primary); }
         .flow-tab.active { border-color:var(--primary); background:var(--primary); color:white; }
-        .flow-tab.tab-pass.active  { background:#1a7f37; border-color:#1a7f37; }
+        .flow-tab.tab-pass.active   { background:#1a7f37; border-color:#1a7f37; }
         .flow-tab.tab-struct.active { background:#cf222e; border-color:#cf222e; }
         .flow-tab.tab-prov.active   { background:#9a6700; border-color:#9a6700; }
 
@@ -24,95 +26,76 @@
         .flow-panel.active { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
         @media(max-width:860px){ .flow-panel.active{ grid-template-columns:1fr; } }
 
-        /* ── flow cards ─────────────────────────────────────── */
-        .flow-card { border:1px solid #e4e4e4; border-radius:12px; overflow:hidden; }
-        .flow-card-header {
-            display:flex; align-items:center; justify-content:space-between;
-            padding:0.65rem 1rem; background:#f6f8fa; border-bottom:1px solid #e4e4e4;
-            font-size:0.82rem; font-family:var(--font-mono); color:#555; font-weight:600;
-        }
-        .badge { font-size:0.7rem; font-weight:700; padding:0.15rem 0.55rem; border-radius:4px; }
-        .badge-input        { background:#e8f0fe; color:#1a56db; }
-        .badge-pass         { background:#e6f4ea; color:#1a7f37; }
-        .badge-fail         { background:#ffeef0; color:#cf222e; }
-        .badge-warn         { background:#fff8c5; color:#9a6700; }
-        .flow-card-body {
-            padding:1rem 1.1rem; font-family:var(--font-mono); font-size:0.8rem;
-            line-height:1.7; background:#0d0d0d; color:#e8e8e8; min-height:180px; overflow-x:auto;
-        }
+        /* flow cards */
+        .flow-card { border:1px solid #e4e4e4; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+        .flow-card-header { display:flex; align-items:center; justify-content:space-between; padding:.65rem 1rem; background:#f6f8fa; border-bottom:1px solid #e4e4e4; font-size:.82rem; font-family:var(--font-mono); color:#555; font-weight:600; gap:.5rem; flex-wrap:wrap; }
+        .badge { font-size:.7rem; font-weight:700; padding:.15rem .55rem; border-radius:4px; white-space:nowrap; }
+        .badge-input  { background:#e8f0fe; color:#1a56db; }
+        .badge-pass   { background:#e6f4ea; color:#1a7f37; }
+        .badge-fail   { background:#ffeef0; color:#cf222e; }
+        .badge-warn   { background:#fff8c5; color:#9a6700; }
+        .flow-card-body { background:#0d0d0d; flex:1; overflow-x:auto; }
+        /* terminal output side — manual coloring */
+        .flow-card-body.terminal { padding:1.1rem 1.25rem; font-family:var(--font-mono); font-size:.8rem; line-height:1.7; color:#e8e8e8; }
+        .flow-card-body.terminal pre { margin:0; }
         .out-pass   { color:#3fb950; }
         .out-fail   { color:#f85149; }
         .out-section{ color:#79c0ff; font-weight:600; }
         .out-dim    { color:#888; }
         .out-bold   { font-weight:700; }
+        /* error callout for invalid JSON cards */
+        .error-callout { background:#1a0000; border-top:1px solid #3a0000; padding:.7rem 1.1rem; font-family:var(--font-mono); font-size:.78rem; color:#f85149; line-height:1.6; }
+        .error-callout-label { color:#888; font-size:.7rem; text-transform:uppercase; letter-spacing:.07em; margin-bottom:.35rem; }
 
-        /* ── layers ─────────────────────────────────────────── */
+        /* copy button inside flow card */
+        .flow-card-header .copy-btn { background:none; border:1px solid #bbb; color:#777; font-size:.72rem; padding:2px 9px; border-radius:5px; cursor:pointer; transition:all .15s; font-family:var(--font-sans, sans-serif); }
+        .flow-card-header .copy-btn:hover { border-color:#555; color:#333; }
+        .flow-card-header .copy-btn.copied { border-color:#1a7f37; color:#1a7f37; }
+
+        /* layers */
         .layers { display:flex; gap:0; margin:2rem 0; border:1px solid #e4e4e4; border-radius:12px; overflow:hidden; }
         .layer { flex:1; padding:1.25rem 1.5rem; border-right:1px solid #e4e4e4; position:relative; }
         .layer:last-child { border-right:none; }
-        .layer-num { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); margin-bottom:0.5rem; }
-        .layer h3 { font-size:1rem; font-weight:600; margin-bottom:0.4rem; }
-        .layer p { font-size:0.875rem; color:var(--text-muted); margin:0; }
+        .layer-num { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); margin-bottom:.5rem; }
+        .layer h3 { font-size:1rem; font-weight:600; margin-bottom:.4rem; }
+        .layer p { font-size:.875rem; color:var(--text-muted); margin:0; }
         .layer.stub { background:#fafafa; }
         .layer.stub h3 { color:var(--text-muted); }
-        .layer-badge { display:inline-block; font-size:0.7rem; font-weight:700; padding:.15rem .55rem; border-radius:4px; margin-bottom:0.5rem; }
+        .layer-badge { display:inline-block; font-size:.7rem; font-weight:700; padding:.15rem .55rem; border-radius:4px; margin-bottom:.5rem; }
         .badge-ready { background:#e6f4ea; color:#1a7f37; }
         .badge-stub  { background:#f0f0f0; color:#888; }
-        .layer-arrow { position:absolute; right:-14px; top:50%; transform:translateY(-50%); width:28px; height:28px; background:white; border:1px solid #e4e4e4; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; color:var(--text-muted); z-index:1; }
+        .layer-arrow { position:absolute; right:-14px; top:50%; transform:translateY(-50%); width:28px; height:28px; background:white; border:1px solid #e4e4e4; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.8rem; color:var(--text-muted); z-index:1; }
 
-        /* ── provenance rules ────────────────────────────────── */
-        .rules-grid { display:grid; grid-template-columns:2rem 1fr; gap:0.1rem 0.75rem; font-size:0.9rem; margin:1rem 0; }
-        .rules-icon { padding-top:0.1rem; font-size:1rem; }
+        /* rules */
+        .rules-grid { display:grid; grid-template-columns:2rem 1fr; gap:.1rem .75rem; font-size:.9rem; margin:1rem 0; }
+        .rules-icon { padding-top:.1rem; }
 
-        /* ── tool cards ─────────────────────────────────────── */
+        /* tool cards */
         .tool-cards { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1.5rem 0; }
         @media(max-width:780px){ .tool-cards{ grid-template-columns:1fr; } }
-
-        .tool-card {
-            border:1px solid #e4e4e4; border-radius:12px; overflow:hidden;
-            display:flex; flex-direction:column;
-        }
-        .tool-card-head {
-            display:flex; align-items:center; justify-content:space-between;
-            padding:0.75rem 1rem; background:#f6f8fa; border-bottom:1px solid #e4e4e4;
-        }
-        .tool-card-head-left { display:flex; align-items:center; gap:0.6rem; }
-        .lang-badge {
-            display:inline-flex; align-items:center; color:white; font-size:0.7rem;
-            font-weight:700; padding:0.2rem 0.6rem; border-radius:4px; letter-spacing:.03em;
-        }
-        .tool-card-title { font-size:0.9rem; font-weight:600; color:#333; }
-        .full-code-link {
-            font-size:0.78rem; color:var(--primary); text-decoration:none;
-            display:inline-flex; align-items:center; gap:0.25rem; white-space:nowrap;
-        }
+        .tool-card { border:1px solid #e4e4e4; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+        .tool-card-head { display:flex; align-items:center; justify-content:space-between; padding:.75rem 1rem; background:#f6f8fa; border-bottom:1px solid #e4e4e4; }
+        .tool-card-head-left { display:flex; align-items:center; gap:.6rem; }
+        .lang-badge { display:inline-flex; align-items:center; color:white; font-size:.7rem; font-weight:700; padding:.2rem .6rem; border-radius:4px; letter-spacing:.03em; }
+        .tool-card-title { font-size:.9rem; font-weight:600; color:#333; }
+        .full-code-link { font-size:.78rem; color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:.25rem; white-space:nowrap; }
         .full-code-link:hover { text-decoration:underline; }
-        .tool-card-body {
-            background:#0d0d0d; padding:0.9rem 1.1rem; flex:1;
-        }
-        .tool-card-body pre {
-            margin:0; font-family:var(--font-mono); font-size:0.82rem;
-            color:#e8e8e8; line-height:1.65; overflow-x:auto;
-        }
-        .cmd-comment { color:#666; }
-        .cmd-line    { color:#e8e8e8; }
-        .cmd-out     { color:#3fb950; }
+        .tool-card-body { background:#0d0d0d; flex:1; }
 
-        /* ── toc ─────────────────────────────────────────────── */
+        /* toc */
         .toc { background:#f9f9fb; border:1px solid #eee; border-radius:10px; padding:1.25rem 1.5rem; margin-bottom:2.5rem; }
-        .toc h2 { font-size:0.9rem; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin-bottom:.75rem; }
+        .toc h2 { font-size:.9rem; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin-bottom:.75rem; }
         .toc ul { margin:0; padding-left:1.2rem; list-style:disc; }
-        .toc li { margin:0.3rem 0; font-size:0.9rem; }
+        .toc li { margin:.3rem 0; font-size:.9rem; }
         .toc a { color:var(--primary); }
 
-        .section-heading { font-size:1.5rem; font-weight:400; margin:2.5rem 0 0.75rem; scroll-margin-top:2rem; }
+        .section-heading { font-size:1.5rem; font-weight:400; margin:2.5rem 0 .75rem; scroll-margin-top:2rem; }
+        code.ic { background:#f0f0f0; padding:.1em .4em; border-radius:4px; font-family:var(--font-mono); font-size:.85em; }
     </style>
 </head>
 <body>
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-
     <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
-
     <aside class="sidebar">
         <div class="sidebar-header">
             <a href="/" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span>Makoto</a>
@@ -122,14 +105,12 @@
         </div>
         <nav class="sidebar-nav">
             <a href="../" class="nav-item">Home</a>
-
             <div class="nav-section">Specification</div>
             <a href="../spec/" class="nav-item">Makoto v0.1</a>
             <a href="../levels/" class="nav-item">Understanding Levels</a>
             <a href="../spec/signature-guide.html" class="nav-item">Signature Guide</a>
             <a href="../comparison/" class="nav-item">SLSA Comparison</a>
             <a href="../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
-
             <div class="nav-section">Resources</div>
             <a href="../examples/" class="nav-item">Examples</a>
             <a href="../demos/" class="nav-item">Demos</a>
@@ -141,7 +122,6 @@
             <a href="#run-it" class="nav-item nav-item-sub">Run it</a>
             <a href="../privacy/" class="nav-item">Privacy Techniques</a>
             <a href="../threats/" class="nav-item">Threat Model</a>
-
             <div class="nav-section">Implementations</div>
             <a href="../expanso/" class="nav-item">Expanso Integration</a>
         </nav>
@@ -150,7 +130,7 @@
     <main class="main-content">
         <div class="section section-wide">
 
-            <h1 style="font-size:2.5rem;font-weight:400;margin-bottom:0.5rem;">Verifying a DBOM Document</h1>
+            <h1 style="font-size:2.5rem;font-weight:400;margin-bottom:.5rem;">Verifying a DBOM Document</h1>
             <p class="lead" style="color:var(--text-muted);font-size:1.1rem;margin-bottom:2rem;">
                 Pick a sample document, watch it pass or fail, then run the same check in your own stack.
             </p>
@@ -164,38 +144,66 @@
                 </ul>
             </div>
 
-            <!-- ─── SAMPLES ──────────────────────────────────────── -->
+            <!-- ─── SAMPLES ─────────────────────────────────────────── -->
             <h2 class="section-heading" id="samples">Sample documents</h2>
             <p style="color:var(--text-muted);margin-bottom:1.25rem;">Three files to try immediately. Select one to see the document and its expected output.</p>
 
             <div class="flow-tabs">
-                <button class="flow-tab tab-pass active" onclick="showFlow('pass', this)">valid.dbom.json ✓</button>
-                <button class="flow-tab tab-struct"      onclick="showFlow('struct', this)">invalid-structural.dbom.json ✗</button>
-                <button class="flow-tab tab-prov"        onclick="showFlow('prov', this)">invalid-provenance.dbom.json ✗</button>
+                <button class="flow-tab tab-pass active" onclick="showFlow('pass',this)">valid.dbom.json ✓</button>
+                <button class="flow-tab tab-struct"      onclick="showFlow('struct',this)">invalid-structural.dbom.json ✗</button>
+                <button class="flow-tab tab-prov"        onclick="showFlow('prov',this)">invalid-provenance.dbom.json ✗</button>
             </div>
 
-            <!-- PASS -->
+            <!-- VALID -->
             <div class="flow-panel active" id="flow-pass">
                 <div class="flow-card">
-                    <div class="flow-card-header">valid.dbom.json <span class="badge badge-input">input</span></div>
-                    <div class="flow-card-body"><pre>{
+                    <div class="flow-card-header">
+                        valid.dbom.json
+                        <div style="display:flex;gap:.5rem;align-items:center;">
+                            <span class="badge badge-input">input</span>
+                            <button class="copy-btn" onclick="copyCard(this)">Copy</button>
+                        </div>
+                    </div>
+                    <div class="flow-card-body">
+<pre class="language-json"><code class="language-json">{
   "schema_version": "0.1",
-  "id": "dbom-a1b2c3d4-...",
+  "id": "dbom-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "created_at": "2024-06-01T12:00:00Z",
   "source": {
+    "uri": "s3://acme-data/exports/transactions-2024-06.parquet",
     "hash": {
       "algorithm": "sha256",
-      "value": "3b4c5d6e..."          <span class="out-dim">← matches final step</span>
-    }
+      "value": "3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c"
+    },
+    "format": "parquet"
+  },
+  "signature": {
+    "algorithm": "sha256",
+    "value": "4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
+    "signer": "github:acme-data-platform"
   },
   "lineage": [
-    { "step": 1, "input_hash": "n/a",        "output_hash": "1a2b3c4d..." },
-    { "step": 2, "input_hash": "1a2b3c4d...", "output_hash": "3b4c5d6e..." }
+    {
+      "step": 1,
+      "description": "Raw export from payments database",
+      "tool": "acme-exporter/1.4.2",
+      "input_hash": "n/a",
+      "output_hash": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b"
+    },
+    {
+      "step": 2,
+      "description": "PII redaction",
+      "tool": "presidio/2.2.354",
+      "input_hash": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+      "output_hash": "3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c"
+    }
   ]
-}</pre></div>
+}</code></pre>
+                    </div>
                 </div>
                 <div class="flow-card">
                     <div class="flow-card-header">terminal output <span class="badge badge-pass">✓ PASSED</span></div>
-                    <div class="flow-card-body"><pre><span class="out-dim">Verifying: valid.dbom.json</span>
+                    <div class="flow-card-body terminal"><pre><span class="out-dim">Verifying: valid.dbom.json</span>
 
 <span class="out-section">[1/2] Structural</span>
   <span class="out-pass">✓ conforms to schema</span>
@@ -212,23 +220,51 @@
             <!-- STRUCTURAL FAIL -->
             <div class="flow-panel" id="flow-struct">
                 <div class="flow-card">
-                    <div class="flow-card-header">invalid-structural.dbom.json <span class="badge badge-input">input</span></div>
-                    <div class="flow-card-body"><pre>{
-  <span class="out-fail">"schema_version": "0.2",</span>       <span class="out-dim">← should be "0.1"</span>
+                    <div class="flow-card-header">
+                        invalid-structural.dbom.json
+                        <div style="display:flex;gap:.5rem;align-items:center;">
+                            <span class="badge badge-input">input</span>
+                            <button class="copy-btn" onclick="copyCard(this)">Copy</button>
+                        </div>
+                    </div>
+                    <div class="flow-card-body">
+<pre class="language-json"><code class="language-json">{
+  "schema_version": "0.2",
+  "id": "dbom-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "created_at": "2024-06-01T12:00:00Z",
   "source": {
+    "uri": "s3://acme-data/exports/transactions-2024-06.parquet",
     "hash": {
-      <span class="out-fail">"algorithm": "md5",</span>            <span class="out-dim">← not in ['sha256']</span>
-      "value": "3b4c5d6e..."
-    }
+      "algorithm": "md5",
+      "value": "3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c"
+    },
+    "format": "parquet"
+  },
+  "signature": {
+    "algorithm": "sha256",
+    "value": "4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
+    "signer": "github:acme-data-platform"
   },
   "lineage": [
-    { "step": 1, "input_hash": "n/a", "output_hash": "3b4c5d6e..." }
+    {
+      "step": 1,
+      "description": "Raw export from payments database",
+      "tool": "acme-exporter/1.4.2",
+      "input_hash": "n/a",
+      "output_hash": "3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c"
+    }
   ]
-}</pre></div>
+}</code></pre>
+                    </div>
+                    <div class="error-callout">
+                        <div class="error-callout-label">deliberate errors</div>
+                        ✗ schema_version "0.2" — must be "0.1"<br>
+                        ✗ source.hash.algorithm "md5" — only "sha256" is allowed
+                    </div>
                 </div>
                 <div class="flow-card">
                     <div class="flow-card-header">terminal output <span class="badge badge-fail">✗ FAILED</span></div>
-                    <div class="flow-card-body"><pre><span class="out-dim">Verifying: invalid-structural.dbom.json</span>
+                    <div class="flow-card-body terminal"><pre><span class="out-dim">Verifying: invalid-structural.dbom.json</span>
 
 <span class="out-section">[1/2] Structural</span>
   <span class="out-fail">✗ [root] Expected '0.1'</span>
@@ -244,22 +280,58 @@
             <!-- PROVENANCE FAIL -->
             <div class="flow-panel" id="flow-prov">
                 <div class="flow-card">
-                    <div class="flow-card-header">invalid-provenance.dbom.json <span class="badge badge-input">input</span></div>
-                    <div class="flow-card-body"><pre>{
-  "schema_version": "0.1",         <span class="out-pass out-dim">← valid</span>
+                    <div class="flow-card-header">
+                        invalid-provenance.dbom.json
+                        <div style="display:flex;gap:.5rem;align-items:center;">
+                            <span class="badge badge-input">input</span>
+                            <button class="copy-btn" onclick="copyCard(this)">Copy</button>
+                        </div>
+                    </div>
+                    <div class="flow-card-body">
+<pre class="language-json"><code class="language-json">{
+  "schema_version": "0.1",
+  "id": "dbom-a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "created_at": "2024-06-01T12:00:00Z",
   "source": {
-    "hash": { "value": "3b4c5d6e..." }   <span class="out-dim">← expected final hash</span>
+    "uri": "s3://acme-data/exports/transactions-2024-06.parquet",
+    "hash": {
+      "algorithm": "sha256",
+      "value": "3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c"
+    },
+    "format": "parquet"
+  },
+  "signature": {
+    "algorithm": "sha256",
+    "value": "4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
+    "signer": "github:acme-data-platform"
   },
   "lineage": [
-    { "step": 1, "input_hash": "n/a",             "output_hash": "1a2b3c4d..." },
-    { "step": 2, <span class="out-fail">"input_hash": "aaaaaaaa...",</span>  <span class="out-dim">← should be 1a2b3c4d</span>
-                 <span class="out-fail">"output_hash": "bbbbbbbb..."</span>  <span class="out-dim">← should be 3b4c5d6e</span> }
+    {
+      "step": 1,
+      "description": "Raw export from payments database",
+      "tool": "acme-exporter/1.4.2",
+      "input_hash": "n/a",
+      "output_hash": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b"
+    },
+    {
+      "step": 2,
+      "description": "PII redaction",
+      "tool": "presidio/2.2.354",
+      "input_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "output_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
   ]
-}</pre></div>
+}</code></pre>
+                    </div>
+                    <div class="error-callout">
+                        <div class="error-callout-label">deliberate errors</div>
+                        ✗ step 2 input_hash (aaa…) ≠ step 1 output_hash (1a2b…)<br>
+                        ✗ final output_hash (bbb…) ≠ source.hash.value (3b4c…)
+                    </div>
                 </div>
                 <div class="flow-card">
                     <div class="flow-card-header">terminal output <span class="badge badge-warn">✗ FAILED</span></div>
-                    <div class="flow-card-body"><pre><span class="out-dim">Verifying: invalid-provenance.dbom.json</span>
+                    <div class="flow-card-body terminal"><pre><span class="out-dim">Verifying: invalid-provenance.dbom.json</span>
 
 <span class="out-section">[1/2] Structural</span>
   <span class="out-pass">✓ conforms to schema</span>
@@ -272,7 +344,7 @@
                 </div>
             </div>
 
-            <!-- ─── HOW IT WORKS ────────────────────────────────── -->
+            <!-- ─── HOW IT WORKS ─────────────────────────────────────── -->
             <h2 class="section-heading" id="how-it-works">How verification works</h2>
             <p style="color:var(--text-muted);margin-bottom:1.5rem;">Three layers, always run in order. Failing layer 1 doesn't skip layer 2 — you get all errors at once.</p>
 
@@ -281,43 +353,38 @@
                     <div class="layer-num">Layer 1</div>
                     <span class="layer-badge badge-ready">Available</span>
                     <h3>Structural</h3>
-                    <p>Fetch the schema from <code style="background:#f0f0f0;padding:.1em .35em;border-radius:3px;font-family:var(--font-mono);font-size:.82em;">usemakoto.dev/schema/v0.1.json</code> and validate against it. Catches wrong types, unsupported enum values, and missing fields.</p>
+                    <p>Fetch the schema from <code class="ic">usemakoto.dev/schema/v0.1.json</code> and validate against it. Catches wrong types, unsupported enum values, and missing fields.</p>
                     <div class="layer-arrow">→</div>
                 </div>
                 <div class="layer">
                     <div class="layer-num">Layer 2</div>
                     <span class="layer-badge badge-ready">Available</span>
                     <h3>Provenance</h3>
-                    <p>Walk the <code style="background:#f0f0f0;padding:.1em .35em;border-radius:3px;font-family:var(--font-mono);font-size:.82em;">lineage</code> array and verify each step's <code style="background:#f0f0f0;padding:.1em .35em;border-radius:3px;font-family:var(--font-mono);font-size:.82em;">input_hash</code> chains to the previous step's <code style="background:#f0f0f0;padding:.1em .35em;border-radius:3px;font-family:var(--font-mono);font-size:.82em;">output_hash</code>. Final hash must match <code style="background:#f0f0f0;padding:.1em .35em;border-radius:3px;font-family:var(--font-mono);font-size:.82em;">source.hash.value</code>.</p>
+                    <p>Walk the <code class="ic">lineage</code> array and verify each step's <code class="ic">input_hash</code> chains to the previous <code class="ic">output_hash</code>. Final hash must match <code class="ic">source.hash.value</code>.</p>
                     <div class="layer-arrow">→</div>
                 </div>
                 <div class="layer stub">
                     <div class="layer-num">Layer 3</div>
                     <span class="layer-badge badge-stub">Coming soon</span>
                     <h3>Cryptographic</h3>
-                    <p>Verify <code style="background:#f0f0f0;padding:.1em .35em;border-radius:3px;font-family:var(--font-mono);font-size:.82em;">signature.value</code> against the public key resolved from <code style="background:#f0f0f0;padding:.1em .35em;border-radius:3px;font-family:var(--font-mono);font-size:.82em;">signature.signer</code>. Signing spec not yet published.</p>
+                    <p>Verify <code class="ic">signature.value</code> against the public key resolved from <code class="ic">signature.signer</code>. Signing spec not yet published.</p>
                 </div>
             </div>
 
-            <div style="background:#f9f9fb;border:1px solid #eee;border-radius:8px;padding:0.9rem 1.1rem;margin-bottom:0.5rem;">
-                <strong style="font-size:0.85rem;">Provenance rules</strong>
-                <div class="rules-grid" style="margin-top:0.6rem;">
-                    <div class="rules-icon">①</div>
-                    <div><code style="font-family:var(--font-mono);font-size:0.83em;">lineage[0].input_hash</code> must be <code style="font-family:var(--font-mono);font-size:0.83em;">"n/a"</code></div>
-                    <div class="rules-icon">②</div>
-                    <div>Each step's <code style="font-family:var(--font-mono);font-size:0.83em;">input_hash</code> must equal the previous step's <code style="font-family:var(--font-mono);font-size:0.83em;">output_hash</code></div>
-                    <div class="rules-icon">③</div>
-                    <div>The final step's <code style="font-family:var(--font-mono);font-size:0.83em;">output_hash</code> must equal <code style="font-family:var(--font-mono);font-size:0.83em;">source.hash.value</code></div>
+            <div style="background:#f9f9fb;border:1px solid #eee;border-radius:8px;padding:.9rem 1.1rem;">
+                <strong style="font-size:.85rem;">Provenance rules</strong>
+                <div class="rules-grid" style="margin-top:.6rem;">
+                    <div class="rules-icon">①</div><div><code class="ic">lineage[0].input_hash</code> must be <code class="ic">"n/a"</code></div>
+                    <div class="rules-icon">②</div><div>Each step's <code class="ic">input_hash</code> must equal the previous step's <code class="ic">output_hash</code></div>
+                    <div class="rules-icon">③</div><div>The final step's <code class="ic">output_hash</code> must equal <code class="ic">source.hash.value</code></div>
                 </div>
             </div>
 
-            <!-- ─── RUN IT ──────────────────────────────────────── -->
+            <!-- ─── RUN IT ────────────────────────────────────────────── -->
             <h2 class="section-heading" id="run-it">Run it</h2>
             <p style="color:var(--text-muted);margin-bottom:1.5rem;">Install, download the script, run it. Full source on each language page.</p>
 
             <div class="tool-cards">
-
-                <!-- BASH -->
                 <div class="tool-card">
                     <div class="tool-card-head">
                         <div class="tool-card-head-left">
@@ -326,15 +393,13 @@
                         </div>
                         <a href="bash.html" class="full-code-link">Full script →</a>
                     </div>
-                    <div class="tool-card-body"><pre><span class="cmd-comment"># install</span>
-<span class="cmd-line">pip install jsonschema[format-nongpl]</span>
-
-<span class="cmd-comment"># run</span>
-<span class="cmd-line">./verify-dbom.sh valid.dbom.json</span>
-<span class="cmd-out">✓ PASSED</span></pre></div>
+                    <div class="tool-card-body">
+<pre class="language-bash"><code class="language-bash">pip install jsonschema[format-nongpl]
+./verify-dbom.sh valid.dbom.json
+# ✓ PASSED</code></pre>
+                    </div>
                 </div>
 
-                <!-- PYTHON -->
                 <div class="tool-card">
                     <div class="tool-card-head">
                         <div class="tool-card-head-left">
@@ -343,15 +408,13 @@
                         </div>
                         <a href="python.html" class="full-code-link">Full script →</a>
                     </div>
-                    <div class="tool-card-body"><pre><span class="cmd-comment"># install</span>
-<span class="cmd-line">pip install jsonschema[format-nongpl] requests</span>
-
-<span class="cmd-comment"># run</span>
-<span class="cmd-line">python verify_dbom.py valid.dbom.json</span>
-<span class="cmd-out">✓ PASSED</span></pre></div>
+                    <div class="tool-card-body">
+<pre class="language-bash"><code class="language-bash">pip install jsonschema[format-nongpl] requests
+python verify_dbom.py valid.dbom.json
+# ✓ PASSED</code></pre>
+                    </div>
                 </div>
 
-                <!-- NODE -->
                 <div class="tool-card">
                     <div class="tool-card-head">
                         <div class="tool-card-head-left">
@@ -360,15 +423,13 @@
                         </div>
                         <a href="nodejs.html" class="full-code-link">Full script →</a>
                     </div>
-                    <div class="tool-card-body"><pre><span class="cmd-comment"># install</span>
-<span class="cmd-line">npm install ajv ajv-formats</span>
-
-<span class="cmd-comment"># run</span>
-<span class="cmd-line">node verify-dbom.mjs valid.dbom.json</span>
-<span class="cmd-out">✓ PASSED</span></pre></div>
+                    <div class="tool-card-body">
+<pre class="language-bash"><code class="language-bash">npm install ajv ajv-formats
+node verify-dbom.mjs valid.dbom.json
+# ✓ PASSED</code></pre>
+                    </div>
                 </div>
 
-                <!-- GO -->
                 <div class="tool-card">
                     <div class="tool-card-head">
                         <div class="tool-card-head-left">
@@ -377,29 +438,39 @@
                         </div>
                         <a href="go.html" class="full-code-link">Full script →</a>
                     </div>
-                    <div class="tool-card-body"><pre><span class="cmd-comment"># install</span>
-<span class="cmd-line">go get github.com/xeipuuv/gojsonschema</span>
-
-<span class="cmd-comment"># run</span>
-<span class="cmd-line">go run verify_dbom.go valid.dbom.json</span>
-<span class="cmd-out">✓ PASSED</span></pre></div>
+                    <div class="tool-card-body">
+<pre class="language-bash"><code class="language-bash">go get github.com/xeipuuv/gojsonschema
+go run verify_dbom.go valid.dbom.json
+# ✓ PASSED</code></pre>
+                    </div>
                 </div>
+            </div>
 
-            </div><!-- /tool-cards -->
-
-            <p style="color:var(--text-muted);font-size:0.875rem;margin-top:0.5rem;">
-                All implementations exit <code style="background:#f0f0f0;padding:.1em .35em;border-radius:3px;font-family:var(--font-mono);font-size:.85em;">0</code> on pass, <code style="background:#f0f0f0;padding:.1em .35em;border-radius:3px;font-family:var(--font-mono);font-size:.85em;">1</code> on any failure — safe to use in CI.
+            <p style="color:var(--text-muted);font-size:.875rem;margin-top:.5rem;">
+                All implementations exit <code class="ic">0</code> on pass, <code class="ic">1</code> on any failure — safe to use in CI.
             </p>
 
-        </div><!-- /section -->
+        </div>
     </main>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <script>
         function showFlow(id, btn) {
             document.querySelectorAll('.flow-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.flow-tab').forEach(t => t.classList.remove('active'));
             document.getElementById('flow-' + id).classList.add('active');
             btn.classList.add('active');
+        }
+
+        function copyCard(btn) {
+            const code = btn.closest('.flow-card').querySelector('code');
+            const text = code ? code.textContent : '';
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+            });
         }
     </script>
 </body>
