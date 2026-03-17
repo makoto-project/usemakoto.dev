@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invisible Unicode Guardrails - Makoto (誠)</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <style>
+        .hero { background: linear-gradient(135deg, #09090b 0%, #18181b 50%, #312e81 100%); color: white; padding: 4rem 3rem; }
+        .hero h1 { font-size: 2.5rem; font-weight: 400; color: var(--accent); margin-bottom: 0.75rem; }
+        .hero p { color: rgba(255,255,255,0.8); font-size: 1.1rem; max-width: 650px; }
+        .hero .subtitle { color: rgba(255,255,255,0.5); font-family: var(--font-mono); font-size: 0.85rem; margin-bottom: 1rem; }
+
+        /* comparison cards */
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 2rem 0; }
+        .compare-card { border-radius: 8px; padding: 1.25rem; }
+        .compare-card.safe { border: 1px solid var(--border); background: var(--bg-white); }
+        .compare-card.flagged { border: 1px solid #fca5a5; background: #fef2f2; }
+        .compare-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+        .compare-badge.pass { background: #dcfce7; color: #16a34a; }
+        .compare-badge.fail { background: #fee2e2; color: #dc2626; }
+
+        /* three panes */
+        .pane-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0 2rem; align-items: stretch; }
+        .pane-col { display: flex; flex-direction: column; min-width: 0; }
+        .pane-label { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light); margin-bottom: 0.5rem; }
+        .pane-box { background: #0d0d0d; border-radius: 12px; overflow: hidden; flex: 1; display: flex; flex-direction: column; }
+        .pane-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #1a1a1a; border-bottom: 1px solid #333; }
+        .pane-header-left { display: flex; align-items: center; gap: 10px; }
+        .pane-dots { display: flex; gap: 5px; }
+        .pane-dots span { width: 10px; height: 10px; border-radius: 50%; }
+        .pane-dots span:nth-child(1) { background: #ff5f57; }
+        .pane-dots span:nth-child(2) { background: #febc2e; }
+        .pane-dots span:nth-child(3) { background: #28c840; }
+        .pane-title { font-size: 0.75rem; color: #888; font-family: var(--font-mono); }
+        .pane-body { padding: 16px; flex: 1; overflow-x: auto; }
+        .pane-body pre { margin: 0; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.55; color: #e2e8f0; white-space: pre; }
+        .fail-badge { background: #dc2626; color: white; padding: 2px 7px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; }
+
+        /* highlighted invisible chars */
+        .vs-mark { color: #f97316; background: rgba(249,115,22,0.15); padding: 0 2px; border-radius: 2px; }
+
+        /* json colors */
+        .jk { color: #89b4fa; }
+        .js { color: #a6e3a1; }
+        .jn { color: #fab387; }
+        .jb { color: #89b4fa; }
+        .jf { color: #f87171; }
+
+        /* field table */
+        .ledger { background: var(--bg-light); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 1rem 0; }
+        .ledger-row { display: grid; grid-template-columns: 200px 1fr; gap: 12px; font-size: 0.85rem; padding: 4px 0; }
+        .ledger-row code { font-family: var(--font-mono); color: var(--primary); background: #f3e8ff; padding: 2px 6px; border-radius: 4px; }
+        .ledger-row span { color: var(--text-muted); }
+
+        /* artifact pair */
+        .artifact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+        .artifact-grid .pane-col { min-height: 0; }
+
+        @media (max-width: 900px) {
+            .pane-grid { grid-template-columns: 1fr; }
+            .compare-grid { grid-template-columns: 1fr; }
+            .artifact-grid { grid-template-columns: 1fr; }
+            .ledger-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <div class="mobile-header">
+        <a href="/" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item">Home</a>
+            <div class="nav-section">Specification</div>
+            <a href="/spec/" class="nav-item">Makoto v0.1</a>
+            <a href="/levels/" class="nav-item">Understanding Levels</a>
+            <a href="/spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="/comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="/comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+            <div class="nav-section">Resources</div>
+            <a href="/examples/" class="nav-item">Examples</a>
+            <a href="/demos/" class="nav-item">Demos</a>
+            <a href="/demos/setup/" class="nav-item nav-item-sub">Setup Guide</a>
+            <a href="/demos/01/" class="nav-item nav-item-sub">01 &mdash; Poisoned Pipeline</a>
+            <a href="/demos/02/" class="nav-item nav-item-sub">02 &mdash; Reproducibility Gap</a>
+            <a href="/demos/03/" class="nav-item nav-item-sub">03 &mdash; GitHub Action</a>
+            <a href="/demos/04/" class="nav-item nav-item-sub">04 &mdash; Config Postmortem</a>
+            <a href="/demos/05/" class="nav-item nav-item-sub">05 &mdash; AI Dataset Verification</a>
+            <a href="/demos/06/" class="nav-item nav-item-sub">06 &mdash; Invisible Unicode</a>
+            <a href="/sdk/" class="nav-item">SDKs</a>
+            <a href="/privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="/threats/" class="nav-item">Threat Model</a>
+            <div class="nav-section">Implementations</div>
+            <a href="/expanso/" class="nav-item">Expanso Integration</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="subtitle">D9: Display-Layer Obfuscation</div>
+            <h1>Invisible Unicode Guardrails</h1>
+            <p>Trusted bytes are not the same thing as trusted appearance. Makoto&rsquo;s render-safe verification catches what signatures and hashes alone cannot.</p>
+        </section>
+
+        <section class="section" style="max-width: 960px;">
+
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin-bottom: 1rem;">Why this exists</h2>
+            <p>In March 2026, the <a href="https://arstechnica.com/security/2026/03/supply-chain-attack-using-invisible-code-hits-github-and-other-repositories/" target="_blank">Glassworm campaign</a> used invisible Unicode variation selectors to hide malicious payloads in code across GitHub, npm, and VS Code marketplaces. The packages were signed. The hashes were valid. The code reviews passed. The attack succeeded because the rendered view and the byte view told different stories.</p>
+            <p>Provenance tells you <strong>where</strong> an artifact came from. Signatures tell you <strong>who</strong> vouched for it. Render-safe analysis tells you <strong>what is actually present in the bytes</strong> &mdash; even when a reviewer might not see it.</p>
+
+            <!-- Safe vs Flagged comparison cards -->
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">Safe vs flagged</h2>
+            <div class="compare-grid">
+                <div class="compare-card safe">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                        <span class="compare-badge pass">PASS</span>
+                        <code style="font-size: 0.85rem; color: var(--primary);">safe-visible.js</code>
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 0.5rem;">A standard data validation utility. All 708 codepoints are visible ASCII. Zero invisible characters detected.</p>
+                    <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-light);">sha256: d7dd0074...40fcd46f</div>
+                </div>
+                <div class="compare-card flagged">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                        <span class="compare-badge fail">FAIL</span>
+                        <code style="font-size: 0.85rem; color: var(--primary);">flagged-invisible.js</code>
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 0.5rem;">Appears identical in editors, but contains 128 invisible variation selectors encoding a hidden message across two Unicode ranges.</p>
+                    <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-light);">sha256: 0dba71c7...5c27d85c</div>
+                </div>
+            </div>
+
+            <!-- Three synchronized panes -->
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">What the flagged file looks like at three levels</h2>
+            <div class="pane-grid">
+                <!-- Pane 1: Rendered view -->
+                <div class="pane-col">
+                    <div class="pane-label">Rendered View</div>
+                    <div class="pane-box">
+                        <div class="pane-header">
+                            <div class="pane-header-left">
+                                <div class="pane-dots"><span></span><span></span><span></span></div>
+                                <span class="pane-title">What a reviewer sees</span>
+                            </div>
+                        </div>
+                        <div class="pane-body">
+<pre><span style="color:#6a9955;">// flagged-invisible.js</span>
+<span style="color:#c586c0;">function</span> <span style="color:#dcdcaa;">validateRecord</span>(r) {
+  <span style="color:#c586c0;">if</span> (!r || <span style="color:#c586c0;">typeof</span> r !== <span style="color:#ce9178;">"object"</span>)
+    <span style="color:#c586c0;">return</span> { valid: <span style="color:#569cd6;">false</span> };
+  <span style="color:#c586c0;">const</span> req = [<span style="color:#ce9178;">"id"</span>, <span style="color:#ce9178;">"ts"</span>];
+  <span style="color:#6a9955;">// Looks normal...</span>
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pane 2: Revealed view -->
+                <div class="pane-col">
+                    <div class="pane-label">Revealed View</div>
+                    <div class="pane-box">
+                        <div class="pane-header">
+                            <div class="pane-header-left">
+                                <div class="pane-dots"><span></span><span></span><span></span></div>
+                                <span class="pane-title">What the bytes contain</span>
+                            </div>
+                        </div>
+                        <div class="pane-body">
+<pre><span style="color:#6a9955;">// flagged-invisible.js</span>
+<span style="color:#c586c0;">function</span> <span style="color:#dcdcaa;">validateRecord</span>(r) {
+  if<span class="vs-mark">[FE04]</span> (!r<span class="vs-mark">[E0105]</span> ||
+    typ<span class="vs-mark">[FE05]</span>eof r<span class="vs-mark">[E0104]</span>
+  <span style="color:#6a9955;">// 128 invisible codepoints</span>
+  <span style="color:#6a9955;">// hidden in function body</span>
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pane 3: Makoto analysis -->
+                <div class="pane-col">
+                    <div class="pane-label">Makoto Analysis</div>
+                    <div class="pane-box">
+                        <div class="pane-header">
+                            <div class="pane-header-left">
+                                <div class="pane-dots"><span></span><span></span><span></span></div>
+                                <span class="pane-title">analysis.flagged.json</span>
+                            </div>
+                            <span class="fail-badge">FAIL</span>
+                        </div>
+                        <div class="pane-body">
+<pre>{
+  <span class="jk">"verdict"</span>: <span class="jf">"fail"</span>,
+  <span class="jk">"invisible"</span>: <span class="jn">128</span>,
+  <span class="jk">"families"</span>: [
+    <span class="js">"variation_selectors"</span>,
+    <span class="js">"variation_selectors_sup"</span>
+  ],
+  <span class="jk">"ranges"</span>: [
+    <span class="js">"U+FE00-U+FE0F"</span>,
+    <span class="js">"U+E0100-U+E01EF"</span>
+  ]
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Codepoint ledger -->
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">Codepoint Ledger</h2>
+            <div class="ledger">
+                <div class="ledger-row"><code>total_codepoints</code> <span>896</span></div>
+                <div class="ledger-row"><code>invisible_codepoints</code> <span>128 (14.3% of content)</span></div>
+                <div class="ledger-row"><code>families</code> <span>variation_selectors, variation_selectors_supplement</span></div>
+                <div class="ledger-row"><code>ranges</code> <span>U+FE00&ndash;U+FE0F, U+E0100&ndash;U+E01EF</span></div>
+                <div class="ledger-row"><code>normalization</code> <span>NFC</span></div>
+                <div class="ledger-row"><code>suspicious_patterns</code> <span>1 &mdash; variation-selector-encoding (high)</span></div>
+                <div class="ledger-row"><code>verdict</code> <span style="color: #dc2626; font-weight: 600;">fail</span></div>
+            </div>
+
+            <!-- Artifact snippets -->
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">How this appears in Makoto artifacts</h2>
+            <div class="artifact-grid">
+                <div class="pane-col">
+                    <div class="pane-label">Attestation</div>
+                    <div class="pane-box">
+                        <div class="pane-header">
+                            <div class="pane-header-left">
+                                <div class="pane-dots"><span></span><span></span><span></span></div>
+                                <span class="pane-title">attestation.flagged.json</span>
+                            </div>
+                        </div>
+                        <div class="pane-body">
+<pre>{
+  <span class="jk">"predicateType"</span>:
+    <span class="js">"makoto.dev/origin/v1"</span>,
+  <span class="jk">"predicate"</span>: {
+    <span class="jk">"analysis"</span>: {
+      <span class="jk">"rendering"</span>: {
+        <span class="jk">"invisible"</span>: <span class="jb">true</span>,
+        <span class="jk">"verdict"</span>: <span class="jf">"fail"</span>
+      }
+    }
+  }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="pane-col">
+                    <div class="pane-label">DBOM</div>
+                    <div class="pane-box">
+                        <div class="pane-header">
+                            <div class="pane-header-left">
+                                <div class="pane-dots"><span></span><span></span><span></span></div>
+                                <span class="pane-title">dbom.flagged.json</span>
+                            </div>
+                        </div>
+                        <div class="pane-body">
+<pre>{
+  <span class="jk">"compliance"</span>: {
+    <span class="jk">"renderingSafety"</span>: {
+      <span class="jk">"scanned"</span>: <span class="jb">true</span>,
+      <span class="jk">"invisible"</span>: <span class="jn">128</span>,
+      <span class="jk">"verdict"</span>: <span class="jf">"fail"</span>,
+      <span class="jk">"reason"</span>:
+        <span class="js">"Non-rendering Unicode"</span>
+    }
+  }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why this matters -->
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">Why this matters</h2>
+            <p>Invisible Unicode is not an edge case. It affects any workflow where humans review text-like artifacts before machines consume them:</p>
+            <ul style="color: var(--text-muted); line-height: 1.8; padding-left: 1.25rem;">
+                <li><strong>Code review</strong> &mdash; pull requests where the diff looks clean but the bytes hide instructions</li>
+                <li><strong>Configuration review</strong> &mdash; YAML/JSON configs with invisible characters altering behavior</li>
+                <li><strong>Prompt review</strong> &mdash; LLM prompts that appear benign but contain hidden injection text</li>
+                <li><strong>ETL and data transforms</strong> &mdash; processing scripts where invisible content affects output</li>
+                <li><strong>Release gates</strong> &mdash; CI/CD checks that verify signatures but not render safety</li>
+            </ul>
+            <p style="margin-top: 1rem;">Makoto&rsquo;s render-safe verification closes this gap. A signed, hash-valid artifact can still fail policy when the bytes contain content that is invisible in ordinary review surfaces.</p>
+
+            <!-- References -->
+            <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">References</h2>
+            <ul style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.8; padding-left: 1.25rem;">
+                <li><a href="https://arstechnica.com/security/2026/03/supply-chain-attack-using-invisible-code-hits-github-and-other-repositories/" target="_blank">Ars Technica: Supply-chain attack using invisible code hits GitHub and other repositories</a></li>
+                <li>Aikido Security: &ldquo;Glassworm Returns: Invisible Unicode Attack Hits GitHub, npm, and VSCode&rdquo; (March 2026)</li>
+                <li>Aikido Security: &ldquo;The Return of the Invisible Threat&rdquo; (October 2025)</li>
+                <li><a href="https://unicode.org/charts/nameslist/n_FE00.html" target="_blank">Unicode Variation Selectors (U+FE00&ndash;U+FE0F)</a></li>
+                <li><a href="https://unicode.org/charts/nameslist/n_E0100.html" target="_blank">Unicode Variation Selectors Supplement (U+E0100&ndash;U+E01EF)</a></li>
+            </ul>
+
+            <p style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                <a href="/demos/06/" style="color: var(--primary);">Demo 06 &mdash; run it yourself</a> &middot;
+                <a href="/threats/#d9" style="color: var(--primary);">D9 in the threat model</a> &middot;
+                <a href="/verify/#render-safe" style="color: var(--primary);">Render-safe verification</a>
+            </p>
+
+        </section>
+
+        <footer class="footer">
+            <p>
+                <span class="kanji">誠</span> Makoto — Sincerity in data provenance.
+                <a href="https://github.com/makoto-project/makoto" target="_blank">View on GitHub &rarr;</a>
+            </p>
+        </footer>
+    </main>
+</body>
+</html>
