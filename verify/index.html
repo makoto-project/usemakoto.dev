@@ -451,6 +451,91 @@ go run verify_dbom.go valid.dbom.json
             </p>
 
         </div>
+
+        <!-- Render-Safe Verification -->
+        <div class="section" style="max-width:860px; margin: 2rem auto;" id="render-safe">
+            <h2>Render-Safe Verification</h2>
+            <p>
+                For text-like artifacts (code, configuration, prompts, scripts), digest validation and signature
+                validation may both succeed while the artifact still fails trust policy due to misleading or
+                non-obvious rendering characteristics. A signed, hash-valid artifact is not necessarily safe to trust at face value.
+            </p>
+
+            <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0;">
+                <p style="margin: 0; font-weight: 600; color: #9a3412;">Trusted bytes are not the same thing as trusted appearance.</p>
+                <p style="margin: 0.5rem 0 0; color: #9a3412; font-size: 0.9rem;">
+                    In March 2026, the Glassworm campaign used invisible Unicode variation selectors to hide malicious payloads
+                    in code that passed every code review and signature check.
+                </p>
+            </div>
+
+            <h3>Recommended verification order</h3>
+            <ol style="line-height: 1.8; color: var(--text-muted);">
+                <li>Fetch the artifact</li>
+                <li>Verify provenance and signature (L2+)</li>
+                <li>Verify digest matches <code class="ic">subject.digest</code></li>
+                <li><strong>Run rendering/visibility analysis</strong></li>
+                <li>Apply policy (pass / warn / fail)</li>
+                <li>Trust or reject</li>
+            </ol>
+
+            <h3>Optional <code class="ic">analysis.rendering</code> extension</h3>
+            <p>
+                Makoto defines an optional, non-breaking extension for text-like artifacts. Producers <strong>may</strong>
+                emit this block and verifiers <strong>may</strong> policy-check it. Makoto strongly recommends it for
+                any artifact where render-review trust matters.
+            </p>
+
+            <div style="background: #0d0d0d; border-radius: 8px; overflow: hidden; margin: 1rem 0;">
+                <div style="background: #1a1a1a; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 8px;">
+                    <span style="width:10px;height:10px;border-radius:50%;background:#ff5f57;display:inline-block;"></span>
+                    <span style="width:10px;height:10px;border-radius:50%;background:#febc2e;display:inline-block;"></span>
+                    <span style="width:10px;height:10px;border-radius:50%;background:#28c840;display:inline-block;"></span>
+                    <span style="color:#888;font-family:var(--font-mono);font-size:0.75rem;margin-left:8px;">analysis.rendering schema</span>
+                </div>
+<pre class="language-json" style="margin:0 !important;"><code class="language-json">{
+  "analysis": {
+    "rendering": {
+      "scanner": {
+        "name": "makoto-text-visibility",
+        "version": "0.1.0"
+      },
+      "normalization": "NFC",
+      "contains_invisible_codepoints": true,
+      "families": ["variation_selectors"],
+      "ranges": ["U+FE00-U+FE0F", "U+E0100-U+E01EF"],
+      "counts": {
+        "total_codepoints": 412,
+        "invisible_codepoints": 91
+      },
+      "patterns": [
+        {
+          "id": "decode-then-execute",
+          "severity": "high",
+          "matched": false
+        }
+      ],
+      "verdict": "fail"
+    }
+  }
+}</code></pre>
+            </div>
+
+            <h3>Terminology note</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                The specific character ranges discussed in the March 2026 attack are Unicode
+                <strong>variation selectors</strong>: U+FE00&ndash;U+FE0F (Variation Selectors) and U+E0100&ndash;U+E01EF
+                (Variation Selectors Supplement). Documentation may use plain-English language like &ldquo;invisible Unicode&rdquo;
+                for accessibility, but these exact ranges should not be mislabeled as private-use characters.
+            </p>
+
+            <p style="margin-top: 1.5rem;">
+                See also: <a href="/examples/#invisible-unicode" style="color: var(--primary);">Invisible Unicode example</a> &middot;
+                <a href="/demos/06/" style="color: var(--primary);">Demo 06</a> &middot;
+                <a href="/threats/#d9" style="color: var(--primary);">D9: Display-Layer Obfuscation</a>
+            </p>
+        </div>
+
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>

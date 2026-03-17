@@ -1,0 +1,43 @@
+flagged-invisible.js — Revealed View
+======================================
+
+This file shows what the invisible Unicode characters in flagged-invisible.js
+actually contain. In a normal editor or code review tool, these characters
+are not displayed — the file appears identical to safe-visible.js.
+
+Encoding method:
+  Each byte of the hidden message is split into two nibbles, each mapped
+  to a Unicode variation selector:
+    - Low nibble (0–15)  → U+FE00–U+FE0F  (Variation Selectors block)
+    - High nibble (0–15) → U+E0100–U+E010F (Variation Selectors Supplement)
+
+Hidden message (decoded from variation selectors):
+  "This text was hidden using invisible Unicode variation selectors"
+
+Character-level annotation (showing invisible codepoints inline):
+  The source contains 128 invisible variation selectors (64 pairs) distributed
+  across the function body. Each pair is placed after a visible alphanumeric
+  character, making them undetectable in standard rendering.
+
+Sample annotated excerpt:
+  Original rendered:  if (!record || typeof record !== "object") {
+  With codepoints:    if︀ (!record︁ || typeof︂ record︃ !== "object︄") {
+                         ^^^^          ^^^^          ^^^^          ^^^^   ^^^^
+                         U+FE00        U+FE01        U+FE02        U+FE03  U+FE04
+
+Codepoint families found:
+  • Variation Selectors (U+FE00–U+FE0F): 64 characters
+  • Variation Selectors Supplement (U+E0100–U+E01EF): 64 characters
+  • Total invisible codepoints: 128
+
+Why this matters:
+  A code reviewer sees a normal validation function.
+  A byte-level scanner sees 128 hidden characters encoding a message.
+  The signature is valid. The hash is correct. But the artifact contains
+  content that is invisible in the review surface.
+
+  In the Glassworm campaign (March 2026), this technique was used to hide
+  actual malicious payloads — not inert messages. The variation selectors
+  encoded instructions that a runtime decoder would reconstruct and execute.
+
+  This fixture encodes only an inert explanation string. It is safe.

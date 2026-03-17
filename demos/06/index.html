@@ -10,7 +10,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo 03: GitHub Action - Makoto (誠)</title>
+    <title>Demo 06: Invisible Unicode Guardrails - Makoto (誠)</title>
     <link rel="stylesheet" href="/assets/styles.css">
     <style>
         .demo-hero { background: linear-gradient(135deg, #09090b 0%, #18181b 50%, #312e81 100%); color: white; padding: 4rem 3rem; }
@@ -43,6 +43,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .handles-list { list-style: none; padding: 0; }
         .handles-list li { padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: var(--text-muted); line-height: 1.6; }
         .handles-list li::before { content: '→'; position: absolute; left: 0; color: var(--primary); font-weight: 600; }
+        .pass-text { color: #22c55e; }
+        .fail-text { color: #ef4444; }
     </style>
 </head>
 <body>
@@ -76,10 +78,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <a href="/demos/setup/" class="nav-item nav-item-sub">Setup Guide</a>
             <a href="/demos/01/" class="nav-item nav-item-sub">01 &mdash; Poisoned Pipeline</a>
             <a href="/demos/02/" class="nav-item nav-item-sub">02 &mdash; Reproducibility Gap</a>
-            <a href="/demos/03/" class="nav-item nav-item-sub active">03 &mdash; GitHub Action</a>
+            <a href="/demos/03/" class="nav-item nav-item-sub">03 &mdash; GitHub Action</a>
             <a href="/demos/04/" class="nav-item nav-item-sub">04 &mdash; Config Postmortem</a>
             <a href="/demos/05/" class="nav-item nav-item-sub">05 &mdash; AI Dataset Verification</a>
-            <a href="/demos/06/" class="nav-item nav-item-sub">06 &mdash; Invisible Unicode</a>
+            <a href="/demos/06/" class="nav-item nav-item-sub active">06 &mdash; Invisible Unicode</a>
             <a href="/sdk/" class="nav-item">SDKs</a>
             <a href="/privacy/" class="nav-item">Privacy Techniques</a>
             <a href="/threats/" class="nav-item">Threat Model</a>
@@ -91,89 +93,117 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <main class="main-content">
         <section class="demo-hero">
             <div>
-                <span class="demo-pill">Demo 03</span>
-                <span class="time-badge">~2 min</span>
+                <span class="demo-pill">Demo 06</span>
+                <span class="time-badge">~3 min</span>
             </div>
-            <h1>GitHub Action &mdash; Provenance on Every Release</h1>
-            <p>Generate a DBOM for any data file with a single command — then automate it in CI.</p>
+            <h1>Invisible Unicode Guardrails</h1>
+            <p>Your code review looks clean. Every character is visible. But 128 hidden codepoints are encoding a message you cannot see. Can your tooling tell the difference?</p>
             <div class="flow-badge">
-                <span class="problem">Manual, forgotten provenance</span>
+                <span class="problem">Hidden content passes code review</span>
                 <span class="arrow">&rarr;</span>
-                <span class="solution">Automatic DBOM in CI</span>
+                <span class="solution">Render-safe analysis blocks it</span>
             </div>
         </section>
 
         <section class="section" style="max-width: 960px;">
 
             <h2 style="font-size: 1.75rem; font-weight: 400; margin-bottom: 1rem;">The Problem</h2>
-            <p>Your team releases data files every sprint — updated models, refreshed training sets, new configuration bundles. Each release should include provenance metadata: where the data came from, who signed off, what hash it had at release time. But provenance is a manual step, and manual steps get skipped. By the third sprint, nobody remembers to generate the attestation file. By the sixth sprint, the compliance team notices.</p>
-            <p>The real cost isn't the audit finding — it's the scramble to retroactively reconstruct provenance for files that have already shipped. You're reverse-engineering hash values from old CI logs and guessing at signer identities from git blame. A five-second automation problem has become a five-day archaeology project.</p>
+            <p>In March 2026, the Glassworm campaign targeted GitHub, npm, and VS Code extension marketplaces with packages containing invisible Unicode. The code looked normal in every editor and review tool. But the bytes told a different story: variation selectors &mdash; characters designed to be invisible &mdash; encoded hidden instructions that a runtime decoder would reconstruct and execute.</p>
+            <p>The packages were signed. The hashes were valid. The code reviews passed. The attack succeeded because nobody&rsquo;s tooling checked whether the rendered view and the byte view told the same story.</p>
 
             <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">What You Will See</h2>
 
-            <div class="subsection-label">Generated DBOM Output</div>
+            <div class="subsection-label">Safe Sample &mdash; No Hidden Content</div>
             <div class="terminal">
                 <div class="terminal-bar">
                     <div class="terminal-dots"><span></span><span></span><span></span></div>
                 </div>
-                <div class="terminal-output">$ uv run generate_dbom.py ../01-poisoned-pipeline/data/sensors_clean.csv
+                <div class="terminal-output"><span class="pass-text">============================================================
+  &#x2705; safe-visible.js  [PASS]
+============================================================</span>
+  SHA-256:    d7dd00740f0860f7...40fcd46f
+  Codepoints: 708 total, 0 invisible
 
-Generated DBOM: sensors_clean.csv.dbom.json
-{
-  "schema_version": "0.1",
-  "id": "dbom-f3a7b2c1-9d4e-4f5a-8b6c-2e1d0f9a8b7c",
-  "created_at": "2025-01-15T10:30:00Z",
-  "source": {
-    "uri": "local:sensors_clean.csv@HEAD",
-    "hash": {
-      "algorithm": "sha256",
-      "value": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2"
-    },
-    "format": "csv"
-  },
-  "signature": {
-    "algorithm": "sha256",
-    "value": "a1b2c3d4...",
-    "signer": "github:unknown"
-  },
-  "lineage": [{
-    "step": 1,
-    "description": "Auto-generated DBOM for sensors_clean.csv",
-    "tool": "makoto-action v0.1",
-    "input_hash": "n/a",
-    "output_hash": "a1b2c3d4..."
-  }]
-}</div>
+  No invisible or non-rendering Unicode characters detected.
+  All codepoints are standard visible characters.
+
+  Artifacts written:
+    analysis.safe.json
+    attestation.safe.json
+    dbom.safe.json</div>
+            </div>
+
+            <div class="subsection-label" style="margin-top: 2rem;">Flagged Sample &mdash; 128 Hidden Variation Selectors</div>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <div class="terminal-dots"><span></span><span></span><span></span></div>
+                </div>
+                <div class="terminal-output"><span class="fail-text">============================================================
+  &#x274c; flagged-invisible.js  [FAIL]
+============================================================</span>
+  SHA-256:    0dba71c75cdeefbb...5c27d85c
+  Codepoints: 896 total, 128 invisible
+  Families:   variation_selectors, variation_selectors_supplement
+  Ranges:     U+E0100-U+E01EF, U+FE00-U+FE0F
+  Pattern:    variation-selector-encoding (severity: high)
+
+  Policy failed because the artifact contains non-rendering
+  Unicode characters that materially affect byte content while
+  being difficult to inspect in ordinary rendered views.
+  Found 128 invisible codepoints across 2 Unicode families.
+
+  Artifacts written:
+    analysis.flagged.json
+    attestation.flagged.json
+    dbom.flagged.json</div>
+            </div>
+
+            <div class="subsection-label" style="margin-top: 2rem;">Policy Summary</div>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <div class="terminal-dots"><span></span><span></span><span></span></div>
+                </div>
+                <div class="terminal-output">============================================================
+  Policy Summary
+============================================================
+  safe-visible.js:      <span class="pass-text">PASS</span>
+  flagged-invisible.js: <span class="fail-text">FAIL</span>
+
+  Trusted bytes are not the same thing as trusted appearance.
+  Makoto render-safe verification catches what signatures
+  and hashes alone cannot.</div>
             </div>
 
             <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">Run It</h2>
             <div class="terminal">
                 <div class="terminal-bar">
                     <div class="terminal-dots"><span></span><span></span><span></span></div>
-                    <button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/makoto&#10;cd makoto/demos/03-github-action&#10;uv run generate_dbom.py path/to/your/data.csv">Copy</button>
+                    <button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/makoto&#10;cd makoto/demos/06-invisible-unicode-guardrails&#10;uv run run.py">Copy</button>
                 </div>
                 <div class="terminal-body">
                     <div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/makoto-project/makoto</span></div>
-                    <div><span class="prompt">$ </span><span class="cmd">cd makoto/demos/03-github-action</span></div>
-                    <div><span class="prompt">$ </span><span class="cmd">uv run generate_dbom.py path/to/your/data.csv</span></div>
+                    <div><span class="prompt">$ </span><span class="cmd">cd makoto/demos/06-invisible-unicode-guardrails</span></div>
+                    <div><span class="prompt">$ </span><span class="cmd">uv run run.py</span></div>
                 </div>
             </div>
 
             <div class="callout">
-                <strong>Key Insight:</strong> Provenance that depends on humans remembering will always fail — make it automatic and it becomes invisible infrastructure.
+                <strong>Key Insight:</strong> Provenance tells you <em>where</em> an artifact came from. Signatures tell you <em>who</em> vouched for it. Render-safe analysis tells you <em>what is actually present in the bytes</em> &mdash; even when a reviewer might not see it. All three are needed.
             </div>
 
             <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem;">What Else This Handles</h2>
             <ul class="handles-list">
-                <li>Automated DBOM generation on every git push or release tag</li>
-                <li>Integration with existing CI/CD pipelines (GitHub Actions, GitLab CI, Jenkins)</li>
-                <li>Batch DBOM generation for entire directories of data files</li>
-                <li>Custom signer identity from CI environment variables or OIDC tokens</li>
+                <li>Zero-width characters hiding content in configuration files and prompts</li>
+                <li>Bidi control abuse making code flow appear different from actual execution order</li>
+                <li>Tag character sequences embedding metadata invisible to standard rendering</li>
+                <li>Any Unicode family where the rendered view diverges from the byte-level content</li>
             </ul>
 
+            <p style="margin-top: 2rem; color: var(--text-muted);">See also: <a href="/examples/#invisible-unicode">Invisible Unicode example</a> for a visual walkthrough, and <a href="/threats/#d9">D9: Display-Layer Obfuscation</a> in the threat model.</p>
+
             <div class="prev-next">
-                <a href="/demos/02/">&larr; Demo 02: Reproducibility Gap</a>
-                <a href="/demos/04/">Demo 04: Config Postmortem &rarr;</a>
+                <a href="/demos/05/">&larr; Demo 05: AI Dataset Verification</a>
+                <a href="/demos/">All Demos &rarr;</a>
             </div>
 
         </section>

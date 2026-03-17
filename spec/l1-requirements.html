@@ -550,6 +550,25 @@ fi</pre>
                         <li><code>predicate.executor.id</code> — non-empty string</li>
                     </ul>
                 </div>
+                <h3>V5: Render-Safe Verification (RECOMMENDED)</h3>
+                <div class="card">
+                    <p><strong>Check:</strong> For text-like artifacts (code, config, prompts, scripts), scan for invisible or non-rendering Unicode characters.</p>
+                    <p>Digest validation and signature validation may both succeed while the artifact still contains content that is invisible in ordinary rendered views. Producers <strong>SHOULD</strong> scan code, config, prompt, and text artifacts for invisible or misleading Unicode. Producers <strong>SHOULD</strong> surface basic counts and suspicious families in local tooling.</p>
+
+                    <h4>Recommended verification order:</h4>
+                    <ol>
+                        <li>Fetch artifact</li>
+                        <li>Verify provenance/signature</li>
+                        <li>Verify digest</li>
+                        <li>Run rendering/visibility analysis</li>
+                        <li>Apply policy</li>
+                        <li>Trust or reject</li>
+                    </ol>
+
+                    <p class="text-muted" style="margin-top: 1rem;">
+                        See <a href="/threats/#d9">D9: Display-Layer Obfuscation</a> and <a href="/examples/#invisible-unicode">invisible Unicode example</a>.
+                    </p>
+                </div>
             </div>
         </section>
 

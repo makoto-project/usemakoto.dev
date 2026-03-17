@@ -1,0 +1,51 @@
+{
+  "dbomVersion": "1.0.0",
+  "dbomId": "urn:dbom:makoto.dev:demo-06-flagged-invisible",
+  "dataset": {
+    "name": "flagged-invisible.js",
+    "version": "1.0.0",
+    "description": "Data validation utility containing invisible Unicode variation selectors",
+    "created": "2026-03-17T00:00:00Z",
+    "digest": {
+      "sha256": "0dba71c75cdeefbbe428436db262721ac91543266c460920d76c2fa55c27d85c"
+    },
+    "makotoLevel": "L2"
+  },
+  "sources": [
+    {
+      "name": "flagged-invisible.js",
+      "attestationRef": "attestation.flagged.json",
+      "attestationType": "https://makoto.dev/origin/v1",
+      "makotoLevel": "L2"
+    }
+  ],
+  "transformations": [],
+  "compliance": {
+    "overallMakotoLevel": "L2",
+    "renderingSafety": {
+      "scanned": true,
+      "invisibleCodepoints": 128,
+      "families": ["variation_selectors", "variation_selectors_supplement"],
+      "verdict": "fail",
+      "reason": "Policy failed because the artifact contains non-rendering Unicode characters that materially affect byte content while being difficult to inspect in ordinary rendered views."
+    }
+  },
+  "verification": {
+    "chainVerified": true,
+    "allSignaturesValid": true,
+    "renderingSafetyPassed": false,
+    "attestationCount": 1,
+    "verificationTimestamp": "2026-03-17T00:00:00Z",
+    "verifier": {
+      "tool": "makoto-text-visibility",
+      "version": "0.1.0"
+    }
+  },
+  "metadata": {
+    "generator": {
+      "tool": "makoto-demo-06",
+      "version": "0.1.0"
+    },
+    "created": "2026-03-17T00:00:00Z"
+  }
+}

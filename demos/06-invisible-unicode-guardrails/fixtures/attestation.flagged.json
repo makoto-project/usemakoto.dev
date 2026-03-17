@@ -1,0 +1,40 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "flagged-invisible.js",
+      "digest": {
+        "sha256": "0dba71c75cdeefbbe428436db262721ac91543266c460920d76c2fa55c27d85c"
+      }
+    }
+  ],
+  "predicateType": "https://makoto.dev/origin/v1",
+  "predicate": {
+    "origin": {
+      "source": "internal",
+      "repository": "https://github.com/makoto-project/makoto",
+      "path": "demos/06-invisible-unicode-guardrails/fixtures/flagged-invisible.js"
+    },
+    "makotoLevel": "L2",
+    "analysis": {
+      "rendering": {
+        "scanner": {
+          "name": "makoto-text-visibility",
+          "version": "0.1.0"
+        },
+        "contains_invisible_codepoints": true,
+        "families": ["variation_selectors", "variation_selectors_supplement"],
+        "ranges": ["U+FE00-U+FE0F", "U+E0100-U+E01EF"],
+        "counts": {
+          "total_codepoints": 896,
+          "invisible_codepoints": 128
+        },
+        "verdict": "fail"
+      }
+    },
+    "metadata": {
+      "created": "2026-03-17T00:00:00Z",
+      "generator": "makoto-demo-06"
+    }
+  }
+}

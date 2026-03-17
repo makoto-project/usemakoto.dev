@@ -208,6 +208,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <li><a href="#identity-verification">Identity Verification</a></li>
                         <li><a href="#timestamp-verification">Timestamp Verification</a></li>
                         <li><a href="#lineage-verification">Lineage Chain Verification</a></li>
+                        <li><a href="#render-safe-verification">Render-Safe Verification</a></li>
                     </ul>
                 </li>
                 <li><a href="#threats-mitigated">Threats Mitigated</a></li>
@@ -725,6 +726,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         modified after attestation and MUST NOT be trusted.
                     </p>
                 </div>
+                <h3 id="render-safe-verification">Render-Safe Verification <a href="#render-safe-verification" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.11</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Bind rendering analysis to artifact digest</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Signed attestations <strong>SHOULD</strong> bind rendering analysis to the artifact digest. For text-like artifacts
+                        (code, config, prompts, scripts), the optional <code>analysis.rendering</code> block <strong>SHOULD</strong> be included in
+                        the attestation predicate. This ensures that the rendering analysis result is cryptographically tied to
+                        the specific artifact version.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L2.V.12</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Support invisible-character policy enforcement</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Verifiers <strong>SHOULD</strong> support policies such as fail/warn/allowlist for invisible-character findings.
+                        A signed, hash-valid text artifact can still fail trust policy due to misleading or non-obvious rendering characteristics.
+                        See <a href="/threats/#d9">D9: Display-Layer Obfuscation</a>.
+                    </p>
+                </div>
+
             </div>
         </section>
 
@@ -763,6 +793,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <td><span class="threat-ref">D8</span></td>
                         <td><strong>Time Manipulation</strong></td>
                         <td>Trusted timestamps from TSA or transparency log prevent backdating attestations.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D9</span></td>
+                        <td><strong>Display-Layer Obfuscation</strong></td>
+                        <td>Rendering analysis bound to signed attestations. Policy enforcement for invisible characters in text-like artifacts.</td>
                     </tr>
                 </tbody>
             </table>

@@ -419,6 +419,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </p>
                     </div>
                 </div>
+
+                <div class="threat-category" id="d9">
+                    <div class="threat-icon">👁️</div>
+                    <div class="threat-details">
+                        <h3>D9: Display-Layer Obfuscation</h3>
+                        <p>
+                            Embedding content that is materially present in artifact bytes but absent, misleading, or difficult
+                            to notice in common rendered views. Examples: invisible Unicode variation selectors encoding hidden
+                            instructions, zero-width character abuse, bidi control abuse, text that appears blank or harmless
+                            but contains semantically meaningful hidden characters.
+                        </p>
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-light);">
+                            This is not generic tampering or provenance falsification &mdash; it is specifically a divergence between
+                            what humans review and what machines ingest. See <a href="/examples/#invisible-unicode">example</a> and
+                            <a href="/demos/06/">Demo 06</a>.
+                        </p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -524,6 +542,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <span class="mitigation-badge">Stream</span>
                                 </td>
                             </tr>
+                            <tr>
+                                <td><span class="threat-id">D9</span></td>
+                                <td>Display-Layer Obfuscation</td>
+                                <td><span class="severity-high">High</span></td>
+                                <td>Invisible Unicode, variation selectors, bidi abuse</td>
+                                <td>
+                                    <span class="mitigation-badge">L1</span>
+                                    <span class="mitigation-badge">L2</span>
+                                    <span class="mitigation-badge">L3</span>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -539,7 +568,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     DPL attestations provide verification points to detect and prevent attacks.
                 </p>
 
-                <svg viewBox="0 0 900 450" class="diagram-svg" style="margin: 2rem 0;">
+                <svg viewBox="0 0 900 520" class="diagram-svg" style="margin: 2rem 0;">
                     <!-- Pipeline stages -->
                     <g transform="translate(50, 100)">
                         <!-- Source -->
@@ -670,6 +699,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <text x="110" y="32" text-anchor="middle" fill="#64748b" font-size="9">Merkle roots + individual proofs</text>
                         </g>
                     </g>
+
+                    <!-- Display-layer obfuscation -->
+                    <g transform="translate(50, 420)">
+                        <rect width="800" height="60" rx="10" fill="#fff1f2" stroke="#e11d48" stroke-width="1.5"/>
+                        <text x="20" y="25" fill="#e11d48" font-weight="600" font-size="12">D9: Display-Layer Obfuscation</text>
+                        <text x="20" y="45" fill="#e11d48" font-size="10">Invisible Unicode can hide content from reviewers while remaining present in artifact bytes</text>
+
+                        <g transform="translate(550, 10)">
+                            <rect width="220" height="40" rx="6" fill="white" stroke="#e11d48" stroke-width="1.5"/>
+                            <text x="110" y="17" text-anchor="middle" fill="#e11d48" font-size="10" font-weight="600">Render-Safe Verification</text>
+                            <text x="110" y="32" text-anchor="middle" fill="#64748b" font-size="9">Codepoint analysis + policy gate</text>
+                        </g>
+                    </g>
                 </svg>
             </div>
         </section>
@@ -699,6 +741,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <span class="threat-badge">D6</span>
                             <span class="threat-badge">D7</span>
                             <span class="threat-badge">D8</span>
+                            <span class="threat-badge partial">D9 Partial</span>
                         </div>
                     </div>
 
@@ -717,6 +760,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <span class="threat-badge partial">D6 Partial</span>
                             <span class="threat-badge">D7</span>
                             <span class="threat-badge mitigated">D8 ✓</span>
+                            <span class="threat-badge mitigated">D9 ✓</span>
                         </div>
                     </div>
 
@@ -735,6 +779,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <span class="threat-badge mitigated">D6 ✓</span>
                             <span class="threat-badge partial">D7 + Privacy</span>
                             <span class="threat-badge mitigated">D8 ✓</span>
+                            <span class="threat-badge mitigated">D9 ✓</span>
                         </div>
                     </div>
                 </div>
@@ -779,6 +824,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <li>D6: Attestation forgery</li>
                                 <li>D7: Privacy leakage from metadata</li>
                                 <li>D8: Stream injection attacks</li>
+                                <li>D9: Display-layer obfuscation</li>
                             </ul>
                         </div>
                     </div>

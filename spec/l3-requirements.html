@@ -803,6 +803,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <li>Cannot be verified against the platform's audit log</li>
                     </ul>
                 </div>
+                <h3 id="render-safe-verification">Render-Safe Verification <a href="#render-safe-verification" class="section-anchor">#</a></h3>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.V.8</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Compute rendering analysis outside tenant-controlled execution</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Rendering analysis <strong>SHOULD</strong> be computed outside tenant-controlled execution environments.
+                        The analysis result <strong>SHOULD</strong> be signed along with artifact metadata by the platform, not the tenant.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="req-row">
+                        <span class="req-id">L3.V.9</span>
+                        <span class="req-level req-should">SHOULD</span>
+                        <span class="req-title">Audit render-safety policy decisions</span>
+                    </div>
+                    <p style="margin-bottom: 0;">
+                        Audit logs <strong>SHOULD</strong> record rendering-safety policy failures, overrides, and exceptions.
+                        This enables post-incident analysis of display-layer obfuscation attempts.
+                        See <a href="/threats/#d9">D9: Display-Layer Obfuscation</a>.
+                    </p>
+                </div>
+
             </div>
         </section>
 
@@ -852,6 +879,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <td><span class="threat-ref">D8</span></td>
                         <td><strong>Time Manipulation</strong></td>
                         <td>Platform controls timestamps. Combined with L2 trusted timestamping, attestation times are unforgeable.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="threat-ref">D9</span></td>
+                        <td><strong>Display-Layer Obfuscation</strong></td>
+                        <td>Platform-computed rendering analysis outside tenant control. Signed analysis results and auditable policy enforcement.</td>
                     </tr>
                 </tbody>
             </table>
