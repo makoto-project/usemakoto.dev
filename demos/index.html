@@ -274,6 +274,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <a href="/demos/03/" class="nav-item nav-item-sub">03 &mdash; GitHub Action</a>
             <a href="/demos/04/" class="nav-item nav-item-sub">04 &mdash; Config Postmortem</a>
             <a href="/demos/05/" class="nav-item nav-item-sub">05 &mdash; AI Dataset Verification</a>
+            <a href="/demos/06/" class="nav-item nav-item-sub">06 &mdash; Invisible Unicode</a>
             <a href="/sdk/" class="nav-item">SDKs</a>
             <a href="/privacy/" class="nav-item">Privacy Techniques</a>
             <a href="/threats/" class="nav-item">Threat Model</a>
@@ -287,7 +288,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <main class="main-content">
         <section class="demos-hero">
             <h1>Live Demos</h1>
-            <p>Five scenarios. Copy-paste commands. See exactly what Makoto does — and what happens without it.</p>
+            <p>Six scenarios. Copy-paste commands. See exactly what Makoto does — and what happens without it.</p>
             <a href="/demos/setup/" class="setup-btn">Setup Guide &rarr;</a>
         </section>
 
@@ -460,6 +461,39 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </div>
                 </div>
                 <a href="/demos/05/" class="walkthrough-link">Full walkthrough &rarr;</a>
+            </div>
+
+            <!-- Demo 06 -->
+            <div class="demo-card">
+                <div class="demo-card-header">
+                    <div>
+                        <div class="demo-number">Demo 06</div>
+                        <h3>Invisible Unicode Guardrails</h3>
+                    </div>
+                    <div class="flow-badge">
+                        <span class="problem">Hidden content passes code review</span>
+                        <span class="arrow">&rarr;</span>
+                        <span class="solution">Render-safe analysis blocks it</span>
+                    </div>
+                </div>
+                <p class="description">Your code review looks clean, but 128 invisible variation selectors are hiding content in the bytes. Signature valid, hash valid, review passed &mdash; and still compromised.</p>
+                <ul class="preview-list">
+                    <li>Safe JS file analyzed &mdash; zero invisible characters, policy pass</li>
+                    <li>Flagged JS file with 128 hidden variation selectors &mdash; policy fail</li>
+                    <li>Machine-readable attestations and DBOMs emitted for both</li>
+                </ul>
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <div class="terminal-dots"><span></span><span></span><span></span></div>
+                        <button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/makoto&#10;cd makoto/demos/06-invisible-unicode-guardrails&#10;uv run run.py">Copy</button>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/makoto-project/makoto</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">cd makoto/demos/06-invisible-unicode-guardrails</span></div>
+                        <div><span class="prompt">$ </span><span class="cmd">uv run run.py</span></div>
+                    </div>
+                </div>
+                <a href="/demos/06/" class="walkthrough-link">Full walkthrough &rarr;</a>
             </div>
 
         </section>

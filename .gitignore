@@ -1,0 +1,16 @@
+# Local-only files
+.local/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Demo output (generated at runtime)
+demos/06-invisible-unicode-guardrails/output/

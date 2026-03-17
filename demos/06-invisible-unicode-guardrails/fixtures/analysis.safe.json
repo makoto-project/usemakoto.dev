@@ -1,0 +1,36 @@
+{
+  "artifact": "safe-visible.js",
+  "digest": {
+    "sha256": "d7dd00740f0860f7f01369cdd036674ddccabba65e702dfc8d40435240fcd46f"
+  },
+  "analysis": {
+    "rendering": {
+      "scanner": {
+        "name": "makoto-text-visibility",
+        "version": "0.1.0"
+      },
+      "normalization": "NFC",
+      "contains_invisible_codepoints": false,
+      "families": [],
+      "ranges": [],
+      "counts": {
+        "total_codepoints": 519,
+        "invisible_codepoints": 0
+      },
+      "patterns": [
+        {
+          "id": "decode-then-execute",
+          "severity": "high",
+          "matched": false
+        },
+        {
+          "id": "variation-selector-encoding",
+          "severity": "high",
+          "matched": false
+        }
+      ],
+      "verdict": "pass",
+      "explanation": "No invisible or non-rendering Unicode characters detected. All codepoints are standard visible ASCII."
+    }
+  }
+}

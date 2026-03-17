@@ -1,0 +1,43 @@
+{
+  "artifact": "flagged-invisible.js",
+  "digest": {
+    "sha256": "0dba71c75cdeefbbe428436db262721ac91543266c460920d76c2fa55c27d85c"
+  },
+  "analysis": {
+    "rendering": {
+      "scanner": {
+        "name": "makoto-text-visibility",
+        "version": "0.1.0"
+      },
+      "normalization": "NFC",
+      "contains_invisible_codepoints": true,
+      "families": [
+        "variation_selectors",
+        "variation_selectors_supplement"
+      ],
+      "ranges": [
+        "U+FE00-U+FE0F",
+        "U+E0100-U+E01EF"
+      ],
+      "counts": {
+        "total_codepoints": 896,
+        "invisible_codepoints": 128
+      },
+      "patterns": [
+        {
+          "id": "decode-then-execute",
+          "severity": "high",
+          "matched": false
+        },
+        {
+          "id": "variation-selector-encoding",
+          "severity": "high",
+          "matched": true,
+          "detail": "128 variation selectors distributed across function body consistent with byte-encoding pattern"
+        }
+      ],
+      "verdict": "fail",
+      "explanation": "Policy failed because the artifact contains non-rendering Unicode characters that materially affect byte content while being difficult to inspect in ordinary rendered views. Found 128 invisible variation selectors encoding hidden content across two Unicode ranges."
+    }
+  }
+}
