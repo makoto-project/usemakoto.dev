@@ -45,7 +45,7 @@ decodes only to an inert explanation string.
 
 ## Learn more
 
-- [Invisible Unicode example](https://usemakoto.dev/examples/#invisible-unicode) — visual walkthrough
+- [Invisible Unicode example](https://usemakoto.dev/examples/invisible-unicode/) — visual walkthrough
 - [Demo 06 page](https://usemakoto.dev/demos/06/) — full narrative
 - [D9: Display-Layer Obfuscation](https://usemakoto.dev/threats/#d9) — threat model entry
 - [Render-safe verification](https://usemakoto.dev/verify/#render-safe) — spec guidance
