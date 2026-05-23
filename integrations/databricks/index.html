@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Databricks Integration | Makoto (誠)</title>
+    <link rel="stylesheet" href="../../assets/styles.css">
+    <style>
+        .concept-banner {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .concept-banner strong { color: #92400e; }
+        .concept-banner p { color: #78350f; margin: 0; }
+
+        .pipeline-demo { background: var(--bg-light); border-radius: 12px; padding: 2rem; margin: 2rem 0; }
+        .pipeline-demo h3 { color: var(--primary); margin-bottom: 1rem; }
+        .pipeline-yaml {
+            background: #0d0d0d; border-radius: 8px; padding: 1.5rem; overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', monospace; font-size: 0.85rem; line-height: 1.6;
+        }
+        .pipeline-yaml pre { margin: 0; color: #e2e8f0; }
+        .yaml-key { color: #89b4fa; }
+        .yaml-string { color: #a6e3a1; }
+        .yaml-comment { color: #6c7086; font-style: italic; }
+        .yaml-number { color: #fab387; }
+        .yaml-bool { color: #cba6f7; }
+        .yaml-kw { color: #f38ba8; }
+
+        .what-is { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 2rem 0; }
+        .what-is h3 { color: var(--primary); margin-bottom: 1rem; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .feature { background: var(--bg-light); padding: 1rem; border-radius: 8px; }
+        .feature strong { color: var(--text); display: block; margin-bottom: 0.25rem; }
+        .feature span { color: var(--text-muted); font-size: 0.9rem; }
+
+        .integration-idea { background: white; border: 2px dashed var(--primary); border-radius: 12px; padding: 2rem; margin: 2rem 0; }
+        .integration-idea h3 { color: var(--primary); margin-bottom: 1rem; }
+        .idea-list { list-style: none; padding: 0; margin: 0; }
+        .idea-list li { padding: 0.75rem 0; padding-left: 2rem; position: relative; border-bottom: 1px solid var(--border); }
+        .idea-list li:last-child { border-bottom: none; }
+        .idea-list li::before { content: "💡"; position: absolute; left: 0; }
+
+        .use-case-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+        .use-case-card h4 { color: var(--primary); margin-bottom: 0.5rem; }
+
+        .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .platform-card {
+            background: white; border: 1px solid var(--border); border-radius: 12px;
+            padding: 1.5rem; text-decoration: none; color: var(--text);
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            display: block;
+        }
+        .platform-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(67, 56, 202, 0.12);
+            border-color: var(--primary);
+            text-decoration: none;
+        }
+        .platform-card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .platform-card h3 { color: var(--primary); margin: 0 0 0.5rem; font-size: 1.1rem; }
+        .platform-card p { color: var(--text-muted); margin: 0; font-size: 0.9rem; }
+        .platform-tag {
+            display: inline-block; margin-top: 0.75rem;
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
+            background: var(--bg-light); color: var(--primary);
+            padding: 0.2rem 0.55rem; border-radius: 4px; font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="../../" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../../" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
+            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../../" class="nav-item">Home</a>
+
+            <div class="nav-section">Specification</div>
+            <a href="../../spec/" class="nav-item">Makoto v0.1</a>
+            <a href="../../levels/" class="nav-item">Understanding Levels</a>
+            <a href="../../spec/signature-guide.html" class="nav-item">Signature Guide</a>
+            <a href="../../comparison/" class="nav-item">SLSA Comparison</a>
+            <a href="../../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+
+            <div class="nav-section">Resources</div>
+            <a href="../../examples/" class="nav-item">Examples</a>
+            <a href="../../demos/" class="nav-item">Demos</a>
+            <a href="../../sdk/" class="nav-item">SDKs</a>
+            <a href="../../validate/" class="nav-item">Tool Validation</a>
+            <a href="../../privacy/" class="nav-item">Privacy Techniques</a>
+            <a href="../../threats/" class="nav-item">Threat Model</a>
+
+            <div class="nav-section">Integrations</div>
+            <a href="../../integrations/" class="nav-item">All Integrations</a>
+            <a href="../../integrations/airflow/" class="nav-item nav-item-sub">Apache Airflow</a>
+            <a href="../../integrations/dbt/" class="nav-item nav-item-sub">dbt</a>
+            <a href="../../integrations/spark/" class="nav-item nav-item-sub">Apache Spark</a>
+            <a href="../../integrations/kafka/" class="nav-item nav-item-sub">Apache Kafka</a>
+            <a href="../../integrations/snowflake/" class="nav-item nav-item-sub">Snowflake</a>
+            <a href="../../integrations/databricks/" class="nav-item nav-item-sub active">Databricks</a>
+            <a href="../../integrations/dagster/" class="nav-item nav-item-sub">Dagster</a>
+            <a href="../../integrations/prefect/" class="nav-item nav-item-sub">Prefect</a>
+            <a href="../../integrations/expanso/" class="nav-item nav-item-sub">Expanso</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <h1 style="font-size: 2.5rem; font-weight: 400; margin-bottom: 0.5rem;">
+                <span style="font-size: 2.5rem; margin-right: 0.5rem;">🧱</span>
+                Databricks + Makoto Integration Concept
+            </h1>
+            <p style="color: var(--text-muted); font-size: 1.15rem; margin-bottom: 1.5rem;">Unity Catalog + Job event hooks — DBOMs for every notebook and job run.</p>
+
+            <div class="concept-banner">
+                <p><strong>Note:</strong> This page explores how Makoto Levels could be implemented on Databricks. It is a conceptual integration proposal — illustrative, not a shipped library. The patterns shown use real Databricks APIs; the Makoto pieces are sketches you (or we) could build out.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="what-is">
+                <h3>What is Databricks?</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">Databricks combines Spark, Delta Lake, and Unity Catalog. Unity already tracks lineage at the column level; Jobs already emit lifecycle events. Makoto sits on top of both, turning Unity lineage into Origin attestations and Job run events into Transform attestations.</p>
+                <div class="feature-grid">
+                    <div class="feature"><strong>Unity Catalog Lineage</strong><span>Column-level lineage → attestation subject set</span></div>
+                    <div class="feature"><strong>Job Run Hooks</strong><span>Job-completed event → publish DBOM</span></div>
+                    <div class="feature"><strong>Delta Live Tables</strong><span>DLT expectations become attestation predicates</span></div>
+                    <div class="feature"><strong>System Tables</strong><span>`system.access.audit` enriches the issuer field</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" style="background: var(--bg-light);">
+            <h2>Integration Approach</h2>
+            <p>Primary pattern: <strong>Unity Catalog hook + Job webhook + DLT expectation expressions</strong>. Below are the integration options ordered by lift required.</p>
+            <div class="integration-idea">
+                <h3>How Makoto attaches to Databricks</h3>
+                <ul class="idea-list">
+                    <li><strong>Databricks App</strong> — Install the Makoto app; it subscribes to Job events and reads Unity lineage on completion.</li>
+                    <li><strong>DLT expectation library</strong> — DLT pipelines call `dlt.expect(makoto.attestation_valid(input_table))` to refuse unattested data.</li>
+                    <li><strong>Notebook helper</strong> — `%pip install makoto-databricks` — wrap any cell with `with makoto.transform(level=2): ...`.</li>
+                    <li><strong>Workflow on_failure / on_success</strong> — Job-level webhook posts the signed DBOM to the configured store.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Conceptual Code Example</h2>
+            <div class="pipeline-demo">
+                <h3>Concept: Delta Live Tables with Makoto attestation</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">Per-table attestation, refusal of unattested upstreams, all in one decorator</p>
+                <div class="pipeline-yaml"><pre><span class="yaml-kw">import</span> dlt
+<span class="yaml-kw">from</span> pyspark.sql.functions <span class="yaml-kw">import</span> col, sha2
+<span class="yaml-kw">from</span> makoto_databricks <span class="yaml-kw">import</span> attest, expect_attestation
+
+<span class="yaml-bool">@dlt</span>.table(name=<span class="yaml-string">"raw_orders"</span>)
+<span class="yaml-bool">@attest</span>.origin(level=<span class="yaml-number">2</span>, signing_key=<span class="yaml-string">"kms://aws/key/..."</span>)
+<span class="yaml-kw">def</span> raw_orders():
+    <span class="yaml-string">"""Pulled from operational Postgres via CDC."""</span>
+    <span class="yaml-kw">return</span> (
+        spark.readStream
+             .format(<span class="yaml-string">"kafka"</span>)
+             .option(<span class="yaml-string">"subscribe"</span>, <span class="yaml-string">"orders.cdc"</span>)
+             .load()
+    )
+
+<span class="yaml-bool">@dlt</span>.table(name=<span class="yaml-string">"curated_orders"</span>)
+<span class="yaml-bool">@attest</span>.transform(level=<span class="yaml-number">2</span>)
+<span class="yaml-bool">@dlt</span>.expect(<span class="yaml-string">"must_have_dbom"</span>,
+    expect_attestation(upstream=<span class="yaml-string">"raw_orders"</span>))
+<span class="yaml-kw">def</span> curated_orders():
+    <span class="yaml-string">"""Hash PII, retain only paid orders."""</span>
+    <span class="yaml-kw">return</span> (
+        dlt.read_stream(<span class="yaml-string">"raw_orders"</span>)
+           .withColumn(<span class="yaml-string">"email_hash"</span>, sha2(col(<span class="yaml-string">"email"</span>), <span class="yaml-number">256</span>))
+           .filter(col(<span class="yaml-string">"status"</span>) == <span class="yaml-string">"paid"</span>)
+           .drop(<span class="yaml-string">"email"</span>)
+    )
+
+<span class="yaml-comment"># On materialization, the @attest decorator:</span>
+<span class="yaml-comment">#   - reads Unity Catalog lineage for `upstream` digests</span>
+<span class="yaml-comment">#   - computes the output table content digest</span>
+<span class="yaml-comment">#   - signs via Databricks Secrets-stored cosign key</span>
+<span class="yaml-comment">#   - writes the DBOM to system.makoto.attestations</span></pre></div>
+            </div>
+        </section>
+
+        <section class="section" style="background: var(--bg-light);">
+            <h2>Potential Use Cases</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+<div class="use-case-card">
+    <h4>Regulated Lakehouses</h4>
+    <p style="color: var(--text-muted);">FedRAMP, HIPAA workloads — every Delta table mutation carries a signed receipt.</p>
+</div>
+
+<div class="use-case-card">
+    <h4>Cross-workspace Shares</h4>
+    <p style="color: var(--text-muted);">Delta Sharing recipients verify DBOMs before consuming.</p>
+</div>
+
+<div class="use-case-card">
+    <h4>Feature Store Provenance</h4>
+    <p style="color: var(--text-muted);">Every feature in the feature store carries a DBOM linked to its training data.</p>
+</div>
+
+<div class="use-case-card">
+    <h4>MLflow Model Cards</h4>
+    <p style="color: var(--text-muted);">Model cards embed DBOMs proving the training data lineage.</p>
+</div>
+            </div>
+        </section>
+
+        <section class="section" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white;">
+            <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: white;">Interested in Databricks + Makoto?</h2>
+                <p style="color: rgba(255,255,255,0.9); margin: 1rem 0 2rem;">
+                    This is a conceptual integration. If you're shipping Databricks pipelines and want to add Makoto attestations, open an issue or reach out — we'd love to scope a real implementation.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://www.databricks.com" target="_blank" class="btn" style="background: white; color: var(--primary);">Learn about Databricks</a>
+                    <a href="../../spec/" class="btn" style="background: transparent; border: 2px solid white; color: white;">Read Makoto Spec</a>
+                    <a href="../" class="btn" style="background: transparent; border: 2px solid white; color: white;">All Integrations</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Makoto brings SLSA-style assurance levels to data supply chains. <a href="https://slsa.dev" target="_blank">Learn about SLSA →</a></p>
+        </footer>
+    </main>
+</body>
+</html>

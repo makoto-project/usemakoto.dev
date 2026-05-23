@@ -4,6 +4,8 @@ The specification website for **Makoto (誠)** — a data integrity framework th
 
 **Live site:** [https://usemakoto.dev](https://usemakoto.dev)
 
+> **100% Open Source.** Makoto is, and will always be, fully open source under the [MIT License](LICENSE) — an [OSI-approved](https://opensource.org/licenses/MIT) license. There is no "open core," no proprietary tier, no source-available trickery. The spec, the schema, the examples, and this site are all yours to read, fork, run, and ship.
+
 ---
 
 ## What's Here
@@ -20,8 +22,29 @@ This repo is the source for `usemakoto.dev`. It contains:
 | `privacy/` | Privacy-preserving attestation techniques |
 | `comparison/` | Makoto vs SLSA vs DVC vs checksums |
 | `attestations/` | Live attestation format examples |
+| `integrations/` | Platform integration concepts (Airflow, dbt, Spark, Kafka, Snowflake, Databricks, Dagster, Prefect, Expanso) |
 | `assets/` | CSS, JS, images |
-| `expanso/` | Expanso integration notes |
+| `expanso/` | Redirect → `integrations/expanso/` |
+
+---
+
+## Platform Integrations
+
+Makoto is platform-agnostic — the same DBOM format works on any data pipeline. The `integrations/` directory contains conceptual integration pages for common platforms, each showing how Makoto attestations attach using that platform's native APIs:
+
+| Platform | Category | Primary integration pattern |
+|----------|----------|------------------------------|
+| [Apache Airflow](https://usemakoto.dev/integrations/airflow/) | Orchestration | `MakotoOperator` + `on_success_callback` |
+| [dbt](https://usemakoto.dev/integrations/dbt/) | Transformations | Post-hook macro + `on-run-end` |
+| [Apache Spark](https://usemakoto.dev/integrations/spark/) | Distributed compute | `SparkListener` + UDF + writer wrapper |
+| [Apache Kafka](https://usemakoto.dev/integrations/kafka/) | Streaming | Producer/Consumer Interceptor, Connect SMT |
+| [Snowflake](https://usemakoto.dev/integrations/snowflake/) | Warehouse | Stored procedure + Task + External Function signing |
+| [Databricks](https://usemakoto.dev/integrations/databricks/) | Lakehouse | Unity Catalog hooks + Job webhooks + DLT expectations |
+| [Dagster](https://usemakoto.dev/integrations/dagster/) | Orchestration | `@makoto_asset` + materialization sensor + IO manager |
+| [Prefect](https://usemakoto.dev/integrations/prefect/) | Orchestration | State hooks + `MakotoResult` serializer |
+| [Expanso](https://usemakoto.dev/integrations/expanso/) | Edge pipelines | Bloblang mapping + custom processor plugin |
+
+All integrations are **conceptual** — they use real platform APIs, but the Makoto-specific pieces (operators, hooks, processors, decorators) are illustrative sketches. To ship one for real, [open an issue](https://github.com/makoto-project/makoto/issues).
 
 ---
 
@@ -80,4 +103,12 @@ For large spec changes (new levels, new attestation types), open an issue first.
 
 ## License
 
-Apache 2.0
+Licensed under the **MIT License** — see [LICENSE](LICENSE) for the full text.
+
+This project is, and always will be, **100% open source**. MIT was chosen specifically because it is:
+
+- **[OSI-approved](https://opensource.org/licenses/MIT)** — meets the Open Source Definition (free to use, modify, redistribute, and sublicense, including for commercial purposes)
+- **Maximally permissive** — short, plain, and battle-tested; legal review takes minutes, not weeks, which lowers adoption friction for teams shipping Makoto-conformant pipelines
+- **Universally compatible** — MIT-licensed work can be combined with virtually any other OSS license (GPL, Apache, BSD, etc.), so downstream tools and specs can ingest the schema and examples without conflict
+
+If you need a different OSI-approved license for compatibility (e.g., Apache-2.0, BSD), open an issue and we'll discuss.

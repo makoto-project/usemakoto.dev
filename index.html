@@ -60,8 +60,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <a href="privacy/" class="nav-item">Privacy Techniques</a>
             <a href="threats/" class="nav-item">Threat Model</a>
 
-            <div class="nav-section">Implementations</div>
-            <a href="expanso/" class="nav-item">Expanso Integration</a>
+            <div class="nav-section">Integrations</div>
+                        <a href="integrations/" class="nav-item">All Integrations</a>
+                        <a href="integrations/airflow/" class="nav-item nav-item-sub">Apache Airflow</a>
+                        <a href="integrations/dbt/" class="nav-item nav-item-sub">dbt</a>
+                        <a href="integrations/spark/" class="nav-item nav-item-sub">Apache Spark</a>
+                        <a href="integrations/kafka/" class="nav-item nav-item-sub">Apache Kafka</a>
+                        <a href="integrations/snowflake/" class="nav-item nav-item-sub">Snowflake</a>
+                        <a href="integrations/databricks/" class="nav-item nav-item-sub">Databricks</a>
+                        <a href="integrations/dagster/" class="nav-item nav-item-sub">Dagster</a>
+                        <a href="integrations/prefect/" class="nav-item nav-item-sub">Prefect</a>
+                        <a href="integrations/expanso/" class="nav-item nav-item-sub">Expanso</a>
         </nav>
     </aside>
 
@@ -89,7 +98,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                     <a href="spec/" class="btn btn-primary" style="background: var(--accent); color: var(--primary-dark);">Read the Specification</a>
                     <a href="demos/" class="btn btn-primary" style="background: var(--primary); color: white;">Try the live demos &rarr;</a>
-                    <a href="examples/" class="btn btn-outline" style="border-color: var(--accent); color: var(--accent);">View Examples</a>
+                    <a href="integrations/" class="btn btn-outline" style="border-color: var(--accent); color: var(--accent);">Platform Integrations</a>
                 </div>
             </div>
         </section>
@@ -359,6 +368,68 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     secure both software and data supply chains.
                 </p>
             </div>
+        </section>
+
+        <!-- Platform Integrations -->
+        <section class="section">
+            <h2>Integrate with your platform</h2>
+            <p style="max-width: 760px;">
+                Makoto is platform-agnostic by design. The same DBOM format works on any pipeline —
+                orchestrators, warehouses, streaming engines, lakehouses. Below are conceptual
+                integrations showing how Makoto attaches to the tools you already run.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+                <a href="integrations/airflow/" style="display: block; padding: 1.25rem; background: white; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; transition: all 0.15s;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🪶</div>
+                    <strong style="color: var(--primary); display: block;">Apache Airflow</strong>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">DAG-driven orchestration</span>
+                </a>
+                <a href="integrations/dbt/" style="display: block; padding: 1.25rem; background: white; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; transition: all 0.15s;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔧</div>
+                    <strong style="color: var(--primary); display: block;">dbt</strong>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">SQL transformations</span>
+                </a>
+                <a href="integrations/spark/" style="display: block; padding: 1.25rem; background: white; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; transition: all 0.15s;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">✨</div>
+                    <strong style="color: var(--primary); display: block;">Apache Spark</strong>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Distributed compute</span>
+                </a>
+                <a href="integrations/kafka/" style="display: block; padding: 1.25rem; background: white; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; transition: all 0.15s;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📨</div>
+                    <strong style="color: var(--primary); display: block;">Apache Kafka</strong>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Streaming</span>
+                </a>
+                <a href="integrations/snowflake/" style="display: block; padding: 1.25rem; background: white; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; transition: all 0.15s;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">❄️</div>
+                    <strong style="color: var(--primary); display: block;">Snowflake</strong>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Warehouse</span>
+                </a>
+                <a href="integrations/databricks/" style="display: block; padding: 1.25rem; background: white; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; transition: all 0.15s;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🧱</div>
+                    <strong style="color: var(--primary); display: block;">Databricks</strong>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Lakehouse</span>
+                </a>
+                <a href="integrations/dagster/" style="display: block; padding: 1.25rem; background: white; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; transition: all 0.15s;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🛰️</div>
+                    <strong style="color: var(--primary); display: block;">Dagster</strong>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Asset-based orchestration</span>
+                </a>
+                <a href="integrations/prefect/" style="display: block; padding: 1.25rem; background: white; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; transition: all 0.15s;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🌀</div>
+                    <strong style="color: var(--primary); display: block;">Prefect</strong>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">State-hook orchestration</span>
+                </a>
+                <a href="integrations/expanso/" style="display: block; padding: 1.25rem; background: white; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; transition: all 0.15s;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🌐</div>
+                    <strong style="color: var(--primary); display: block;">Expanso</strong>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Edge-to-cloud pipelines</span>
+                </a>
+            </div>
+
+            <p style="margin-top: 1.5rem;">
+                <a href="integrations/">See all integrations →</a>
+            </p>
         </section>
 
         <!-- Get Started CTA -->
