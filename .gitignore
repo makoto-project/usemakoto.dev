@@ -12,5 +12,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Python
+*.pyc
+__pycache__/
+
 # Demo output (generated at runtime)
 demos/06-invisible-unicode-guardrails/output/
