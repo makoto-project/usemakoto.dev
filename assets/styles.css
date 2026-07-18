@@ -4,6 +4,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;700&display=swap');
 
 :root {
+    color-scheme: light;
+
     /* Indigo theme (matching Expanso standard) */
     --primary-dark: #312e81;      /* Deep indigo - sidebar bg */
     --primary: #6366f1;           /* Main indigo */
@@ -18,6 +20,19 @@
     --bg-white: #fafafa;
     --bg-light: #f4f4f5;
     --border: #e4e4e7;
+    --surface: #ffffff;
+
+    /* Links use a deeper indigo than decorative accents for readable contrast. */
+    --link: #4338ca;
+    --link-hover: #312e81;
+    --focus-ring: #818cf8;
+
+    /* Evidence layers used by the reproducibility coverage map. */
+    --evidence-data: #0f766e;
+    --evidence-model: #7c3aed;
+    --evidence-software: #4338ca;
+    --evidence-runtime: #b45309;
+    --evidence-evaluation: #be123c;
 
     /* Sidebar - dark mode to match other demos */
     --sidebar-width: 220px;
@@ -138,12 +153,22 @@ body {
 }
 
 a {
-    color: var(--primary);
-    text-decoration: none;
+    color: var(--link);
+    text-decoration: underline;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.16em;
 }
 
 a:hover {
-    text-decoration: underline;
+    color: var(--link-hover);
+    text-decoration-thickness: 0.12em;
+}
+
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+    border-radius: 3px;
 }
 
 /* ===== SIDEBAR NAVIGATION ===== */
@@ -426,8 +451,8 @@ a:hover {
 }
 
 .content-table a {
-    color: var(--primary);
-    text-decoration: none;
+    color: var(--link);
+    text-decoration: underline;
 }
 
 .content-table a:hover {
@@ -627,7 +652,7 @@ code {
 
 .page-nav a:hover,
 .page-nav a.active {
-    color: var(--primary);
+    color: var(--link);
 }
 
 /* ===== PIPELINE DIAGRAM ===== */
@@ -779,7 +804,7 @@ code {
 }
 
 .footer a {
-    color: var(--primary);
+    color: var(--link);
 }
 
 /* ===== SVG DIAGRAM STYLES ===== */
@@ -922,6 +947,14 @@ code {
         padding: 2rem 1.5rem;
     }
 
+    .content-table,
+    .threat-table {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .page-nav {
         display: none;
     }
@@ -1053,4 +1086,356 @@ code {
 .pipeline-yaml pre {
     margin: 0;
     color: #e2e8f0;
+}
+
+/* ===== REPRODUCIBILITY EVIDENCE MAP ===== */
+.repro-kicker {
+    margin-bottom: 0.5rem;
+    color: var(--link);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.evidence-stack {
+    display: grid;
+    gap: 0.75rem;
+    margin: 2rem 0;
+}
+
+.evidence-layer {
+    --layer-color: var(--primary);
+    display: grid;
+    grid-template-columns: minmax(8.5rem, 0.7fr) minmax(0, 2fr) minmax(7.5rem, auto);
+    gap: 1.25rem;
+    align-items: start;
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--layer-color);
+    border-radius: 8px;
+}
+
+.evidence-layer[data-layer="data"] { --layer-color: var(--evidence-data); }
+.evidence-layer[data-layer="model"] { --layer-color: var(--evidence-model); }
+.evidence-layer[data-layer="software"] { --layer-color: var(--evidence-software); }
+.evidence-layer[data-layer="runtime"] { --layer-color: var(--evidence-runtime); }
+.evidence-layer[data-layer="evaluation"] { --layer-color: var(--evidence-evaluation); }
+
+.evidence-label {
+    color: var(--layer-color);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.evidence-record strong {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: var(--text);
+}
+
+.evidence-record span {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.evidence-coverage {
+    justify-self: end;
+    padding: 0.25rem 0.55rem;
+    color: var(--text-muted);
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.repro-output {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    margin: 1rem 0 2rem;
+    padding: 1.25rem 1.5rem;
+    color: var(--text);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(15, 118, 110, 0.08));
+    border: 1px solid var(--primary-light);
+    border-radius: 10px;
+}
+
+.repro-proof-mark {
+    display: inline-flex;
+    width: 42px;
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-dark);
+    background: var(--accent);
+    border-radius: 50%;
+    font-family: var(--font-jp);
+    font-weight: 700;
+}
+
+.repro-output strong {
+    display: block;
+    margin-bottom: 0.15rem;
+}
+
+.repro-output p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.repro-run-id {
+    color: var(--link);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.repro-checklist {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 1.5rem;
+    margin: 1rem 0 2rem;
+    padding: 0;
+    list-style: none;
+}
+
+.repro-checklist li {
+    position: relative;
+    padding-left: 1.5rem;
+    color: var(--text-muted);
+}
+
+.repro-checklist li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--evidence-data);
+    font-weight: 700;
+}
+
+.scope-note {
+    padding: 1rem 1.25rem;
+    background: var(--bg-light);
+    border-left: 4px solid var(--primary);
+    border-radius: 0 8px 8px 0;
+}
+
+.scope-note p {
+    margin: 0;
+}
+
+@media (max-width: 700px) {
+    .evidence-layer {
+        grid-template-columns: 1fr;
+        gap: 0.45rem;
+    }
+
+    .evidence-coverage {
+        justify-self: start;
+    }
+
+    .repro-output {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .repro-run-id {
+        grid-column: 2;
+    }
+
+    .repro-checklist {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== SYSTEM DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+
+        --text: #f4f4f5;
+        --text-muted: #c7c7d1;
+        --text-light: #a1a1aa;
+        --bg-white: #101014;
+        --bg-light: #1a1a21;
+        --border: #3f3f49;
+        --surface: #18181f;
+
+        --link: #a5b4fc;
+        --link-hover: #c7d2fe;
+        --focus-ring: #c7d2fe;
+
+        --evidence-data: #5eead4;
+        --evidence-model: #c4b5fd;
+        --evidence-software: #a5b4fc;
+        --evidence-runtime: #fcd34d;
+        --evidence-evaluation: #fda4af;
+
+        --sidebar-text: rgba(250, 250, 250, 0.95);
+        --sidebar-text-muted: rgba(212, 212, 216, 0.88);
+    }
+
+    /* Keep the dark canvas explicit so browser auto-darkening cannot remap it. */
+    body,
+    .main-content {
+        background: var(--bg-white);
+    }
+
+    .btn-outline {
+        color: var(--link);
+        border-color: var(--link);
+    }
+
+    .btn-outline:hover {
+        color: white;
+        background: #4338ca;
+        border-color: #4338ca;
+    }
+
+    /* Raised content surfaces used across specifications, demos, and integrations. */
+    .card,
+    .page-nav,
+    .pipeline-stage,
+    .technique-card,
+    .level-section table,
+    .threat-category,
+    .comparison-card,
+    .coverage-card,
+    .what-is,
+    .integration-idea,
+    .use-case-card,
+    .platform-card,
+    .sdk-section,
+    .toc,
+    .schema-sample,
+    .tool-card,
+    .flow-card-header,
+    .tool-card-head,
+    .layer-arrow {
+        background: var(--surface) !important;
+        border-color: var(--border) !important;
+    }
+
+    .flow-card-header,
+    .tool-card-head,
+    .tool-card-title {
+        color: var(--text) !important;
+    }
+
+    .flow-card-header .copy-btn {
+        color: var(--text-muted) !important;
+        border-color: var(--border) !important;
+    }
+
+    .flow-tab:not(.active) {
+        background: var(--surface) !important;
+        border-color: var(--border) !important;
+        color: var(--text-muted) !important;
+    }
+
+    /* Several older pages use inline white cards; leave white CTA buttons intact. */
+    [style*="background: white"]:not(.btn),
+    [style*="background:white"]:not(.btn) {
+        background: var(--surface) !important;
+    }
+
+    [style*="color: var(--primary)"]:not(.btn),
+    [style*="color:var(--primary)"]:not(.btn),
+    .what-is h3,
+    .integration-idea h3,
+    .use-case-card h4,
+    .platform-card h3,
+    .platform-tag,
+    .pipeline-demo h3 {
+        color: var(--link) !important;
+    }
+
+    .toc a,
+    .full-code-link {
+        color: var(--link) !important;
+        text-decoration: underline !important;
+    }
+
+    /* Translate light-only callouts into quiet dark tints without losing meaning. */
+    [style*="background: #eff6ff"],
+    [style*="background:#eff6ff"] {
+        background: #171d32 !important;
+        border-color: #475569 !important;
+    }
+
+    [style*="background: #fef3c7"],
+    [style*="background:#fef3c7"],
+    [style*="background: #fff7ed"],
+    [style*="background:#fff7ed"] {
+        background: #29210f !important;
+        border-color: #854d0e !important;
+    }
+
+    [style*="background: #fef2f2"],
+    [style*="background:#fef2f2"] {
+        background: #2b171b !important;
+        border-color: #7f1d1d !important;
+    }
+
+    [style*="background: #f0fdf4"],
+    [style*="background:#f0fdf4"],
+    [style*="background: #ecfdf5"],
+    [style*="background:#ecfdf5"] {
+        background: #11251a !important;
+        border-color: #166534 !important;
+    }
+
+    [style*="background: #f1f5f9"],
+    [style*="background:#f1f5f9"],
+    [style*="background: #f8fafc"],
+    [style*="background:#f8fafc"],
+    [style*="background: #f6f8fa"],
+    [style*="background:#f6f8fa"] {
+        background: var(--bg-light) !important;
+    }
+
+    /* Page-local light callouts load after this stylesheet, so these are intentional overrides. */
+    .note-box,
+    .verification-box,
+    .schema-note,
+    .compare-card.flagged {
+        background: #29210f !important;
+        border-color: #854d0e !important;
+        color: var(--text) !important;
+    }
+
+    .note-box strong,
+    .concept-banner strong,
+    .concept-banner p {
+        color: #fde68a !important;
+    }
+
+    .tool-section .tool-meta code,
+    code.inline,
+    .field-item code,
+    .ledger-row code {
+        background: #262633 !important;
+        color: var(--link) !important;
+    }
+
+    .content-table th,
+    .threat-table th,
+    .cmp-table tr:nth-child(even) td {
+        background: var(--bg-light) !important;
+    }
+
+    .accent-banner p {
+        opacity: 1;
+    }
 }

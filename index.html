@@ -130,7 +130,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><a href="spec/#about">About Makoto Levels</a></td>
+                        <td><a href="spec/#overview">About Makoto Levels</a></td>
                         <td>An introductory guide to the Makoto specification</td>
                     </tr>
                     <tr>
@@ -138,7 +138,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <td>An introduction to data supply chain threats</td>
                     </tr>
                     <tr>
-                        <td><a href="spec/#use-cases">Use cases</a></td>
+                        <td><a href="comparison/decision-guide.html#scenarios">Use cases</a></td>
                         <td>Common use cases for data attestation</td>
                     </tr>
                     <tr>
@@ -171,11 +171,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <td>Overview of L1, L2, and L3 provenance levels</td>
                     </tr>
                     <tr>
-                        <td><a href="spec/#producing">Producing DBOMs</a></td>
+                        <td><a href="spec/#dbom">Producing DBOMs</a></td>
                         <td>How to produce DBOMs for your data pipelines</td>
                     </tr>
                     <tr>
-                        <td><a href="spec/#verifying">Verifying DBOMs</a></td>
+                        <td><a href="spec/#verification">Verifying DBOMs</a></td>
                         <td>How to verify Data Bills of Materials</td>
                     </tr>
                 </tbody>
@@ -368,6 +368,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     secure both software and data supply chains.
                 </p>
             </div>
+        </section>
+
+        <!-- AI/ML Reproducibility -->
+        <section class="section" id="reproducibility">
+            <div class="repro-kicker">Beyond the model card</div>
+            <h2>Can someone reproduce the result?</h2>
+            <p style="max-width: 760px;">
+                A production result depends on more than a model version. Reproducing it requires evidence for the
+                exact data, model recipe, software build, runtime configuration, and evaluation record that shaped the output.
+            </p>
+
+            <div class="repro-output" style="max-width: 860px;">
+                <span class="repro-proof-mark" aria-hidden="true">証</span>
+                <div>
+                    <strong>One result. Five evidence layers.</strong>
+                    <p>Makoto verifies the data layer and links it to the rest of the handoff.</p>
+                </div>
+                <span class="repro-run-id">data · model · software · runtime · eval</span>
+            </div>
+
+            <p>
+                <a href="comparison/decision-guide.html#ai-reproducibility" class="btn btn-outline">See the reproducibility evidence map</a>
+            </p>
         </section>
 
         <!-- Platform Integrations -->
