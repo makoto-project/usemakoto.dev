@@ -465,13 +465,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     Many organizations need both frameworks. For example, an ML pipeline might use:
                 </p>
                 <ul>
-                    <li><strong>SLSA</strong> for the training code and model binary</li>
-                    <li><strong>Makoto</strong> for the training data and feature datasets</li>
+                    <li><strong>SLSA and an SBOM</strong> for training code, containers, and software dependencies</li>
+                    <li><strong>Makoto</strong> for training, evaluation, and inference data</li>
+                    <li><strong>Additional signed records</strong> for the model digest and recipe, runtime configuration, and evaluation history</li>
                 </ul>
                 <p>
-                    The attestations can be stored together and verified as a combined provenance chain,
-                    proving both the software and data integrity of the final model.
+                    Store these records together and bind them to one run identifier. Each record proves its own layer;
+                    no combination automatically guarantees full model reproducibility unless the model recipe, runtime,
+                    and evaluation evidence are also captured.
                 </p>
+                <p><a href="decision-guide.html#ai-reproducibility">See the AI/ML reproducibility evidence map →</a></p>
             </div>
         </section>
 

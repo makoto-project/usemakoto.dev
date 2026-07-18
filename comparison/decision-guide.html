@@ -125,9 +125,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <td>Standard ontology for cross-system interoperability</td>
                     </tr>
                     <tr>
-                        <td><strong>ML model training data governance</strong></td>
-                        <td><span style="color: #059669; font-weight: 600;">Makoto</span> + <span style="color: #4f46e5; font-weight: 600;">SLSA</span></td>
-                        <td>Makoto for data, SLSA for model artifacts</td>
+                        <td><strong>Reproduce an AI training or inference result</strong></td>
+                        <td><span style="color: #059669; font-weight: 600;">Makoto</span> + <span style="color: #4f46e5; font-weight: 600;">SBOM/SLSA</span> + run records</td>
+                        <td>No single standard covers the data, model recipe, software, runtime, and evaluation together</td>
                     </tr>
                     <tr>
                         <td><strong>Data catalog with lineage visibility</strong></td>
@@ -136,6 +136,92 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </tr>
                 </tbody>
             </table>
+        </section>
+
+        <!-- AI/ML Reproducibility Coverage -->
+        <section class="section" id="ai-reproducibility" style="background: var(--bg-light); max-width: none; padding: 3rem;">
+            <div style="max-width: 900px;">
+                <div class="repro-kicker">AI/ML supply chain</div>
+                <h2>A reproducible result is a stack, not a model card</h2>
+                <p style="max-width: 760px;">
+                    When a model produces a result in production, reproducing that result requires the exact evidence
+                    for every layer that shaped it. A model name and version are useful context, but they do not capture
+                    the input bytes, training recipe, application build, deployment configuration, or evaluation history.
+                </p>
+
+                <div class="evidence-stack" aria-label="Five evidence layers required for an AI reproducibility handoff">
+                    <article class="evidence-layer" data-layer="data">
+                        <div class="evidence-label">Data</div>
+                        <div class="evidence-record">
+                            <strong>Training, evaluation, and inference inputs</strong>
+                            <span>Record source and content digests, transformations, feature preparation, and the exact input presented to the model.</span>
+                        </div>
+                        <div class="evidence-coverage">Makoto DBOM</div>
+                    </article>
+
+                    <article class="evidence-layer" data-layer="model">
+                        <div class="evidence-label">Model recipe</div>
+                        <div class="evidence-record">
+                            <strong>Model artifact and how it was produced</strong>
+                            <span>Record the base-model and checkpoint digests, training-code reference, hyperparameters, random seed, and final model digest.</span>
+                        </div>
+                        <div class="evidence-coverage">Explicit record</div>
+                    </article>
+
+                    <article class="evidence-layer" data-layer="software">
+                        <div class="evidence-label">Software</div>
+                        <div class="evidence-record">
+                            <strong>Application, container, and dependencies</strong>
+                            <span>Record the source revision, dependency graph, build provenance, container digest, and any preprocessing or postprocessing code.</span>
+                        </div>
+                        <div class="evidence-coverage">SBOM + SLSA</div>
+                    </article>
+
+                    <article class="evidence-layer" data-layer="runtime">
+                        <div class="evidence-label">Runtime</div>
+                        <div class="evidence-record">
+                            <strong>The environment that actually ran</strong>
+                            <span>Record hardware, accelerator and driver versions, serving configuration, feature flags, sampling parameters, and sensor settings.</span>
+                        </div>
+                        <div class="evidence-coverage">Deployment record</div>
+                    </article>
+
+                    <article class="evidence-layer" data-layer="evaluation">
+                        <div class="evidence-label">Evaluation</div>
+                        <div class="evidence-record">
+                            <strong>Expected behavior and observed outcome</strong>
+                            <span>Record the evaluation suite and version, metrics, policy thresholds, output digest, and any accepted variance.</span>
+                        </div>
+                        <div class="evidence-coverage">Versioned eval record</div>
+                    </article>
+                </div>
+
+                <div class="repro-output">
+                    <span class="repro-proof-mark" aria-hidden="true">証</span>
+                    <div>
+                        <strong>Bind every record to the same handoff</strong>
+                        <p>A shared run identifier turns separate bills of materials and attestations into one traceable result.</p>
+                    </div>
+                    <span class="repro-run-id">run:sha256:…</span>
+                </div>
+
+                <h3>Minimum handoff checklist</h3>
+                <ul class="repro-checklist">
+                    <li>Content-address every input, model, and output</li>
+                    <li>Bind all evidence to one immutable run identifier</li>
+                    <li>Capture source, dependency, and container revisions</li>
+                    <li>Record runtime configuration and hardware details</li>
+                    <li>Preserve seeds, sampling parameters, and accepted variance</li>
+                    <li>List missing evidence explicitly instead of filling gaps with assumptions</li>
+                </ul>
+
+                <div class="scope-note">
+                    <p><strong>Makoto's boundary:</strong> Makoto makes the data layer machine-readable and verifiable.
+                    It is designed to sit beside software build provenance, model-recipe records, deployment manifests,
+                    and versioned evaluations—not replace them. Model cards remain useful explanatory documents, but
+                    they are not substitutes for content digests and machine-verifiable evidence.</p>
+                </div>
+            </div>
         </section>
 
         <!-- Standard Profiles -->
@@ -380,12 +466,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                 <h3>Scenario 1: ML Training Pipeline</h3>
                 <div class="card">
-                    <p style="margin-top: 0;"><em>"I'm training ML models and need to prove the provenance of both my training data and model artifacts."</em></p>
-                    <p><strong>Recommendation:</strong> Use <strong>Makoto</strong> for training data attestations and <strong>SLSA</strong> for model artifact provenance.</p>
+                    <p style="margin-top: 0;"><em>"I'm training ML models and need enough evidence to reproduce a training run or investigate a production result."</em></p>
+                    <p><strong>Recommendation:</strong> Build a linked evidence stack. Use <strong>Makoto</strong> for data,
+                    <strong>SBOM/SLSA</strong> for software and builds, and explicit records for the model recipe, runtime, and evaluations.</p>
                     <ul style="margin-bottom: 0;">
-                        <li>Makoto tracks data origin, transformations, and feature engineering</li>
-                        <li>SLSA tracks model training code and resulting artifacts</li>
-                        <li>Both use in-toto format, enabling unified verification policies</li>
+                        <li>Makoto tracks training, evaluation, and inference data origin and transformations</li>
+                        <li>SBOMs and SLSA track application dependencies and build provenance</li>
+                        <li>Model digests, training parameters, deployment settings, and eval history need their own records</li>
+                        <li>Bind every record to one immutable run identifier for a traceable handoff</li>
                     </ul>
                 </div>
 
