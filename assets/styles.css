@@ -1367,6 +1367,23 @@ code {
         text-decoration: underline !important;
     }
 
+    /* Inline brand colors are tuned for light cards; use AA-safe tints in dark mode. */
+    .framework-heading-slsa {
+        color: #a5b4fc !important;
+    }
+
+    .framework-heading-makoto {
+        color: #6ee7b7 !important;
+    }
+
+    .framework-heading-openlineage {
+        color: #fca5a5 !important;
+    }
+
+    .framework-heading-w3c {
+        color: #c4b5fd !important;
+    }
+
     /* Translate light-only callouts into quiet dark tints without losing meaning. */
     [style*="background: #eff6ff"],
     [style*="background:#eff6ff"] {
