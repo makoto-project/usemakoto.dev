@@ -197,7 +197,13 @@ def fetch_exact(
     timeout: float,
 ) -> bytes:
     url = base_url.rstrip("/") + resource.path
-    request = urllib.request.Request(url, headers={"User-Agent": "makoto-release-probe/0.2"})
+    request = urllib.request.Request(
+        url,
+        headers={
+            "Accept": "*/*",
+            "User-Agent": "makoto-release-probe/0.2",
+        },
+    )
     try:
         with opener.open(request, timeout=timeout) as response:
             status = response.getcode()
