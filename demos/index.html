@@ -297,6 +297,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <main class="main-content">
         <section class="demos-hero">
             <h1>Live Demos</h1>
+
+<div class="legacy-v01-banner" role="note"><p><strong>Historical v0.1 material.</strong> This page describes the v0.1 Makoto Levels/DBOM format, which is incompatible with v0.2 and is not current v0.2 documentation.</p></div>
             <p>Six scenarios. Copy-paste commands. See exactly what Makoto does — and what happens without it.</p>
             <a href="/demos/setup/" class="setup-btn">Setup Guide &rarr;</a>
         </section>
@@ -494,12 +496,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="terminal">
                     <div class="terminal-bar">
                         <div class="terminal-dots"><span></span><span></span><span></span></div>
-                        <button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/makoto&#10;cd makoto/demos/06-invisible-unicode-guardrails&#10;uv run run.py">Copy</button>
+<button class="terminal-copy" onclick="copyCommands(this)" data-commands="git clone https://github.com/makoto-project/usemakoto.dev.git&#10;cd usemakoto.dev&#10;uv run python -m http.server 8080&#10;# open http://localhost:8080/demos/06/">Copy</button>
                     </div>
                     <div class="terminal-body">
-                        <div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/makoto-project/makoto</span></div>
-                        <div><span class="prompt">$ </span><span class="cmd">cd makoto/demos/06-invisible-unicode-guardrails</span></div>
-                        <div><span class="prompt">$ </span><span class="cmd">uv run run.py</span></div>
+<div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/makoto-project/usemakoto.dev.git</span></div>
+<div><span class="prompt">$ </span><span class="cmd">cd usemakoto.dev</span></div>
+<div><span class="prompt">$ </span><span class="cmd">uv run python -m http.server 8080</span></div>
+<div><span class="prompt"># </span><span class="cmd">open http://localhost:8080/demos/06/</span></div>
                     </div>
                 </div>
                 <a href="/demos/06/" class="walkthrough-link">Full walkthrough &rarr;</a>

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://usemakoto.dev/schema/core-release.schema.json",
+  "title": "Makoto website core release pin",
+  "type": "object",
+  "required": ["version", "repository", "commit", "tag", "schemas", "documentation", "resources"],
+  "properties": {
+    "version": { "const": "0.2" },
+    "repository": { "const": "https://github.com/makoto-project/makoto" },
+    "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "tag": { "const": "v0.2.0" },
+    "schemas": { "$ref": "#/$defs/entries" },
+    "documentation": { "$ref": "#/$defs/entries" },
+    "resources": { "$ref": "#/$defs/resourceEntries" }
+  },
+  "$defs": {
+    "digest": {
+      "type": "object",
+      "required": ["sha256"],
+      "properties": { "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" } },
+      "additionalProperties": false
+    },
+    "entry": {
+      "type": "object",
+      "required": ["path", "digest"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "digest": { "$ref": "#/$defs/digest" }
+      },
+      "additionalProperties": false
+    },
+    "entries": { "type": "array", "items": { "$ref": "#/$defs/entry" } }
+    ,
+    "resourceEntry": {
+      "type": "object",
+      "required": ["path", "digest", "mediaType", "cors"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "digest": { "$ref": "#/$defs/digest" },
+        "mediaType": {
+          "enum": ["application/json", "application/octet-stream", "text/markdown"]
+        },
+        "cors": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "resourceEntries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/resourceEntry" }
+    }
+  },
+  "additionalProperties": false
+}

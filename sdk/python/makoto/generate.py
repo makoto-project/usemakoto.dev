@@ -2,18 +2,18 @@
 
 import hashlib
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import Any
 
 
 def generate(
     file_path: str,
     signer: str,
-    uri: Optional[str] = None,
-    lineage_steps: Optional[List[Dict[str, Any]]] = None,
-    format: Optional[str] = None,
-) -> Dict[str, Any]:
+    uri: str | None = None,
+    lineage_steps: list[dict[str, Any]] | None = None,
+    format: str | None = None,
+) -> dict[str, Any]:
     """Generate a DBOM for a file.
 
     Args:
@@ -62,7 +62,7 @@ def generate(
     dbom = {
         "schema_version": "0.1",
         "id": "dbom-" + str(uuid.uuid4()),
-        "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "created_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": {
             "uri": source_uri,
             "hash": {

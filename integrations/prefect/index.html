@@ -133,6 +133,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <span style="font-size: 2.5rem; margin-right: 0.5rem;">🌀</span>
                 Prefect + Makoto Integration Concept
             </h1>
+
+<div class="legacy-v01-banner" role="note"><p><strong>Conceptual integration only.</strong> No Makoto package, operator, app, hook, adapter, or signing API named on this page is shipped or installable for v0.2. Treat the code as an architecture sketch.</p></div>
             <p style="color: var(--text-muted); font-size: 1.15rem; margin-bottom: 1.5rem;">Flow + task state hooks turn Prefect into a DBOM publisher.</p>
 
             <div class="concept-banner">
@@ -159,7 +161,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="integration-idea">
                 <h3>How Makoto attaches to Prefect</h3>
                 <ul class="idea-list">
-                    <li><strong>makoto-prefect library</strong> — Install with `pip install makoto-prefect`. Drops in `@flow(on_completion=[makoto.attest])`.</li>
+                    <li><strong>Hypothetical Prefect adapter</strong> — A future adapter could expose a flow-completion hook; no <code>makoto-prefect</code> package is published.</li>
                     <li><strong>MakotoResult serializer</strong> — Custom result serializer that hashes + signs as it writes to S3/GCS.</li>
                     <li><strong>State hook callback</strong> — Universal `on_completion` callback that you attach via `prefect deployment` config.</li>
                     <li><strong>Artifact type</strong> — First-class `MakotoArtifact` shows the signed DBOM in the Prefect UI.</li>
