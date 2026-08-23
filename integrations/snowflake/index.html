@@ -133,6 +133,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <span style="font-size: 2.5rem; margin-right: 0.5rem;">❄️</span>
                 Snowflake + Makoto Integration Concept
             </h1>
+
+<div class="legacy-v01-banner" role="note"><p><strong>Conceptual integration only.</strong> No Makoto package, operator, app, hook, adapter, or signing API named on this page is shipped or installable for v0.2. Treat the code as an architecture sketch.</p></div>
             <p style="color: var(--text-muted); font-size: 1.15rem; margin-bottom: 1.5rem;">Stored procedures + Tasks emit DBOMs on every load and transform.</p>
 
             <div class="concept-banner">
@@ -180,7 +182,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <span class="yaml-kw">CREATE</span> <span class="yaml-kw">OR</span> <span class="yaml-kw">REPLACE</span> EXTERNAL <span class="yaml-kw">FUNCTION</span> makoto.sign_dbom(payload VARIANT)
   <span class="yaml-kw">RETURNS</span> VARIANT
   API_INTEGRATION = makoto_signing_api
-  <span class="yaml-kw">AS</span> <span class="yaml-string">'https://api.makoto.dev/sign'</span>;
+  <span class="yaml-kw">AS</span> <span class="yaml-string">'https://signer.example.invalid/makoto'</span>; <span class="yaml-comment">-- illustrative; operator-owned</span>
 
 <span class="yaml-comment">-- 3. Task that runs the transform AND emits an attestation</span>
 <span class="yaml-kw">CREATE</span> <span class="yaml-kw">OR</span> <span class="yaml-kw">REPLACE</span> <span class="yaml-kw">TASK</span> sales.mart.refresh_orders

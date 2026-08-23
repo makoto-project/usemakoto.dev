@@ -1,114 +1,82 @@
 # usemakoto.dev
 
-The specification website for **Makoto (誠)** — a data integrity framework that brings SLSA-style assurance levels to data pipelines.
+This repository is the public documentation and hosted-schema candidate for Makoto v0.2: a
+source-first, SLSA-like framework for data provenance and integrity.
 
-**Live site:** [https://usemakoto.dev](https://usemakoto.dev)
+Makoto lets a recipient answer three concrete questions:
 
-> **100% Open Source.** Makoto is, and will always be, fully open source under the [MIT License](LICENSE) — an [OSI-approved](https://opensource.org/licenses/MIT) license. There is no "open core," no proprietary tier, no source-available trickery. The spec, the schema, the examples, and this site are all yours to read, fork, run, and ship.
+1. Where did these data bytes originate?
+2. Which append-only, hash-linked transformations produced the handed-off result?
+3. Which receiver-authorized identities attested those claims, and do the metadata and data
+   bytes still match their signed digests?
 
----
+## Release status
 
-## What's Here
+v0.2 is an unreleased candidate. The deployed pages and schema files are public review
+artifacts, not proof of a tagged release or an immutable release contract. The candidate pin
+identifies the exact core commit used for the hosted schemas and demo; it does not make that
+commit a v0.2.0 release.
 
-This repo is the source for `usemakoto.dev`. It contains:
+The normative specification is [`spec/v0.2/spec.md`](spec/v0.2/spec.md), and the
+[adversarial review record](docs/v0.2-adversarial-review.md) preserves completed findings and
+excluded timeouts without claiming convergence. The runnable narrative is
+[`demos/v0.2-end-to-end/`](demos/v0.2-end-to-end/), and the candidate hosted schemas are in
+[`schema/v0.2/`](schema/v0.2/).
+
+The older v0.1 SDK, verifier, examples, integration sketches, Makoto Levels, and L1-L3 pages are
+historical design material. They are not wire-compatible with v0.2 and do not describe shipped
+v0.2 packages or adapters.
+
+## Repository layout
 
 | Path | Contents |
-|------|----------|
-| `index.html` | Landing page |
-| `spec/` | Makoto Levels specification (L1/L2/L3) |
-| `threats/` | Data supply chain threat model |
-| `examples/` | Sample attestation JSON files |
-| `levels/` | Per-level requirements detail |
-| `privacy/` | Privacy-preserving attestation techniques |
-| `comparison/` | Makoto vs SLSA vs DVC vs checksums |
-| `attestations/` | Live attestation format examples |
-| `integrations/` | Platform integration concepts (Airflow, dbt, Spark, Kafka, Snowflake, Databricks, Dagster, Prefect, Expanso) |
-| `assets/` | CSS, JS, images |
-| `expanso/` | Redirect → `integrations/expanso/` |
+|---|---|
+| `index.html` | v0.2 candidate landing page |
+| `spec/v0.2/` | normative v0.2 specification and reading page |
+| `schema/v0.2/` | byte-for-byte copies of the core v0.2 schemas and catalog |
+| `predicate/v0.2/` | origin and transformation predicate documentation |
+| `vocab/v0.2/` | bounded extension-vocabulary documentation |
+| `demos/v0.2-end-to-end/` | public producer-to-receiver proof and generated artifacts |
+| `integrations/` | conceptual integration sketches; no packaged v0.2 adapters |
+| `sdk/`, `verify/`, `levels/`, `examples/` | historical v0.1 material |
 
----
+## Local review
 
-## Platform Integrations
-
-Makoto is platform-agnostic — the same DBOM format works on any data pipeline. The `integrations/` directory contains conceptual integration pages for common platforms, each showing how Makoto attestations attach using that platform's native APIs:
-
-| Platform | Category | Primary integration pattern |
-|----------|----------|------------------------------|
-| [Apache Airflow](https://usemakoto.dev/integrations/airflow/) | Orchestration | `MakotoOperator` + `on_success_callback` |
-| [dbt](https://usemakoto.dev/integrations/dbt/) | Transformations | Post-hook macro + `on-run-end` |
-| [Apache Spark](https://usemakoto.dev/integrations/spark/) | Distributed compute | `SparkListener` + UDF + writer wrapper |
-| [Apache Kafka](https://usemakoto.dev/integrations/kafka/) | Streaming | Producer/Consumer Interceptor, Connect SMT |
-| [Snowflake](https://usemakoto.dev/integrations/snowflake/) | Warehouse | Stored procedure + Task + External Function signing |
-| [Databricks](https://usemakoto.dev/integrations/databricks/) | Lakehouse | Unity Catalog hooks + Job webhooks + DLT expectations |
-| [Dagster](https://usemakoto.dev/integrations/dagster/) | Orchestration | `@makoto_asset` + materialization sensor + IO manager |
-| [Prefect](https://usemakoto.dev/integrations/prefect/) | Orchestration | State hooks + `MakotoResult` serializer |
-| [Expanso](https://usemakoto.dev/integrations/expanso/) | Edge pipelines | Bloblang mapping + custom processor plugin |
-
-All integrations are **conceptual** — they use real platform APIs, but the Makoto-specific pieces (operators, hooks, processors, decorators) are illustrative sketches. To ship one for real, [open an issue](https://github.com/makoto-project/makoto/issues).
-
----
-
-## How Deploys Work
-
-Pushes to `main` auto-deploy to GitHub Pages via the [deploy workflow](.github/workflows/deploy.yml):
-
-```
-main → GitHub Actions → gh-pages branch → GitHub Pages → usemakoto.dev
-```
-
-DNS is managed via Cloudflare (proxied). HTTPS is handled by Cloudflare — no certificate configuration needed at the GitHub level.
-
-**Deploy time:** ~30 seconds after merging to `main`.
-
----
-
-## Local Development
-
-No build step — it's static HTML/CSS/JS.
+The site has no production build step. Python tooling is managed with `uv`:
 
 ```bash
 git clone https://github.com/makoto-project/usemakoto.dev
 cd usemakoto.dev
-
-# Serve locally (Python)
-python3 -m http.server 8080
-# → open http://localhost:8080
-
-# Or with Node
-npx serve .
+uv sync --locked --dev
+uv run python -m http.server 8080
 ```
 
----
+Run the complete local gate before proposing a change:
 
-## Contributing
+```bash
+uv run scripts/check_site.py --working-tree ../core
+```
 
-Spec corrections, new examples, and clarifications welcome.
+Working-tree mode is for local review against the sibling core checkout. A deployable review
+candidate must pin an exact core commit; a release must pin the approved `v0.2.0` tag. Both must
+pass their corresponding deployment-mode gate.
 
-1. Fork the repo
-2. Edit the relevant HTML or JSON files
-3. Test locally (`python3 -m http.server`)
-4. PR against `main` — deploy is automatic on merge
+## Integration boundary
 
-For large spec changes (new levels, new attestation types), open an issue first.
+Airflow, Databricks, dbt, Kafka, Prefect, Spark, Dagster, Snowflake, Expanso, and Docling can
+produce or consume Makoto evidence. They are not protocol dependencies. The inherited adapter
+pages are conceptual examples only; packages such as `makoto-prefect`, `makoto-databricks`,
+`@makoto/sdk`, and the unrelated PyPI project named `makoto` are not v0.2 distributions.
 
----
+Docling is complementary: a document-processing pipeline could emit Makoto statements and
+artifact profiles for its outputs, but Docling is not part of the Makoto protocol.
 
-## Related
+## Publication boundary
 
-- **Demo repo:** [makoto-project/makoto](https://github.com/makoto-project/makoto) — 5 runnable demos, GitHub Action, DBOM generator
-- **Full spec:** [usemakoto.dev/spec/](https://usemakoto.dev/spec/)
-- **JSON Schema:** [dbom_schema.json](https://github.com/makoto-project/makoto/blob/main/dbom_schema.json)
-
----
+Merging source, tagging core, copying release artifacts, hosting schemas, and successfully
+deploying `usemakoto.dev` are separate evidence lanes. A hosted candidate is explicitly a
+review surface. Only a release pin tied to the approved `v0.2.0` tag is release evidence.
 
 ## License
 
-Licensed under the **MIT License** — see [LICENSE](LICENSE) for the full text.
-
-This project is, and always will be, **100% open source**. MIT was chosen specifically because it is:
-
-- **[OSI-approved](https://opensource.org/licenses/MIT)** — meets the Open Source Definition (free to use, modify, redistribute, and sublicense, including for commercial purposes)
-- **Maximally permissive** — short, plain, and battle-tested; legal review takes minutes, not weeks, which lowers adoption friction for teams shipping Makoto-conformant pipelines
-- **Universally compatible** — MIT-licensed work can be combined with virtually any other OSS license (GPL, Apache, BSD, etc.), so downstream tools and specs can ingest the schema and examples without conflict
-
-If you need a different OSI-approved license for compatibility (e.g., Apache-2.0, BSD), open an issue and we'll discuss.
+Apache License 2.0. See [`LICENSE`](LICENSE).

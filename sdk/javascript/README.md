@@ -1,11 +1,14 @@
-# @makoto/sdk — JavaScript
+# Historical @makoto/sdk JavaScript experiment
+
+This v0.1 experiment is incompatible with Makoto v0.2. `@makoto/sdk` is not published; the
+commands and CDN imports below are retained only as historical design notes.
 
 Generate and verify [Makoto DBOM](https://usemakoto.dev) (Data Bill of Materials) files in JavaScript — works in Node.js and the browser.
 
 ## Install
 
 ```bash
-npm install @makoto/sdk
+# unavailable: @makoto/sdk was never published
 ```
 
 ## Quick Start — Node.js
@@ -32,7 +35,7 @@ console.log(result.valid ? "✓ Valid" : result.errors);
 
 ```html
 <script type="module">
-  import { generate, verify } from "https://unpkg.com/@makoto/sdk";
+  // Historical pseudocode only; no @makoto/sdk CDN artifact exists.
 
   const file = document.querySelector('input[type="file"]').files[0];
   const buffer = await file.arrayBuffer();

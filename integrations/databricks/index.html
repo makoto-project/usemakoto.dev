@@ -133,6 +133,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <span style="font-size: 2.5rem; margin-right: 0.5rem;">🧱</span>
                 Databricks + Makoto Integration Concept
             </h1>
+
+<div class="legacy-v01-banner" role="note"><p><strong>Conceptual integration only.</strong> No Makoto package, operator, app, hook, adapter, or signing API named on this page is shipped or installable for v0.2. Treat the code as an architecture sketch.</p></div>
             <p style="color: var(--text-muted); font-size: 1.15rem; margin-bottom: 1.5rem;">Unity Catalog + Job event hooks — DBOMs for every notebook and job run.</p>
 
             <div class="concept-banner">
@@ -159,9 +161,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="integration-idea">
                 <h3>How Makoto attaches to Databricks</h3>
                 <ul class="idea-list">
-                    <li><strong>Databricks App</strong> — Install the Makoto app; it subscribes to Job events and reads Unity lineage on completion.</li>
+                    <li><strong>Hypothetical Databricks App</strong> — A future app could subscribe to Job events and read Unity lineage on completion; no Makoto app is shipped.</li>
                     <li><strong>DLT expectation library</strong> — DLT pipelines call `dlt.expect(makoto.attestation_valid(input_table))` to refuse unattested data.</li>
-                    <li><strong>Notebook helper</strong> — `%pip install makoto-databricks` — wrap any cell with `with makoto.transform(level=2): ...`.</li>
+                    <li><strong>Hypothetical notebook helper</strong> — A future helper could wrap a cell at a transformation boundary; no <code>makoto-databricks</code> package is published.</li>
                     <li><strong>Workflow on_failure / on_success</strong> — Job-level webhook posts the signed DBOM to the configured store.</li>
                 </ul>
             </div>

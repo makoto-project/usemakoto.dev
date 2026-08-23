@@ -24,7 +24,7 @@ print(f"Created sample file: {tmp_path}\n")
 dbom = generate(
     file_path=tmp_path,
     signer="github:example-user",
-    uri=f"s3://my-data-bucket/example.csv",
+    uri="s3://my-data-bucket/example.csv",
     format="csv",
 )
 

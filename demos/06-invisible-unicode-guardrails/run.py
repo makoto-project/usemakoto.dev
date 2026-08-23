@@ -15,12 +15,12 @@ Usage:
 
 Safety: This demo never evaluates or executes hidden content.
 """
+
 from __future__ import annotations
 
 import hashlib
 import json
 import sys
-import unicodedata
 from pathlib import Path
 
 # Unicode ranges that are invisible / non-rendering
@@ -85,9 +85,9 @@ def analyze_text(content: str) -> dict:
 
     # Add detail if variation selector encoding detected
     if patterns[1]["matched"]:
-        vs_count = families_found.get(
-            "variation_selectors", 0
-        ) + families_found.get("variation_selectors_supplement", 0)
+        vs_count = families_found.get("variation_selectors", 0) + families_found.get(
+            "variation_selectors_supplement", 0
+        )
         patterns[1]["detail"] = (
             f"{vs_count} variation selectors distributed across "
             f"content consistent with byte-encoding pattern"
@@ -124,22 +124,17 @@ def analyze_text(content: str) -> dict:
     }
 
 
-def build_attestation(
-    filename: str, digest: str, analysis: dict
-) -> dict:
+def build_attestation(filename: str, digest: str, analysis: dict) -> dict:
     """Build an in-toto attestation with rendering analysis."""
     return {
         "_type": "https://in-toto.io/Statement/v1",
-        "subject": [
-            {"name": filename, "digest": {"sha256": digest}}
-        ],
+        "subject": [{"name": filename, "digest": {"sha256": digest}}],
         "predicateType": "https://makoto.dev/origin/v1",
         "predicate": {
             "origin": {
                 "source": "internal",
                 "repository": "https://github.com/makoto-project/makoto",
-                "path": f"demos/06-invisible-unicode-guardrails/"
-                f"fixtures/{filename}",
+                "path": f"demos/06-invisible-unicode-guardrails/fixtures/{filename}",
             },
             "makotoLevel": "L2",
             "analysis": {"rendering": analysis},
@@ -151,9 +146,7 @@ def build_attestation(
     }
 
 
-def build_dbom(
-    filename: str, digest: str, analysis: dict
-) -> dict:
+def build_dbom(filename: str, digest: str, analysis: dict) -> dict:
     """Build a DBOM with rendering safety compliance."""
     verdict = analysis["verdict"]
     inv_count = analysis["counts"]["invisible_codepoints"]
@@ -181,8 +174,7 @@ def build_dbom(
         "sources": [
             {
                 "name": filename,
-                "attestationRef": f"attestation."
-                f"{'safe' if verdict == 'pass' else 'flagged'}.json",
+                "attestationRef": f"attestation.{'safe' if verdict == 'pass' else 'flagged'}.json",
                 "attestationType": "https://makoto.dev/origin/v1",
                 "makotoLevel": "L2",
             }
@@ -213,9 +205,7 @@ def build_dbom(
     }
 
 
-def print_result(
-    filename: str, analysis: dict, digest: str
-) -> None:
+def print_result(filename: str, analysis: dict, digest: str) -> None:
     """Print human-readable analysis result."""
     v = analysis["verdict"].upper()
     icon = "\u2705" if v == "PASS" else "\u274c"
@@ -241,21 +231,9 @@ def print_result(
 
 def main() -> int:
     print()
-    print(
-        "\u250c"
-        + "\u2500" * 58
-        + "\u2510"
-    )
-    print(
-        "\u2502"
-        + "  Makoto Demo 06: Invisible Unicode Guardrails".center(58)
-        + "\u2502"
-    )
-    print(
-        "\u2514"
-        + "\u2500" * 58
-        + "\u2518"
-    )
+    print("\u250c" + "\u2500" * 58 + "\u2510")
+    print("\u2502" + "  Makoto Demo 06: Invisible Unicode Guardrails".center(58) + "\u2502")
+    print("\u2514" + "\u2500" * 58 + "\u2518")
 
     samples = [
         ("safe-visible.js", "safe"),
@@ -263,8 +241,6 @@ def main() -> int:
     ]
 
     OUTPUT.mkdir(exist_ok=True)
-    all_passed = True
-
     for filename, label in samples:
         filepath = FIXTURES / filename
         if not filepath.exists():
@@ -286,7 +262,11 @@ def main() -> int:
         attestation_out = OUTPUT / f"attestation.{label}.json"
         dbom_out = OUTPUT / f"dbom.{label}.json"
 
-        analysis_doc = {"artifact": filename, "digest": {"sha256": digest}, "analysis": {"rendering": analysis}}
+        analysis_doc = {
+            "artifact": filename,
+            "digest": {"sha256": digest},
+            "analysis": {"rendering": analysis},
+        }
         attestation_doc = build_attestation(filename, digest, analysis)
         dbom_doc = build_dbom(filename, digest, analysis)
 
@@ -297,32 +277,24 @@ def main() -> int:
         ]:
             path.write_text(json.dumps(doc, indent=2) + "\n")
 
-        print(f"\n  Artifacts written:")
+        print("\n  Artifacts written:")
         print(f"    {analysis_out.name}")
         print(f"    {attestation_out.name}")
         print(f"    {dbom_out.name}")
-
-        # Step 4: Policy gate
-        if analysis["verdict"] == "fail":
-            all_passed = False
 
     # Summary
     print(f"\n{'=' * 60}")
     print("  Policy Summary")
     print(f"{'=' * 60}")
-    print(f"  safe-visible.js:      PASS")
-    print(f"  flagged-invisible.js: FAIL")
+    print("  safe-visible.js:      PASS")
+    print("  flagged-invisible.js: FAIL")
     print()
-    print(
-        "  Trusted bytes are not the same thing as trusted appearance."
-    )
-    print(
-        "  Makoto render-safe verification catches what signatures"
-    )
+    print("  Trusted bytes are not the same thing as trusted appearance.")
+    print("  Makoto render-safe verification catches what signatures")
     print("  and hashes alone cannot.")
     print()
 
-    return 0 if not all_passed else 0  # Demo always exits 0
+    return 0  # The demonstration intentionally includes one rejected fixture.
 
 
 if __name__ == "__main__":

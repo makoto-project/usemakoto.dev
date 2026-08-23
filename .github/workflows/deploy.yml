@@ -1,20 +1,106 @@
-name: Deploy to GitHub Pages
+name: Validate and deploy GitHub Pages
 
 on:
+  pull_request:
   push:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: pages-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  deploy:
+  validate:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out website
+        uses: actions/checkout@v4
+        with:
+          path: site
+          persist-credentials: false
+
+      - name: Select the exact core pin
+        id: pin
+        working-directory: site
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f schema/core-release.json && ! -f schema/core-candidate.json ]]; then
+            echo "mode=release" >> "$GITHUB_OUTPUT"
+            echo "commit=$(jq -r .commit schema/core-release.json)" >> "$GITHUB_OUTPUT"
+          elif [[ -f schema/core-candidate.json && ! -f schema/core-release.json ]]; then
+            echo "mode=candidate" >> "$GITHUB_OUTPUT"
+            echo "commit=$(jq -r .commit schema/core-candidate.json)" >> "$GITHUB_OUTPUT"
+          else
+            echo "exactly one core candidate or release pin is required" >&2
+            exit 1
+          fi
+
+      - name: Check out pinned Makoto core
+        uses: actions/checkout@v4
+        with:
+          repository: makoto-project/makoto
+          ref: ${{ steps.pin.outputs.commit }}
+          path: core
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Run the candidate or release gate
+        working-directory: site
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv sync --locked --dev
+          uv run ruff check scripts tests
+          uv run pytest -q
+          if [[ "${{ steps.pin.outputs.mode }}" == "candidate" ]]; then
+            uv run scripts/check_site.py --candidate --core-repo ../core
+          else
+            uv run scripts/check_site.py --release --core-repo ../core
+          fi
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
       - uses: actions/checkout@v4
-      - name: Deploy to gh-pages
+        with:
+          persist-credentials: false
+      - name: Deploy the validated candidate or release tree
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
           publish_branch: gh-pages
+
+  probe:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+      - name: Verify the hosted candidate or release contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f schema/core-candidate.json ]]; then
+            uv run scripts/probe_hosted.py --candidate --attempts 72 --retry-delay 10 --timeout 15
+          else
+            uv run scripts/probe_hosted.py --release --attempts 72 --retry-delay 10 --timeout 15
+          fi
