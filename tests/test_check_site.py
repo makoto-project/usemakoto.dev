@@ -134,6 +134,50 @@ def test_lineage_story_is_a_first_class_linked_route() -> None:
     assert all(required in content for required in check_site.LINEAGE_REQUIRED_TEXT)
 
 
+def test_current_pages_share_persistent_navigation_and_mobile_menu() -> None:
+    for relative in check_site.CURRENT_SHELL_PAGES:
+        content = (check_site.ROOT / relative).read_text(encoding="utf-8")
+        assert all(marker in content for marker in check_site.CURRENT_SHELL_MARKERS), relative
+
+        parser = check_site.PageParser()
+        parser.feed(content)
+        expected = "/" if relative == "index.html" else f"/{relative.removesuffix('index.html')}"
+        assert parser.mobile_current_hrefs == [expected], relative
+
+
+def test_home_restores_examples_tooling_and_open_source_discovery() -> None:
+    home = (check_site.ROOT / "index.html").read_text(encoding="utf-8")
+
+    assert "Poisoned pipeline" in home
+    assert "Scientific reproducibility" in home
+    assert "Configuration postmortem" in home
+    assert "Invisible Unicode" in home
+    assert "Tooling &amp; SDKs" in home
+    assert "Build with us on GitHub" in home
+    assert "Contributions welcome" in home
+
+
+def test_tooling_page_keeps_current_and_historical_status_separate() -> None:
+    content = (check_site.ROOT / "tooling/index.html").read_text(encoding="utf-8")
+
+    assert "Reference CLI and Python library" in content
+    assert "Current v0.2 source" in content
+    assert "Historical v0.1 experiments" in content
+    assert "not a published Makoto distribution" in content
+    assert "no maintained v0.2 adapter packages are claimed" in content
+
+
+def test_community_page_links_real_public_participation_paths() -> None:
+    content = (check_site.ROOT / "community/index.html").read_text(encoding="utf-8")
+
+    assert (check_site.ROOT / "CONTRIBUTING.md").is_file()
+    assert "Makoto is developed in public." in content
+    assert "Formal governance is not established yet" in content
+    assert "https://github.com/makoto-project/makoto/issues/new" in content
+    assert "https://github.com/makoto-project/usemakoto.dev/issues/new" in content
+    assert "CONTRIBUTING.md" in content
+
+
 def test_current_site_matches_sibling_core_working_tree() -> None:
     errors: list[str] = []
     core = check_site.ROOT.parent / "core"

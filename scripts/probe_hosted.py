@@ -25,6 +25,10 @@ WALKTHROUGH_PATH = "/demos/v0.2-end-to-end/"
 SITE_REVIEW_SURFACES = {
     HOME_PATH: "index.html",
     LINEAGE_PATH: "why-lineage/index.html",
+    "/community/": "community/index.html",
+    "/examples/v0.2/": "examples/v0.2/index.html",
+    "/integrations/v0.2/": "integrations/v0.2/index.html",
+    "/tooling/": "tooling/index.html",
 }
 CANDIDATE_DISCLOSURE = b"v0.2 candidate \xc2\xb7 not yet released"
 

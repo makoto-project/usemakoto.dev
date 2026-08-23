@@ -13,6 +13,7 @@ from scripts import probe_hosted
 
 HOME_BYTES = "<main>v0.2 candidate · not yet released</main>\n".encode()
 LINEAGE_BYTES = b"<main>why lineage</main>\n"
+REVIEW_BYTES = b"<main>review surface</main>\n"
 
 
 def canonical(value: object) -> bytes:
@@ -46,10 +47,13 @@ def write_release_pin(root: Path, *, schema_body: bytes, walkthrough: bytes) -> 
     (root / "schema/core-release.schema.json").write_bytes(
         (probe_hosted.ROOT / "schema/core-release.schema.json").read_bytes()
     )
-    (root / "index.html").write_bytes(HOME_BYTES)
-    lineage = root / "why-lineage/index.html"
-    lineage.parent.mkdir()
-    lineage.write_bytes(LINEAGE_BYTES)
+    for public_path, relative in probe_hosted.SITE_REVIEW_SURFACES.items():
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        body = HOME_BYTES if public_path == probe_hosted.HOME_PATH else REVIEW_BYTES
+        if public_path == probe_hosted.LINEAGE_PATH:
+            body = LINEAGE_BYTES
+        path.write_bytes(body)
     return pin_bytes
 
 
@@ -102,6 +106,18 @@ class Opener:
         return self.responses[request.full_url]  # type: ignore[attr-defined]
 
 
+def site_surface_responses(
+    root: Path, base: str, *, homepage: bytes = HOME_BYTES
+) -> dict[str, Response]:
+    responses: dict[str, Response] = {}
+    for public_path, relative in probe_hosted.SITE_REVIEW_SURFACES.items():
+        body = (root / relative).read_bytes()
+        if public_path == probe_hosted.HOME_PATH:
+            body = homepage
+        responses[f"{base}{public_path}"] = Response(f"{base}{public_path}", body, "text/html")
+    return responses
+
+
 def candidate_responses(
     root: Path,
     base: str,
@@ -127,12 +143,7 @@ def candidate_responses(
         f"{base}{probe_hosted.WALKTHROUGH_PATH}": Response(
             f"{base}{probe_hosted.WALKTHROUGH_PATH}", walkthrough, "text/html"
         ),
-        f"{base}{probe_hosted.HOME_PATH}": Response(
-            f"{base}{probe_hosted.HOME_PATH}", homepage, "text/html"
-        ),
-        f"{base}{probe_hosted.LINEAGE_PATH}": Response(
-            f"{base}{probe_hosted.LINEAGE_PATH}", LINEAGE_BYTES, "text/html"
-        ),
+        **site_surface_responses(root, base, homepage=homepage),
     }
 
 
@@ -160,12 +171,7 @@ def test_probe_once_accepts_exact_bytes_media_types_cors_and_tag_link(
         f"{base}{probe_hosted.WALKTHROUGH_PATH}": Response(
             f"{base}{probe_hosted.WALKTHROUGH_PATH}", walkthrough, "text/html"
         ),
-        f"{base}{probe_hosted.HOME_PATH}": Response(
-            f"{base}{probe_hosted.HOME_PATH}", HOME_BYTES, "text/html"
-        ),
-        f"{base}{probe_hosted.LINEAGE_PATH}": Response(
-            f"{base}{probe_hosted.LINEAGE_PATH}", LINEAGE_BYTES, "text/html"
-        ),
+        **site_surface_responses(tmp_path, base),
     }
     monkeypatch.setattr(
         probe_hosted.urllib.request, "build_opener", lambda *args: Opener(responses)

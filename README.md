@@ -27,6 +27,20 @@ The older v0.1 SDK, verifier, examples, integration sketches, Makoto Levels, and
 historical design material. They are not wire-compatible with v0.2 and do not describe shipped
 v0.2 packages or adapters.
 
+## Open-source project
+
+Makoto is developed in public under Apache-2.0. The core specification, schemas, reference CLI,
+verifier, demos, fixtures, and tests live in
+[`makoto-project/makoto`](https://github.com/makoto-project/makoto). This website and hosted
+candidate mirror live in
+[`makoto-project/usemakoto.dev`](https://github.com/makoto-project/usemakoto.dev).
+
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution paths. Useful contributions include
+running the proof, bringing a real producer-to-consumer handoff, adding a denial fixture,
+reviewing a schema, improving documentation, or submitting a tested implementation patch. Formal
+governance has not been established; public issues, tests, and reviewable changes are the current
+technical decision record.
+
 ## Repository layout
 
 | Path | Contents |
@@ -37,6 +51,10 @@ v0.2 packages or adapters.
 | `predicate/v0.2/` | origin and transformation predicate documentation |
 | `vocab/v0.2/` | bounded extension-vocabulary documentation |
 | `demos/v0.2-end-to-end/` | public producer-to-receiver proof and generated artifacts |
+| `examples/v0.2/` | current proof plus clearly labeled real-world scenario archive |
+| `tooling/` | truthful status of the reference CLI, hosted schemas, and SDK experiments |
+| `integrations/v0.2/` | current integration contract and labeled historical sketches |
+| `community/`, `CONTRIBUTING.md` | public participation and contribution paths |
 | `integrations/` | conceptual integration sketches; no packaged v0.2 adapters |
 | `sdk/`, `verify/`, `levels/`, `examples/` | historical v0.1 material |
 
@@ -63,13 +81,10 @@ pass their corresponding deployment-mode gate.
 
 ## Integration boundary
 
-Airflow, Databricks, dbt, Kafka, Prefect, Spark, Dagster, Snowflake, Expanso, and Docling can
-produce or consume Makoto evidence. They are not protocol dependencies. The inherited adapter
-pages are conceptual examples only; packages such as `makoto-prefect`, `makoto-databricks`,
-`@makoto/sdk`, and the unrelated PyPI project named `makoto` are not v0.2 distributions.
-
-Docling is complementary: a document-processing pipeline could emit Makoto statements and
-artifact profiles for its outputs, but Docling is not part of the Makoto protocol.
+Orchestrators, warehouses, stream processors, catalogs, and other data tools can produce or
+consume Makoto evidence. They are not protocol dependencies. The inherited adapter pages are
+conceptual examples only; packages such as `makoto-prefect`, `makoto-databricks`, `@makoto/sdk`,
+and the unrelated PyPI project named `makoto` are not v0.2 distributions.
 
 ## Publication boundary
 
