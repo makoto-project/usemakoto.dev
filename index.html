@@ -13,15 +13,28 @@
     <div class="topbar-inner">
       <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a>
       <nav class="nav" aria-label="Primary">
-        <a href="/why-lineage/">Why lineage matters</a>
-        <a href="/spec/v0.2/">Specification</a>
-        <a href="/demos/v0.2-end-to-end/">Runnable demo</a>
-        <a href="/schema/v0.2/catalog.json">Schemas</a>
-        <a href="https://github.com/makoto-project/makoto">Core repository</a>
+        <a href="/examples/v0.2/">Examples</a>
+        <a href="/tooling/">Tooling &amp; SDKs</a>
+        <a href="/community/">Community</a>
+        <a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a>
       </nav>
+      <details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile">
+        <p class="mobile-section">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/v0.2/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable demo</a>
+        <p class="mobile-section">Learn</p><a href="/examples/v0.2/">Examples</a><p class="mobile-section">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/v0.2/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a>
+      </nav></details>
     </div>
   </header>
 
+  <div class="site-shell">
+    <aside class="docs-sidebar" aria-label="Documentation">
+      <nav class="docs-nav">
+        <div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/v0.2/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable demo</a></div>
+        <div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/v0.2/">Real-world examples</a><a href="/threats/">Threat model <small>(v0.1)</small></a><a href="/comparison/">Comparisons <small>(v0.1)</small></a><a href="/demos/">Demo archive <small>(v0.1)</small></a></div>
+        <div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/v0.2/">Integration patterns</a></div>
+        <div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div>
+      </nav>
+    </aside>
+    <div class="site-main">
   <main id="main">
     <section class="hero-v02">
       <div class="hero-inner">
@@ -31,6 +44,7 @@
         <div class="actions">
           <a class="button" href="/demos/v0.2-end-to-end/">Run the end-to-end proof</a>
           <a class="button secondary" href="/spec/v0.2/">Read the v0.2 specification</a>
+          <a class="button secondary" href="https://github.com/makoto-project/makoto">Build with us on GitHub</a>
         </div>
       </div>
     </section>
@@ -87,8 +101,38 @@
         <p>The September walkthrough creates a synthetic dataset, signs an origin, applies two transformations, signs the handoff, and verifies it as an independent receiver. It also proves seven negative cases fail for their intended reasons.</p>
         <div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Open the runnable walkthrough</a></div>
       </section>
+
+      <section aria-labelledby="examples">
+        <div class="section-intro"><div><span class="kicker">Where lineage breaks today</span><h2 id="examples">Real problems, not toy metadata</h2></div><a class="text-link" href="/examples/v0.2/">See every example →</a></div>
+        <div class="grid">
+          <a class="card-v02 card-link" href="/demos/v0.2-end-to-end/"><span class="tag current">Runnable v0.2</span><h3>Independent data handoff</h3><p>A producer signs an origin and two transformations. A receiver enforces its own trust and schema policy, then hashes the final bytes.</p></a>
+          <a class="card-v02 card-link" href="/demos/01/"><span class="tag historical">Scenario archive · v0.1</span><h3>Poisoned pipeline</h3><p>Trace a malicious or corrupted input back through the transformations that spread it.</p></a>
+          <a class="card-v02 card-link" href="/demos/02/"><span class="tag historical">Scenario archive · v0.1</span><h3>Scientific reproducibility</h3><p>Preserve enough evidence to answer which source data and processing steps produced a published result.</p></a>
+          <a class="card-v02 card-link" href="/demos/03/"><span class="tag historical">Scenario archive · v0.1</span><h3>Release provenance</h3><p>Bind a published dataset release to its inputs and build history.</p></a>
+          <a class="card-v02 card-link" href="/demos/04/"><span class="tag historical">Scenario archive · v0.1</span><h3>Configuration postmortem</h3><p>Reconstruct which configuration change altered downstream data and where it propagated.</p></a>
+          <a class="card-v02 card-link" href="/demos/06/"><span class="tag historical">Scenario archive · v0.1</span><h3>Invisible Unicode</h3><p>Make policy-relevant transformations explicit so hidden characters cannot pass as unseen changes.</p></a>
+        </div>
+      </section>
+
+      <section aria-labelledby="build">
+        <div class="section-intro"><div><span class="kicker">Build and extend</span><h2 id="build">One protocol, many implementation paths</h2></div><a class="text-link" href="/tooling/">See tooling status →</a></div>
+        <div class="grid">
+          <article class="card-v02"><h3>Reference CLI</h3><p>Clone the core repository to create, sign, bundle, and verify v0.2 evidence today. It is source-available and tested, but not yet a published package.</p></article>
+          <article class="card-v02"><h3>Hosted JSON Schemas</h3><p>Validate core statements and build digest-pinned public or private profiles from stable candidate URLs.</p><p><a href="/schema/v0.2/catalog.json">Open the schema catalog</a></p></article>
+          <article class="card-v02"><h3>SDK and integration experiments</h3><p>Explore the earlier Python, JavaScript, Airflow, dbt, Kafka, and warehouse sketches without mistaking them for v0.2 distributions.</p><p><a href="/integrations/v0.2/">Explore integration patterns</a></p></article>
+        </div>
+      </section>
+
+      <section class="community-band" aria-labelledby="open">
+        <span class="kicker">Apache-2.0 · built in public</span>
+        <h2 id="open">Makoto should belong to the people who need trustworthy data.</h2>
+        <p>The protocol, schemas, verifier, demo, tests, and website are all developed in public. You do not need permission to run the proof, challenge the design, report a failure, propose a data-system use case, or submit a patch.</p>
+        <div class="actions"><a class="button" href="/community/">Choose a way to contribute</a><a class="button secondary" href="https://github.com/makoto-project/makoto/issues">Open an issue on GitHub</a></div>
+      </section>
     </div>
   </main>
-  <footer class="footer"><div class="footer-inner">Makoto v0.2 candidate · Apache-2.0 · Docling and data tools may complement Makoto but are not part of the protocol.</div></footer>
+  <footer class="footer"><div class="footer-inner">Makoto v0.2 candidate · Apache-2.0 · <a href="https://github.com/makoto-project/makoto">Developed in public on GitHub</a> · <a href="/community/">Contributions welcome</a></div></footer>
+    </div>
+  </div>
 </body>
 </html>

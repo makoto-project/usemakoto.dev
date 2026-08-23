@@ -78,6 +78,33 @@ INTEGRATION_PAGES = (
     "integrations/spark/index.html",
 )
 LINEAGE_PAGE = "why-lineage/index.html"
+CURRENT_SHELL_PAGES = (
+    "community/index.html",
+    "demos/v0.2-end-to-end/index.html",
+    "examples/v0.2/index.html",
+    "index.html",
+    "integrations/v0.2/index.html",
+    "predicate/v0.2/origin/index.html",
+    "predicate/v0.2/transform/index.html",
+    "source/file/index.html",
+    "spec/v0.2/index.html",
+    "tooling/index.html",
+    "vocab/v0.2/bounded-pattern/index.html",
+    "why-lineage/index.html",
+)
+CURRENT_SHELL_MARKERS = (
+    'class="docs-sidebar"',
+    'class="mobile-menu"',
+    'href="/why-lineage/"',
+    'href="/examples/v0.2/"',
+    'href="/source/file/"',
+    'href="/vocab/v0.2/bounded-pattern/"',
+    'href="/tooling/"',
+    'href="/integrations/v0.2/"',
+    'href="/community/"',
+    'href="https://github.com/makoto-project/makoto"',
+    'href="https://github.com/makoto-project/makoto/issues"',
+)
 LINEAGE_REQUIRED_TEXT = (
     "One file becomes ten copies. Its history usually doesn’t.",
     "Now let it move.",
@@ -216,9 +243,20 @@ class PageParser(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.ids: list[str] = []
         self.references: list[str] = []
+        self.in_mobile_nav = False
+        self.mobile_current_hrefs: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
+        if tag == "nav" and values.get("aria-label") == "Mobile":
+            self.in_mobile_nav = True
+        if (
+            self.in_mobile_nav
+            and tag == "a"
+            and values.get("aria-current") == "page"
+            and values.get("href")
+        ):
+            self.mobile_current_hrefs.append(str(values["href"]))
         if values.get("id") is not None:
             self.ids.append(str(values["id"]))
         for name in ("href", "src"):
@@ -229,6 +267,10 @@ class PageParser(HTMLParser):
                 url = candidate.strip().split(" ", 1)[0]
                 if url:
                     self.references.append(url)
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "nav" and self.in_mobile_nav:
+            self.in_mobile_nav = False
 
 
 def parse_args() -> argparse.Namespace:
@@ -655,6 +697,51 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
     for relative in INTEGRATION_PAGES:
         if "Conceptual integration only." not in (ROOT / relative).read_text(encoding="utf-8"):
             errors.append(f"conceptual integration banner missing: {relative}")
+    for relative in CURRENT_SHELL_PAGES:
+        path = ROOT / relative
+        if not path.is_file():
+            errors.append(f"current documentation page missing: {relative}")
+            continue
+        content = path.read_text(encoding="utf-8")
+        for marker in CURRENT_SHELL_MARKERS:
+            if marker not in content:
+                errors.append(f"current documentation shell is incomplete in {relative}: {marker}")
+        parser = PageParser()
+        parser.feed(content)
+        expected_current = (
+            "/" if relative == "index.html" else f"/{relative.removesuffix('index.html')}"
+        )
+        if parser.mobile_current_hrefs != [expected_current]:
+            errors.append(
+                "mobile navigation current page differs in "
+                f"{relative}: expected={[expected_current]!r} actual={parser.mobile_current_hrefs!r}"
+            )
+    community = ROOT / "community/index.html"
+    contributing = ROOT / "CONTRIBUTING.md"
+    if not contributing.is_file():
+        errors.append("CONTRIBUTING.md is missing")
+    if community.is_file():
+        content = community.read_text(encoding="utf-8")
+        for marker in (
+            "Makoto is developed in public.",
+            "Formal governance is not established yet",
+            "makoto-project/makoto/issues/new",
+            "makoto-project/usemakoto.dev/issues/new",
+            "CONTRIBUTING.md",
+        ):
+            if marker not in content:
+                errors.append(f"community participation path is incomplete: {marker}")
+    tooling = ROOT / "tooling/index.html"
+    if tooling.is_file():
+        content = tooling.read_text(encoding="utf-8")
+        for marker in (
+            "package publication pending",
+            "Historical v0.1 experiments",
+            "not a published Makoto distribution",
+            "no maintained v0.2 adapter packages are claimed",
+        ):
+            if marker not in content:
+                errors.append(f"tooling status boundary is incomplete: {marker}")
     lineage_path = ROOT / LINEAGE_PAGE
     if not lineage_path.is_file():
         errors.append(f"lineage explanation page missing: {LINEAGE_PAGE}")
