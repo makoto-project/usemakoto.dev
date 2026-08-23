@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="One source file becomes ten copies. Data lineage keeps origin, transformations, attesters, and exact artifacts connected as data moves.">
+  <title>Why data lineage matters — Makoto</title>
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a>
+      <nav class="nav" aria-label="Primary">
+        <a href="/why-lineage/" aria-current="page">Why lineage matters</a>
+        <a href="/spec/v0.2/">Specification</a>
+        <a href="/demos/v0.2-end-to-end/">Runnable demo</a>
+        <a href="/schema/v0.2/catalog.json">Schemas</a>
+        <a href="https://github.com/makoto-project/makoto">Core repository</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero-v02 lineage-hero">
+      <div class="hero-inner">
+        <span class="eyebrow">Why lineage matters</span>
+        <h1>One file becomes ten copies. Its history usually doesn’t.</h1>
+        <p>Data does not stay where it was created. It is copied, reshaped, retained, shared, and forgotten. Without portable lineage, every move separates the bytes from the evidence needed to trust, reproduce, govern, or safely delete them.</p>
+      </div>
+    </section>
+
+    <div class="page wide">
+      <section class="lineage-opening" aria-labelledby="move">
+        <div>
+          <span class="kicker">The multiplication problem</span>
+          <h2 id="move">Now let it move.</h2>
+        </div>
+        <blockquote class="story-quote">
+          <p>It lands in object storage, gets picked up into a warehouse, gets denormalized into three marts because three teams wanted different grain, gets a feature-store copy for the model, gets a nightly backup with a 90-day cycle, gets replicated to a second region for durability, gets pulled into a vendor's SaaS for enrichment, and gets exported once into a notebook by an analyst who left in March.</p>
+          <p>Call that eight to ten locations, and I am being conservative, because I have not counted the CI fixture somebody generated from prod or the Slack thread with the screenshot.</p>
+        </blockquote>
+      </section>
+
+      <section aria-labelledby="copies">
+        <div class="copy-heading">
+          <div>
+            <span class="kicker">One source, expanding custody</span>
+            <h2 id="copies">Every copy creates another question</h2>
+          </div>
+          <div class="copy-count" aria-label="One source becomes at least ten downstream copies">
+            <strong>1 → 10+</strong>
+            <span>downstream copies</span>
+          </div>
+        </div>
+
+        <figure class="lineage-spread" aria-labelledby="spread-caption">
+          <figcaption id="spread-caption" class="visually-hidden">A source dataset spreads to storage, warehouse, marts, feature store, backup, regional replica, vendor software, and an analyst notebook, with additional shadow copies in CI and Slack.</figcaption>
+          <div class="spread-source">
+            <span class="spread-number">01</span>
+            <div><strong>Source dataset</strong><span>The place where its history can begin.</span></div>
+          </div>
+          <div class="spread-arrow" aria-hidden="true"><span>copies move faster than context</span></div>
+          <ul class="spread-grid">
+            <li class="spread-node"><span>02</span><strong>Object storage</strong><small>Landing copy</small></li>
+            <li class="spread-node"><span>03</span><strong>Warehouse</strong><small>Loaded copy</small></li>
+            <li class="spread-node"><span>04–06</span><strong>Three marts</strong><small>Different grain</small></li>
+            <li class="spread-node"><span>07</span><strong>Feature store</strong><small>Model input</small></li>
+            <li class="spread-node"><span>08</span><strong>Nightly backup</strong><small>90-day retention</small></li>
+            <li class="spread-node"><span>09</span><strong>Region two</strong><small>Durability replica</small></li>
+            <li class="spread-node"><span>10</span><strong>Vendor SaaS</strong><small>Enrichment copy</small></li>
+            <li class="spread-node"><span>11</span><strong>Old notebook</strong><small>Owner departed</small></li>
+          </ul>
+          <div class="shadow-copies">
+            <span class="kicker">Outside the map</span>
+            <p><strong>CI fixture from production</strong> and <strong>Slack screenshot</strong>: copies that may exist without a system of record, an active owner, or a deletion path.</p>
+          </div>
+        </figure>
+      </section>
+
+      <section aria-labelledby="questions-grow">
+        <h2 id="questions-grow">The bytes multiplied. So did the consequences.</h2>
+        <div class="grid consequence-grid">
+          <article class="card-v02"><span class="kicker">Incident response</span><h3>How far did the bad data travel?</h3><p>Without predecessor links, responders must reconstruct the blast radius from job logs, storage listings, and institutional memory.</p></article>
+          <article class="card-v02"><span class="kicker">Deletion</span><h3>What does “delete it” mean now?</h3><p>A source deletion does not remove warehouse rows, backups, vendor copies, model features, or forgotten analyst exports.</p></article>
+          <article class="card-v02"><span class="kicker">Reproducibility</span><h3>Which exact bytes trained the model?</h3><p>A table name or notebook path cannot prove the precise input, transformations, schema rules, and code identity used at the time.</p></article>
+          <article class="card-v02"><span class="kicker">Custody</span><h3>Who made and approved each copy?</h3><p>System identity, signer authorization, and organizational responsibility are separate questions. All three matter at a handoff.</p></article>
+          <article class="card-v02"><span class="kicker">Retention</span><h3>Which policy applies downstream?</h3><p>A 90-day rule attached to the source is ineffective if downstream copies lose that context or silently adopt different controls.</p></article>
+          <article class="card-v02"><span class="kicker">Change</span><h3>Is this still the same dataset?</h3><p>Normalization, filtering, enrichment, redaction, and even newline conversion can produce meaningfully different artifacts.</p></article>
+        </div>
+      </section>
+
+      <section aria-labelledby="checksum">
+        <h2 id="checksum">A checksum is necessary. It is not lineage.</h2>
+        <div class="lineage-comparison">
+          <article class="comparison-panel checksum-panel">
+            <span class="kicker">Checksum</span>
+            <h3>“Are these the same bytes?”</h3>
+            <p>A digest can identify an exact artifact and expose a one-byte change. It cannot explain where the artifact came from, why it changed, which input preceded it, or who attested to that history.</p>
+          </article>
+          <article class="comparison-panel lineage-panel">
+            <span class="kicker">Lineage</span>
+            <h3>“How did these bytes come to exist?”</h3>
+            <p>Lineage connects exact artifacts to origin claims, ordered transformations, participating systems, and accountable attesters. Digests make those connections tamper-evident.</p>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="makoto-answer">
+        <span class="kicker">The Makoto model</span>
+        <h2 id="makoto-answer">Carry the evidence with the data</h2>
+        <p class="lead">Makoto begins at the source, then adds immutable signed statements as participating systems transform or hand off the data. The receiver evaluates the resulting evidence under its own trust policy.</p>
+        <div class="lineage-proof">
+          <article><span>1</span><div><h3>Begin with the source</h3><p>Bind the origin claim to the exact bytes that were collected.</p></div></article>
+          <article><span>2</span><div><h3>Append every participating step</h3><p>Each transformation points to exact predecessor statements and artifacts instead of editing history in place.</p></div></article>
+          <article><span>3</span><div><h3>Name the attesters</h3><p>Signatures prove control of keys; the receiver separately decides whether those keys were authorized for each claim.</p></div></article>
+          <article><span>4</span><div><h3>Verify the handoff</h3><p>The receiver validates schemas, graph continuity, signer policy, signed completeness, and the final artifact digest.</p></div></article>
+        </div>
+        <div class="callout lineage-boundary">
+          <strong>The honest boundary:</strong> Makoto does not discover an unrecorded notebook export or Slack screenshot. It makes participating handoffs verifiable and missing evidence visible. Organizational inventory, access control, retention, and discovery systems still have work to do.
+        </div>
+      </section>
+
+      <section class="lineage-cta" aria-labelledby="see-it">
+        <div>
+          <span class="kicker">From argument to evidence</span>
+          <h2 id="see-it">Watch the history survive the handoff</h2>
+          <p>The runnable v0.2 walkthrough creates source data, signs its origin, applies two transformations, signs the handoff, and verifies the graph and final bytes as an independent receiver.</p>
+        </div>
+        <div class="actions">
+          <a class="button dark" href="/demos/v0.2-end-to-end/">Run the end-to-end proof</a>
+          <a class="button outline" href="/spec/v0.2/">Read the v0.2 specification</a>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer class="footer"><div class="footer-inner">Makoto v0.2 candidate · Source-first, append-only data provenance.</div></footer>
+</body>
+</html>

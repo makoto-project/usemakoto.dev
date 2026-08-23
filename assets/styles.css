@@ -58,6 +58,19 @@
     --font-mono: 'JetBrains Mono', 'Monaco', 'Menlo', monospace;
 }
 
+.legacy-v01-banner {
+    margin: 1rem 0 2rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid #f59e0b;
+    border-radius: 0.5rem;
+    background: #fffbeb;
+    color: #78350f;
+}
+
+.legacy-v01-banner p {
+    margin: 0;
+}
+
 /* ===== JAPANESE-INSPIRED ELEMENTS ===== */
 
 /* Mon (family crest) style logo */

@@ -133,8 +133,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
     <main class="main-content">
         <div class="section section-wide">
-            <h1>SDKs — Generate and Verify DBOMs in 3 Lines</h1>
-            <p class="lead">Official libraries for Python and JavaScript. Both SDKs generate schema-valid <a href="https://usemakoto.dev/spec/">Makoto DBOM</a> records and verify them with a single function call.</p>
+            <h1>Historical v0.1 SDK experiments</h1>
+
+<div class="legacy-v01-banner" role="note"><p><strong>Historical v0.1 experiment; not a published package.</strong> PyPI <code>makoto</code> is unrelated, npm <code>@makoto/sdk</code> is unpublished, and this format is incompatible with v0.2.</p></div>
+            <p class="lead">These archived Python and JavaScript prototypes illustrate the earlier DBOM design. They are not official libraries, installable packages, or a supported way to produce Makoto v0.2 evidence.</p>
 
             <div class="schema-note">
                 🔒 All DBOMs are validated against the canonical schema at
@@ -145,12 +147,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             <!-- Python SDK -->
             <div class="sdk-section">
                 <h2><span class="lang-badge">Python</span> makoto</h2>
-                <p>Works with Python 3.8+. Install via <code class="inline">uv</code> or <code class="inline">pip</code>.</p>
+                <p>Historical source experiment only; no Makoto v0.2 Python package is published.</p>
 
                 <strong>Install</strong>
                 <div class="install-block">
                     <button class="copy-btn" onclick="copy(this)">Copy</button>
-                    uv add makoto
+                    # unavailable: no Makoto v0.2 Python package is published
                 </div>
 
                 <strong>Quick Start</strong>
@@ -165,18 +167,18 @@ dbom = generate("data/sales.csv", signer="github:you")
 result = verify(dbom, file_path="data/sales.csv")
 print("Valid" if result.valid else result.errors)
                 </div>
-                <p class="readme-link">→ <a href="https://github.com/makoto-project/makoto/tree/main/sdk/python">Full README &amp; API reference</a></p>
+                <p class="readme-link">→ <a href="https://github.com/makoto-project/usemakoto.dev/tree/main/sdk/python">Historical source and README</a></p>
             </div>
 
             <!-- JavaScript SDK -->
             <div class="sdk-section">
                 <h2><span class="lang-badge" style="background:#f7df1e;color:#222;">JS</span> @makoto/sdk</h2>
-                <p>Works in Node.js 18+ and modern browsers. ES modules only.</p>
+                <p>Historical source experiment only; <code>@makoto/sdk</code> is unpublished.</p>
 
                 <strong>Install</strong>
                 <div class="install-block">
                     <button class="copy-btn" onclick="copy(this)">Copy</button>
-                    npm install @makoto/sdk
+                    # unavailable: @makoto/sdk was never published
                 </div>
 
                 <strong>Quick Start — Node.js</strong>
@@ -198,16 +200,16 @@ const buffer = await file.arrayBuffer();
 const dbom = await generate({ fileBuffer: buffer, fileName: file.name, signer: "github:you" });
 const result = await verify(dbom, buffer);
                 </div>
-                <p class="readme-link">→ <a href="https://github.com/makoto-project/makoto/tree/main/sdk/javascript">Full README &amp; API reference</a></p>
+                <p class="readme-link">→ <a href="https://github.com/makoto-project/usemakoto.dev/tree/main/sdk/javascript">Historical source and README</a></p>
             </div>
 
-            <h2>Schema</h2>
-            <p>The DBOM JSON Schema is published at:</p>
+            <h2>Historical schema</h2>
+            <p>The archived DBOM JSON Schema remains available for reading at:</p>
             <div class="install-block">
                 https://usemakoto.dev/schema/v0.1.json<br>
                 https://usemakoto.dev/schema/latest.json
             </div>
-            <p>Both URLs serve the same v0.1 schema. Both SDKs fetch it at runtime and fall back to a bundled copy when offline.</p>
+            <p>These v0.1 URLs are retained for historical compatibility only. They do not define Makoto v0.2.</p>
         </div><!-- /section -->
     </main>
 

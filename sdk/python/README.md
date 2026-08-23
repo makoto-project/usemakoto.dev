@@ -1,13 +1,14 @@
-# Makoto Python SDK
+# Historical Makoto Python SDK experiment
+
+This v0.1 experiment is incompatible with Makoto v0.2. The PyPI project named `makoto` is
+unrelated; use the checked-out core repository and its locked `uv` environment.
 
 Generate and verify [Makoto DBOM](https://usemakoto.dev) (Data Bill of Materials) files in Python.
 
 ## Install
 
 ```bash
-uv add makoto
-# or
-pip install makoto
+# unavailable: no Makoto v0.2 Python distribution is published
 ```
 
 ## Quick Start
@@ -21,8 +22,8 @@ import json
 dbom = generate(
     file_path="data/sales.csv",
     signer="github:your-username",
-    uri="s3://my-bucket/sales.csv",    # optional
-    format="csv",                       # optional, inferred from extension
+    uri="s3://my-bucket/sales.csv",  # optional
+    format="csv",  # optional, inferred from extension
 )
 
 print(json.dumps(dbom, indent=2))
