@@ -273,6 +273,26 @@ def test_fetch_exact_rejects_bad_schema_response(
         probe_hosted.fetch_exact(Opener({base + path: response}), base, resource, timeout=1)
 
 
+def test_fetch_exact_sends_explicit_accept_header() -> None:
+    base = "https://example.test"
+    path = probe_hosted.HOME_PATH
+    response = Response(base + path, HOME_BYTES, "text/html")
+    resource = probe_hosted.ExpectedResource(
+        path,
+        hashlib.sha256(HOME_BYTES).hexdigest(),
+        ("text/html",),
+        False,
+    )
+
+    class RecordingOpener:
+        def open(self, request: object, timeout: float) -> Response:
+            del timeout
+            assert request.get_header("Accept") == "*/*"  # type: ignore[attr-defined]
+            return response
+
+    assert probe_hosted.fetch_exact(RecordingOpener(), base, resource, timeout=1) == HOME_BYTES
+
+
 def test_fetch_exact_rejects_redirect() -> None:
     base = "https://example.test"
     path = probe_hosted.WALKTHROUGH_PATH
