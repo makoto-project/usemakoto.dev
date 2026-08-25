@@ -40,8 +40,9 @@ decodes only to an inert explanation string.
 | `fixtures/flagged-invisible.js` | Same-looking JS with 128 hidden variation selectors |
 | `fixtures/flagged-revealed.txt` | Annotated view showing what the invisible characters contain |
 | `fixtures/analysis.*.json` | Pre-computed rendering analysis |
-| `fixtures/attestation.*.json` | Pre-computed Makoto attestations |
-| `fixtures/dbom.*.json` | Pre-computed Data Bills of Materials |
+The retired mutable attestation and DBOM fixtures were removed. The current
+content-policy example lives at [`/examples/invisible-unicode/`](../../examples/invisible-unicode/)
+and uses digest-pinned profiles alongside the signed handoff proof.
 
 ## Learn more
 

@@ -11,7 +11,8 @@ import pytest
 
 from scripts import probe_hosted
 
-HOME_BYTES = "<main>v0.2 candidate · not yet released</main>\n".encode()
+HOME_BYTES = b"<main>source-first data provenance</main>\n"
+STATUS_BYTES = b"<main>not yet an immutable tagged release</main>\n"
 LINEAGE_BYTES = b"<main>why lineage</main>\n"
 REVIEW_BYTES = b"<main>review surface</main>\n"
 
@@ -53,6 +54,8 @@ def write_release_pin(root: Path, *, schema_body: bytes, walkthrough: bytes) -> 
         body = HOME_BYTES if public_path == probe_hosted.HOME_PATH else REVIEW_BYTES
         if public_path == probe_hosted.LINEAGE_PATH:
             body = LINEAGE_BYTES
+        elif public_path == probe_hosted.STATUS_PATH:
+            body = STATUS_BYTES
         path.write_bytes(body)
     return pin_bytes
 
@@ -216,7 +219,7 @@ def test_candidate_probe_rejects_missing_exact_commit_link(
         probe_hosted.probe_once(tmp_path, base, timeout=1, candidate=True)
 
 
-def test_candidate_probe_rejects_missing_homepage_disclosure(
+def test_candidate_probe_rejects_missing_specification_disclosure(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     base = "https://example.test"
@@ -224,15 +227,14 @@ def test_candidate_probe_rejects_missing_homepage_disclosure(
     commit_link = f"https://github.com/makoto-project/makoto/tree/{'a' * 40}/demos/v0.2-end-to-end"
     walkthrough = f'<a href="{commit_link}">candidate source</a>\n'.encode()
     pin_bytes = write_candidate_pin(tmp_path, schema_body=schema, walkthrough=walkthrough)
-    homepage = b"<main>status omitted</main>\n"
-    (tmp_path / "index.html").write_bytes(homepage)
+    status_page = b"<main>status omitted</main>\n"
+    (tmp_path / "spec/index.html").write_bytes(status_page)
     responses = candidate_responses(
         tmp_path,
         base,
         pin_bytes=pin_bytes,
         schema=schema,
         walkthrough=walkthrough,
-        homepage=homepage,
     )
     monkeypatch.setattr(
         probe_hosted.urllib.request, "build_opener", lambda *args: Opener(responses)
