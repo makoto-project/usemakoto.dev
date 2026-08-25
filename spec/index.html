@@ -28,7 +28,7 @@
   </section>
 
   <section aria-labelledby="objects"><h2 id="objects">Core objects and their jobs</h2>
-    <table><thead><tr><th>Object</th><th>What it commits to</th><th>What remains outside it</th></tr></thead><tbody>
+    <table class="stack-table object-table"><thead><tr><th>Object</th><th>What it commits to</th><th>What remains outside it</th></tr></thead><tbody>
       <tr><td><a href="/predicate/v0.2/origin/">Origin statement</a></td><td>Source claims, event identity and time, and exact observed subjects.</td><td>Whether the source claim is truthful.</td></tr>
       <tr><td><a href="/predicate/v0.2/transform/">Transformation statement</a></td><td>Operation metadata, predecessor payloads, input artifacts, and output subjects.</td><td>Proof that the claimed code actually executed.</td></tr>
       <tr><td><a href="/schema/v0.2/envelope.schema.json">DSSE envelope</a></td><td>The exact statement payload and one or more cryptographic signatures.</td><td>Authorization to make the claim.</td></tr>
@@ -45,7 +45,7 @@
   </section>
 
   <section aria-labelledby="verification"><h2 id="verification">Verification is deliberately decomposed</h2>
-    <table><thead><tr><th>Question</th><th>Required evidence</th><th>Why it stays separate</th></tr></thead><tbody>
+    <table class="stack-table verification-table"><thead><tr><th>Question</th><th>Required evidence</th><th>Why it stays separate</th></tr></thead><tbody>
       <tr><td>Is the resource well-formed?</td><td>Core schema and any required profile pass.</td><td>Valid structure says nothing about identity.</td></tr>
       <tr><td>Who controlled the signing key?</td><td>DSSE signature verifies over exact payload bytes.</td><td>A valid signature may belong to the wrong party.</td></tr>
       <tr><td>Was that signer allowed?</td><td>Receiver policy authorizes the key for the selected claim and role.</td><td>Authorization is a consumer decision.</td></tr>

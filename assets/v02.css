@@ -164,6 +164,7 @@ details > div { padding: 0 0 1rem; }
 .schema-list { columns: 2; column-gap: 2rem; }
 .schema-list li { break-inside: avoid; margin: .45rem 0; }
 table { width: 100%; border-collapse: collapse; background: transparent; }
+.wide-table caption { display: none; }
 th, td { padding: .8rem .75rem; border: 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
 th { border-top: 1px solid var(--ink); background: transparent; font-family: var(--display); }
 .footer { border-top: 1px solid var(--ink); padding: 2rem 1.5rem; color: var(--muted); }
@@ -251,7 +252,7 @@ th { border-top: 1px solid var(--ink); background: transparent; font-family: var
   .hero-v02 h1 { font-size: clamp(3rem,15vw,4.6rem); }
   .page { padding-top: 3.5rem; }
   .page h1 { font-size: clamp(2.45rem,11vw,3.35rem); }
-  table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; table-layout: fixed; }
   .provenance-spine li { grid-template-columns: 2.5rem 1fr; }
   .provenance-spine span { grid-column: 2; }
   .casebook-item { grid-template-columns: 2.6rem 1fr; gap: .7rem; }
@@ -263,7 +264,37 @@ th { border-top: 1px solid var(--ink); background: transparent; font-family: var
   .spread-grid { grid-template-columns: 1fr; }
   .spread-node, .spread-node:nth-child(4n) { border-right: 0; }
 .story-quote { padding-left: 0; }
-  .page table { display: block; max-width: 100%; overflow-x: auto; border-top: 1px solid var(--ink); }
-  .page table > thead, .page table > tbody { display: table; width: 680px; table-layout: fixed; }
+  .page table { border-top: 1px solid var(--ink); }
+  .page table th, .page table td { padding: .65rem .35rem; overflow-wrap: normal; word-break: normal; hyphens: none; }
+  .page table code, .page table .hash { overflow-wrap: anywhere; word-break: break-word; }
+  .page .wide-table { display: block; max-width: 100%; overflow-x: auto; table-layout: auto; -webkit-overflow-scrolling: touch; }
+  .page .wide-table > thead, .page .wide-table > tbody { display: table; width: 640px; table-layout: fixed; }
+  .wide-table caption { display: table-caption; width: 100%; padding: .5rem 0; color: var(--muted); font-size: .8rem; text-align: left; }
+  .page .stack-table { display: block; border-top: 0; table-layout: auto; }
+  .page .stack-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .page .stack-table tbody, .page .stack-table tr { display: block; }
+  .page .stack-table tr { padding: .65rem 0; border-top: 1px solid var(--line-strong); }
+  .page .stack-table td { display: grid; grid-template-columns: minmax(6.8rem,.42fr) minmax(0,1fr); gap: .75rem; padding: .28rem 0; border: 0; }
+  .page .stack-table td::before { color: var(--muted); font: 700 .62rem/1.4 var(--mono); letter-spacing: .04em; text-transform: uppercase; }
+  .protocol-table td:nth-child(1)::before { content: "Evidence"; }
+  .protocol-table td:nth-child(2)::before { content: "Answers"; }
+  .protocol-table td:nth-child(3)::before { content: "Decision"; }
+  .object-table td:nth-child(1)::before { content: "Object"; }
+  .object-table td:nth-child(2)::before { content: "Commits to"; }
+  .object-table td:nth-child(3)::before { content: "Outside it"; }
+  .verification-table td:nth-child(1)::before { content: "Question"; }
+  .verification-table td:nth-child(2)::before { content: "Evidence"; }
+  .verification-table td:nth-child(3)::before { content: "Kept separate"; }
+  .status-table td:nth-child(1)::before { content: "Interface"; }
+  .status-table td:nth-child(2)::before { content: "Current state"; }
+  .status-table td:nth-child(3)::before { content: "Use today"; }
+  .module-table td:nth-child(1)::before { content: "Module"; }
+  .module-table td:nth-child(2)::before { content: "Responsibility"; }
+  .validation-table td:nth-child(1)::before { content: "Layer"; }
+  .validation-table td:nth-child(2)::before { content: "Checks"; }
+  .validation-table td:nth-child(3)::before { content: "Does not check"; }
+  .assurance-table td:nth-child(1)::before { content: "Dimension"; }
+  .assurance-table td:nth-child(2)::before { content: "Evidence"; }
+  .assurance-table td:nth-child(3)::before { content: "Does not establish"; }
   .page table th { border-top: 0; }
 }
