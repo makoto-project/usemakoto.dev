@@ -22,15 +22,18 @@ DEFAULT_BASE_URL = "https://usemakoto.dev"
 HOME_PATH = "/"
 LINEAGE_PATH = "/why-lineage/"
 WALKTHROUGH_PATH = "/demos/v0.2-end-to-end/"
+STATUS_PATH = "/spec/"
 SITE_REVIEW_SURFACES = {
     HOME_PATH: "index.html",
     LINEAGE_PATH: "why-lineage/index.html",
     "/community/": "community/index.html",
-    "/examples/v0.2/": "examples/v0.2/index.html",
-    "/integrations/v0.2/": "integrations/v0.2/index.html",
+    "/examples/": "examples/index.html",
+    "/integrations/": "integrations/index.html",
+    "/demos/": "demos/index.html",
+    STATUS_PATH: "spec/index.html",
     "/tooling/": "tooling/index.html",
 }
-CANDIDATE_DISCLOSURE = b"v0.2 candidate \xc2\xb7 not yet released"
+CANDIDATE_DISCLOSURE = b"not yet an immutable tagged release"
 
 
 class ProbeError(ValueError):
@@ -247,19 +250,19 @@ def probe_once(root: Path, base_url: str, *, timeout: float, candidate: bool = F
     resources, source_link = load_expectations(root, candidate=candidate)
     opener = urllib.request.build_opener(NoRedirects())
     walkthrough: bytes | None = None
-    homepage: bytes | None = None
+    status_page: bytes | None = None
     for resource in resources:
         body = fetch_exact(opener, base_url, resource, timeout=timeout)
         if resource.path == WALKTHROUGH_PATH:
             walkthrough = body
-        elif resource.path == HOME_PATH:
-            homepage = body
+        elif resource.path == STATUS_PATH:
+            status_page = body
     if walkthrough is None:
         raise ProbeError("walkthrough was not included in the hosted expectations")
     if source_link.encode() not in walkthrough:
         raise ProbeError(f"walkthrough does not link to exact source revision: {source_link}")
-    if candidate and (homepage is None or CANDIDATE_DISCLOSURE not in homepage):
-        raise ProbeError("hosted candidate homepage does not disclose its unreleased status")
+    if candidate and (status_page is None or CANDIDATE_DISCLOSURE not in status_page):
+        raise ProbeError("hosted specification does not disclose its unreleased status")
 
 
 def main() -> int:

@@ -1,227 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
-<!-- End Google Tag Manager -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SDKs - Makoto (誠)</title>
-    <link rel="stylesheet" href="/assets/styles.css?v=20260718c">
-    <style>
-        .sdk-section {
-            background: var(--bg-white);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        .sdk-section h2 {
-            margin-top: 0;
-            font-size: 1.5rem;
-        }
-        .install-block {
-            background: #1e1e2e;
-            color: #cdd6f4;
-            border-radius: 8px;
-            padding: 1rem 1.25rem;
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            margin: 1rem 0;
-            position: relative;
-            overflow-x: auto;
-        }
-        .copy-btn {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: #cdd6f4;
-            border-radius: 4px;
-            padding: 0.25rem 0.6rem;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-        .copy-btn:hover { background: rgba(255,255,255,0.2); }
-        code.inline {
-            background: #f0f0f0;
-            padding: 0.1em 0.4em;
-            border-radius: 4px;
-            font-family: var(--font-mono);
-            font-size: 0.9em;
-        }
-        .schema-note {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 8px;
-            padding: 1rem 1.25rem;
-            font-size: 0.95rem;
-            margin: 2rem 0;
-        }
-        .schema-note a { color: #16a34a; }
-        .lang-badge {
-            display: inline-block;
-            background: var(--primary);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            margin-right: 0.5rem;
-            vertical-align: middle;
-        }
-        .readme-link {
-            font-size: 0.9rem;
-            margin-top: 1rem;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Makoto's reference Python implementation, command-line interface, and language SDK design requirements.">
+  <title>SDKs and language interfaces — Makoto</title>
+  <link rel="stylesheet" href="/assets/v02.css">
 </head>
 <body>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/" aria-current="page">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><p class="mobile-section">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/tooling/">Tooling map</a><a href="/sdk/" aria-current="page">Language SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+  <div class="site-shell">
+    <aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/tooling/">Tooling map</a><a href="/sdk/" aria-current="page">Language SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+    <div class="site-main"><main id="main" class="page wide">
+      <span class="kicker">Language interfaces</span>
+      <h1>The protocol is portable. The supported implementation is explicit.</h1>
+      <p class="lead">Makoto currently ships as source: a Python reference library and command-line interface in the core repository. JavaScript, browser, Go, and other language work should reproduce the same signed bytes and verification decisions, not invent a friendlier but incompatible document.</p>
 
-    <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+      <table class="status-table stack-table"><thead><tr><th>Interface</th><th>Current state</th><th>Use today</th></tr></thead><tbody><tr><td>Command-line interface</td><td>Implemented and tested in the core repository</td><td>Create keys, attest origins and transformations, build handoffs, validate schemas, and verify bundles.</td></tr><tr><td>Python library</td><td>Reference implementation in the source tree</td><td>Embed the same schema, signing, graph, profile, and verification logic behind a controlled integration.</td></tr><tr><td>JavaScript and browser</td><td>Interface research; no published package</td><td>Review the client-side requirements and help define byte-for-byte interoperability tests.</td></tr><tr><td>Go and other languages</td><td>No maintained SDK claimed</td><td>Start from schemas, test vectors, canonicalization rules, and stable verification diagnostics.</td></tr></tbody></table>
 
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <a href="/" class="sidebar-logo">
-                <span class="sidebar-logo-icon">誠</span>
-                Makoto
-            </a>
-            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                </svg>
-            </a>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="/" class="nav-item">Home</a>
+      <section aria-labelledby="cli"><span class="kicker">Reference path</span><h2 id="cli">Command line</h2><p>The CLI is the shortest route to every protocol operation without binding a pipeline to Python internals.</p><pre><code>git clone https://github.com/makoto-project/makoto.git
+cd makoto
+uv sync --locked --dev
+uv run makoto --help
+uv run makoto attest origin --help
+uv run makoto attest transform --help
+uv run makoto handoff create --help
+uv run makoto verify bundle --help</code></pre><p><a href="/demos/setup/">Run the complete local setup</a> · <a href="/verify/">Read the receiver verification guide</a></p></section>
 
-            <div class="nav-section">Specification</div>
-            <a href="/spec/" class="nav-item">Makoto v0.1</a>
-            <a href="/levels/" class="nav-item">Understanding Levels</a>
-            <a href="/spec/signature-guide.html" class="nav-item">Signature Guide</a>
-            <a href="/comparison/" class="nav-item">SLSA Comparison</a>
-            <a href="/comparison/decision-guide.html" class="nav-item">Which Standard?</a>
+      <section aria-labelledby="python"><span class="kicker">Maintained source</span><h2 id="python">Python</h2><p>The Python package is the reference implementation used by the CLI and tests. It is not advertised as a separately published distribution, and its internal modules are not yet a stable public SDK. Use the command line for the supported boundary; read these modules when reviewing or contributing to the implementation.</p><table class="stack-table module-table"><thead><tr><th>Implemented module</th><th>Responsibility</th></tr></thead><tbody><tr><td><code>makoto.model</code></td><td>Construct statement, predicate, subject, and handoff model objects.</td></tr><tr><td><code>makoto.dsse</code></td><td>Sign and verify exact DSSE payload bytes.</td></tr><tr><td><code>makoto.schema</code> and <code>makoto.schema_catalog</code></td><td>Strict JSON parsing, core validation, and digest-pinned resource resolution.</td></tr><tr><td><code>makoto.graph</code>, <code>makoto.policy</code>, and <code>makoto.report</code></td><td>Evaluate graph structure, receiver authorization policy, and machine-readable outcomes.</td></tr><tr><td><code>makoto.bundle</code></td><td>Safely read and verify a complete portable handoff bundle.</td></tr></tbody></table><p><a href="https://github.com/makoto-project/makoto/tree/f82af01c54349c27db6da2d3ed5c6751863d0ff7/src/makoto">Browse the reviewed Python source ↗</a> · <a href="https://github.com/makoto-project/makoto/tree/f82af01c54349c27db6da2d3ed5c6751863d0ff7/tests">Read the reviewed tests ↗</a></p></section>
 
-            <div class="nav-section">Resources</div>
-            <a href="/examples/" class="nav-item">Examples</a>
-            <a href="/demos/" class="nav-item">Demos</a>
-            <a href="/sdk/" class="nav-item active">SDKs</a>
-            <a href="/validate/" class="nav-item">Tool Validation</a>
-            <a href="/privacy/" class="nav-item">Privacy Techniques</a>
-            <a href="/threats/" class="nav-item">Threat Model</a>
+      <section aria-labelledby="future"><span class="kicker">Interop contract</span><h2 id="future">What every future SDK must preserve</h2><ol class="provenance-spine"><li><strong>Exact bytes</strong><span>Do not parse and silently rewrite signed JSON. DSSE authenticates the payload bytes that were actually signed.</span></li><li><strong>Closed core shapes</strong><span>Core statements stay portable and strict. Team-specific fields enter through declared, digest-pinned profiles.</span></li><li><strong>Independent policy</strong><span>Signature validity and signer authorization are separate results. The receiver supplies trust policy outside the bundle.</span></li><li><strong>Graph identity</strong><span>Transformation inputs bind both the predecessor statement digest and the exact subject digest.</span></li><li><strong>Stable failures</strong><span>Implementations should agree on allow/deny behavior and machine-readable diagnostic codes for the conformance fixtures.</span></li></ol></section>
 
-            <div class="nav-section">Integrations</div>
-                        <a href="/integrations/" class="nav-item">All Integrations</a>
-                        <a href="/integrations/airflow/" class="nav-item nav-item-sub">Apache Airflow</a>
-                        <a href="/integrations/dbt/" class="nav-item nav-item-sub">dbt</a>
-                        <a href="/integrations/spark/" class="nav-item nav-item-sub">Apache Spark</a>
-                        <a href="/integrations/kafka/" class="nav-item nav-item-sub">Apache Kafka</a>
-                        <a href="/integrations/snowflake/" class="nav-item nav-item-sub">Snowflake</a>
-                        <a href="/integrations/databricks/" class="nav-item nav-item-sub">Databricks</a>
-                        <a href="/integrations/dagster/" class="nav-item nav-item-sub">Dagster</a>
-                        <a href="/integrations/prefect/" class="nav-item nav-item-sub">Prefect</a>
-                        <a href="/integrations/expanso/" class="nav-item nav-item-sub">Expanso</a>
-        </nav>
-    </aside>
+      <section aria-labelledby="javascript"><span class="kicker">JavaScript and browser design</span><h2 id="javascript">The browser is a useful verifier surface, but not a shortcut around trust.</h2><p>A future browser library can hash received <code>ArrayBuffer</code> bytes, validate schemas from a pinned catalog, verify Ed25519 signatures, and render a report. It still needs receiver-owned authorization policy, explicit expected heads or manifests, resource limits, and negative test vectors. No CDN import or package name is promised until those constraints are implemented and tested.</p><p><a href="https://github.com/makoto-project/usemakoto.dev/tree/main/sdk/javascript">Review the JavaScript design source ↗</a> · <a href="https://github.com/makoto-project/usemakoto.dev/tree/main/sdk/python">Review the earlier Python API study ↗</a></p></section>
 
-    <main class="main-content">
-        <div class="section section-wide">
-            <h1>Historical v0.1 SDK experiments</h1>
-
-<div class="legacy-v01-banner" role="note"><p><strong>Historical v0.1 experiment; not a published package.</strong> PyPI <code>makoto</code> is unrelated, npm <code>@makoto/sdk</code> is unpublished, and this format is incompatible with v0.2. <a href="/tooling/">See the current CLI, schema, and SDK status.</a></p></div>
-            <p class="lead">These archived Python and JavaScript prototypes illustrate the earlier DBOM design. They are not official libraries, installable packages, or a supported way to produce Makoto v0.2 evidence.</p>
-
-            <div class="schema-note">
-                🔒 All DBOMs are validated against the canonical schema at
-                <a href="https://usemakoto.dev/schema/v0.1.json"><code>https://usemakoto.dev/schema/v0.1.json</code></a>.
-                A bundled copy is included in each SDK for offline use.
-            </div>
-
-            <!-- Python SDK -->
-            <div class="sdk-section">
-                <h2><span class="lang-badge">Python</span> makoto</h2>
-                <p>Historical source experiment only; no Makoto v0.2 Python package is published.</p>
-
-                <strong>Install</strong>
-                <div class="install-block">
-                    <button class="copy-btn" onclick="copy(this)">Copy</button>
-                    # unavailable: no Makoto v0.2 Python package is published
-                </div>
-
-                <strong>Quick Start</strong>
-                <div class="install-block" style="white-space: pre;">
-                    <button class="copy-btn" onclick="copy(this)">Copy</button>
-from makoto import generate, verify
-
-# Generate a DBOM
-dbom = generate("data/sales.csv", signer="github:you")
-
-# Verify it
-result = verify(dbom, file_path="data/sales.csv")
-print("Valid" if result.valid else result.errors)
-                </div>
-                <p class="readme-link">→ <a href="https://github.com/makoto-project/usemakoto.dev/tree/main/sdk/python">Historical source and README</a></p>
-            </div>
-
-            <!-- JavaScript SDK -->
-            <div class="sdk-section">
-                <h2><span class="lang-badge" style="background:#f7df1e;color:#222;">JS</span> @makoto/sdk</h2>
-                <p>Historical source experiment only; <code>@makoto/sdk</code> is unpublished.</p>
-
-                <strong>Install</strong>
-                <div class="install-block">
-                    <button class="copy-btn" onclick="copy(this)">Copy</button>
-                    # unavailable: @makoto/sdk was never published
-                </div>
-
-                <strong>Quick Start — Node.js</strong>
-                <div class="install-block" style="white-space: pre;">
-                    <button class="copy-btn" onclick="copy(this)">Copy</button>
-import { generate, verify } from "@makoto/sdk";
-
-const dbom = await generate({ filePath: "sales.csv", signer: "github:you", fileName: "sales.csv" });
-const result = await verify(dbom);
-console.log(result.valid ? "✓ Valid" : result.errors);
-                </div>
-
-                <strong>Quick Start — Browser</strong>
-                <div class="install-block" style="white-space: pre;">
-                    <button class="copy-btn" onclick="copy(this)">Copy</button>
-import { generate, verify } from "@makoto/sdk";
-
-const buffer = await file.arrayBuffer();
-const dbom = await generate({ fileBuffer: buffer, fileName: file.name, signer: "github:you" });
-const result = await verify(dbom, buffer);
-                </div>
-                <p class="readme-link">→ <a href="https://github.com/makoto-project/usemakoto.dev/tree/main/sdk/javascript">Historical source and README</a></p>
-            </div>
-
-            <h2>Historical schema</h2>
-            <p>The archived DBOM JSON Schema remains available for reading at:</p>
-            <div class="install-block">
-                https://usemakoto.dev/schema/v0.1.json<br>
-                https://usemakoto.dev/schema/latest.json
-            </div>
-            <p>These v0.1 URLs are retained for historical compatibility only. They do not define Makoto v0.2.</p>
-        </div><!-- /section -->
-    </main>
-
-    <script>
-        function copy(btn) {
-            const block = btn.parentElement;
-            const text = block.textContent.replace("Copy", "").trim();
-            navigator.clipboard.writeText(text).then(() => {
-                btn.textContent = "Copied!";
-                setTimeout(() => { btn.textContent = "Copy"; }, 1500);
-            });
-        }
-    </script>
+      <section class="community-band"><span class="kicker">Build one language well</span><h2>An SDK starts with a cross-language conformance result, not an install snippet.</h2><p>Bring the runtime you need, implement one positive fixture and every relevant denial, then propose the API around behavior we can compare.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Propose an SDK on GitHub</a><a class="button secondary" href="/tooling/">See all tooling</a></div></section>
+    </main><footer class="footer"><div class="footer-inner">Makoto language interfaces · Apache-2.0 · Package availability is stated per interface</div></footer></div>
+  </div>
 </body>
 </html>

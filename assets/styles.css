@@ -1,31 +1,28 @@
 /* Makoto (誠) - Data Integrity Framework */
-/* Japanese-inspired design with indigo theme */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+/* Editorial compatibility layer for the older long-form pages. */
 
 :root {
     color-scheme: light;
 
-    /* Indigo theme (matching Expanso standard) */
-    --primary-dark: #312e81;      /* Deep indigo - sidebar bg */
-    --primary: #6366f1;           /* Main indigo */
-    --primary-light: #818cf8;     /* Lighter indigo for accents */
-    --accent: #a5b4fc;            /* Light indigo accent */
-    --accent-light: #c7d2fe;      /* Lightest indigo */
+    --primary-dark: #7d2922;
+    --primary: #b33a2f;
+    --primary-light: #c96758;
+    --accent: #e8b7ae;
+    --accent-light: #f5dfdc;
 
     /* Neutrals */
-    --text: #18181b;
-    --text-muted: #52525b;
-    --text-light: #a1a1aa;
-    --bg-white: #fafafa;
-    --bg-light: #f4f4f5;
-    --border: #e4e4e7;
-    --surface: #ffffff;
+    --text: #17211d;
+    --text-muted: #59635d;
+    --text-light: #918b7f;
+    --bg-white: #f5f1e8;
+    --bg-light: #ebe5d8;
+    --border: #cfc8ba;
+    --surface: #fffdf8;
 
     /* Links use a deeper indigo than decorative accents for readable contrast. */
-    --link: #4338ca;
-    --link-hover: #312e81;
-    --focus-ring: #818cf8;
+    --link: #7d2922;
+    --link-hover: #b33a2f;
+    --focus-ring: #b33a2f;
 
     /* Evidence layers used by the reproducibility coverage map. */
     --evidence-data: #0f766e;
@@ -36,11 +33,11 @@
 
     /* Sidebar - dark mode to match other demos */
     --sidebar-width: 220px;
-    --sidebar-bg: #09090b;
+    --sidebar-bg: #17211d;
     --sidebar-text: rgba(250, 250, 250, 0.9);
     --sidebar-text-muted: rgba(161, 161, 170, 0.8);
-    --sidebar-hover: rgba(99, 102, 241, 0.15);
-    --sidebar-active: rgba(99, 102, 241, 0.25);
+    --sidebar-hover: transparent;
+    --sidebar-active: transparent;
 
     /* Level colors */
     --level-1: #eab308;
@@ -52,23 +49,9 @@
     --warning: #eab308;
     --error: #ef4444;
 
-    /* Fonts - standardized with Japanese support */
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-jp: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
-    --font-mono: 'JetBrains Mono', 'Monaco', 'Menlo', monospace;
-}
-
-.legacy-v01-banner {
-    margin: 1rem 0 2rem;
-    padding: 1rem 1.25rem;
-    border: 1px solid #f59e0b;
-    border-radius: 0.5rem;
-    background: #fffbeb;
-    color: #78350f;
-}
-
-.legacy-v01-banner p {
-    margin: 0;
+    --font-sans: 'Avenir Next', Avenir, 'Segoe UI', sans-serif;
+    --font-jp: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
 }
 
 /* ===== JAPANESE-INSPIRED ELEMENTS ===== */
@@ -77,8 +60,8 @@
 .makoto-mon {
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
-    border-radius: 50%;
+    background: var(--primary);
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -87,7 +70,7 @@
     font-weight: 700;
     font-size: 1rem;
     border: 2px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    box-shadow: 2px 2px 0 #17211d;
 }
 
 /* Seigaiha (wave) pattern for backgrounds */
@@ -121,8 +104,8 @@
     bottom: -4px;
     width: 40px;
     height: 3px;
-    background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
-    border-radius: 2px;
+    background: var(--primary);
+    border-radius: 0;
 }
 
 /* Kanji character styling */
@@ -139,7 +122,7 @@
     width: 48px;
     height: 48px;
     border: 2px solid var(--primary);
-    border-radius: 50%;
+    border-radius: 0;
     font-family: var(--font-jp);
     font-weight: 700;
     font-size: 1.25rem;
@@ -227,8 +210,8 @@ button:focus-visible {
 .sidebar-logo-icon {
     width: 28px;
     height: 28px;
-    background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
-    border-radius: 50%;
+    background: var(--primary);
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -262,19 +245,23 @@ button:focus-visible {
     color: var(--sidebar-text);
     text-decoration: none;
     font-size: 0.9rem;
-    transition: all 0.2s;
-    border-left: 3px solid transparent;
+    transition: color 0.2s ease-out;
+    border-left: 0;
 }
 
 .nav-item:hover {
-    background: var(--sidebar-hover);
-    text-decoration: none;
+    background: transparent;
+    text-decoration: underline;
 }
 
 .nav-item.active {
-    background: var(--sidebar-active);
-    border-left-color: var(--accent);
+    background: transparent;
+    border-left-color: transparent;
     color: white;
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-color: var(--primary-light);
+    text-underline-offset: .25em;
 }
 
 .nav-section {
@@ -299,7 +286,7 @@ button:focus-visible {
 
 /* ===== HERO SECTION ===== */
 .hero {
-    background: linear-gradient(135deg, #09090b 0%, #18181b 50%, #312e81 100%);
+    background: #17211d;
     color: white;
     padding: 6rem 3rem;
     position: relative;
@@ -1272,8 +1259,480 @@ code {
     }
 }
 
-/* ===== SYSTEM DARK MODE ===== */
-@media (prefers-color-scheme: dark) {
+/* ===== EDITORIAL MIGRATION LAYER =====
+   The long-form examples predate the current shell. Keep their useful content,
+   but make them read as one technical publication instead of a SaaS template. */
+
+body {
+    background:
+        linear-gradient(rgba(23, 33, 29, 0.025) 1px, transparent 1px),
+        var(--bg-white);
+    background-size: 100% 32px;
+}
+
+body::selection {
+    color: var(--surface);
+    background: var(--primary);
+}
+
+a:visited { color: #63404d; }
+
+.sidebar {
+    color: var(--text);
+    background: rgba(235, 229, 216, 0.97);
+    border-right: 1px solid var(--border);
+}
+
+.sidebar-header {
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo,
+.sidebar-logo:hover,
+.sidebar-logo:visited,
+.sidebar-github,
+.sidebar-github:visited,
+.nav-item,
+.nav-item:visited {
+    color: var(--text);
+}
+
+.sidebar-logo { min-height: 44px; }
+
+.sidebar-github { opacity: 0.78; }
+
+.nav-section {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-weight: 750;
+}
+
+.nav-item {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    color: var(--primary-dark);
+}
+
+.nav-item.active {
+    text-decoration-color: var(--primary);
+}
+
+.main-content { background: transparent; }
+
+.mobile-header {
+    background: rgba(245, 241, 232, 0.97);
+    border-bottom: 1px solid var(--text);
+}
+
+.mobile-header .sidebar-logo,
+.mobile-header .sidebar-logo:visited,
+.mobile-header .sidebar-logo:hover {
+    color: var(--text) !important;
+}
+
+.mobile-menu-btn {
+    min-width: 44px;
+    min-height: 44px;
+    color: var(--text);
+}
+
+.hero,
+.demo-hero,
+.demos-hero,
+.privacy-hero {
+    min-height: 0 !important;
+    padding: clamp(3.5rem, 7vw, 6rem) clamp(1.5rem, 5vw, 4.5rem) !important;
+    color: var(--text) !important;
+    background: var(--surface) !important;
+    border-bottom: 1px solid var(--text);
+}
+
+.hero::before,
+.hero::after,
+.wave-overlay::after,
+.hero-decoration,
+.accent-banner::before,
+.accent-banner::after {
+    display: none !important;
+}
+
+.hero h1,
+.demo-hero h1,
+.demos-hero h1,
+.privacy-hero h1,
+.section h1,
+.section h2,
+.section h3,
+.section h4,
+.main-content > h1,
+.main-content > h2 {
+    color: var(--text) !important;
+    font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+    letter-spacing: -0.025em;
+}
+
+.hero h1,
+.demo-hero h1,
+.demos-hero h1,
+.privacy-hero h1 {
+    max-width: 880px;
+    font-size: clamp(3rem, 7vw, 5.7rem) !important;
+    font-weight: 700 !important;
+    line-height: 0.96;
+}
+
+.hero p,
+.demo-hero p,
+.demos-hero p,
+.privacy-hero p {
+    max-width: 720px;
+    color: var(--text-muted) !important;
+    font-size: 1.12rem;
+}
+
+.demo-pill,
+.time-badge,
+.platform-tag,
+.mitigation-badge,
+.threat-badge,
+.lang-badge,
+.level-badge,
+.status-badge,
+.evidence-coverage {
+    padding: 0 !important;
+    color: var(--primary-dark) !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    font-family: var(--font-mono);
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.demo-pill + .time-badge { margin-left: 1rem; }
+
+.flow-badge {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    width: min(100%, 720px);
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.flow-badge .problem,
+.flow-badge .solution {
+    padding: 0 !important;
+    color: var(--text) !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+}
+
+.flow-badge .arrow { color: var(--primary-dark) !important; }
+
+.section {
+    max-width: 1020px;
+    padding: clamp(2.5rem, 4vw, 3.25rem) clamp(1.5rem, 5vw, 4.5rem);
+}
+
+.section h1 > span[style*="font-size: 2.5rem"] { display: none !important; }
+.what-is h2 { margin: 0 0 1rem; }
+
+/* Integration field notes share one editorial grammar. Keep the platform-specific
+   material, but do not turn it into a stack of interchangeable product cards. */
+.integration-detail .section:first-child {
+    padding-top: clamp(3.5rem, 7vw, 6.5rem);
+    padding-bottom: clamp(2.75rem, 5vw, 4.5rem);
+}
+
+.integration-detail .section:first-child h1 {
+    max-width: 16ch;
+    margin: 0 0 1rem;
+    font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+    font-size: clamp(2.7rem, 5vw, 4.5rem) !important;
+    font-weight: 700 !important;
+    line-height: 0.96;
+    letter-spacing: -0.045em;
+}
+
+.integration-detail .section:first-child > p {
+    max-width: 66ch;
+    margin-bottom: 1.75rem !important;
+    color: #3f4b45 !important;
+    font-size: 1.16rem !important;
+}
+
+.integration-detail .concept-banner {
+    max-width: 72ch;
+    margin: 2rem 0 0;
+}
+
+.integration-detail .what-is,
+.integration-detail .integration-idea,
+.integration-detail .pipeline-demo {
+    margin: 0;
+}
+
+.integration-detail .feature-grid {
+    margin-top: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.integration-detail .feature-grid > div {
+    display: grid;
+    grid-template-columns: minmax(9rem, 0.45fr) minmax(0, 1fr);
+    gap: 1.25rem;
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--border);
+}
+
+.integration-detail .feature-grid strong,
+.integration-detail .feature-grid span {
+    color: inherit;
+    font-size: inherit;
+}
+
+.integration-detail .idea-list {
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: attachment;
+    border-bottom: 1px solid var(--border);
+}
+
+.integration-detail .idea-list li {
+display: block;
+position: relative;
+padding: 1rem 0 1rem 3.1rem !important;
+overflow-wrap: break-word;
+border-top: 1px solid var(--border);
+border-bottom: 0 !important;
+counter-increment: attachment;
+}
+
+.integration-detail .idea-list li::before {
+content: counter(attachment, decimal-leading-zero) !important;
+position: absolute !important;
+top: 1.12rem;
+left: 0;
+display: block !important;
+    color: var(--primary-dark);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+}
+
+.integration-detail .pipeline-yaml {
+    margin-top: 1.25rem;
+    border: 1px solid #30302f;
+}
+
+.integration-cases {
+    margin-top: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.integration-cases > article {
+    display: grid;
+    grid-template-columns: minmax(10rem, 0.45fr) minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 1.15rem 0;
+    border-top: 1px solid var(--border);
+}
+
+.integration-cases h3,
+.integration-cases p {
+    margin: 0;
+}
+
+.integration-cta {
+    margin-top: 2.5rem;
+    padding-top: clamp(2.75rem, 5vw, 4rem) !important;
+    padding-bottom: clamp(2.75rem, 5vw, 4rem) !important;
+    color: var(--text) !important;
+    background: transparent !important;
+    border-top: 3px double var(--text) !important;
+    border-bottom: 1px solid var(--text) !important;
+}
+
+.integration-cta-copy {
+    max-width: 720px;
+}
+
+.integration-cta h2 {
+    max-width: 18ch;
+    color: var(--text) !important;
+}
+
+.integration-cta p {
+    max-width: 66ch;
+    margin: 1rem 0 0 !important;
+    color: var(--text-muted) !important;
+}
+
+.integration-cta .actions {
+    justify-content: flex-start;
+}
+
+.integration-cta .btn {
+    min-height: 44px;
+    padding: 0.7rem 0.9rem;
+    color: white !important;
+    background: var(--text) !important;
+    border: 1px solid var(--text) !important;
+    text-decoration: none;
+}
+
+.integration-cta .btn + .btn {
+    color: var(--text) !important;
+    background: transparent !important;
+}
+
+.integration-cta .btn:hover {
+    color: white !important;
+    background: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+}
+
+.integration-cta .btn + .btn:hover {
+    color: var(--primary-dark) !important;
+    background: transparent !important;
+}
+
+.demo-context {
+    margin-top: 1.4rem;
+    font-size: 0.92rem !important;
+}
+
+.section + .section { border-top: 1px solid var(--border); }
+
+.section[style*="background"],
+.accent-banner {
+    color: var(--text) !important;
+    background: transparent !important;
+}
+
+.card,
+.feature,
+.what-is,
+.integration-idea,
+.use-case-card,
+.platform-card,
+.threat-category,
+.level-section,
+.pipeline-demo,
+.pipeline-diagram,
+.field-explanation,
+.example-section,
+.status-box,
+.schema-note,
+.scope-note,
+.evidence-layer,
+.repro-output {
+    padding: 1.25rem 0 !important;
+    color: var(--text) !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-top: 1px solid var(--border) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.card-grid,
+.feature-grid,
+.platform-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+}
+
+.platform-card-icon,
+.threat-icon,
+.idea-list li::before {
+    display: none !important;
+}
+
+.idea-list li { padding-left: 0 !important; }
+
+.callout,
+.concept-banner {
+    padding: 1rem 0 !important;
+    color: var(--text) !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-top: 1px solid var(--border) !important;
+    border-bottom: 1px solid var(--border) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.concept-banner strong,
+.concept-banner p { color: inherit !important; }
+
+.btn,
+.setup-btn,
+.prev-next a,
+.terminal-copy,
+.copy-btn {
+    min-height: 44px;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.terminal,
+.code-block,
+.pipeline-yaml {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.terminal-dots { display: none !important; }
+
+.content-table,
+.threat-table,
+table {
+    background: transparent !important;
+    border-collapse: collapse;
+}
+
+.content-table th,
+.content-table td,
+.threat-table th,
+.threat-table td,
+th,
+td {
+    border: 0 !important;
+    border-bottom: 1px solid var(--border) !important;
+    background: transparent !important;
+}
+
+.content-table th,
+.threat-table th,
+th {
+    border-top: 1px solid var(--text) !important;
+    font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+}
+
+@media (max-width: 900px) {
+    .sidebar { background: var(--bg-light); }
+    .flow-badge { grid-template-columns: 1fr; gap: 0.65rem; }
+    .flow-badge .arrow { rotate: 90deg; justify-self: start; }
+
+    .integration-detail .feature-grid > div,
+    .integration-cases > article {
+        grid-template-columns: 1fr;
+        gap: 0.35rem;
+    }
+}
+
+/* The editorial site intentionally keeps one paper-and-ink palette. */
+@media not all {
     :root {
         color-scheme: dark;
 
