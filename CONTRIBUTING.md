@@ -34,7 +34,8 @@ The website has no production build step. Python tooling is managed with `uv`.
 git clone https://github.com/makoto-project/usemakoto.dev.git
 cd usemakoto.dev
 uv sync --locked --dev
-uv run scripts/check_site.py --working-tree ../core
+./scripts/check.sh --working-tree ../core
+actionlint .github/workflows/deploy.yml
 ```
 
 Before a pull request, run the repository checks documented in `README.md`. Changes to the hosted

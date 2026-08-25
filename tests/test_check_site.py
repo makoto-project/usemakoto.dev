@@ -4,11 +4,36 @@ import hashlib
 import json
 import re
 import subprocess
+from html.parser import HTMLParser
 from pathlib import Path
 
 import pytest
 
 from scripts import check_site
+
+
+class WalkthroughCodeParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.current: str | None = None
+        self.parts: list[str] = []
+        self.examples: dict[str, str] = {}
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        values = dict(attrs)
+        if tag == "code" and values.get("data-walkthrough-file"):
+            self.current = str(values["data-walkthrough-file"])
+            self.parts = []
+
+    def handle_data(self, data: str) -> None:
+        if self.current is not None:
+            self.parts.append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "code" and self.current is not None:
+            self.examples[self.current] = "".join(self.parts)
+            self.current = None
+            self.parts = []
 
 
 def canonical(value: object) -> bytes:
@@ -135,15 +160,33 @@ def test_lineage_story_is_a_first_class_linked_route() -> None:
     assert all(required in content for required in check_site.LINEAGE_REQUIRED_TEXT)
 
 
-def test_current_pages_share_persistent_navigation_and_mobile_menu() -> None:
-    for relative in check_site.CURRENT_SHELL_PAGES:
-        content = (check_site.ROOT / relative).read_text(encoding="utf-8")
-        assert all(marker in content for marker in check_site.CURRENT_SHELL_MARKERS), relative
+def test_every_substantive_page_uses_one_canonical_navigation_shell() -> None:
+    errors: list[str] = []
 
-        parser = check_site.PageParser()
-        parser.feed(content)
-        expected = "/" if relative == "index.html" else f"/{relative.removesuffix('index.html')}"
-        assert parser.mobile_current_hrefs == [expected], relative
+    check_site.check_navigation(errors)
+
+    assert errors == []
+    assert len(list(check_site.ROOT.rglob("*.html"))) - len(check_site.REDIRECT_PAGES) == 41
+
+
+def test_sidebar_scroll_position_is_preserved_per_browser_tab() -> None:
+    script = (check_site.ROOT / "assets/nav.js").read_text(encoding="utf-8")
+
+    assert "sessionStorage" in script
+    assert "sidebar.scrollTop" in script
+    assert 'window.addEventListener("pagehide", save)' in script
+
+
+def test_rendered_walkthrough_json_matches_the_checked_demo_projections() -> None:
+    page = (check_site.ROOT / check_site.WALKTHROUGH_PAGE).read_text(encoding="utf-8")
+    parser = WalkthroughCodeParser()
+    parser.feed(page)
+    artifacts = check_site.ROOT / "demos/v0.2-end-to-end/artifacts/walkthrough"
+    expected_names = {path.name for path in artifacts.glob("*.json")}
+
+    assert set(parser.examples) == expected_names
+    for name, rendered in parser.examples.items():
+        assert json.loads(rendered) == json.loads((artifacts / name).read_bytes())
 
 
 def test_home_restores_examples_tooling_and_open_source_discovery() -> None:

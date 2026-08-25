@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Runnable Makoto source-to-receiver walkthrough."><title>End-to-end handoff proof — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Runnable Makoto source-to-receiver walkthrough."><title>End-to-end handoff proof — Makoto</title><link rel="stylesheet" href="/assets/v02.css"><script src="/assets/nav.js" defer></script></head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/" aria-current="page">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><p class="mobile-section">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
-<div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/" aria-current="page">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside><div class="site-main">
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/spec/">Specification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><a href="/community/">Community</a><a href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/" aria-current="page">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Real-world examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a><p class="mobile-section">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a><a href="https://github.com/makoto-project/makoto/issues">Issues ↗</a></nav></details></div></header>
+<div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/" aria-current="page">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Real-world examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">GitHub repository ↗</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues ↗</a></div></nav></aside><div class="site-main">
 <main id="main" class="page wide">
   <span class="kicker">Runnable reference proof · browser page is not a verifier</span>
   <h1>From source bytes to an independently verified handoff</h1>
@@ -21,6 +21,311 @@
   </div>
   <p class="hash">Manifest: b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c · Head: 962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 · Final artifact: 2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4</p>
 
+  <h2>Read the evidence in the order it is created</h2>
+  <p class="lead">These syntax-formatted views come directly from the signed runnable demo. They show one receiver-owned data schema, the source claim, each append-only change, the signed summary record, who attested, and the receiver's final test. The downloadable JSON beside each view is checked against the full signed evidence.</p>
+  <!-- GENERATED WALKTHROUGH START -->
+<ol class="evidence-sequence"><li class="evidence-step"><div class="evidence-step-copy"><span>00</span><div><p class="evidence-step-eyebrow">The receiver&#x27;s rule</p><h3>One JSON Schema for the final dataset</h3><p>This private profile rejects direct identifiers, fixes allowed fields, and constrains their types and lengths. The full proof also uses a separate metadata profile for the privacy transformation.</p><a href="artifacts/walkthrough/00-customer-public.schema.json">Open the exact JSON</a></div></div><pre class="walkthrough-json"><code class="language-json" data-walkthrough-file="00-customer-public.schema.json">{
+  &quot;$schema&quot;: &quot;https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json&quot;,
+  &quot;$id&quot;: &quot;https://schemas.example.internal/makoto/customer-public-v1.schema.json&quot;,
+  &quot;type&quot;: &quot;array&quot;,
+  &quot;items&quot;: {
+    &quot;type&quot;: &quot;object&quot;,
+    &quot;required&quot;: [
+      &quot;age_band&quot;,
+      &quot;customer_id&quot;,
+      &quot;marketing_consent&quot;,
+      &quot;region&quot;
+    ],
+    &quot;properties&quot;: {
+      &quot;age_band&quot;: {
+        &quot;enum&quot;: [
+          &quot;0-17&quot;,
+          &quot;18-24&quot;,
+          &quot;25-34&quot;,
+          &quot;35-44&quot;,
+          &quot;45-54&quot;,
+          &quot;55-64&quot;,
+          &quot;65+&quot;
+        ]
+      },
+      &quot;customer_id&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 20,
+        &quot;maxLength&quot;: 20
+      },
+      &quot;marketing_consent&quot;: {
+        &quot;type&quot;: &quot;boolean&quot;
+      },
+      &quot;region&quot;: {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;minLength&quot;: 2,
+        &quot;maxLength&quot;: 2
+      }
+    },
+    &quot;additionalProperties&quot;: false
+  }
+}
+</code></pre></li><li class="evidence-step"><div class="evidence-step-copy"><span>01</span><div><p class="evidence-step-eyebrow">Begin at the source</p><h3>Bind the origin claim to exact bytes</h3><p>The first statement names the source and hashes customers.raw.json before anything changes.</p><a href="artifacts/walkthrough/01-origin.statement.json">Open the exact JSON</a></div></div><pre class="walkthrough-json"><code class="language-json" data-walkthrough-file="01-origin.statement.json">{
+  &quot;_type&quot;: &quot;https://in-toto.io/Statement/v1&quot;,
+  &quot;predicate&quot;: {
+    &quot;event&quot;: {
+      &quot;id&quot;: &quot;urn:uuid:11111111-1111-4111-8111-111111111111&quot;,
+      &quot;occurredAt&quot;: &quot;2026-09-16T16:00:00Z&quot;
+    },
+    &quot;profiles&quot;: [],
+    &quot;schemaVersion&quot;: &quot;0.2&quot;,
+    &quot;source&quot;: {
+      &quot;kind&quot;: &quot;urn:makoto:demo:source:synthetic-file&quot;,
+      &quot;uri&quot;: &quot;urn:makoto:demo:v0.2:source:customers-raw&quot;
+    }
+  },
+  &quot;predicateType&quot;: &quot;https://usemakoto.dev/predicate/v0.2/origin&quot;,
+  &quot;subject&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919&quot;
+      },
+      &quot;name&quot;: &quot;customers.raw.json&quot;
+    }
+  ]
+}
+</code></pre></li><li class="evidence-step"><div class="evidence-step-copy"><span>02</span><div><p class="evidence-step-eyebrow">First change</p><h3>Normalize the customer records</h3><p>The new statement points to the origin statement and raw artifact, then hashes the normalized output. Nothing edits the origin in place.</p><a href="artifacts/walkthrough/02-normalize.statement.json">Open the exact JSON</a></div></div><pre class="walkthrough-json"><code class="language-json" data-walkthrough-file="02-normalize.statement.json">{
+  &quot;_type&quot;: &quot;https://in-toto.io/Statement/v1&quot;,
+  &quot;predicate&quot;: {
+    &quot;event&quot;: {
+      &quot;id&quot;: &quot;urn:uuid:22222222-2222-4222-8222-222222222222&quot;,
+      &quot;occurredAt&quot;: &quot;2026-09-16T16:00:00Z&quot;
+    },
+    &quot;inputs&quot;: [
+      {
+        &quot;digest&quot;: {
+          &quot;sha256&quot;: &quot;4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919&quot;
+        },
+        &quot;name&quot;: &quot;raw&quot;,
+        &quot;provenance&quot;: {
+          &quot;statementDigest&quot;: {
+            &quot;sha256&quot;: &quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a&quot;
+          },
+          &quot;subjectName&quot;: &quot;customers.raw.json&quot;
+        }
+      }
+    ],
+    &quot;operation&quot;: {
+      &quot;name&quot;: &quot;Normalize customer records&quot;,
+      &quot;type&quot;: &quot;urn:makoto:demo:operation:normalize&quot;
+    },
+    &quot;profiles&quot;: [],
+    &quot;schemaVersion&quot;: &quot;0.2&quot;
+  },
+  &quot;predicateType&quot;: &quot;https://usemakoto.dev/predicate/v0.2/transform&quot;,
+  &quot;subject&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8&quot;
+      },
+      &quot;name&quot;: &quot;customers.normalized.json&quot;
+    }
+  ]
+}
+</code></pre></li><li class="evidence-step"><div class="evidence-step-copy"><span>03</span><div><p class="evidence-step-eyebrow">Second change</p><h3>Remove direct identifiers and bucket ages</h3><p>The next statement points to the normalized predecessor, records the operation, and pins both the metadata rule and final-data rule by digest.</p><a href="artifacts/walkthrough/03-public-safe.statement.json">Open the exact JSON</a></div></div><pre class="walkthrough-json"><code class="language-json" data-walkthrough-file="03-public-safe.statement.json">{
+  &quot;_type&quot;: &quot;https://in-toto.io/Statement/v1&quot;,
+  &quot;predicate&quot;: {
+    &quot;event&quot;: {
+      &quot;id&quot;: &quot;urn:uuid:33333333-3333-4333-8333-333333333333&quot;,
+      &quot;occurredAt&quot;: &quot;2026-09-16T16:00:00Z&quot;
+    },
+    &quot;extensions&quot;: {
+      &quot;urn:makoto:demo:privacy-reviewed&quot;: true
+    },
+    &quot;inputs&quot;: [
+      {
+        &quot;digest&quot;: {
+          &quot;sha256&quot;: &quot;421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8&quot;
+        },
+        &quot;name&quot;: &quot;normalized&quot;,
+        &quot;provenance&quot;: {
+          &quot;statementDigest&quot;: {
+            &quot;sha256&quot;: &quot;1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848&quot;
+          },
+          &quot;subjectName&quot;: &quot;customers.normalized.json&quot;
+        }
+      }
+    ],
+    &quot;operation&quot;: {
+      &quot;name&quot;: &quot;Remove direct identifiers and bucket ages&quot;,
+      &quot;type&quot;: &quot;urn:makoto:demo:operation:public-safe&quot;
+    },
+    &quot;profiles&quot;: [
+      {
+        &quot;closureDigest&quot;: {
+          &quot;sha256&quot;: &quot;8c13490145ccdfe6958163ef0c578afb57da07772c2071932f8a4d98870e776e&quot;
+        },
+        &quot;critical&quot;: true,
+        &quot;digest&quot;: {
+          &quot;sha256&quot;: &quot;31934d2cf8fa7b5af2f8e4cf591d96278c4f59ddb6bb190afccb93701244f9eb&quot;
+        },
+        &quot;id&quot;: &quot;https://schemas.example.internal/makoto/public-transform-metadata-v1.schema.json&quot;,
+        &quot;resources&quot;: [],
+        &quot;target&quot;: &quot;predicate&quot;
+      },
+      {
+        &quot;closureDigest&quot;: {
+          &quot;sha256&quot;: &quot;57eec614be9b2141ad536f486ff4400b514d79b8b1cc9642a839cf1a39b10794&quot;
+        },
+        &quot;critical&quot;: true,
+        &quot;digest&quot;: {
+          &quot;sha256&quot;: &quot;68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb&quot;
+        },
+        &quot;id&quot;: &quot;https://schemas.example.internal/makoto/customer-public-v1.schema.json&quot;,
+        &quot;mediaType&quot;: &quot;application/json&quot;,
+        &quot;resources&quot;: [],
+        &quot;subjectName&quot;: &quot;customers.public.json&quot;,
+        &quot;target&quot;: &quot;artifact&quot;
+      }
+    ],
+    &quot;schemaVersion&quot;: &quot;0.2&quot;
+  },
+  &quot;predicateType&quot;: &quot;https://usemakoto.dev/predicate/v0.2/transform&quot;,
+  &quot;subject&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4&quot;
+      },
+      &quot;name&quot;: &quot;customers.public.json&quot;
+    }
+  ]
+}
+</code></pre></li><li class="evidence-step"><div class="evidence-step-copy"><span>04</span><div><p class="evidence-step-eyebrow">Summary record</p><h3>Commit to the complete handoff</h3><p>This decoded payload is the signed handoff manifest: the only normative summary. It commits to the root, head, complete statement set, recipient, and final artifact.</p><a href="artifacts/walkthrough/04-handoff.json">Open the exact JSON</a></div></div><pre class="walkthrough-json"><code class="language-json" data-walkthrough-file="04-handoff.json">{
+  &quot;artifacts&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4&quot;
+      },
+      &quot;head&quot;: {
+        &quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;
+      },
+      &quot;mediaType&quot;: &quot;application/json&quot;,
+      &quot;name&quot;: &quot;customers.public.json&quot;
+    }
+  ],
+  &quot;bundleId&quot;: &quot;urn:uuid:55555555-5555-4555-8555-555555555555&quot;,
+  &quot;heads&quot;: [
+    {
+      &quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;
+    }
+  ],
+  &quot;issuedAt&quot;: &quot;2026-09-16T16:00:00Z&quot;,
+  &quot;recipient&quot;: &quot;example:downstream-team&quot;,
+  &quot;requiredProfiles&quot;: [
+    {
+      &quot;closureDigest&quot;: {
+        &quot;sha256&quot;: &quot;57eec614be9b2141ad536f486ff4400b514d79b8b1cc9642a839cf1a39b10794&quot;
+      },
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb&quot;
+      },
+      &quot;head&quot;: {
+        &quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;
+      },
+      &quot;id&quot;: &quot;https://schemas.example.internal/makoto/customer-public-v1.schema.json&quot;,
+      &quot;mediaType&quot;: &quot;application/json&quot;,
+      &quot;scope&quot;: &quot;eachMatchingFinalArtifact&quot;,
+      &quot;subjectName&quot;: &quot;customers.public.json&quot;,
+      &quot;target&quot;: &quot;artifact&quot;
+    }
+  ],
+  &quot;roots&quot;: [
+    {
+      &quot;sha256&quot;: &quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a&quot;
+    }
+  ],
+  &quot;statements&quot;: [
+    {
+      &quot;sha256&quot;: &quot;1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848&quot;
+    },
+    {
+      &quot;sha256&quot;: &quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a&quot;
+    },
+    {
+      &quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;
+    }
+  ],
+  &quot;version&quot;: &quot;0.2&quot;
+}
+</code></pre></li><li class="evidence-step"><div class="evidence-step-copy"><span>05</span><div><p class="evidence-step-eyebrow">Who attested</p><h3>Interpret keys through receiver policy</h3><p>Key IDs are not identities by themselves. This teaching view joins each signed envelope to the labels and roles authorized by the receiver&#x27;s policy.</p><a href="artifacts/walkthrough/05-attesters.json">Open the exact JSON</a></div></div><pre class="walkthrough-json"><code class="language-json" data-walkthrough-file="05-attesters.json">{
+  &quot;attesters&quot;: [
+    {
+      &quot;authorizedKeys&quot;: [
+        {
+          &quot;keyid&quot;: &quot;sha256:fd110d301d2f077de1414b8f99f441b1403fab207b2052fbd2c065e4ee8e7dc2&quot;,
+          &quot;policyLabel&quot;: &quot;insecure demo-only origin key&quot;
+        }
+      ],
+      &quot;role&quot;: &quot;source ingestion&quot;,
+      &quot;statement&quot;: &quot;01-origin.statement.json&quot;
+    },
+    {
+      &quot;authorizedKeys&quot;: [
+        {
+          &quot;keyid&quot;: &quot;sha256:47dea58ea00fae9417ee19d76755bfef690899021132effb04fe1f9e4f0c8059&quot;,
+          &quot;policyLabel&quot;: &quot;insecure demo-only normalize key&quot;
+        }
+      ],
+      &quot;role&quot;: &quot;normalization&quot;,
+      &quot;statement&quot;: &quot;02-normalize.statement.json&quot;
+    },
+    {
+      &quot;authorizedKeys&quot;: [
+        {
+          &quot;keyid&quot;: &quot;sha256:8cef065b7af83669150b7d32704d3d3e75c3e9aee0d4f6740544c68e81b377aa&quot;,
+          &quot;policyLabel&quot;: &quot;insecure demo-only public key&quot;
+        }
+      ],
+      &quot;role&quot;: &quot;privacy transformation&quot;,
+      &quot;statement&quot;: &quot;03-public-safe.statement.json&quot;
+    },
+    {
+      &quot;authorizedKeys&quot;: [
+        {
+          &quot;keyid&quot;: &quot;sha256:d016df3d83373617c06b5e1d6359caa06eeba8b3af2c7077234f109f2194516c&quot;,
+          &quot;policyLabel&quot;: &quot;insecure demo-only handoff key&quot;
+        }
+      ],
+      &quot;role&quot;: &quot;recipient handoff&quot;,
+      &quot;statement&quot;: &quot;04-handoff.json&quot;
+    }
+  ]
+}
+</code></pre></li><li class="evidence-step"><div class="evidence-step-copy"><span>06</span><div><p class="evidence-step-eyebrow">Receiver test</p><h3>Validate the history, rules, signatures, and bytes</h3><p>The verifier separately passes core schemas, private profiles, signatures, authorization, graph continuity, completeness, freshness anchors, and the final data digest before returning allow.</p><a href="artifacts/walkthrough/06-verification-summary.json">Open the exact JSON</a></div></div><pre class="walkthrough-json"><code class="language-json" data-walkthrough-file="06-verification-summary.json">{
+  &quot;checks&quot;: {
+    &quot;artifact-bytes&quot;: &quot;pass&quot;,
+    &quot;artifact-profiles&quot;: &quot;pass&quot;,
+    &quot;authorization&quot;: &quot;pass&quot;,
+    &quot;completeness-anchor&quot;: &quot;pass&quot;,
+    &quot;core-schemas&quot;: &quot;pass&quot;,
+    &quot;freshness-anchors&quot;: &quot;pass&quot;,
+    &quot;graph&quot;: &quot;pass&quot;,
+    &quot;metadata-profiles&quot;: &quot;pass&quot;,
+    &quot;signatures&quot;: &quot;pass&quot;
+  },
+  &quot;decision&quot;: &quot;allow&quot;,
+  &quot;errors&quot;: [],
+  &quot;finalArtifact&quot;: {
+    &quot;digest&quot;: {
+      &quot;sha256&quot;: &quot;2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4&quot;
+    },
+    &quot;digestStatus&quot;: &quot;pass&quot;,
+    &quot;name&quot;: &quot;customers.public.json&quot;,
+    &quot;profileStatus&quot;: &quot;pass&quot;
+  },
+  &quot;manifestDigest&quot;: {
+    &quot;sha256&quot;: &quot;b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c&quot;
+  },
+  &quot;warnings&quot;: []
+}
+</code></pre></li></ol>
+<!-- GENERATED WALKTHROUGH END -->
+
   <h2>Clone and run</h2>
   <p>These are the repository's canonical acceptance commands.</p>
   <pre><code>git clone https://github.com/makoto-project/makoto.git
@@ -30,7 +335,7 @@ uv sync --locked --dev
   <p>The measured run creates all three provenance events plus the handoff, verifies the positive bundle, checks seven negative fixtures, and removes its ignored work directory. It requires no cloud credentials, service, or Docker.</p>
 
   <h2>Send the bundle; verify as the receiver</h2>
-  <p>The sender transfers only the signed bundle. The receiver keeps its trust policy, schema catalog, and expected artifact outside that bundle, then runs the verifier against the received bytes.</p>
+<p>The sender transfers only the signed bundle. The receiver keeps its trust policy, schema catalog, and <a href="artifacts/receiver/accepted-handoff.json">approved expectation lock</a> outside that bundle. The candidate must match that receiver-owned lock before the verifier evaluates the received bytes; the bundle cannot set its own expected result.</p>
   <pre><code>MAKOTO_RECEIVER_DIR="$(mktemp -d)"
 cp -R demos/v0.2-end-to-end/generated/positive-bundle "$MAKOTO_RECEIVER_DIR/bundle"
 
@@ -38,9 +343,10 @@ uv run makoto verify bundle "$MAKOTO_RECEIVER_DIR/bundle" \
   --policy demos/v0.2-end-to-end/generated/receiver/policy.json \
   --schema-catalog demos/v0.2-end-to-end/generated/receiver/catalog.json \
   --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
-  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
-  --expected-artifact demos/v0.2-end-to-end/generated/receiver/expected-artifact.json \
-  --evaluation-time 2026-09-16T16:00:00Z \
+--expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+--expected-artifact demos/v0.2-end-to-end/generated/receiver/expected-artifact.json \
+--expected-recipient example:downstream-team \
+--evaluation-time 2026-09-16T16:00:00Z \
   --json</code></pre>
   <p>The expected result is <code>"decision":"allow"</code>. Download and inspect the exact <a href="artifacts/data/customers.raw.json">source data</a>, <a href="artifacts/data/customers.normalized.json">normalized data</a>, <a href="artifacts/data/customers.public.json">final public data</a>, or the <a href="artifacts/positive-bundle/artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin">final bytes carried in the bundle</a>. The receiver expectation is also <a href="artifacts/receiver/expected-artifact.json">downloadable</a>.</p>
   <p><a href="https://github.com/makoto-project/makoto/tree/0e41afbd0c3f1c389d6643bfe279ab159e4f53ac/demos/v0.2-end-to-end">Open the exact source revision</a>. This exact commit link identifies the implementation snapshot used for these artifacts.</p>

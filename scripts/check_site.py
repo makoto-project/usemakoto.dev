@@ -19,6 +19,11 @@ from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError, ValidationError
 from referencing import Registry, Resource
 
+try:
+    from scripts.update_navigation import GROUPS, PRIMARY, owner_for, route_for
+except ModuleNotFoundError:  # Direct `uv run scripts/check_site.py` execution.
+    from update_navigation import GROUPS, PRIMARY, owner_for, route_for
+
 ROOT = Path(__file__).resolve().parents[1]
 CORE_SCHEMA_NAMES = (
     "bundle.schema.json",
@@ -99,6 +104,20 @@ CURRENT_INTEGRATION_PAGES = tuple(
     )
 )
 CURRENT_SHELL_PAGES += CURRENT_INTEGRATION_PAGES
+REDIRECT_PAGES = {
+    "comparison/decision-guide.html",
+    "comparison/open-lineage.html",
+    "comparison/w3c-prov.html",
+    "examples/v0.2/index.html",
+    "expanso/index.html",
+    "integrations/v0.2/index.html",
+    "sdk/javascript/examples/browser-example.html",
+    "spec/l1-requirements.html",
+    "spec/l2-requirements.html",
+    "spec/l3-requirements.html",
+    "spec/signature-guide.html",
+    "spec/v0.2/index.html",
+}
 STALE_INTEGRATION_MARKERS = (
     "origin/v1",
     "transform/v1",
@@ -116,18 +135,14 @@ STALE_INTEGRATION_MARKERS = (
 )
 LINEAGE_REQUIRED_TEXT = (
     "One file becomes ten copies. Its history usually doesn’t.",
-    "Now let it move.",
+    "Data doesn’t just move. It multiplies.",
     (
-        "It lands in object storage, gets picked up into a warehouse, gets denormalized into three "
-        "marts because three teams wanted different grain, gets a feature-store copy for the model, "
-        "gets a nightly backup with a 90-day cycle, gets replicated to a second region for durability, "
-        "gets pulled into a vendor's SaaS for enrichment, and gets exported once into a notebook by an "
-        "analyst who left in March."
+        "A dataset rarely travels as one thing. It leaves a trail of useful copies: a landing "
+        "object, a warehouse table, three marts at three different grains, model features, a "
+        "rotating backup, a regional replica, vendor enrichment, and the notebook nobody owns "
+        "anymore."
     ),
-    (
-        "Call that eight to ten locations, and I am being conservative, because I have not counted "
-        "the CI fixture somebody generated from prod or the Slack thread with the screenshot."
-    ),
+    ("One source becomes a small estate of data. Without lineage, the estate has no deed history."),
     "A checksum is necessary. It is not lineage.",
     "Makoto does not discover an unrecorded notebook export or Slack screenshot.",
     "/demos/v0.2-end-to-end/",
@@ -150,6 +165,7 @@ DOCUMENTATION_FILES = {
     "/vocab/v0.2/bounded-pattern/": "vocab/v0.2/bounded-pattern/index.html",
 }
 STATIC_RESOURCES = {
+    "docs/adopter-framework.md": ("docs/adopter-framework.md", "text/markdown"),
     "docs/v0.2-adversarial-review.md": (
         "docs/v0.2-adversarial-review.md",
         "text/markdown",
@@ -169,6 +185,12 @@ STATIC_RESOURCES = {
     ),
 }
 PUBLIC_TEXT_REWRITES = {
+    "docs/adopter-framework.md": (
+        (
+            "(../demos/v0.2-end-to-end/generated/walkthrough/)",
+            "(../demos/v0.2-end-to-end/artifacts/walkthrough/)",
+        ),
+    ),
     "docs/v0.2-adversarial-review.md": (("(../spec/v0.2.md)", "(../spec/v0.2/spec.md)"),),
     "docs/v0.2-architecture.md": (
         (
@@ -182,6 +204,11 @@ PUBLIC_TEXT_REWRITES = {
     ),
 }
 JSON_EXAMPLE_SCHEMAS = {
+    "demos/v0.2-end-to-end/artifacts/walkthrough/00-customer-public.schema.json": "profile-dialect.schema.json",
+    "demos/v0.2-end-to-end/artifacts/walkthrough/01-origin.statement.json": "statement.schema.json",
+    "demos/v0.2-end-to-end/artifacts/walkthrough/02-normalize.statement.json": "statement.schema.json",
+    "demos/v0.2-end-to-end/artifacts/walkthrough/03-public-safe.statement.json": "statement.schema.json",
+    "demos/v0.2-end-to-end/artifacts/walkthrough/04-handoff.json": "handoff.schema.json",
     "demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json": "envelope.schema.json",
     "demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json": "envelope.schema.json",
     "demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json": "envelope.schema.json",
@@ -286,6 +313,72 @@ class PageParser(HTMLParser):
     def handle_data(self, data: str) -> None:
         if not self.ignored_text_depth and data.strip():
             self.visible_text.append(data.strip())
+
+
+class NavigationParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.surface: str | None = None
+        self.counts = {"primary": 0, "mobile": 0, "documentation": 0}
+        self.links: dict[str, list[tuple[str, str]]] = {
+            "primary": [],
+            "mobile": [],
+            "documentation": [],
+        }
+        self.groups: dict[str, list[str]] = {"mobile": [], "documentation": []}
+        self.current: dict[str, list[str]] = {
+            "primary": [],
+            "mobile": [],
+            "documentation": [],
+        }
+        self.link: tuple[str, str, bool, list[str]] | None = None
+        self.group: tuple[str, list[str]] | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        values = dict(attrs)
+        if tag == "nav":
+            classes = set(str(values.get("class", "")).split())
+            if values.get("aria-label") == "Primary" and "nav" in classes:
+                self.surface = "primary"
+            elif values.get("aria-label") == "Mobile":
+                self.surface = "mobile"
+            elif "docs-nav" in classes:
+                self.surface = "documentation"
+            if self.surface is not None:
+                self.counts[self.surface] += 1
+        elif tag == "a" and self.surface is not None and values.get("href"):
+            self.link = (
+                self.surface,
+                str(values["href"]),
+                values.get("aria-current") == "page",
+                [],
+            )
+        elif tag == "p" and self.surface in {"mobile", "documentation"}:
+            classes = set(str(values.get("class", "")).split())
+            expected = "mobile-section" if self.surface == "mobile" else "docs-nav-title"
+            if expected in classes:
+                self.group = (self.surface, [])
+
+    def handle_data(self, data: str) -> None:
+        if self.link is not None:
+            self.link[3].append(data)
+        if self.group is not None:
+            self.group[1].append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "a" and self.link is not None:
+            surface, href, is_current, parts = self.link
+            label = " ".join("".join(parts).split())
+            self.links[surface].append((label, href))
+            if is_current:
+                self.current[surface].append(href)
+            self.link = None
+        elif tag == "p" and self.group is not None:
+            surface, parts = self.group
+            self.groups[surface].append(" ".join("".join(parts).split()))
+            self.group = None
+        elif tag == "nav" and self.surface is not None:
+            self.surface = None
 
 
 def parse_args() -> argparse.Namespace:
@@ -719,6 +812,60 @@ def check_tracked_files(errors: list[str]) -> None:
         errors.append(f"forbidden tracked dependencies/caches: {forbidden[:10]!r}")
 
 
+def check_navigation(errors: list[str]) -> None:
+    all_pages = {path.relative_to(ROOT).as_posix() for path in ROOT.rglob("*.html")}
+    shell_pages = all_pages - REDIRECT_PAGES
+    if not REDIRECT_PAGES <= all_pages:
+        errors.append(f"declared redirect pages are absent: {sorted(REDIRECT_PAGES - all_pages)!r}")
+
+    expected_primary = [(label, href) for label, href, _ in PRIMARY]
+    expected_links = [(label, href) for _, items in GROUPS for label, href, _ in items]
+    expected_groups = [title for title, _ in GROUPS]
+    primary_hrefs = {href for _, href in expected_primary}
+
+    for relative in sorted(REDIRECT_PAGES):
+        content = (ROOT / relative).read_text(encoding="utf-8")
+        if 'http-equiv="refresh"' not in content.casefold():
+            errors.append(f"navigation-free page is not an explicit redirect: {relative}")
+        if any(
+            marker in content
+            for marker in ('aria-label="Primary"', 'aria-label="Mobile"', 'class="docs-sidebar"')
+        ):
+            errors.append(f"redirect unexpectedly contains the documentation shell: {relative}")
+
+    for relative in sorted(shell_pages):
+        path = ROOT / relative
+        content = path.read_text(encoding="utf-8")
+        parser = NavigationParser()
+        parser.feed(content)
+        if parser.counts != {"primary": 1, "mobile": 1, "documentation": 1}:
+            errors.append(f"navigation surface counts differ in {relative}: {parser.counts!r}")
+            continue
+        if parser.links["primary"] != expected_primary:
+            errors.append(f"primary navigation differs in {relative}")
+        for surface in ("mobile", "documentation"):
+            if parser.links[surface] != expected_links:
+                errors.append(f"{surface} navigation differs in {relative}")
+            if parser.groups[surface] != expected_groups:
+                errors.append(f"{surface} navigation groups differ in {relative}")
+        try:
+            owner = owner_for(route_for(path))
+        except ValueError as error:
+            errors.append(str(error))
+            continue
+        expected_primary_current = [owner] if owner in primary_hrefs else []
+        if parser.current["primary"] != expected_primary_current:
+            errors.append(f"primary current route differs in {relative}")
+        for surface in ("mobile", "documentation"):
+            if parser.current[surface] != [owner]:
+                errors.append(
+                    f"{surface} current route differs in {relative}: "
+                    f"expected={[owner]!r} actual={parser.current[surface]!r}"
+                )
+        if '<script src="/assets/nav.js" defer></script>' not in content:
+            errors.append(f"sidebar scroll restoration is absent from {relative}")
+
+
 def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None:
     for path in sorted(ROOT.rglob("*.html")):
         relative = path.relative_to(ROOT).as_posix()
@@ -765,25 +912,7 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
                 errors.append(f"stale integration construct remains in {relative}: {marker}")
         if re.search(r"\blevel\s*=", content, flags=re.IGNORECASE):
             errors.append(f"stale level assignment remains in {relative}")
-    for relative in CURRENT_SHELL_PAGES:
-        path = ROOT / relative
-        if not path.is_file():
-            errors.append(f"current documentation page missing: {relative}")
-            continue
-        content = path.read_text(encoding="utf-8")
-        for marker in CURRENT_SHELL_MARKERS:
-            if marker not in content:
-                errors.append(f"current documentation shell is incomplete in {relative}: {marker}")
-        parser = PageParser()
-        parser.feed(content)
-        expected_current = (
-            "/" if relative == "index.html" else f"/{relative.removesuffix('index.html')}"
-        )
-        if parser.mobile_current_hrefs != [expected_current]:
-            errors.append(
-                "mobile navigation current page differs in "
-                f"{relative}: expected={[expected_current]!r} actual={parser.mobile_current_hrefs!r}"
-            )
+    check_navigation(errors)
     community = ROOT / "community/index.html"
     contributing = ROOT / "CONTRIBUTING.md"
     if not contributing.is_file():
@@ -845,7 +974,9 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
         "MAKOTO_RECEIVER_DIR",
         "--expected-manifest sha256:b83a5cd1",
         "--expected-artifact demos/v0.2-end-to-end/generated/receiver/expected-artifact.json",
+        "--expected-recipient example:downstream-team",
         "artifacts/data/customers.public.json",
+        "artifacts/receiver/accepted-handoff.json",
         "artifacts/receiver/expected-artifact.json",
     ):
         if required_demo_text not in demo:

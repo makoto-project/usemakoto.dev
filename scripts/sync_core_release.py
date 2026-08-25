@@ -42,6 +42,7 @@ DOCUMENTATION = {
     "/vocab/v0.2/bounded-pattern/": "vocab/v0.2/bounded-pattern/index.html",
 }
 STATIC_RESOURCES = {
+    "docs/adopter-framework.md": ("docs/adopter-framework.md", "text/markdown"),
     "docs/v0.2-adversarial-review.md": (
         "docs/v0.2-adversarial-review.md",
         "text/markdown",
@@ -61,6 +62,12 @@ STATIC_RESOURCES = {
     ),
 }
 PUBLIC_TEXT_REWRITES = {
+    "docs/adopter-framework.md": (
+        (
+            "(../demos/v0.2-end-to-end/generated/walkthrough/)",
+            "(../demos/v0.2-end-to-end/artifacts/walkthrough/)",
+        ),
+    ),
     "docs/v0.2-adversarial-review.md": (("(../spec/v0.2.md)", "(../spec/v0.2/spec.md)"),),
     "docs/v0.2-architecture.md": (
         (

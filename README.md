@@ -71,11 +71,15 @@ uv run python -m http.server 8080
 Run the complete local gate before proposing a change:
 
 ```bash
-uv run scripts/check_site.py --working-tree ../core
+./scripts/check.sh --working-tree ../core
+actionlint .github/workflows/deploy.yml
 ```
 
 Working-tree mode is for local review against the sibling core checkout. Deployment pins an exact
-core commit; release publication pins the approved tag. Both pass their corresponding gate.
+core commit; release publication pins the approved tag. Both pass their corresponding gate. The
+script runs the same formatting, lint, test, generated-navigation, rendered-walkthrough, and site
+contract checks used by CI. `actionlint` is the additional local parser for workflow changes;
+install it before editing `.github/workflows/`.
 
 ## Integration boundary
 
