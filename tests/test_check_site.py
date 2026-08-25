@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -153,18 +154,79 @@ def test_home_restores_examples_tooling_and_open_source_discovery() -> None:
     assert "Configuration postmortem" in home
     assert "Invisible Unicode" in home
     assert "Tooling &amp; SDKs" in home
-    assert "Build with us on GitHub" in home
-    assert "Contributions welcome" in home
+    assert "Build it with us on GitHub" in home
+    assert "A common language should be built by the people who need it." in home
 
 
-def test_tooling_page_keeps_current_and_historical_status_separate() -> None:
+def test_tooling_page_distinguishes_shipped_source_from_api_research() -> None:
     content = (check_site.ROOT / "tooling/index.html").read_text(encoding="utf-8")
 
     assert "Reference CLI and Python library" in content
-    assert "Current v0.2 source" in content
-    assert "Historical v0.1 experiments" in content
+    assert "Source checkout" in content
+    assert "API research" in content
     assert "not a published Makoto distribution" in content
-    assert "no maintained v0.2 adapter packages are claimed" in content
+    assert "No published SDK or adapter package is claimed" in content
+
+
+def test_sdk_page_is_a_real_current_language_interface_guide() -> None:
+    content = (check_site.ROOT / "sdk/index.html").read_text(encoding="utf-8")
+
+    assert 'http-equiv="refresh"' not in content
+    assert "Command-line interface" in content
+    assert "Python library" in content
+    assert "JavaScript and browser" in content
+    assert "What every future SDK must preserve" in content
+    assert "no published package" in content.casefold()
+
+
+def test_current_integrations_reject_obsolete_protocol_constructs() -> None:
+    for relative in check_site.CURRENT_INTEGRATION_PAGES:
+        content = (check_site.ROOT / relative).read_text(encoding="utf-8")
+        assert all(marker not in content for marker in check_site.STALE_INTEGRATION_MARKERS), (
+            relative
+        )
+        assert re.search(r"\blevel\s*=", content, flags=re.IGNORECASE) is None, relative
+
+
+def test_assurance_model_does_not_publish_numbered_security_levels() -> None:
+    content = (check_site.ROOT / "levels/index.html").read_text(encoding="utf-8")
+
+    assert "Trust is a set of answers, not a level badge." in content
+    assert "Seven dimensions the receiver evaluates" in content
+    assert all(label not in content for label in ("Level 1", "Level 2", "Level 3"))
+
+
+def test_canonical_presentation_pages_have_no_visible_version_taxonomy() -> None:
+    for relative in check_site.CANONICAL_PRESENTATION_PAGES:
+        parser = check_site.PageParser()
+        parser.feed((check_site.ROOT / relative).read_text(encoding="utf-8"))
+        visible = " ".join(parser.visible_text).casefold()
+        assert all(
+            re.search(rf"\b{re.escape(forbidden)}\b", visible) is None
+            for forbidden in ("v0.1", "v0.2", "historical", "legacy", "archive")
+        ), relative
+
+
+def test_narrative_pages_have_no_visible_version_labels() -> None:
+    for path in sorted(check_site.ROOT.rglob("*.html")):
+        relative = path.relative_to(check_site.ROOT).as_posix()
+        if relative in check_site.TECHNICAL_VERSION_PAGES:
+            continue
+        parser = check_site.PageParser()
+        parser.feed(path.read_text(encoding="utf-8", errors="replace"))
+        visible = " ".join(parser.visible_text).casefold()
+        assert all(
+            re.search(rf"\b{re.escape(forbidden)}\b", visible) is None
+            for forbidden in ("v0.1", "v0.2")
+        ), relative
+
+
+def test_html_does_not_reference_retired_protocol_version() -> None:
+    for path in sorted(check_site.ROOT.rglob("*.html")):
+        content = path.read_text(encoding="utf-8", errors="replace")
+        assert re.search(r"v0\.1", content, flags=re.IGNORECASE) is None, path.relative_to(
+            check_site.ROOT
+        )
 
 
 def test_community_page_links_real_public_participation_paths() -> None:

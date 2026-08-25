@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import unicodedata
@@ -34,61 +35,37 @@ CORE_SCHEMA_NAMES = (
     "trust-policy.schema.json",
     "verification-report.schema.json",
 )
-LEGACY_PAGES = (
-    "comparison/decision-guide.html",
-    "comparison/index.html",
-    "comparison/open-lineage.html",
-    "comparison/w3c-prov.html",
-    "demos/01/index.html",
-    "demos/02/index.html",
-    "demos/03/index.html",
-    "demos/04/index.html",
-    "demos/05/index.html",
-    "demos/06/index.html",
-    "demos/index.html",
-    "demos/setup/index.html",
-    "examples/index.html",
-    "examples/invisible-unicode/index.html",
-    "levels/index.html",
-    "privacy/index.html",
-    "spec/index.html",
-    "spec/l1-requirements.html",
-    "spec/l2-requirements.html",
-    "spec/l3-requirements.html",
-    "spec/signature-guide.html",
-    "threats/index.html",
-    "validate/index.html",
-    "verify/bash.html",
-    "verify/go.html",
-    "verify/index.html",
-    "verify/nodejs.html",
-    "verify/python.html",
-)
-INTEGRATION_PAGES = (
-    "expanso/index.html",
-    "integrations/airflow/index.html",
-    "integrations/databricks/index.html",
-    "integrations/dagster/index.html",
-    "integrations/dbt/index.html",
-    "integrations/expanso/index.html",
-    "integrations/index.html",
-    "integrations/kafka/index.html",
-    "integrations/prefect/index.html",
-    "integrations/snowflake/index.html",
-    "integrations/spark/index.html",
-)
 LINEAGE_PAGE = "why-lineage/index.html"
+CANONICAL_PRESENTATION_PAGES = (
+    "community/index.html",
+    "demos/index.html",
+    "examples/index.html",
+    "index.html",
+    "integrations/index.html",
+    "tooling/index.html",
+    "verify/index.html",
+    "why-lineage/index.html",
+)
+TECHNICAL_VERSION_PAGES = {
+    "predicate/v0.2/origin/index.html",
+    "predicate/v0.2/transform/index.html",
+    "source/file/index.html",
+    "spec/v0.2/index.html",
+    "vocab/v0.2/bounded-pattern/index.html",
+}
 CURRENT_SHELL_PAGES = (
     "community/index.html",
+    "demos/index.html",
     "demos/v0.2-end-to-end/index.html",
-    "examples/v0.2/index.html",
+    "examples/index.html",
     "index.html",
-    "integrations/v0.2/index.html",
+    "integrations/index.html",
     "predicate/v0.2/origin/index.html",
     "predicate/v0.2/transform/index.html",
     "source/file/index.html",
     "spec/v0.2/index.html",
     "tooling/index.html",
+    "verify/index.html",
     "vocab/v0.2/bounded-pattern/index.html",
     "why-lineage/index.html",
 )
@@ -96,14 +73,43 @@ CURRENT_SHELL_MARKERS = (
     'class="docs-sidebar"',
     'class="mobile-menu"',
     'href="/why-lineage/"',
-    'href="/examples/v0.2/"',
+    'href="/examples/"',
     'href="/source/file/"',
     'href="/vocab/v0.2/bounded-pattern/"',
     'href="/tooling/"',
-    'href="/integrations/v0.2/"',
+    'href="/integrations/"',
     'href="/community/"',
     'href="https://github.com/makoto-project/makoto"',
     'href="https://github.com/makoto-project/makoto/issues"',
+)
+CURRENT_INTEGRATION_PAGES = tuple(
+    f"integrations/{name}/index.html"
+    for name in (
+        "airflow",
+        "dagster",
+        "databricks",
+        "dbt",
+        "expanso",
+        "kafka",
+        "prefect",
+        "snowflake",
+        "spark",
+    )
+)
+STALE_INTEGRATION_MARKERS = (
+    "origin/v1",
+    "transform/v1",
+    "makoto.level",
+    "makoto_airflow",
+    "makoto_dagster",
+    "makoto_databricks",
+    "makoto_prefect",
+    "MakotoOperator",
+    "MakotoResult",
+    "AttestationListener",
+    "AttestationSMT",
+    "@makoto_asset",
+    "flow_dbom",
 )
 LINEAGE_REQUIRED_TEXT = (
     "One file becomes ten copies. Its history usually doesn’t.",
@@ -129,12 +135,8 @@ CANDIDATE_STATUS_TEXT = {
         "v0.2 is an unreleased candidate.",
         "artifacts, not proof of a tagged release or an immutable release contract.",
     ),
-    "index.html": (
-        "v0.2 candidate · not yet released",
-        "These versioned URLs are mutable public review routes",
-    ),
-    "spec/v0.2/index.html": ("v0.2 candidate · not released",),
-    "demos/v0.2-end-to-end/index.html": ("tested v0.2 candidate implementation · not released",),
+    "spec/v0.2/index.html": ("Protocol candidate · not released",),
+    "demos/v0.2-end-to-end/index.html": ("Tested review candidate",),
 }
 DOCUMENTATION_FILES = {
     "/demos/v0.2-end-to-end/": "demos/v0.2-end-to-end/index.html",
@@ -245,9 +247,13 @@ class PageParser(HTMLParser):
         self.references: list[str] = []
         self.in_mobile_nav = False
         self.mobile_current_hrefs: list[str] = []
+        self.ignored_text_depth = 0
+        self.visible_text: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
+        if tag in {"code", "pre", "script", "style"}:
+            self.ignored_text_depth += 1
         if tag == "nav" and values.get("aria-label") == "Mobile":
             self.in_mobile_nav = True
         if (
@@ -271,6 +277,12 @@ class PageParser(HTMLParser):
     def handle_endtag(self, tag: str) -> None:
         if tag == "nav" and self.in_mobile_nav:
             self.in_mobile_nav = False
+        if tag in {"code", "pre", "script", "style"} and self.ignored_text_depth:
+            self.ignored_text_depth -= 1
+
+    def handle_data(self, data: str) -> None:
+        if not self.ignored_text_depth and data.strip():
+            self.visible_text.append(data.strip())
 
 
 def parse_args() -> argparse.Namespace:
@@ -688,15 +700,35 @@ def check_tracked_files(errors: list[str]) -> None:
 
 
 def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None:
-    for relative in LEGACY_PAGES:
-        if "Historical v0.1 material." not in (ROOT / relative).read_text(encoding="utf-8"):
-            errors.append(f"historical v0.1 banner missing: {relative}")
-    for relative in ("sdk/index.html", "sdk/javascript/examples/browser-example.html"):
-        if "Historical v0.1 experiment" not in (ROOT / relative).read_text(encoding="utf-8"):
-            errors.append(f"historical SDK banner missing: {relative}")
-    for relative in INTEGRATION_PAGES:
-        if "Conceptual integration only." not in (ROOT / relative).read_text(encoding="utf-8"):
-            errors.append(f"conceptual integration banner missing: {relative}")
+    for path in sorted(ROOT.rglob("*.html")):
+        relative = path.relative_to(ROOT).as_posix()
+        content = path.read_text(encoding="utf-8", errors="replace")
+        if re.search(r"v0\.1", content, flags=re.IGNORECASE):
+            errors.append(f"retired protocol version remains in HTML: {relative}")
+        if relative in TECHNICAL_VERSION_PAGES:
+            continue
+        parser = PageParser()
+        parser.feed(content)
+        visible_text = " ".join(parser.visible_text).casefold()
+        for forbidden in ("v0.1", "v0.2"):
+            if re.search(rf"\b{re.escape(forbidden)}\b", visible_text):
+                errors.append(
+                    f"visible version label remains in narrative page {relative}: {forbidden}"
+                )
+    for relative in CANONICAL_PRESENTATION_PAGES:
+        parser = PageParser()
+        parser.feed((ROOT / relative).read_text(encoding="utf-8"))
+        visible_text = " ".join(parser.visible_text).casefold()
+        for forbidden in ("historical", "legacy", "archive"):
+            if re.search(rf"\b{re.escape(forbidden)}\b", visible_text):
+                errors.append(f"presentation version label remains in {relative}: {forbidden}")
+    for relative in CURRENT_INTEGRATION_PAGES:
+        content = (ROOT / relative).read_text(encoding="utf-8", errors="replace")
+        for marker in STALE_INTEGRATION_MARKERS:
+            if marker in content:
+                errors.append(f"stale integration construct remains in {relative}: {marker}")
+        if re.search(r"\blevel\s*=", content, flags=re.IGNORECASE):
+            errors.append(f"stale level assignment remains in {relative}")
     for relative in CURRENT_SHELL_PAGES:
         path = ROOT / relative
         if not path.is_file():
@@ -735,10 +767,10 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
     if tooling.is_file():
         content = tooling.read_text(encoding="utf-8")
         for marker in (
-            "package publication pending",
-            "Historical v0.1 experiments",
+            "Source checkout",
+            "API research",
             "not a published Makoto distribution",
-            "no maintained v0.2 adapter packages are claimed",
+            "No published SDK or adapter package is claimed",
         ):
             if marker not in content:
                 errors.append(f"tooling status boundary is incomplete: {marker}")

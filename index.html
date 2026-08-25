@@ -4,134 +4,88 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Makoto is a source-first, signed provenance framework for data.">
-  <title>Makoto v0.2 — source-first data provenance</title>
+  <title>Makoto — source-first data provenance</title>
   <link rel="stylesheet" href="/assets/v02.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a>
-      <nav class="nav" aria-label="Primary">
-        <a href="/examples/v0.2/">Examples</a>
-        <a href="/tooling/">Tooling &amp; SDKs</a>
-        <a href="/community/">Community</a>
-        <a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a>
-      </nav>
-      <details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile">
-        <p class="mobile-section">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/v0.2/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable demo</a>
-        <p class="mobile-section">Learn</p><a href="/examples/v0.2/">Examples</a><p class="mobile-section">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/v0.2/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a>
-      </nav></details>
-    </div>
-  </header>
+  <header class="topbar"><div class="topbar-inner">
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a>
+    <nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav>
+    <details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile">
+      <p class="mobile-section">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/v0.2/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a>
+      <p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a>
+      <p class="mobile-section">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a>
+      <p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a>
+    </nav></details>
+  </div></header>
 
   <div class="site-shell">
-    <aside class="docs-sidebar" aria-label="Documentation">
-      <nav class="docs-nav">
-        <div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/v0.2/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable demo</a></div>
-        <div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/v0.2/">Real-world examples</a><a href="/threats/">Threat model <small>(v0.1)</small></a><a href="/comparison/">Comparisons <small>(v0.1)</small></a><a href="/demos/">Demo archive <small>(v0.1)</small></a></div>
-        <div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/v0.2/">Integration patterns</a></div>
-        <div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div>
-      </nav>
-    </aside>
+    <aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav">
+      <div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/v0.2/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a></div>
+      <div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div>
+      <div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a></div>
+      <div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div>
+    </nav></aside>
+
     <div class="site-main">
-  <main id="main">
-    <section class="hero-v02">
-      <div class="hero-inner">
-        <span class="eyebrow">v0.2 candidate · not yet released</span>
-        <h1>Know where data began, what changed, and who attested to it.</h1>
-        <p>Makoto is a source-first, SLSA-like framework for data. Each origin and transformation is an immutable signed statement. A receiver verifies the exact graph, the authorized signers, private organizational rules, and the final data bytes.</p>
-        <div class="actions">
-          <a class="button" href="/demos/v0.2-end-to-end/">Run the end-to-end proof</a>
-          <a class="button secondary" href="/spec/v0.2/">Read the v0.2 specification</a>
-          <a class="button secondary" href="https://github.com/makoto-project/makoto">Build with us on GitHub</a>
+      <main id="main">
+        <section class="hero-v02"><div class="hero-inner">
+          <h1>Know where data began, what changed, and who attested to it.</h1>
+          <p>Makoto is a source-first, SLSA-like framework for data. It keeps a verifiable history beside the bytes as data moves between systems, teams, and organizations.</p>
+          <div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Run the proof</a><a class="button secondary" href="/spec/v0.2/">Read the specification</a><a class="button secondary" href="https://github.com/makoto-project/makoto">Build it with us on GitHub</a></div>
+        </div></section>
+
+        <div class="page wide">
+          <section class="manifesto" aria-labelledby="portable-handoff"><div>
+            <span class="kicker">A portable record of custody</span>
+            <h2 id="portable-handoff">Data does not need another catalog entry. It needs evidence that survives the handoff.</h2>
+            <p class="lead">The hard part is not identifying one source file. It is keeping origin, processing history, attesters, and exact artifacts connected after the file becomes ten copies across systems, teams, vendors, and forgotten exports. <a href="/why-lineage/">See why lineage matters.</a></p>
+          </div><aside class="manifesto-aside"><strong>Small core. Private rules.</strong> Teams can extend Makoto with digest-pinned JSON Schema profiles without publishing their internal policy or teaching every receiver a new wire format.</aside></section>
+
+          <section aria-labelledby="questions"><h2 id="questions">Three questions, one signed history</h2>
+            <ol class="provenance-spine">
+              <li><strong>Where did this data begin?</strong><span>An origin statement binds claims about collection and source to exact artifact bytes.</span></li>
+              <li><strong>What happened along the way?</strong><span>Each transformation points to predecessor statements and artifacts. History grows by addition, never by rewriting an earlier claim.</span></li>
+              <li><strong>Who stands behind each claim?</strong><span>Signatures prove control of keys. The receiver separately decides whether those keys were authorized for the claims they signed.</span></li>
+              <li><strong>Are these still the same bytes?</strong><span>Digests bind the signed history to the source, intermediate artifacts when available, and the final data delivered to the receiver.</span></li>
+            </ol>
+          </section>
+
+          <section aria-labelledby="core"><h2 id="core">What the protocol carries</h2>
+            <table><thead><tr><th>Evidence</th><th>What it answers</th><th>Who decides</th></tr></thead><tbody>
+              <tr><td>Origin statement</td><td>Where and how the data began</td><td>The producer states it; the receiver evaluates it</td></tr>
+              <tr><td>Transformation graph</td><td>Which exact inputs and steps produced this artifact</td><td>Each participating system appends its claim</td></tr>
+              <tr><td>DSSE signatures</td><td>Which keys attested to each statement</td><td>The receiver authorizes or rejects the signers</td></tr>
+              <tr><td>JSON Schema profiles</td><td>Which public or private structural rules apply</td><td>Data teams define them; receivers resolve exact digests</td></tr>
+              <tr><td>Artifact digests</td><td>Whether the delivered bytes match the signed handoff</td><td>The receiver hashes the bytes it actually received</td></tr>
+            </tbody></table>
+          </section>
+
+          <section aria-labelledby="cases"><div class="section-intro"><div><span class="kicker">The casebook</span><h2 id="cases">Real failures, not toy metadata</h2></div><a class="text-link" href="/examples/">See every example →</a></div>
+            <ol class="casebook">
+              <li class="casebook-item"><span class="case-number">01</span><h3>Independent data handoff</h3><p>A producer signs an origin and two transformations. A receiver applies its own trust policy and verifies the final bytes.</p><a href="/demos/v0.2-end-to-end/">Run it →</a></li>
+              <li class="casebook-item"><span class="case-number">02</span><h3>Poisoned pipeline</h3><p>Trace malicious or corrupted input through the transformations that spread it.</p><a href="/demos/01/">Read the case →</a></li>
+              <li class="casebook-item"><span class="case-number">03</span><h3>Scientific reproducibility</h3><p>Preserve the source and processing evidence needed to reproduce a published result.</p><a href="/demos/02/">Read the case →</a></li>
+              <li class="casebook-item"><span class="case-number">04</span><h3>Release provenance</h3><p>Bind a published dataset to its inputs, build history, signed handoff, and exact release bytes.</p><a href="/demos/03/">Read the case →</a></li>
+              <li class="casebook-item"><span class="case-number">05</span><h3>Configuration postmortem</h3><p>Reconstruct which configuration and processing step altered downstream data and where it propagated.</p><a href="/demos/04/">Read the case →</a></li>
+              <li class="casebook-item"><span class="case-number">06</span><h3>AI dataset verification</h3><p>Refuse training data unless its source, processing claims, authorized signers, profiles, and bytes verify.</p><a href="/demos/05/">Read the case →</a></li>
+              <li class="casebook-item"><span class="case-number">07</span><h3>Invisible Unicode</h3><p>Make a policy-relevant normalization or rejection step explicit when hidden characters alter meaning.</p><a href="/examples/#invisible-unicode">Read the case →</a></li>
+            </ol>
+          </section>
+
+          <section aria-labelledby="build"><div class="section-intro"><div><span class="kicker">Build and extend</span><h2 id="build">One protocol, many implementation paths</h2></div><a class="text-link" href="/tooling/">See tooling status →</a></div>
+            <table><tbody>
+              <tr><th>Reference implementation</th><td>Create, sign, bundle, and verify evidence locally from the open-source core repository.</td><td><a href="https://github.com/makoto-project/makoto">Open core repository ↗</a></td></tr>
+              <tr><th>Hosted JSON Schemas</th><td>Validate core statements and resolve exact digest-pinned private profiles.</td><td><a href="/schema/v0.2/catalog.json">Open schema catalog</a></td></tr>
+              <tr><th>Integration patterns</th><td>Attach evidence at lifecycle hooks, materializations, writes, releases, and organizational handoffs.</td><td><a href="/integrations/">Explore integrations</a></td></tr>
+            </tbody></table>
+          </section>
+
+          <section class="community-band" aria-labelledby="commons"><span class="kicker">Apache-2.0 · built in public</span><h2 id="commons">A common language should be built by the people who need it.</h2><p>The protocol, schemas, verifier, conformance fixtures, demos, and site are open on GitHub. Bring a real handoff, challenge a claim, add a denial case, or send a tested patch.</p><div class="actions"><a class="button" href="/community/">Choose a contribution path</a><a class="button secondary" href="https://github.com/makoto-project/makoto/issues">Open an issue on GitHub</a></div></section>
         </div>
-      </div>
-    </section>
-
-    <div class="page wide">
-      <div class="callout warning">
-        <strong>Candidate status:</strong> the schema, CLI, and demo are implemented and tested, but v0.2 is not tagged, released, or fully conformant yet. These versioned URLs are mutable public review routes, not immutable release proof.
-      </div>
-
-      <section aria-labelledby="questions">
-        <h2 id="questions">Three questions, one portable handoff</h2>
-        <p class="lead">The hard part is not identifying one source file. It is keeping its history attached after that file becomes ten copies across systems, teams, vendors, and forgotten exports. <a href="/why-lineage/">See why lineage matters.</a></p>
-        <div class="grid">
-          <article class="card-v02"><span class="kicker">Source</span><h3>Where did this data begin?</h3><p>An origin statement binds source claims to the exact collected bytes.</p></article>
-          <article class="card-v02"><span class="kicker">History</span><h3>What happened along the way?</h3><p>Every transformation points to exact predecessor statement and artifact digests, forming an append-only DAG.</p></article>
-          <article class="card-v02"><span class="kicker">Trust</span><h3>Who attested to each claim?</h3><p>DSSE signatures prove key control; the receiver's policy separately decides whether those keys are authorized.</p></article>
-        </div>
-      </section>
-
-      <section aria-labelledby="flow">
-        <h2 id="flow">The v0.2 flow</h2>
-        <div class="dag" role="img" aria-label="An origin statement feeds a normalization statement, then a public-safe transformation, then a signed handoff verified by a receiver.">
-          <div class="dag-node"><strong>1. Origin</strong><span>Hash source bytes and sign the source claim.</span></div>
-          <div class="dag-node"><strong>2. Transform</strong><span>Bind each input to its predecessor statement and subject.</span></div>
-          <div class="dag-node"><strong>3. Handoff</strong><span>Sign the exact statements, roots, heads, profiles, and final artifacts.</span></div>
-          <div class="dag-node"><strong>4. Verify</strong><span>Resolve pinned schemas, authorize signers, reconstruct the graph, and hash final bytes.</span></div>
-        </div>
-      </section>
-
-      <section aria-labelledby="extensible">
-        <h2 id="extensible">A small core; private rules remain private</h2>
-        <p class="lead">Makoto defines origin, transformation, handoff, trust, and reporting primitives. Teams extend them with digest-pinned JSON Schema profiles that may constrain statement metadata, transformation fields, or structured output data. A schema can stay entirely inside an organization; a receiver resolves it offline by URI and exact digest.</p>
-        <div class="grid">
-          <article class="card-v02"><h3>Infinitely extensible</h3><p>URI-namespaced extensions and private profiles add organizational meaning without forking the core wire format.</p></article>
-          <article class="card-v02"><h3>Append-only evidence</h3><p>New signed statements reference earlier payload and artifact digests. Existing history is never edited in place.</p></article>
-          <article class="card-v02"><h3>Exact-byte integrity</h3><p>Hashes bind the precise bytes presented. Reformatting, newline conversion, or a one-byte mutation intentionally changes the digest.</p></article>
-        </div>
-      </section>
-
-      <section aria-labelledby="limits">
-        <h2 id="limits">What verification does—and does not—prove</h2>
-        <table>
-          <thead><tr><th>Can establish</th><th>Does not establish by itself</th></tr></thead>
-          <tbody>
-            <tr><td>Signature validity and receiver-defined signer authorization</td><td>That the signer was truthful or the claimed code actually ran</td></tr>
-            <tr><td>Hash-linked graph continuity and signed handoff completeness</td><td>That no newer valid handoff exists without an independent freshness anchor</td></tr>
-            <tr><td>Exact-byte integrity and JSON Schema conformance</td><td>Confidentiality, legal compliance, data quality, or absence of malicious content</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section aria-labelledby="start">
-        <h2 id="start">Start with the proof</h2>
-        <p>The September walkthrough creates a synthetic dataset, signs an origin, applies two transformations, signs the handoff, and verifies it as an independent receiver. It also proves seven negative cases fail for their intended reasons.</p>
-        <div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Open the runnable walkthrough</a></div>
-      </section>
-
-      <section aria-labelledby="examples">
-        <div class="section-intro"><div><span class="kicker">Where lineage breaks today</span><h2 id="examples">Real problems, not toy metadata</h2></div><a class="text-link" href="/examples/v0.2/">See every example →</a></div>
-        <div class="grid">
-          <a class="card-v02 card-link" href="/demos/v0.2-end-to-end/"><span class="tag current">Runnable v0.2</span><h3>Independent data handoff</h3><p>A producer signs an origin and two transformations. A receiver enforces its own trust and schema policy, then hashes the final bytes.</p></a>
-          <a class="card-v02 card-link" href="/demos/01/"><span class="tag historical">Scenario archive · v0.1</span><h3>Poisoned pipeline</h3><p>Trace a malicious or corrupted input back through the transformations that spread it.</p></a>
-          <a class="card-v02 card-link" href="/demos/02/"><span class="tag historical">Scenario archive · v0.1</span><h3>Scientific reproducibility</h3><p>Preserve enough evidence to answer which source data and processing steps produced a published result.</p></a>
-          <a class="card-v02 card-link" href="/demos/03/"><span class="tag historical">Scenario archive · v0.1</span><h3>Release provenance</h3><p>Bind a published dataset release to its inputs and build history.</p></a>
-          <a class="card-v02 card-link" href="/demos/04/"><span class="tag historical">Scenario archive · v0.1</span><h3>Configuration postmortem</h3><p>Reconstruct which configuration change altered downstream data and where it propagated.</p></a>
-          <a class="card-v02 card-link" href="/demos/06/"><span class="tag historical">Scenario archive · v0.1</span><h3>Invisible Unicode</h3><p>Make policy-relevant transformations explicit so hidden characters cannot pass as unseen changes.</p></a>
-        </div>
-      </section>
-
-      <section aria-labelledby="build">
-        <div class="section-intro"><div><span class="kicker">Build and extend</span><h2 id="build">One protocol, many implementation paths</h2></div><a class="text-link" href="/tooling/">See tooling status →</a></div>
-        <div class="grid">
-          <article class="card-v02"><h3>Reference CLI</h3><p>Clone the core repository to create, sign, bundle, and verify v0.2 evidence today. It is source-available and tested, but not yet a published package.</p></article>
-          <article class="card-v02"><h3>Hosted JSON Schemas</h3><p>Validate core statements and build digest-pinned public or private profiles from stable candidate URLs.</p><p><a href="/schema/v0.2/catalog.json">Open the schema catalog</a></p></article>
-          <article class="card-v02"><h3>SDK and integration experiments</h3><p>Explore the earlier Python, JavaScript, Airflow, dbt, Kafka, and warehouse sketches without mistaking them for v0.2 distributions.</p><p><a href="/integrations/v0.2/">Explore integration patterns</a></p></article>
-        </div>
-      </section>
-
-      <section class="community-band" aria-labelledby="open">
-        <span class="kicker">Apache-2.0 · built in public</span>
-        <h2 id="open">Makoto should belong to the people who need trustworthy data.</h2>
-        <p>The protocol, schemas, verifier, demo, tests, and website are all developed in public. You do not need permission to run the proof, challenge the design, report a failure, propose a data-system use case, or submit a patch.</p>
-        <div class="actions"><a class="button" href="/community/">Choose a way to contribute</a><a class="button secondary" href="https://github.com/makoto-project/makoto/issues">Open an issue on GitHub</a></div>
-      </section>
-    </div>
-  </main>
-  <footer class="footer"><div class="footer-inner">Makoto v0.2 candidate · Apache-2.0 · <a href="https://github.com/makoto-project/makoto">Developed in public on GitHub</a> · <a href="/community/">Contributions welcome</a></div></footer>
+      </main>
+      <footer class="footer"><div class="footer-inner">Makoto · Source-first, append-only data provenance · <a href="https://github.com/makoto-project/makoto">Developed in public on GitHub</a></div></footer>
     </div>
   </div>
 </body>
