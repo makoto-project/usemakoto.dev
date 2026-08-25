@@ -36,6 +36,8 @@ CORE_SCHEMA_NAMES = (
     "verification-report.schema.json",
 )
 LINEAGE_PAGE = "why-lineage/index.html"
+WALKTHROUGH_PAGE = "demos/v0.2-end-to-end/index.html"
+SOURCE_REVISION_PREFIX = "https://github.com/makoto-project/makoto/tree/"
 CANONICAL_PRESENTATION_PAGES = (
     "community/index.html",
     "demos/index.html",
@@ -366,6 +368,22 @@ def expected_resource_files() -> dict[str, tuple[Path, str, bool]]:
     return resources
 
 
+def validate_source_revision_link(pin: dict[str, Any], mode: str, errors: list[str]) -> None:
+    revision = pin["commit"] if mode == "candidate" else pin["tag"]
+    expected = f"{SOURCE_REVISION_PREFIX}{revision}/demos/v0.2-end-to-end"
+    walkthrough = ROOT / WALKTHROUGH_PAGE
+    try:
+        text = walkthrough.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as error:
+        errors.append(f"cannot inspect walkthrough source revision link: {error}")
+        return
+    links = re.findall(rf'{re.escape(SOURCE_REVISION_PREFIX)}[^"\s<]+/demos/v0\.2-end-to-end', text)
+    if links != [expected]:
+        errors.append(
+            f"walkthrough source revision link is not exact: expected={expected!r} actual={links!r}"
+        )
+
+
 def validate_pin(mode: str, core_repo: Path | None, errors: list[str]) -> Path | None:
     candidate = ROOT / "schema/core-candidate.json"
     release = ROOT / "schema/core-release.json"
@@ -389,6 +407,7 @@ def validate_pin(mode: str, core_repo: Path | None, errors: list[str]) -> Path |
     )
     if expected.read_bytes() != canonical:
         errors.append(f"{mode} pin is not canonical JSON plus one LF")
+    validate_source_revision_link(pin, mode, errors)
     for collection in ("schemas", "documentation", "resources"):
         paths = [item["path"] for item in pin[collection]]
         if paths != sorted(paths, key=str.encode) or len(paths) != len(set(paths)):

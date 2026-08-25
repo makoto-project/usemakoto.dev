@@ -461,6 +461,46 @@ def test_validate_pin_defaults_to_sibling_core(
     assert resolved == core
 
 
+def test_validate_source_revision_link_accepts_exact_candidate_commit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    site = tmp_path / "site"
+    commit = "a" * 40
+    write(
+        site / check_site.WALKTHROUGH_PAGE,
+        (
+            '<a href="https://github.com/makoto-project/makoto/tree/'
+            f'{commit}/demos/v0.2-end-to-end">source</a>\n'
+        ).encode(),
+    )
+    monkeypatch.setattr(check_site, "ROOT", site)
+    errors: list[str] = []
+
+    check_site.validate_source_revision_link({"commit": commit}, "candidate", errors)
+
+    assert errors == []
+
+
+def test_validate_source_revision_link_rejects_stale_candidate_commit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    site = tmp_path / "site"
+    write(
+        site / check_site.WALKTHROUGH_PAGE,
+        (
+            '<a href="https://github.com/makoto-project/makoto/tree/'
+            f'{"b" * 40}/demos/v0.2-end-to-end">source</a>\n'
+        ).encode(),
+    )
+    monkeypatch.setattr(check_site, "ROOT", site)
+    errors: list[str] = []
+
+    check_site.validate_source_revision_link({"commit": "a" * 40}, "candidate", errors)
+
+    assert len(errors) == 1
+    assert "walkthrough source revision link is not exact" in errors[0]
+
+
 def test_validate_pin_rejects_noncanonical_candidate_bytes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
