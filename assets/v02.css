@@ -142,7 +142,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .evidence-trail li:last-child { border-bottom: 0; }
 .evidence-trail span { color: var(--seal-dark); font: 700 .7rem/1.5 var(--mono); }
 .evidence-trail strong { display: block; }
-.editorial-note { max-width: var(--measure); padding-left: 1.4rem; border-left: 1px solid var(--seal); color: var(--muted); }
+.editorial-note { max-width: var(--measure); padding: .9rem 0 0; border-top: 1px solid var(--line-strong); color: var(--muted); }
 
 pre, code { font-family: var(--mono); }
 code { font-size: .9em; }
