@@ -1,2 +1,14 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=/verify/#structural-validation"><link rel="canonical" href="https://usemakoto.dev/verify/"><title>Verification — Makoto</title></head><body><p><a href="/verify/#structural-validation">Continue to structural validation and full verification</a>.</p></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Node.js verification recipe — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/">誠 Makoto</a><nav class="nav" aria-label="Primary"><a href="/verify/">Verification</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><a href="/">Overview</a><a href="/verify/">Verification</a><a href="/validate/">Schema validation</a><a href="/sdk/">Language interfaces</a><a href="/community/">Community</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Verification</p><a href="/verify/">Decision model</a><a href="/validate/">Schema validation</a><a href="/verify/bash.html">Bash</a><a href="/verify/python.html">Python</a><a href="/verify/nodejs.html" aria-current="page">Node.js</a><a href="/verify/go.html">Go</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a></div></nav></aside><div class="site-main"><main id="main" class="page"><span class="kicker">Node.js recipe</span><h1>Invoke the reference report contract.</h1><p class="lead">There is no maintained Node.js verifier package. A server-side process can invoke a pinned core checkout while a native implementation is built against the same fixtures.</p><pre><code>import { spawnSync } from "node:child_process";
+
+const result = spawnSync("uv", [
+  "run", "makoto", "verify", "bundle", bundle,
+  "--policy", policy,
+  "--schema-catalog", catalog,
+  "--expected-artifact", expectedArtifact,
+  "--evaluation-time", evaluationTime,
+  "--json",
+], { cwd: reviewedCoreCheckout, encoding: "utf8" });
+
+if (!result.stdout) throw new Error(result.stderr);
+const report = JSON.parse(result.stdout);
+if (report.decision !== "allow") throw new Error(JSON.stringify(report));</code></pre><p>Do not send evidence to an undocumented remote service. Keep trust policy and expected artifacts under receiver control.</p><p><a href="/validate/">Use AJV for structure-only checks →</a></p></main><footer class="footer"><div class="footer-inner">Makoto verification · Node.js subprocess recipe · No package claim</div></footer></div></div></body></html>

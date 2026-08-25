@@ -1,172 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-MPSKFDMF');</script>
-<!-- End Google Tag Manager -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apache Airflow Integration | Makoto (誠)</title>
-    <link rel="stylesheet" href="../../assets/styles.css?v=20260824a">
-</head>
-<body class="integration-detail">
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPSKFDMF"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-    <!-- Mobile Header -->
-    <div class="mobile-header">
-        <a href="../../" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
-        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
-    </div>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A truthful Makoto attachment pattern for Airflow task outputs and dataset handoffs."><title>Apache Airflow integration pattern — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
+<a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/spec/">Specification</a><p class="mobile-section">Build</p><a href="/verify/">Verification</a><a href="/integrations/airflow/" aria-current="page">Airflow field note</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a></nav></details></div></header>
+<div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/" aria-current="page">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Platforms</p><a href="/integrations/airflow/" aria-current="page">Airflow</a><a href="/integrations/dbt/">dbt</a><a href="/integrations/spark/">Spark</a><a href="/integrations/kafka/">Kafka</a><a href="/integrations/snowflake/">Snowflake</a><a href="/integrations/databricks/">Databricks</a><a href="/integrations/dagster/">Dagster</a><a href="/integrations/prefect/">Prefect</a><a href="/integrations/expanso/">Expanso</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide"><span class="kicker">Integration field note</span><h1>Airflow: attest after the task commits its output.</h1><p class="lead">Airflow knows task and DAG execution. Makoto needs the exact artifact that task produced, exact predecessor evidence, and a signer authorized for that transformation or handoff.</p><p class="editorial-note"><strong>Implementation boundary.</strong> This is a TaskFlow/operator pattern, not a shipped Airflow provider or custom operator.</p>
+<h2>The attachment point</h2><table><tbody><tr><th>Task output</th><td>After the operator commits a stable file set, table snapshot, or manifest, append a transformation statement.</td></tr><tr><th>Dataset event</th><td>Use the dataset URI and event as scheduler context; resolve exact artifact bytes separately.</td></tr><tr><th>XCom</th><td>Pass statement digests and artifact references, not large evidence bundles or signing keys.</td></tr><tr><th>DAG boundary</th><td>Create a handoff only when the exact final artifacts, heads, recipients, and profiles are known.</td></tr></tbody></table>
+<h2>Control flow</h2><pre><code>@task
+def transform(input_ref):
+    output_ref = write_and_commit(input_ref)
+    return output_ref
 
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <a href="../../" class="sidebar-logo"><span class="sidebar-logo-icon">誠</span> Makoto</a>
-            <a href="https://github.com/makoto-project/makoto" class="sidebar-github" target="_blank"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="../../" class="nav-item">Home</a>
+@task
+def attest(output_ref, predecessor_ref):
+    # Resolve exact bytes and invoke the checked-out reference CLI.
+    # Keep key material in the task's secret boundary, never XCom.
+    ...
 
-            <div class="nav-section">Specification</div>
-            <a href="/spec/v0.2/" class="nav-item">Specification</a>
-            <a href="../../levels/" class="nav-item">Assurance model</a>
-            <a href="../../spec/signature-guide.html" class="nav-item">Signature Guide</a>
-            <a href="../../comparison/" class="nav-item">SLSA Comparison</a>
-            <a href="../../comparison/decision-guide.html" class="nav-item">Which Standard?</a>
-
-            <div class="nav-section">Resources</div>
-            <a href="../../examples/" class="nav-item">Examples</a>
-            <a href="../../demos/" class="nav-item">Demos</a>
-            <a href="../../sdk/" class="nav-item">SDKs</a>
-            <a href="../../validate/" class="nav-item">Tool Validation</a>
-            <a href="../../privacy/" class="nav-item">Privacy Techniques</a>
-            <a href="../../threats/" class="nav-item">Threat Model</a>
-
-            <div class="nav-section">Integrations</div>
-            <a href="../../integrations/" class="nav-item">All Integrations</a>
-            <a href="../../integrations/airflow/" class="nav-item nav-item-sub active">Apache Airflow</a>
-            <a href="../../integrations/dbt/" class="nav-item nav-item-sub">dbt</a>
-            <a href="../../integrations/spark/" class="nav-item nav-item-sub">Apache Spark</a>
-            <a href="../../integrations/kafka/" class="nav-item nav-item-sub">Apache Kafka</a>
-            <a href="../../integrations/snowflake/" class="nav-item nav-item-sub">Snowflake</a>
-            <a href="../../integrations/databricks/" class="nav-item nav-item-sub">Databricks</a>
-            <a href="../../integrations/dagster/" class="nav-item nav-item-sub">Dagster</a>
-            <a href="../../integrations/prefect/" class="nav-item nav-item-sub">Prefect</a>
-            <a href="../../integrations/expanso/" class="nav-item nav-item-sub">Expanso</a>
-        </nav>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <section class="section">
-            <span class="kicker">Integration field note</span>
-            <h1>Apache Airflow with Makoto</h1>
-
-            <p>DAG-driven orchestration — record signed evidence at the task boundaries that actually create durable data.</p>
-
-            <div class="concept-banner">
-                <p><strong>Design note:</strong> This is an implementation pattern, not a shipped adapter. The attachment points use real Apache Airflow APIs; the Makoto calls show where signed evidence would enter the lifecycle.</p>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="what-is">
-<h2>What is Apache Airflow?</h2>
-                <p>Apache Airflow schedules tasks and records their execution context. A DAG edge alone does not identify exact data bytes, but a sensor, materializing task, or publish callback can capture the artifact, predecessor statement, operation identity, and signer needed for portable evidence.</p>
-                <div class="feature-grid">
-                    <div class="feature"><strong>Sensor success</strong><span>Observe a stable source object and attest its exact digest</span></div>
-                    <div class="feature"><strong>Task output</strong><span>Bind a materialized artifact to predecessor evidence and an operation</span></div>
-                    <div class="feature"><strong>DAG completion</strong><span>Assemble a signed handoff only after required heads exist</span></div>
-                    <div class="feature"><strong>Receiver gate</strong><span>Verify outside Airflow with independent policy and expected bytes</span></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Where Makoto attaches</h2>
-            <p>Primary pattern: <strong>Operator + on_success_callback</strong>. Below are the integration options ordered by lift required.</p>
-            <div class="integration-idea">
-                <h3>How Makoto attaches to Apache Airflow</h3>
-                <ul class="idea-list">
-                    <li><strong>Sensor callback</strong> — After a sensor resolves a stable object or partition, hash the bytes and create an origin statement. The sensor event is context; the artifact digest is identity.</li>
-                    <li><strong>Materialization callback</strong> — After a task commits output, create a transformation statement that binds the output to the exact upstream statement and subject.</li>
-                    <li><strong>OpenLineage input</strong> — Existing events can supply job and dataset context, but an adapter must still resolve exact artifact bytes, Makoto predecessor digests, and an authorized signing boundary.</li>
-                    <li><strong>DAG-level handoff</strong> — A final task can collect the signed heads and artifacts into a handoff for another team; it must not infer completeness from task success alone.</li>
-                </ul>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Implementation sketch</h2>
-            <div class="pipeline-demo">
-                <h3>Call the reference CLI after materialization</h3>
-                <p>This shell task uses real Makoto commands. The operator must supply stable paths, an input binding, and a protected signing key.</p>
-                <div class="pipeline-yaml"><pre><span class="yaml-comment"># A BashOperator or callback runs only after orders.parquet is committed.</span>
-<span class="yaml-comment"># input-binding.json names the input bytes, predecessor envelope,</span>
-<span class="yaml-comment"># and predecessor subject. Airflow does not invent those values.</span>
-uv run makoto attest transform \
-  --subject <span class="yaml-string">"orders.parquet=/data/orders.parquet"</span> \
-  --input-binding /evidence/input-binding.json \
-  --operation-type <span class="yaml-string">"urn:example:airflow:task"</span> \
-  --operation-name <span class="yaml-string">"sales_etl.hash_pii"</span> \
-  --operation-metadata /evidence/airflow-task.json \
-  --key <span class="yaml-string">"/run/keys/transform.private.pem"</span> \
-  --out /evidence/transform.dsse.json
-
-<span class="yaml-comment"># A later handoff task can collect signed heads and artifacts.</span>
-uv run makoto handoff create --help</pre></div>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Where this pattern would matter</h2>
-            <div class="integration-cases">
-<article>
-    <h3>Daily ETL</h3>
-    <p>Each materializing task can leave a signed, hash-linked record of the exact inputs and outputs it claims.</p>
-</article>
-
-<article>
-    <h3>Compliance Audit</h3>
-    <p>Auditors can compare signed evidence with Airflow history without relying on scheduler logs as the trust anchor.</p>
-</article>
-
-<article>
-    <h3>Multi-team Handoff</h3>
-    <p>Downstream teams can refuse parquet files whose signed handoff, graph, signer policy, or received-byte digest fails.</p>
-</article>
-
-<article>
-    <h3>Data Contract Enforcement</h3>
-    <p>Schema and hash mismatches surface as task failures, not silent corruption.</p>
-</article>
-            </div>
-        </section>
-
-        <section class="section integration-cta">
-            <div class="integration-cta-copy">
-                <span class="kicker">Open implementation</span>
-                <h2>Make the Apache Airflow attachment point real.</h2>
-                <p>
-                    These notes identify the lifecycle hooks and evidence boundary. If you run Apache Airflow in production, bring the constraints we missed or help build the adapter in public.
-                </p>
-                <div class="actions">
-                    <a href="https://github.com/makoto-project/makoto/issues/new" class="btn">Build this on GitHub ↗</a>
-                    <a href="https://airflow.apache.org" target="_blank" class="btn">Learn about Apache Airflow</a>
-                    <a href="../" class="btn">All Integrations</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>Makoto applies source-first, append-only evidence to data supply chains. <a href="https://slsa.dev" target="_blank">Learn about SLSA →</a></p>
-        </footer>
-    </main>
-</body>
-</html>
+uv run makoto attest transform --help</code></pre><p>Retries must be deterministic: the integration should recover an existing statement for the same event and artifacts or fail, not emit conflicting signed histories. A successful Airflow task alone does not establish artifact integrity.</p>
+<h2>What the evidence can say</h2><p>It can bind one committed task output to exact inputs, predecessor statements, and selected Airflow run context. It cannot prove task code executed honestly or infer recipient authorization from DAG ownership.</p>
+<section class="community-band"><h2>Contribute one DAG with a verifiable handoff.</h2><p>The fixture should include stable artifacts, retry behavior, key isolation, and the denial produced when the output changes.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Propose the Airflow fixture</a><a class="button secondary" href="/integrations/">Return to integrations</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto + Airflow · Lifecycle pattern, not a shipped adapter</div></footer></div></div></body></html>

@@ -1,1 +1,124 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Scientific reproducibility — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/spec/">Specification</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/demos/" aria-current="page">Demos</a><p class="mobile-section">Build</p><a href="/verify/">Verification</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/" aria-current="page">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Casebook</p><a href="/demos/01/">Poisoned pipeline</a><a href="/demos/02/" aria-current="page">Reproducibility</a><a href="/demos/03/">Dataset release</a><a href="/demos/04/">Postmortem</a><a href="/demos/05/">AI dataset gate</a><a href="/demos/06/">Invisible Unicode</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a></div></nav></aside><div class="site-main"><main id="main" class="page wide"><span class="kicker">Case 02 · scientific reproducibility</span><h1>The chart survived. The method did not.</h1><p class="lead">A paper cites an experiment file, but the source instrument export, outlier rule, normalization parameters, and exact plotting input disappeared when the postdoc left.</p><section><h2>Publish the evidence beside the result</h2><ol class="provenance-spine"><li><strong>Instrument export</strong><span>Start with exact collected bytes, acquisition time, instrument identity, and the source claim.</span></li><li><strong>Outlier removal</strong><span>Append an operation statement with predecessor bindings, code identity, parameters, and exact output.</span></li><li><strong>Normalization</strong><span>Append the next statement with the statistics and software evidence needed to interpret the claim.</span></li><li><strong>Publication handoff</strong><span>Sign the exact graph and final plotting artifact distributed with the paper.</span></li></ol></section><section><h2>The honest limit</h2><p>Makoto can preserve the inputs and signed claims needed to reproduce the workflow. It cannot reconstruct missing intermediate bytes after publication or prove that an instrument was calibrated merely because its identifier was signed.</p></section><section class="community-band"><span class="kicker">Make the next paper inspectable</span><h2>Start the graph when data leaves the instrument, not when the PDF is submitted.</h2><div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Run the source-to-handoff pattern</a><a class="button secondary" href="/examples/#reproducibility">Read the casebook entry</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto demo · Scientific reproducibility · Source to published result</div></footer></div></div></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scientific reproducibility — Makoto</title>
+<link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar">
+<div class="topbar-inner">
+<a class="brand" href="/">
+<span class="brand-mark" aria-hidden="true">誠</span> Makoto</a>
+<nav class="nav" aria-label="Primary">
+<a href="/examples/">Examples</a>
+<a href="/tooling/">Tooling &amp; SDKs</a>
+<a href="/community/">Community</a>
+<a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a>
+</nav>
+<details class="mobile-menu">
+<summary>Menu</summary>
+<nav aria-label="Mobile">
+<p class="mobile-section">Start</p>
+<a href="/">Overview</a>
+<a href="/spec/">Specification</a>
+<p class="mobile-section">Learn</p>
+<a href="/examples/">Examples</a>
+<a href="/demos/" aria-current="page">Demos</a>
+<p class="mobile-section">Build</p>
+<a href="/verify/">Verification</a>
+<p class="mobile-section">Community</p>
+<a href="/community/">Get involved</a>
+</nav>
+</details>
+</div>
+</header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation">
+<nav class="docs-nav">
+<div class="docs-nav-group">
+<p class="docs-nav-title">Start</p>
+<a href="/">Overview</a>
+<a href="/why-lineage/">Why lineage matters</a>
+<a href="/spec/">Specification</a>
+<a href="/demos/" aria-current="page">Runnable proof</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Learn</p>
+<a href="/examples/">Examples</a>
+<a href="/levels/">Assurance model</a>
+<a href="/threats/">Threat model</a>
+<a href="/comparison/">Comparisons</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Build</p>
+<a href="/schema/v0.2/catalog.json">Hosted schemas</a>
+<a href="/verify/">Verification</a>
+<a href="/tooling/">Tooling &amp; SDKs</a>
+<a href="/integrations/">Integration patterns</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Casebook</p>
+<a href="/demos/01/">Poisoned pipeline</a>
+<a href="/demos/02/" aria-current="page">Reproducibility</a>
+<a href="/demos/03/">Dataset release</a>
+<a href="/demos/04/">Postmortem</a>
+<a href="/demos/05/">AI dataset gate</a>
+<a href="/demos/06/">Invisible Unicode</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Community</p>
+<a href="/community/">Get involved</a>
+<a class="external" href="https://github.com/makoto-project/makoto">Core repository</a>
+</div>
+</nav>
+</aside>
+<div class="site-main">
+<main id="main" class="page wide">
+<span class="kicker">Case 02 · scientific reproducibility</span>
+<h1>The chart survived. The method did not.</h1>
+<p class="lead">A paper cites an experiment file, but the source instrument export, outlier rule, normalization parameters, and exact plotting input disappeared when the postdoc left.</p>
+<section>
+<h2>Publish the evidence beside the result</h2>
+<ol class="provenance-spine">
+<li>
+<strong>Instrument export</strong>
+<span>Start with exact collected bytes, acquisition time, instrument identity, and the source claim.</span>
+</li>
+<li>
+<strong>Outlier removal</strong>
+<span>Append an operation statement with predecessor bindings, code identity, parameters, and exact output.</span>
+</li>
+<li>
+<strong>Normalization</strong>
+<span>Append the next statement with the statistics and software evidence needed to interpret the claim.</span>
+</li>
+<li>
+<strong>Publication handoff</strong>
+<span>Sign the exact graph and final plotting artifact distributed with the paper.</span>
+</li>
+</ol>
+</section>
+<section>
+<h2>The honest limit</h2>
+<p>Makoto can preserve the inputs and signed claims needed to reproduce the workflow. It cannot reconstruct missing intermediate bytes after publication or prove that an instrument was calibrated merely because its identifier was signed.</p>
+</section>
+<section><h2>Concrete publication bundle</h2><table><tbody><tr><th>Input</th><td>Instrument export, calibration reference, collection parameters, and a signed origin statement over the exact raw bytes.</td></tr><tr><th>Steps</th><td>Append outlier-removal, normalization, analysis, and plotting statements; bind code and parameter artifacts where available.</td></tr><tr><th>Handoff</th><td>Publish the final figure data with the signed graph, required profiles, and exact terminal artifacts.</td></tr><tr><th>Reproduction check</th><td>A new researcher verifies the received bytes and can identify every missing intermediate instead of guessing it.</td></tr></tbody></table><p>The checked-in customer-data proof uses the same source → two transforms → signed handoff structure with downloadable intermediate artifacts.</p></section>
+<section class="community-band">
+<span class="kicker">Make the next paper inspectable</span>
+<h2>Start the graph when data leaves the instrument, not when the PDF is submitted.</h2>
+<div class="actions">
+<a class="button" href="/demos/v0.2-end-to-end/">Run the source-to-handoff pattern</a>
+<a class="button secondary" href="/examples/#reproducibility">Read the casebook entry</a>
+</div>
+</section>
+</main>
+<footer class="footer">
+<div class="footer-inner">Makoto demo · Scientific reproducibility · Source to published result</div>
+</footer>
+</div>
+</div>
+</body>
+</html>

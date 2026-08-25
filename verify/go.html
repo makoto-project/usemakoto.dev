@@ -1,2 +1,22 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=/verify/#structural-validation"><link rel="canonical" href="https://usemakoto.dev/verify/"><title>Verification — Makoto</title></head><body><p><a href="/verify/#structural-validation">Continue to structural validation and full verification</a>.</p></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Go verification recipe — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/">誠 Makoto</a><nav class="nav" aria-label="Primary"><a href="/verify/">Verification</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><a href="/">Overview</a><a href="/verify/">Verification</a><a href="/validate/">Schema validation</a><a href="/sdk/">Language interfaces</a><a href="/community/">Community</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Verification</p><a href="/verify/">Decision model</a><a href="/validate/">Schema validation</a><a href="/verify/bash.html">Bash</a><a href="/verify/python.html">Python</a><a href="/verify/nodejs.html">Node.js</a><a href="/verify/go.html" aria-current="page">Go</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a></div></nav></aside><div class="site-main"><main id="main" class="page"><span class="kicker">Go recipe</span><h1>Keep the reference verifier behind an explicit process boundary.</h1><p class="lead">There is no maintained Go SDK. A service can invoke the pinned reference CLI today and replace it only when a native verifier passes the same conformance fixtures.</p><pre><code>cmd := exec.Command(
+    "uv", "run", "makoto", "verify", "bundle", bundle,
+    "--policy", policy,
+    "--schema-catalog", catalog,
+    "--expected-artifact", expectedArtifact,
+    "--evaluation-time", evaluationTime,
+    "--json",
+)
+cmd.Dir = reviewedCoreCheckout
+output, runErr := cmd.Output()
+if runErr != nil {
+    if _, ok := runErr.(*exec.ExitError); !ok {
+        return fmt.Errorf("start verifier: %w", runErr)
+    }
+}
+
+var report VerificationReport
+if err := json.Unmarshal(output, &report); err != nil {
+    return fmt.Errorf("malformed verifier report: %w", err)
+}
+if report.Decision != "allow" { return fmt.Errorf("denied: %+v", report) }
+if runErr != nil { return fmt.Errorf("verifier failed after ALLOW: %w", runErr) }</code></pre><p>Makoto returns a nonzero process status for a well-formed <code>deny</code> decision. Parse and retain that JSON report before handling the process status; a launch failure, malformed report, denial, and inconsistent ALLOW exit are different failures.</p><p><a href="/verify/">Read the complete decision model →</a></p></main><footer class="footer"><div class="footer-inner">Makoto verification · Go subprocess recipe · No SDK claim</div></footer></div></div></body></html>

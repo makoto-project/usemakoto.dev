@@ -263,11 +263,10 @@ pipeline:
    - [ ] Level overview
    - [ ] Call to action
 
-5. **Create Sample Attestations**:
-   - [ ] `attestations/origin-example.json`
-   - [ ] `attestations/transform-example.json`
-   - [ ] `attestations/stream-window-example.json`
-   - [ ] `attestations/dbom-example.json`
+5. **Current sample evidence**:
+- [x] Retire the mutable prototype documents.
+- [x] Publish source, transformation, handoff, profile, policy, and verification
+  artifacts from the deterministic proof.
 
 ---
 

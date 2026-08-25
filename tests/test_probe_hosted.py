@@ -12,7 +12,7 @@ import pytest
 from scripts import probe_hosted
 
 HOME_BYTES = b"<main>source-first data provenance</main>\n"
-STATUS_BYTES = "<main>Protocol candidate · not released</main>\n".encode()
+STATUS_BYTES = b"<main>not yet an immutable tagged release</main>\n"
 LINEAGE_BYTES = b"<main>why lineage</main>\n"
 REVIEW_BYTES = b"<main>review surface</main>\n"
 
@@ -228,7 +228,7 @@ def test_candidate_probe_rejects_missing_specification_disclosure(
     walkthrough = f'<a href="{commit_link}">candidate source</a>\n'.encode()
     pin_bytes = write_candidate_pin(tmp_path, schema_body=schema, walkthrough=walkthrough)
     status_page = b"<main>status omitted</main>\n"
-    (tmp_path / "spec/v0.2/index.html").write_bytes(status_page)
+    (tmp_path / "spec/index.html").write_bytes(status_page)
     responses = candidate_responses(
         tmp_path,
         base,

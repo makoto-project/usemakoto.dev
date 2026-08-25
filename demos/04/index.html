@@ -1,1 +1,124 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Configuration postmortem — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/spec/">Specification</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/demos/" aria-current="page">Demos</a><p class="mobile-section">Build</p><a href="/verify/">Verification</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/" aria-current="page">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Casebook</p><a href="/demos/01/">Poisoned pipeline</a><a href="/demos/02/">Reproducibility</a><a href="/demos/03/">Dataset release</a><a href="/demos/04/" aria-current="page">Postmortem</a><a href="/demos/05/">AI dataset gate</a><a href="/demos/06/">Invisible Unicode</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a></div></nav></aside><div class="site-main"><main id="main" class="page wide"><span class="kicker">Case 04 · configuration postmortem</span><h1>The config changed on Saturday. Which data did it change?</h1><p class="lead">A service account reduces batch size and Monday throughput collapses. The audit question is not only who changed the file. It is which exact outputs were produced under that configuration.</p><section><h2>Model configuration as transformation evidence</h2><ol class="provenance-spine"><li><strong>Bind the config bytes</strong><span>Record the exact configuration artifact or digest used by the operation.</span></li><li><strong>Name the executor</strong><span>Sign the transformation with the workload identity and let receiver policy decide whether that identity was authorized.</span></li><li><strong>Append affected outputs</strong><span>Each output statement references the input data, predecessor statement, operation, and configuration evidence.</span></li><li><strong>Traverse the interval</strong><span>Postmortem analysis can identify outputs produced after the changed config and before the corrected one.</span></li></ol></section><section><h2>What remains outside Makoto</h2><p>Change approval, human intent, alerting, and root-cause judgment remain separate systems. Makoto supplies attributable, tamper-evident claims about artifacts; it does not decide whether the configuration was wise.</p></section><section class="community-band"><span class="kicker">Make the postmortem reproducible</span><h2>Attach the exact configuration and output bytes to the transformation claim.</h2><div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Run the append-only pattern</a><a class="button secondary" href="/examples/#postmortem">Read the casebook entry</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto demo · Configuration postmortem · Claim-to-artifact impact</div></footer></div></div></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Configuration postmortem — Makoto</title>
+<link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar">
+<div class="topbar-inner">
+<a class="brand" href="/">
+<span class="brand-mark" aria-hidden="true">誠</span> Makoto</a>
+<nav class="nav" aria-label="Primary">
+<a href="/examples/">Examples</a>
+<a href="/tooling/">Tooling &amp; SDKs</a>
+<a href="/community/">Community</a>
+<a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a>
+</nav>
+<details class="mobile-menu">
+<summary>Menu</summary>
+<nav aria-label="Mobile">
+<p class="mobile-section">Start</p>
+<a href="/">Overview</a>
+<a href="/spec/">Specification</a>
+<p class="mobile-section">Learn</p>
+<a href="/examples/">Examples</a>
+<a href="/demos/" aria-current="page">Demos</a>
+<p class="mobile-section">Build</p>
+<a href="/verify/">Verification</a>
+<p class="mobile-section">Community</p>
+<a href="/community/">Get involved</a>
+</nav>
+</details>
+</div>
+</header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation">
+<nav class="docs-nav">
+<div class="docs-nav-group">
+<p class="docs-nav-title">Start</p>
+<a href="/">Overview</a>
+<a href="/why-lineage/">Why lineage matters</a>
+<a href="/spec/">Specification</a>
+<a href="/demos/" aria-current="page">Runnable proof</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Learn</p>
+<a href="/examples/">Examples</a>
+<a href="/levels/">Assurance model</a>
+<a href="/threats/">Threat model</a>
+<a href="/comparison/">Comparisons</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Build</p>
+<a href="/schema/v0.2/catalog.json">Hosted schemas</a>
+<a href="/verify/">Verification</a>
+<a href="/tooling/">Tooling &amp; SDKs</a>
+<a href="/integrations/">Integration patterns</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Casebook</p>
+<a href="/demos/01/">Poisoned pipeline</a>
+<a href="/demos/02/">Reproducibility</a>
+<a href="/demos/03/">Dataset release</a>
+<a href="/demos/04/" aria-current="page">Postmortem</a>
+<a href="/demos/05/">AI dataset gate</a>
+<a href="/demos/06/">Invisible Unicode</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Community</p>
+<a href="/community/">Get involved</a>
+<a class="external" href="https://github.com/makoto-project/makoto">Core repository</a>
+</div>
+</nav>
+</aside>
+<div class="site-main">
+<main id="main" class="page wide">
+<span class="kicker">Case 04 · configuration postmortem</span>
+<h1>The config changed on Saturday. Which data did it change?</h1>
+<p class="lead">A service account reduces batch size and Monday throughput collapses. The audit question is not only who changed the file. It is which exact outputs were produced under that configuration.</p>
+<section>
+<h2>Model configuration as transformation evidence</h2>
+<ol class="provenance-spine">
+<li>
+<strong>Bind the config bytes</strong>
+<span>Record the exact configuration artifact or digest used by the operation.</span>
+</li>
+<li>
+<strong>Name the executor</strong>
+<span>Sign the transformation with the workload identity and let receiver policy decide whether that identity was authorized.</span>
+</li>
+<li>
+<strong>Append affected outputs</strong>
+<span>Each output statement references the input data, predecessor statement, operation, and configuration evidence.</span>
+</li>
+<li>
+<strong>Traverse the interval</strong>
+<span>Postmortem analysis can identify outputs produced after the changed config and before the corrected one.</span>
+</li>
+</ol>
+</section>
+<section>
+<h2>What remains outside Makoto</h2>
+<p>Change approval, human intent, alerting, and root-cause judgment remain separate systems. Makoto supplies attributable, tamper-evident claims about artifacts; it does not decide whether the configuration was wise.</p>
+</section>
+<section><h2>Concrete postmortem record</h2><table><tbody><tr><th>Before</th><td>Configuration artifact A is bound to outputs produced under the earlier settings.</td></tr><tr><th>Change</th><td>Configuration artifact B is committed; the next transformation statement names its digest and authorized workload signer.</td></tr><tr><th>Blast radius</th><td>Traverse descendants produced after B and before corrective artifact C.</td></tr><tr><th>Finding</th><td>The report identifies attributable claims and affected bytes without pretending to know whether the human change was justified.</td></tr></tbody></table><p>Configuration belongs in the evidence as an exact input artifact, not merely a free-text note or ticket URL.</p></section>
+<section class="community-band">
+<span class="kicker">Make the postmortem reproducible</span>
+<h2>Attach the exact configuration and output bytes to the transformation claim.</h2>
+<div class="actions">
+<a class="button" href="/demos/v0.2-end-to-end/">Run the append-only pattern</a>
+<a class="button secondary" href="/examples/#postmortem">Read the casebook entry</a>
+</div>
+</section>
+</main>
+<footer class="footer">
+<div class="footer-inner">Makoto demo · Configuration postmortem · Claim-to-artifact impact</div>
+</footer>
+</div>
+</div>
+</body>
+</html>

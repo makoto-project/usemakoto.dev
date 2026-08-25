@@ -1,1 +1,124 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Invisible Unicode — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/spec/">Specification</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/demos/" aria-current="page">Demos</a><p class="mobile-section">Build</p><a href="/verify/">Verification</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/" aria-current="page">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Casebook</p><a href="/demos/01/">Poisoned pipeline</a><a href="/demos/02/">Reproducibility</a><a href="/demos/03/">Dataset release</a><a href="/demos/04/">Postmortem</a><a href="/demos/05/">AI dataset gate</a><a href="/demos/06/" aria-current="page">Invisible Unicode</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a></div></nav></aside><div class="site-main"><main id="main" class="page wide"><span class="kicker">Case 06 · invisible Unicode</span><h1>Unchanged bytes can still violate policy.</h1><p class="lead">A string contains a bidirectional control or zero-width character. The signature and digest both pass because the dangerous bytes were present when the producer signed them.</p><section><h2>The correct failure</h2><ol class="provenance-spine"><li><strong>Verify authenticity</strong><span>Keep the valid signature result. Do not mislabel the content hazard as tampering.</span></li><li><strong>Verify artifact integrity</strong><span>Keep the valid digest result when the received bytes are unchanged.</span></li><li><strong>Apply the required profile</strong><span>Validate the actual structured artifact or relevant predicate extension under the receiver's digest-pinned schema.</span></li><li><strong>Deny on content policy</strong><span>Report the exact field and rule that failed so the producer can normalize, reject, or explicitly justify the value.</span></li></ol></section><section><h2>Why this belongs in the provenance story</h2><p>The profile and result travel with the evidence boundary, so a later recipient can tell the difference between “bytes changed” and “unchanged bytes were never acceptable.” That distinction matters for incident response and remediation.</p></section><section class="community-band"><span class="kicker">Inspect the bytes</span><h2>The detailed case includes a bounded string-profile example.</h2><div class="actions"><a class="button" href="/examples/invisible-unicode/">Open the detailed example</a><a class="button secondary" href="/verify/#render-safe">Read the verification boundary</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto demo · Invisible Unicode · Integrity is not safety</div></footer></div></div></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invisible Unicode — Makoto</title>
+<link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar">
+<div class="topbar-inner">
+<a class="brand" href="/">
+<span class="brand-mark" aria-hidden="true">誠</span> Makoto</a>
+<nav class="nav" aria-label="Primary">
+<a href="/examples/">Examples</a>
+<a href="/tooling/">Tooling &amp; SDKs</a>
+<a href="/community/">Community</a>
+<a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a>
+</nav>
+<details class="mobile-menu">
+<summary>Menu</summary>
+<nav aria-label="Mobile">
+<p class="mobile-section">Start</p>
+<a href="/">Overview</a>
+<a href="/spec/">Specification</a>
+<p class="mobile-section">Learn</p>
+<a href="/examples/">Examples</a>
+<a href="/demos/" aria-current="page">Demos</a>
+<p class="mobile-section">Build</p>
+<a href="/verify/">Verification</a>
+<p class="mobile-section">Community</p>
+<a href="/community/">Get involved</a>
+</nav>
+</details>
+</div>
+</header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation">
+<nav class="docs-nav">
+<div class="docs-nav-group">
+<p class="docs-nav-title">Start</p>
+<a href="/">Overview</a>
+<a href="/why-lineage/">Why lineage matters</a>
+<a href="/spec/">Specification</a>
+<a href="/demos/" aria-current="page">Runnable proof</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Learn</p>
+<a href="/examples/">Examples</a>
+<a href="/levels/">Assurance model</a>
+<a href="/threats/">Threat model</a>
+<a href="/comparison/">Comparisons</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Build</p>
+<a href="/schema/v0.2/catalog.json">Hosted schemas</a>
+<a href="/verify/">Verification</a>
+<a href="/tooling/">Tooling &amp; SDKs</a>
+<a href="/integrations/">Integration patterns</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Casebook</p>
+<a href="/demos/01/">Poisoned pipeline</a>
+<a href="/demos/02/">Reproducibility</a>
+<a href="/demos/03/">Dataset release</a>
+<a href="/demos/04/">Postmortem</a>
+<a href="/demos/05/">AI dataset gate</a>
+<a href="/demos/06/" aria-current="page">Invisible Unicode</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Community</p>
+<a href="/community/">Get involved</a>
+<a class="external" href="https://github.com/makoto-project/makoto">Core repository</a>
+</div>
+</nav>
+</aside>
+<div class="site-main">
+<main id="main" class="page wide">
+<span class="kicker">Case 06 · invisible Unicode</span>
+<h1>Unchanged bytes can still violate policy.</h1>
+<p class="lead">A string contains a bidirectional control or zero-width character. The signature and digest both pass because the dangerous bytes were present when the producer signed them.</p>
+<section>
+<h2>The correct failure</h2>
+<ol class="provenance-spine">
+<li>
+<strong>Verify authenticity</strong>
+<span>Keep the valid signature result. Do not mislabel the content hazard as tampering.</span>
+</li>
+<li>
+<strong>Verify artifact integrity</strong>
+<span>Keep the valid digest result when the received bytes are unchanged.</span>
+</li>
+<li>
+<strong>Apply the required profile</strong>
+<span>Validate the actual structured artifact or relevant predicate extension under the receiver's digest-pinned schema.</span>
+</li>
+<li>
+<strong>Deny on content policy</strong>
+<span>Report the exact field and rule that failed so the producer can normalize, reject, or explicitly justify the value.</span>
+</li>
+</ol>
+</section>
+<section>
+<h2>Why this belongs in the provenance story</h2>
+<p>The profile and result travel with the evidence boundary, so a later recipient can tell the difference between “bytes changed” and “unchanged bytes were never acceptable.” That distinction matters for incident response and remediation.</p>
+</section>
+<section><h2>Concrete content-policy check</h2><table><tbody><tr><th>Input</th><td>A signed JSON artifact whose visible label contains a hidden bidirectional or control character.</td></tr><tr><th>Integrity result</th><td>The digest and signature can still pass because the bytes have not changed.</td></tr><tr><th>Profile result</th><td>A receiver-required bounded string rule rejects the exact field and reports the profile failure.</td></tr><tr><th>Remediation</th><td>The producer normalizes or rejects the field, creates new output bytes, and appends a new signed statement.</td></tr></tbody></table><p><a href="/examples/invisible-unicode/">Inspect the safe and flagged byte sequences side by side</a></p></section>
+<section class="community-band">
+<span class="kicker">Inspect the bytes</span>
+<h2>The detailed case includes a bounded string-profile example.</h2>
+<div class="actions">
+<a class="button" href="/examples/invisible-unicode/">Open the detailed example</a>
+<a class="button secondary" href="/verify/#render-safe">Read the verification boundary</a>
+</div>
+</section>
+</main>
+<footer class="footer">
+<div class="footer-inner">Makoto demo · Invisible Unicode · Integrity is not safety</div>
+</footer>
+</div>
+</div>
+</body>
+</html>

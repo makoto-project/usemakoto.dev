@@ -1,1 +1,136 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI dataset gate — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/spec/">Specification</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/demos/" aria-current="page">Demos</a><p class="mobile-section">Build</p><a href="/verify/">Verification</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/" aria-current="page">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Casebook</p><a href="/demos/01/">Poisoned pipeline</a><a href="/demos/02/">Reproducibility</a><a href="/demos/03/">Dataset release</a><a href="/demos/04/">Postmortem</a><a href="/demos/05/" aria-current="page">AI dataset gate</a><a href="/demos/06/">Invisible Unicode</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a></div></nav></aside><div class="site-main"><main id="main" class="page wide"><span class="kicker">Case 05 · AI dataset gate</span><h1>Do not train on a label and a checksum.</h1><p class="lead">A shared dataset looks plausible, but one label was altered. Before training, the model builder needs exact bytes, signed source and transformation claims, required content profiles, an authorized handoff, and an independent expectation of what should arrive.</p><section><h2>The admission decision</h2><table><thead><tr><th>Check</th><th>Training gate</th></tr></thead><tbody><tr><td>Origin and transformations</td><td>Every head traces through exact predecessor bindings to an accepted source claim.</td></tr><tr><td>Signer authorization</td><td>Each key is allowed for the source, operation, profile, or handoff role it signed.</td></tr><tr><td>Required profiles</td><td>Labels, schema, allowed values, identifier rules, and other organization-specific constraints pass.</td></tr><tr><td>Handoff completeness and freshness</td><td>The expected manifest or head matches the signed graph presented for this training run.</td></tr><tr><td>Received bytes</td><td>The actual dataset or dataset manifest matches the signed artifact binding.</td></tr></tbody></table></section><section><h2>A valid gate is not a quality score</h2><p>The verifier can establish that exact bytes match authorized signed claims and required schemas. It cannot prove the labels are correct, the dataset is unbiased, or the model will be safe. Those require separate evaluation evidence and policy.</p></section><section class="community-band"><span class="kicker">Fail before the GPU queue</span><h2>Make the training job consume a verification report, not producer confidence.</h2><div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Run the receiver gate</a><a class="button secondary" href="/examples/#ai-dataset">Read the casebook entry</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto demo · AI dataset gate · Evidence before training</div></footer></div></div></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI dataset gate — Makoto</title>
+<link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar">
+<div class="topbar-inner">
+<a class="brand" href="/">
+<span class="brand-mark" aria-hidden="true">誠</span> Makoto</a>
+<nav class="nav" aria-label="Primary">
+<a href="/examples/">Examples</a>
+<a href="/tooling/">Tooling &amp; SDKs</a>
+<a href="/community/">Community</a>
+<a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a>
+</nav>
+<details class="mobile-menu">
+<summary>Menu</summary>
+<nav aria-label="Mobile">
+<p class="mobile-section">Start</p>
+<a href="/">Overview</a>
+<a href="/spec/">Specification</a>
+<p class="mobile-section">Learn</p>
+<a href="/examples/">Examples</a>
+<a href="/demos/" aria-current="page">Demos</a>
+<p class="mobile-section">Build</p>
+<a href="/verify/">Verification</a>
+<p class="mobile-section">Community</p>
+<a href="/community/">Get involved</a>
+</nav>
+</details>
+</div>
+</header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation">
+<nav class="docs-nav">
+<div class="docs-nav-group">
+<p class="docs-nav-title">Start</p>
+<a href="/">Overview</a>
+<a href="/why-lineage/">Why lineage matters</a>
+<a href="/spec/">Specification</a>
+<a href="/demos/" aria-current="page">Runnable proof</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Learn</p>
+<a href="/examples/">Examples</a>
+<a href="/levels/">Assurance model</a>
+<a href="/threats/">Threat model</a>
+<a href="/comparison/">Comparisons</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Build</p>
+<a href="/schema/v0.2/catalog.json">Hosted schemas</a>
+<a href="/verify/">Verification</a>
+<a href="/tooling/">Tooling &amp; SDKs</a>
+<a href="/integrations/">Integration patterns</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Casebook</p>
+<a href="/demos/01/">Poisoned pipeline</a>
+<a href="/demos/02/">Reproducibility</a>
+<a href="/demos/03/">Dataset release</a>
+<a href="/demos/04/">Postmortem</a>
+<a href="/demos/05/" aria-current="page">AI dataset gate</a>
+<a href="/demos/06/">Invisible Unicode</a>
+</div>
+<div class="docs-nav-group">
+<p class="docs-nav-title">Community</p>
+<a href="/community/">Get involved</a>
+<a class="external" href="https://github.com/makoto-project/makoto">Core repository</a>
+</div>
+</nav>
+</aside>
+<div class="site-main">
+<main id="main" class="page wide">
+<span class="kicker">Case 05 · AI dataset gate</span>
+<h1>Do not train on a label and a checksum.</h1>
+<p class="lead">A shared dataset looks plausible, but one label was altered. Before training, the model builder needs exact bytes, signed source and transformation claims, required content profiles, an authorized handoff, and an independent expectation of what should arrive.</p>
+<section>
+<h2>The admission decision</h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Training gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Origin and transformations</td>
+<td>Every head traces through exact predecessor bindings to an accepted source claim.</td>
+</tr>
+<tr>
+<td>Signer authorization</td>
+<td>Each key is allowed for the source, operation, profile, or handoff role it signed.</td>
+</tr>
+<tr>
+<td>Required profiles</td>
+<td>Labels, schema, allowed values, identifier rules, and other organization-specific constraints pass.</td>
+</tr>
+<tr>
+<td>Handoff completeness and freshness</td>
+<td>The expected manifest or head matches the signed graph presented for this training run.</td>
+</tr>
+<tr>
+<td>Received bytes</td>
+<td>The actual dataset or dataset manifest matches the signed artifact binding.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>A valid gate is not a quality score</h2>
+<p>The verifier can establish that exact bytes match authorized signed claims and required schemas. It cannot prove the labels are correct, the dataset is unbiased, or the model will be safe. Those require separate evaluation evidence and policy.</p>
+</section>
+<section><h2>Concrete training gate</h2><table><tbody><tr><th>Input</th><td>A received dataset bundle, receiver trust policy, local schema catalog, expected head or manifest, and expected artifact binding.</td></tr><tr><th>Gate</th><td>Run complete bundle verification before enqueueing the training job.</td></tr><tr><th>Allow</th><td>All required checks pass and the report decision is <code>allow</code>.</td></tr><tr><th>Deny</th><td>A validly re-signed dataset that reintroduces a direct identifier fails the receiver's private artifact profile with <code>E_PROFILE_INVALID</code>.</td></tr></tbody></table><p><a href="/demos/v0.2-end-to-end/artifacts/reports/private-schema-violation.json">Open the private-profile denial</a></p></section>
+<section class="community-band">
+<span class="kicker">Fail before the GPU queue</span>
+<h2>Make the training job consume a verification report, not producer confidence.</h2>
+<div class="actions">
+<a class="button" href="/demos/v0.2-end-to-end/">Run the receiver gate</a>
+<a class="button secondary" href="/examples/#ai-dataset">Read the casebook entry</a>
+</div>
+</section>
+</main>
+<footer class="footer">
+<div class="footer-inner">Makoto demo · AI dataset gate · Evidence before training</div>
+</footer>
+</div>
+</div>
+</body>
+</html>

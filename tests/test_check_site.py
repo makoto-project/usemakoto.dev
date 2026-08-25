@@ -179,6 +179,44 @@ def test_sdk_page_is_a_real_current_language_interface_guide() -> None:
     assert "no published package" in content.casefold()
 
 
+def test_validation_and_language_recipes_are_substantive_and_truthful() -> None:
+    validation = (check_site.ROOT / "validate/index.html").read_text(encoding="utf-8")
+    assert 'http-equiv="refresh"' not in validation
+    assert "JSON Schema answers" in validation
+    assert "Draft202012Validator" in validation
+    assert "Ajv2020" in validation
+    assert "Complete receiver decision" in validation
+
+    expected = {
+        "verify/bash.html": "Call the reference verifier directly.",
+        "verify/python.html": "subprocess.run",
+        "verify/nodejs.html": "spawnSync",
+        "verify/go.html": "exec.Command",
+    }
+    for relative, marker in expected.items():
+        content = (check_site.ROOT / relative).read_text(encoding="utf-8")
+        assert 'http-equiv="refresh"' not in content, relative
+        assert marker in content, relative
+
+    go = (check_site.ROOT / "verify/go.html").read_text(encoding="utf-8")
+    assert go.index("json.Unmarshal(output") < go.index('report.Decision != "allow"')
+    assert "runErr.(*exec.ExitError)" in go
+    assert "nonzero process status" in go
+
+
+def test_mutable_latest_schema_alias_is_not_deployed() -> None:
+    assert not (check_site.ROOT / "schema/latest.json").exists()
+
+
+def test_integration_field_notes_share_current_shell_and_status_boundary() -> None:
+    for relative in check_site.CURRENT_INTEGRATION_PAGES:
+        content = (check_site.ROOT / relative).read_text(encoding="utf-8")
+        assert 'href="/assets/v02.css"' in content, relative
+        assert 'class="docs-sidebar"' in content, relative
+        assert 'class="mobile-menu"' in content, relative
+        assert "not a shipped adapter" in content, relative
+
+
 def test_current_integrations_reject_obsolete_protocol_constructs() -> None:
     for relative in check_site.CURRENT_INTEGRATION_PAGES:
         content = (check_site.ROOT / relative).read_text(encoding="utf-8")
@@ -229,12 +267,27 @@ def test_html_does_not_reference_retired_protocol_version() -> None:
         )
 
 
+def test_deployable_json_does_not_expose_retired_wire_constructs() -> None:
+    patterns = (
+        r"makoto\.dev/(?:origin|transform)/v1",
+        r'"makotoLevel"',
+        r'"level"\s*:\s*[123](?:\s*[,}])',
+    )
+    for path in sorted(check_site.ROOT.rglob("*.json")):
+        if ".codex-work" in path.parts:
+            continue
+        content = path.read_text(encoding="utf-8", errors="replace")
+        assert all(re.search(pattern, content) is None for pattern in patterns), path.relative_to(
+            check_site.ROOT
+        )
+
+
 def test_community_page_links_real_public_participation_paths() -> None:
     content = (check_site.ROOT / "community/index.html").read_text(encoding="utf-8")
 
     assert (check_site.ROOT / "CONTRIBUTING.md").is_file()
     assert "Makoto is developed in public." in content
-    assert "Formal governance is not established yet" in content
+    assert "No membership required." in content
     assert "https://github.com/makoto-project/makoto/issues/new" in content
     assert "https://github.com/makoto-project/usemakoto.dev/issues/new" in content
     assert "CONTRIBUTING.md" in content

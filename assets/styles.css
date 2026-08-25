@@ -54,8 +54,6 @@
     --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
 }
 
-.legacy-v01-banner { display: none; }
-
 /* ===== JAPANESE-INSPIRED ELEMENTS ===== */
 
 /* Mon (family crest) style logo */
@@ -1456,7 +1454,7 @@ a:visited { color: #63404d; }
     max-width: 16ch;
     margin: 0 0 1rem;
     font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
-    font-size: clamp(3rem, 7vw, 5.8rem) !important;
+    font-size: clamp(2.7rem, 5vw, 4.5rem) !important;
     font-weight: 700 !important;
     line-height: 0.96;
     letter-spacing: -0.045em;

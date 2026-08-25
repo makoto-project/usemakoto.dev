@@ -1,2 +1,20 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=/verify/#structural-validation"><link rel="canonical" href="https://usemakoto.dev/verify/"><title>Verification — Makoto</title></head><body><p><a href="/verify/#structural-validation">Continue to structural validation and full verification</a>.</p></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Python verification recipe — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/">誠 Makoto</a><nav class="nav" aria-label="Primary"><a href="/verify/">Verification</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><a href="/">Overview</a><a href="/verify/">Verification</a><a href="/validate/">Schema validation</a><a href="/sdk/">Language interfaces</a><a href="/community/">Community</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Verification</p><a href="/verify/">Decision model</a><a href="/validate/">Schema validation</a><a href="/verify/bash.html">Bash</a><a href="/verify/python.html" aria-current="page">Python</a><a href="/verify/nodejs.html">Node.js</a><a href="/verify/go.html">Go</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a></div></nav></aside><div class="site-main"><main id="main" class="page"><span class="kicker">Python recipe</span><h1>Embed the CLI boundary before depending on internals.</h1><p class="lead">The core repository is implemented in Python, but its internal modules are not yet a stable published SDK. A subprocess keeps your application on the tested command and report contract.</p><pre><code>import json
+import subprocess
+
+completed = subprocess.run(
+    [
+        "uv", "run", "makoto", "verify", "bundle", bundle,
+        "--policy", policy,
+        "--schema-catalog", catalog,
+        "--expected-artifact", expected_artifact,
+        "--evaluation-time", evaluation_time,
+        "--json",
+    ],
+    cwd=reviewed_core_checkout,
+    check=False,
+    capture_output=True,
+    text=True,
+)
+report = json.loads(completed.stdout)
+if report["decision"] != "allow":
+    raise RuntimeError(report)</code></pre><p>Pin the core checkout, treat malformed output as failure, and preserve the report’s separate structure, signature, authorization, graph, handoff, freshness, and artifact results.</p><p><a href="/sdk/">Read the Python implementation boundary →</a></p></main><footer class="footer"><div class="footer-inner">Makoto verification · Python subprocess recipe · No published SDK claim</div></footer></div></div></body></html>

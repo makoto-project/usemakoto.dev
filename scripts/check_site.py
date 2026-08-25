@@ -42,6 +42,7 @@ CANONICAL_PRESENTATION_PAGES = (
     "examples/index.html",
     "index.html",
     "integrations/index.html",
+    "spec/index.html",
     "tooling/index.html",
     "verify/index.html",
     "why-lineage/index.html",
@@ -50,7 +51,6 @@ TECHNICAL_VERSION_PAGES = {
     "predicate/v0.2/origin/index.html",
     "predicate/v0.2/transform/index.html",
     "source/file/index.html",
-    "spec/v0.2/index.html",
     "vocab/v0.2/bounded-pattern/index.html",
 }
 CURRENT_SHELL_PAGES = (
@@ -63,7 +63,7 @@ CURRENT_SHELL_PAGES = (
     "predicate/v0.2/origin/index.html",
     "predicate/v0.2/transform/index.html",
     "source/file/index.html",
-    "spec/v0.2/index.html",
+    "spec/index.html",
     "tooling/index.html",
     "verify/index.html",
     "vocab/v0.2/bounded-pattern/index.html",
@@ -96,6 +96,7 @@ CURRENT_INTEGRATION_PAGES = tuple(
         "spark",
     )
 )
+CURRENT_SHELL_PAGES += CURRENT_INTEGRATION_PAGES
 STALE_INTEGRATION_MARKERS = (
     "origin/v1",
     "transform/v1",
@@ -128,15 +129,15 @@ LINEAGE_REQUIRED_TEXT = (
     "A checksum is necessary. It is not lineage.",
     "Makoto does not discover an unrecorded notebook export or Slack screenshot.",
     "/demos/v0.2-end-to-end/",
-    "/spec/v0.2/",
+    "/spec/",
 )
 CANDIDATE_STATUS_TEXT = {
     "README.md": (
-        "v0.2 is an unreleased candidate.",
-        "artifacts, not proof of a tagged release or an immutable release contract.",
+        "under review and has not been released.",
+        "files are public review artifacts",
     ),
-    "spec/v0.2/index.html": ("Protocol candidate · not released",),
-    "demos/v0.2-end-to-end/index.html": ("Tested review candidate",),
+    "spec/index.html": ("not yet an immutable tagged release",),
+    "demos/v0.2-end-to-end/index.html": ("Runnable reference proof",),
 }
 DOCUMENTATION_FILES = {
     "/demos/v0.2-end-to-end/": "demos/v0.2-end-to-end/index.html",
@@ -715,6 +716,22 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
                 errors.append(
                     f"visible version label remains in narrative page {relative}: {forbidden}"
                 )
+    stale_json_patterns = (
+        r"makoto\.dev/(?:origin|transform)/v1",
+        r'"makotoLevel"',
+        r'"level"\s*:\s*[123](?:\s*[,}])',
+    )
+    for path in sorted(ROOT.rglob("*.json")):
+        if ".codex-work" in path.parts:
+            continue
+        content = path.read_text(encoding="utf-8", errors="replace")
+        for pattern in stale_json_patterns:
+            if re.search(pattern, content):
+                errors.append(
+                    "retired protocol construct remains in deployable JSON: "
+                    f"{path.relative_to(ROOT)}"
+                )
+                break
     for relative in CANONICAL_PRESENTATION_PAGES:
         parser = PageParser()
         parser.feed((ROOT / relative).read_text(encoding="utf-8"))
@@ -756,7 +773,7 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
         content = community.read_text(encoding="utf-8")
         for marker in (
             "Makoto is developed in public.",
-            "Formal governance is not established yet",
+            "No membership required.",
             "makoto-project/makoto/issues/new",
             "makoto-project/usemakoto.dev/issues/new",
             "CONTRIBUTING.md",

@@ -22,7 +22,7 @@ DEFAULT_BASE_URL = "https://usemakoto.dev"
 HOME_PATH = "/"
 LINEAGE_PATH = "/why-lineage/"
 WALKTHROUGH_PATH = "/demos/v0.2-end-to-end/"
-STATUS_PATH = "/spec/v0.2/"
+STATUS_PATH = "/spec/"
 SITE_REVIEW_SURFACES = {
     HOME_PATH: "index.html",
     LINEAGE_PATH: "why-lineage/index.html",
@@ -30,10 +30,10 @@ SITE_REVIEW_SURFACES = {
     "/examples/": "examples/index.html",
     "/integrations/": "integrations/index.html",
     "/demos/": "demos/index.html",
-    STATUS_PATH: "spec/v0.2/index.html",
+    STATUS_PATH: "spec/index.html",
     "/tooling/": "tooling/index.html",
 }
-CANDIDATE_DISCLOSURE = b"Protocol candidate \xc2\xb7 not released"
+CANDIDATE_DISCLOSURE = b"not yet an immutable tagged release"
 
 
 class ProbeError(ValueError):
