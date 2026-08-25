@@ -182,6 +182,7 @@ th { border-top: 1px solid var(--ink); background: transparent; font-family: var
 .troubleshooting dd { margin: .35rem 0 0; padding: 0 0 1.2rem; border-bottom: 1px solid var(--line); color: var(--muted); }
 
 .lineage-hero { background: var(--surface); }
+.lineage-hero .hero-inner::before { content: none; }
 .lineage-opening { display: grid; grid-template-columns: minmax(220px,.7fr) minmax(0,1.8fr); gap: 3rem; align-items: start; }
 .lineage-opening h2 { margin-top: .6rem; }
 .story-quote { margin: 0; padding: 1.5rem 0 0; border: 0; border-top: 3px double var(--ink); border-radius: 0; background: transparent; box-shadow: none; color: var(--ink); font-family: var(--display); font-size: clamp(1.16rem,2vw,1.4rem); }
