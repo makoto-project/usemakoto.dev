@@ -144,6 +144,14 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .evidence-trail strong { display: block; }
 .editorial-note { max-width: var(--measure); padding: .9rem 0 0; border-top: 1px solid var(--line-strong); color: var(--muted); }
 
+.evidence-pair { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.75rem; margin: 2rem 0 1.5rem; }
+.evidence-panel { margin: 0; min-width: 0; border-top: 2px solid var(--ink); }
+.evidence-panel figcaption { display: grid; grid-template-columns: 2.4rem minmax(0,1fr); gap: .75rem; align-items: baseline; padding: .85rem 0 1rem; color: var(--muted); }
+.evidence-panel figcaption strong { color: var(--ink); font-family: var(--display); font-size: 1.18rem; }
+.evidence-step { color: var(--seal-dark); font: 700 .74rem/1.4 var(--mono); }
+.evidence-panel pre { margin: 0; font-size: .775rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.hl { background: rgba(226,158,110,.22); color: #f2c49c; font-weight: 700; }
+
 pre, code { font-family: var(--mono); }
 code { font-size: .9em; }
 pre { overflow: auto; padding: 1rem; border-radius: 0; background: #15211c; color: #edf0eb; line-height: 1.5; white-space: pre; }
@@ -238,6 +246,7 @@ th { border-top: 1px solid var(--ink); background: transparent; font-family: var
   .dag { border-bottom: 0; }
   .dag-node { border-right: 0; border-bottom: 1px solid var(--line); }
   .dag-node:not(:last-child)::after { content: "↓"; right: 50%; top: auto; bottom: -.85rem; }
+  .evidence-pair { grid-template-columns: 1fr; gap: 1.25rem; }
   .schema-list { columns: 1; }
   .hero-inner { padding-top: 4.5rem; }
   .lineage-cta .actions { justify-content: flex-start; }
