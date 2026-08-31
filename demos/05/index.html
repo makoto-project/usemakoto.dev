@@ -95,7 +95,8 @@
 <span class="kicker">Case 05 · AI dataset gate</span>
 <h1>Do not train on a label and a checksum.</h1>
 <p class="lead">A shared dataset looks plausible, but one label was altered. Before training, the model builder needs exact bytes, signed source and transformation claims, required content profiles, an authorized handoff, and an independent expectation of what should arrive.</p>
-<section>
+<div class="callout evidence-status"><p><strong>Executable evidence.</strong> One denial fixture in the runnable proof exercises this failure: <code>private-schema-violation</code>, which presents re-signed bytes that reintroduce a direct identifier and is refused with <code>E_PROFILE_INVALID</code>. <a href="/demos/v0.2-end-to-end/artifacts/reports/private-schema-violation.json">Open the denial report</a> or <a href="/demos/v0.2-end-to-end/">run the whole proof</a>.</p></div>
+        <section>
 <h2>The admission decision</h2>
 <table>
 <thead>
