@@ -37,9 +37,18 @@ uv sync --locked --dev
 uv run scripts/check_site.py --working-tree ../core
 ```
 
-Before a pull request, run the repository checks documented in `README.md`. Changes to the hosted
-v0.2 schemas, mirrored specification, or demo evidence must originate in the core repository and
-be synchronized through the repository script; do not hand-edit those public mirrors.
+Before a pull request, run the complete gate. It is the same work the hosted job does, so a green
+run locally is the result rather than a prediction of it:
+
+```bash
+uv run scripts/local_ci.py
+```
+
+That lints the workflows with `actionlint` when it is installed, resolves every workflow action
+reference against its remote, provisions the pinned core checkout, and runs the lock check, lint,
+tests, and the site gate. Changes to the hosted v0.2 schemas, mirrored specification, or demo
+evidence must originate in the core repository and be synchronized through the repository script;
+do not hand-edit those public mirrors.
 
 ## Review expectations
 
