@@ -18,12 +18,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CORE_URL = "https://github.com/makoto-project/makoto"
+USES_PATTERN = re.compile(r"^\s*-?\s*uses:\s*([\w.-]+/[\w.-]+)@(\S+)", re.MULTILINE)
 
 
 def fail(message: str) -> int:
@@ -70,6 +72,36 @@ def sync_core(core: Path, commit: str) -> None:
     print(f"local-ci: core at {git('rev-parse', 'HEAD', cwd=core)}")
 
 
+def check_action_refs() -> list[str]:
+    """Confirm every `uses:` reference in every workflow resolves on the remote.
+
+    A tag that does not exist fails the hosted run before any project code
+    executes, and nothing else here can catch it: the reference is resolved by
+    GitHub, not by anything in the checkout. Not every project publishes a
+    floating major tag, so `@v10` can be unresolvable while `v10.0.1` is real.
+    Commit SHAs are accepted as given.
+    """
+    problems: list[str] = []
+    seen: set[tuple[str, str]] = set()
+    for workflow in sorted((ROOT / ".github/workflows").glob("*.y*ml")):
+        for action, ref in USES_PATTERN.findall(workflow.read_text()):
+            if (action, ref) in seen:
+                continue
+            seen.add((action, ref))
+            if re.fullmatch(r"[0-9a-f]{40}", ref):
+                continue
+            remote = f"https://github.com/{action}"
+            result = subprocess.run(
+                ["git", "ls-remote", "--tags", "--heads", remote, ref, f"refs/tags/{ref}"],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0 or not result.stdout.strip():
+                problems.append(f"{workflow.name}: {action}@{ref} does not resolve")
+    return problems
+
+
 def step(name: str, argv: list[str]) -> bool:
     print(f"\nlocal-ci: {name}")
     return subprocess.run(argv, cwd=ROOT, check=False).returncode == 0
@@ -97,6 +129,13 @@ def main() -> int:
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         return fail(str(error))
 
+    print("\nlocal-ci: workflow action references")
+    problems = check_action_refs()
+    for problem in problems:
+        print(f"  unresolvable: {problem}")
+    if not problems:
+        print("  every uses: reference resolves")
+
     checks = [
         ("uv sync --locked --dev", ["uv", "sync", "--locked", "--dev"]),
         ("ruff check scripts tests", ["uv", "run", "ruff", "check", "scripts", "tests"]),
@@ -114,11 +153,12 @@ def main() -> int:
             )
         )
 
-    failed = [name for name, argv in checks if not step(name, argv)]
+    failed = ["workflow action references"] if problems else []
+    failed += [name for name, argv in checks if not step(name, argv)]
     if failed:
         print(f"\nlocal-ci: FAILED: {', '.join(failed)}")
         return 1
-    print(f"\nlocal-ci: all {len(checks)} checks passed against core {commit[:12]}")
+    print(f"\nlocal-ci: all {len(checks) + 1} checks passed against core {commit[:12]}")
     return 0
 
 
