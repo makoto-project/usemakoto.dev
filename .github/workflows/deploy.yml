@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out website
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: site
           persist-credentials: false
@@ -40,7 +40,7 @@ jobs:
           fi
 
       - name: Check out pinned Makoto core
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: makoto-project/makoto
           ref: ${{ steps.pin.outputs.commit }}
@@ -50,7 +50,7 @@ jobs:
           persist-credentials: false
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v10
         with:
           enable-cache: true
 
@@ -75,7 +75,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Deploy the validated candidate or release tree
@@ -90,11 +90,11 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v10
       - name: Verify the hosted candidate or release contract
         shell: bash
         run: |
