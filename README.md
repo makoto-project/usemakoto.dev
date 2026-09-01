@@ -77,6 +77,20 @@ uv run scripts/check_site.py --working-tree ../core
 Working-tree mode is for local review against the sibling core checkout. Deployment pins an exact
 core commit; release publication pins the approved tag. Both pass their corresponding gate.
 
+To run everything the hosted `validate` job runs, against the exact pinned core commit, use the
+local gate. It lints the workflows with `actionlint`, resolves every workflow action reference
+against its remote and checks each digest pin against the version its comment claims, clones
+`makoto-project/makoto` into the sibling checkout on first use, moves it to the pinned commit,
+then runs the lock check, lint, tests, and the candidate or release gate:
+
+```bash
+uv run scripts/local_ci.py
+```
+
+Add `--probe` to also verify that the deployed site still serves the pinned bytes. Nothing in the
+validate job needs the network beyond fetching core, and nothing needs the hosted runner. A push
+should confirm a result you already have.
+
 ## Integration boundary
 
 Orchestrators, warehouses, stream processors, catalogs, and other data tools can produce or

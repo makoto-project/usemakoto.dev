@@ -4,6 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AI dataset gate — Makoto</title>
+<meta name="description" content="A model builder refuses training data unless its source, processing steps, authorized attesters, required profiles, and final bytes verify.">
+<link rel="canonical" href="https://usemakoto.dev/demos/05/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Makoto">
+<meta property="og:title" content="AI dataset gate — Makoto">
+<meta property="og:description" content="A model builder refuses training data unless its source, processing steps, authorized attesters, required profiles, and final bytes verify.">
+<meta property="og:url" content="https://usemakoto.dev/demos/05/">
+<meta property="og:image" content="https://usemakoto.dev/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Makoto — know where data began, what changed, and who attested to it.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI dataset gate — Makoto">
+<meta name="twitter:description" content="A model builder refuses training data unless its source, processing steps, authorized attesters, required profiles, and final bytes verify.">
+<meta name="twitter:image" content="https://usemakoto.dev/assets/og-card.png">
 <link rel="stylesheet" href="/assets/v02.css">
 </head>
 <body>
@@ -80,7 +95,8 @@
 <span class="kicker">Case 05 · AI dataset gate</span>
 <h1>Do not train on a label and a checksum.</h1>
 <p class="lead">A shared dataset looks plausible, but one label was altered. Before training, the model builder needs exact bytes, signed source and transformation claims, required content profiles, an authorized handoff, and an independent expectation of what should arrive.</p>
-<section>
+<div class="callout evidence-status"><p><strong>Executable evidence.</strong> One denial fixture in the runnable proof exercises this failure: <code>private-schema-violation</code>, which presents re-signed bytes that reintroduce a direct identifier and is refused with <code>E_PROFILE_INVALID</code>. <a href="/demos/v0.2-end-to-end/artifacts/reports/private-schema-violation.json">Open the denial report</a> or <a href="/demos/v0.2-end-to-end/">run the whole proof</a>.</p></div>
+        <section>
 <h2>The admission decision</h2>
 <table>
 <thead>

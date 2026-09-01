@@ -4,6 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Poisoned pipeline — Makoto</title>
+<meta name="description" content="A corrupted sensor batch spreads downstream: how signed predecessor links expose the blast radius and close the receiver gate.">
+<link rel="canonical" href="https://usemakoto.dev/demos/01/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Makoto">
+<meta property="og:title" content="Poisoned pipeline — Makoto">
+<meta property="og:description" content="A corrupted sensor batch spreads downstream: how signed predecessor links expose the blast radius and close the receiver gate.">
+<meta property="og:url" content="https://usemakoto.dev/demos/01/">
+<meta property="og:image" content="https://usemakoto.dev/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Makoto — know where data began, what changed, and who attested to it.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Poisoned pipeline — Makoto">
+<meta name="twitter:description" content="A corrupted sensor batch spreads downstream: how signed predecessor links expose the blast radius and close the receiver gate.">
+<meta name="twitter:image" content="https://usemakoto.dev/assets/og-card.png">
 <link rel="stylesheet" href="/assets/v02.css">
 </head>
 <body>
@@ -80,7 +95,8 @@
 <span class="kicker">Case 01 · poisoned pipeline</span>
 <h1>Find every artifact descended from the bad source.</h1>
 <p class="lead">A corrupted sensor batch contains impossible readings, duplicate rows, and a payload hidden in a text field. The immediate gate matters, but so does the blast radius after the batch has already moved.</p>
-<section>
+<div class="callout evidence-status"><p><strong>Executable evidence.</strong> One denial fixture in the runnable proof exercises this failure: <code>mutated-final-data</code>, which presents a byte changed after the handoff was signed and is refused with <code>E_ARTIFACT_DIGEST</code>. <a href="/demos/v0.2-end-to-end/artifacts/reports/mutated-final-data.json">Open the denial report</a> or <a href="/demos/v0.2-end-to-end/">run the whole proof</a>.</p></div>
+        <section>
 <h2>The evidence path</h2>
 <ol class="provenance-spine">
 <li>

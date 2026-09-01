@@ -4,6 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dataset release — Makoto</title>
+<meta name="description" content="A dataset release that ships evidence with the bytes: signed origin, transformation, and digest records consumers can inspect.">
+<link rel="canonical" href="https://usemakoto.dev/demos/03/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Makoto">
+<meta property="og:title" content="Dataset release — Makoto">
+<meta property="og:description" content="A dataset release that ships evidence with the bytes: signed origin, transformation, and digest records consumers can inspect.">
+<meta property="og:url" content="https://usemakoto.dev/demos/03/">
+<meta property="og:image" content="https://usemakoto.dev/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Makoto — know where data began, what changed, and who attested to it.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dataset release — Makoto">
+<meta name="twitter:description" content="A dataset release that ships evidence with the bytes: signed origin, transformation, and digest records consumers can inspect.">
+<meta name="twitter:image" content="https://usemakoto.dev/assets/og-card.png">
 <link rel="stylesheet" href="/assets/v02.css">
 </head>
 <body>
@@ -80,7 +95,8 @@
 <span class="kicker">Case 03 · dataset release</span>
 <h1>Ship the data and the evidence needed to refuse it.</h1>
 <p class="lead">A release process can attach more than a checksum. It can publish signed origin and transformation statements, required profiles, an exact handoff, and the verifier inputs a consumer needs.</p>
-<section>
+<div class="callout evidence-status"><p><strong>Executable evidence.</strong> One denial fixture in the runnable proof exercises this failure: <code>unauthorized-signer</code>, which presents a known key that no rule authorizes and is refused with <code>E_SIGNER_UNAUTHORIZED</code>. <a href="/demos/v0.2-end-to-end/artifacts/reports/unauthorized-signer.json">Open the denial report</a> or <a href="/demos/v0.2-end-to-end/">run the whole proof</a>.</p></div>
+        <section>
 <h2>A release has two independently reviewed artifacts</h2>
 <table>
 <thead>
