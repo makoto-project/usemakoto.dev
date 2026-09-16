@@ -6,7 +6,7 @@
 
 <section aria-labelledby="catalogue">
 <h2 id="catalogue">The data supply-chain threat catalogue</h2>
-<p>Data pipelines face threats that software build pipelines do not: readings that were never taken, rows that changed after sign-off, lineage that skips the step that mattered, and content that passes every integrity check because it was bad when it was signed. The catalogue below names nine of them. Each entry lists the attack, the verifier check and diagnostic codes that answer it, what remains outside Makoto, and the casebook demo that runs it against real fixtures when one exists.</p>
+<p>Data pipelines face threats that software build pipelines do not: readings that were never taken, rows that changed after sign-off, lineage that skips the step that mattered, and content that passes every integrity check because it was bad when it was signed. The catalogue below names nine of them. Each entry lists the attack, the verifier check and diagnostic codes that answer it, the <a href="/levels/">assurance level</a> that stops it, what remains outside Makoto, and the casebook demo that runs it against real fixtures when one exists.</p>
 
 <h3 id="d1">D1 · Source impersonation</h3>
 <p>An attacker claims data originates from a trusted source when it does not: fake sensor readings, forged API responses, spoofed device identifiers.</p>
@@ -14,6 +14,7 @@
 <tr><th>Verifier control</th><td>Origin statements are signed over exact source bytes. Receiver policy authorizes origin claims per key and per <code>sourceKinds</code> (and optionally exact <code>sourceUris</code>), so a key trusted for one source cannot vouch for another.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_SIGNATURE_INVALID</code>, <code>E_SIGNER_UNAUTHORIZED</code></td></tr>
 <tr><th>Residual risk</th><td>An authorized collector can still sign a false claim. Makoto cannot establish that a signer told the truth or that the source was correct.</td></tr>
+<tr><th>Stopped at</th><td><a href="/levels/#l2">L2</a>. <code>authorization</code> requires an origin rule for the key and source.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/06/">Case 06</a> denies an origin claim that no origin rule authorizes.</td></tr>
 </tbody></table>
 
@@ -23,6 +24,7 @@
 <tr><th>Verifier control</th><td>The receiver hashes the exact bytes it received and compares them with the signed subject digest. Partitioned datasets commit each entry digest and optional size through a dataset manifest.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_SIZE</code>, <code>E_ARTIFACT_MISSING</code></td></tr>
 <tr><th>Residual risk</th><td>A producer can sign bytes that were already bad. A historical artifact that is no longer available is reported <code>not_checked</code>, not verified.</td></tr>
+<tr><th>Stopped at</th><td><a href="/levels/#l2">L2</a>. <code>artifact-bytes</code> must pass.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/01/">Case 01</a> appends one byte after signing and denies with <code>E_ARTIFACT_DIGEST</code>.</td></tr>
 </tbody></table>
 
@@ -32,6 +34,7 @@
 <tr><th>Verifier control</th><td>Every transformation input binds the predecessor statement digest, predecessor subject name, and input artifact digest. The graph must reach declared origins without cycles, and the signed handoff commits to the exact statement, root, and head sets.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_PREDECESSOR_MISSING</code>, <code>E_PREDECESSOR_SUBJECT</code>, <code>E_INPUT_DIGEST</code>, <code>E_GRAPH_CYCLE</code>, <code>E_ROOT_INVALID</code>, <code>E_MANIFEST_SET</code>; an edited binding without a new signature fails <code>E_SIGNATURE_INVALID</code></td></tr>
 <tr><th>Residual risk</th><td>A compromised authorized key can sign an alternate graph that is internally consistent. Makoto records claims about transformations; it does not prove a described transformation executed.</td></tr>
+<tr><th>Stopped at</th><td><a href="/levels/#l2">L2 for a missing or re-pointed step; L1 when the edit breaks a signature</a>. <code>graph</code> and <code>completeness-anchor</code> must pass.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/02/">Case 02</a> removes the origin statement and rewires the final step.</td></tr>
 </tbody></table>
 
@@ -41,6 +44,7 @@
 <tr><th>Verifier control</th><td><code>occurredAt</code> and <code>issuedAt</code> are signer-asserted claims, not trusted time. Freshness comes from receiver-held anchors: an expected manifest, head set, or final-artifact set; a consumer nonce; or a <code>maxAgeSeconds</code> bound at a consumer-controlled evaluation time. Key <code>validFrom</code> and <code>validUntil</code> are evaluated against that evaluation time, never the signed event time, so backdating cannot restore authorization.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_EXPECTED_MANIFEST</code>, <code>E_EXPECTED_HEAD</code>, <code>E_EXPECTED_ARTIFACT</code>, <code>E_HANDOFF_NONCE</code>, <code>E_HANDOFF_STALE</code>, <code>E_FRESHNESS_REQUIRED</code></td></tr>
 <tr><th>Residual risk</th><td>No timestamp is proven to come from a trusted clock. Transparency logs are out of scope, so rollback resistance is only as strong as the channel that delivered the expected values.</td></tr>
+<tr><th>Stopped at</th><td><a href="/levels/#l3">L3</a>. <code>freshness-anchors</code> must pass and the decision must be <code>allow</code>.</td></tr>
 <tr><th>Runnable proof</th><td>No replay denial is checked in yet. Every casebook gate pins the expected manifest and head, which is the anchor this threat requires.</td></tr>
 </tbody></table>
 
@@ -50,6 +54,7 @@
 <tr><th>Verifier control</th><td>Authenticity and authorization are separate checks. A statement must satisfy a receiver rule that lists its key for that predicate type, source, or operation, with a minimum signature threshold. Handoff signers are authorized separately.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_SIGNER_UNAUTHORIZED</code></td></tr>
 <tr><th>Residual risk</th><td>A stolen key that the policy still authorizes passes. Revocation is a local policy edit; public revocation infrastructure is out of scope.</td></tr>
+<tr><th>Stopped at</th><td><a href="/levels/#l2">L2</a>. <code>authorization-thresholds</code> and <code>authorization</code> must pass.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/03/">Case 03</a> denies a byte-identical claim signed by a known but unauthorized key.</td></tr>
 </tbody></table>
 
@@ -59,6 +64,7 @@
 <tr><th>Verifier control</th><td>DSSE signatures cover the exact payload bytes. The verifier recomputes every statement digest from decoded payload bytes before trusting the bundle index, and parses JSON strictly.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_SIGNATURE_INVALID</code>, <code>E_STATEMENT_DIGEST</code>, <code>E_ENVELOPE_MALFORMED</code>, <code>E_PAYLOAD_TYPE</code>, <code>E_JSON_DUPLICATE_KEY</code>, <code>E_JSON_INVALID</code></td></tr>
 <tr><th>Residual risk</th><td>Key custody is a deployment responsibility. A signer with the key can produce a new, valid forgery, which is why authorization and anchors still matter.</td></tr>
+<tr><th>Stopped at</th><td><a href="/levels/#l1">L1</a>. <code>signatures</code> and <code>index-payloads</code> must pass.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/04/">Case 04</a> edits a signed record two ways and denies both.</td></tr>
 </tbody></table>
 
@@ -68,6 +74,7 @@
 <tr><th>Verifier control</th><td>Source locators are optional and extension payloads are organization-controlled. Private profiles are exchanged separately and resolved from the receiver's local catalog with no network retrieval. A required artifact profile can reject identifiers in structured data.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_PROFILE_INVALID</code> for content; metadata minimization has no diagnostic and is a producer obligation</td></tr>
 <tr><th>Residual risk</th><td>Provenance does not make data confidential. Reports can contain recipient and nonce values and must be handled as sensitive evidence.</td></tr>
+<tr><th>Stopped at</th><td><a href="/levels/#l2">L2 for content rules</a>. Required <code>artifact-profiles</code> must pass; metadata minimization sits outside every level.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/05/">Case 05</a> denies a validly signed dataset that reintroduced email addresses. See <a href="/privacy/">privacy techniques</a>.</td></tr>
 </tbody></table>
 
@@ -77,6 +84,7 @@
 <tr><th>Verifier control</th><td>The reference implementation covers finite artifacts. A dataset manifest commits to an exact, sorted set of partition digests, and finite newline-delimited JSON can be validated against a profile under strict line and size bounds.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_DATASET_MANIFEST_INVALID</code>, <code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_SIZE</code>, <code>E_RESOURCE_LIMIT</code></td></tr>
 <tr><th>Residual risk</th><td>A production streaming or windowing protocol is not part of the current release. A dataset manifest proves the producer's committed partition set, not that a storage prefix contains no other objects.</td></tr>
+<tr><th>Stopped at</th><td><a href="/levels/#l2">L2 for committed partitions</a>. <code>artifact-bytes</code> covers supplied partition bytes; no level covers live streams.</td></tr>
 <tr><th>Runnable proof</th><td>None yet. This is an open area for <a href="/community/">community fixtures</a>.</td></tr>
 </tbody></table>
 
@@ -86,23 +94,24 @@
 <tr><th>Verifier control</th><td>A render-safety scan travels as an extension of the signed claim, and a digest-pinned receiver profile requires a passing verdict. The reference producer refuses to attach a profile the claim does not satisfy, and a receiver rule with a profile constraint authorizes nothing without it.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_SIGNER_UNAUTHORIZED</code> when no rule's profile constraint is met; <code>E_PROFILE_INVALID</code> when a present profile fails</td></tr>
 <tr><th>Residual risk</th><td>The guarantee is only as good as the scanner and the profile. Content validation is normative for JSON artifacts; other formats need adapters.</td></tr>
+<tr><th>Stopped at</th><td><a href="/levels/#l2">L2</a>. A rule with a render-safety profile constraint must authorize the claim.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/06/">Case 06</a> denies a source file carrying 128 hidden variation selectors. See the <a href="/examples/invisible-unicode/">invisible Unicode example</a>.</td></tr>
 </tbody></table>
 </section>
 
 <section aria-labelledby="matrix">
 <h2 id="matrix">Threat matrix</h2>
-<p>Severity is editorial: how much damage a successful attack does before anyone notices. The check column is the report check that fails first.</p>
-<table class="wide-table"><caption>On narrow screens, scroll right to see the verifier check and proof.</caption><thead><tr><th>ID</th><th>Threat</th><th>Severity</th><th>Attack vector</th><th>Failing check</th><th>Proof</th></tr></thead><tbody>
-<tr><td>D1</td><td>Source impersonation</td><td>Critical</td><td>Spoofed source identifiers, unauthorized collector keys</td><td><code>authorization-thresholds</code></td><td><a href="/demos/06/">Case 06</a></td></tr>
-<tr><td>D2</td><td>Data tampering</td><td>Critical</td><td>Man-in-the-middle, storage compromise, injection</td><td><code>artifact-bytes</code></td><td><a href="/demos/01/">Case 01</a></td></tr>
-<tr><td>D3</td><td>Lineage falsification</td><td>High</td><td>Removed or rewired steps, fabricated chains</td><td><code>graph</code>, <code>signatures</code></td><td><a href="/demos/02/">Case 02</a></td></tr>
-<tr><td>D4</td><td>Timestamp manipulation and replay</td><td>High</td><td>Backdated claims, replayed handoffs</td><td><code>freshness-anchors</code></td><td>Not yet</td></tr>
-<tr><td>D5</td><td>Unauthorized attribution</td><td>High</td><td>Key theft, known key outside its role</td><td><code>authorization-thresholds</code></td><td><a href="/demos/03/">Case 03</a></td></tr>
-<tr><td>D6</td><td>Attestation forgery</td><td>Critical</td><td>Edited payloads, substituted envelopes</td><td><code>signatures</code>, <code>index-payloads</code></td><td><a href="/demos/04/">Case 04</a></td></tr>
-<tr><td>D7</td><td>Privacy violation</td><td>Medium</td><td>Metadata over-sharing, reintroduced identifiers</td><td><code>artifact-profiles</code></td><td><a href="/demos/05/">Case 05</a></td></tr>
-<tr><td>D8</td><td>Stream injection</td><td>High</td><td>Event spoofing, window manipulation</td><td><code>artifact-bytes</code> for committed partitions</td><td>Not yet</td></tr>
-<tr><td>D9</td><td>Display-layer obfuscation</td><td>High</td><td>Invisible Unicode, variation selectors, bidirectional controls</td><td><code>authorization-thresholds</code></td><td><a href="/demos/06/">Case 06</a></td></tr>
+<p>Severity is editorial: how much damage a successful attack does before anyone notices. The check column is the report check that fails first, and the level column is the lowest <a href="/levels/">assurance level</a> a receiver must require to stop it.</p>
+<table class="wide-table"><caption>On narrow screens, scroll right to see the verifier check and proof.</caption><thead><tr><th>ID</th><th>Threat</th><th>Severity</th><th>Attack vector</th><th>Failing check</th><th>Stopped at</th><th>Proof</th></tr></thead><tbody>
+<tr><td>D1</td><td>Source impersonation</td><td>Critical</td><td>Spoofed source identifiers, unauthorized collector keys</td><td><code>authorization-thresholds</code></td><td>L2</td><td><a href="/demos/06/">Case 06</a></td></tr>
+<tr><td>D2</td><td>Data tampering</td><td>Critical</td><td>Man-in-the-middle, storage compromise, injection</td><td><code>artifact-bytes</code></td><td>L2</td><td><a href="/demos/01/">Case 01</a></td></tr>
+<tr><td>D3</td><td>Lineage falsification</td><td>High</td><td>Removed or rewired steps, fabricated chains</td><td><code>graph</code>, <code>signatures</code></td><td>L2 (L1 if re-signing fails)</td><td><a href="/demos/02/">Case 02</a></td></tr>
+<tr><td>D4</td><td>Timestamp manipulation and replay</td><td>High</td><td>Backdated claims, replayed handoffs</td><td><code>freshness-anchors</code></td><td>L3</td><td>Not yet</td></tr>
+<tr><td>D5</td><td>Unauthorized attribution</td><td>High</td><td>Key theft, known key outside its role</td><td><code>authorization-thresholds</code></td><td>L2</td><td><a href="/demos/03/">Case 03</a></td></tr>
+<tr><td>D6</td><td>Attestation forgery</td><td>Critical</td><td>Edited payloads, substituted envelopes</td><td><code>signatures</code>, <code>index-payloads</code></td><td>L1</td><td><a href="/demos/04/">Case 04</a></td></tr>
+<tr><td>D7</td><td>Privacy violation</td><td>Medium</td><td>Metadata over-sharing, reintroduced identifiers</td><td><code>artifact-profiles</code></td><td>L2</td><td><a href="/demos/05/">Case 05</a></td></tr>
+<tr><td>D8</td><td>Stream injection</td><td>High</td><td>Event spoofing, window manipulation</td><td><code>artifact-bytes</code> for committed partitions</td><td>L2</td><td>Not yet</td></tr>
+<tr><td>D9</td><td>Display-layer obfuscation</td><td>High</td><td>Invisible Unicode, variation selectors, bidirectional controls</td><td><code>authorization-thresholds</code></td><td>L2</td><td><a href="/demos/06/">Case 06</a></td></tr>
 </tbody></table>
 </section>
 
@@ -151,18 +160,18 @@
 <li><strong>Same envelope.</strong> Makoto statements are in-toto Statements carried in DSSE envelopes.</li>
 <li><strong>Tamper-evident.</strong> Exact-byte SHA-256 digests make modification detectable.</li>
 <li><strong>Receiver-owned policy.</strong> Makoto's receiver decides which keys may make which claims; the bundle never declares itself trusted.</li>
-<li><strong>Separate checks, not levels.</strong> Makoto reports structure, authenticity, authorization, continuity, completeness, freshness, and artifact integrity as distinct results. See the <a href="/levels/">assurance model</a> and the <a href="/comparison/">comparisons</a>.</li>
+<li><strong>Progressive levels.</strong> Both name cumulative levels. Makoto defines <a href="/levels/">L1 authentic, L2 authorized and complete, and L3 anchored</a> as fixed sets of report checks, so a denied handoff still shows exactly which check stopped it. See the <a href="/comparison/">comparisons</a>.</li>
 </ul>
 </section>
 
 <section aria-labelledby="depth">
 <h2 id="depth">Defense in depth</h2>
 <ol class="provenance-spine">
-<li><strong>Detection</strong><span>Exact-byte digests expose any change to artifacts or statement payloads.</span></li>
-<li><strong>Authentication</strong><span>DSSE signatures bind each statement and handoff to a key.</span></li>
-<li><strong>Authorization</strong><span>Receiver policy limits each key to the sources, operations, profiles, and handoffs it may sign.</span></li>
-<li><strong>Completeness and freshness</strong><span>A signed handoff plus an independent anchor defeats omission and replay.</span></li>
-<li><strong>Content policy</strong><span>Digest-pinned private profiles reject unchanged bytes that were never acceptable.</span></li>
+<li><strong>Detection (L1, L2)</strong><span>Exact-byte digests expose any change to statement payloads at L1 and to received artifacts at L2.</span></li>
+<li><strong>Authentication (L1)</strong><span>DSSE signatures bind each statement and handoff to a key.</span></li>
+<li><strong>Authorization (L2)</strong><span>Receiver policy limits each key to the sources, operations, profiles, and handoffs it may sign.</span></li>
+<li><strong>Completeness and freshness (L2, L3)</strong><span>A signed handoff defeats omission at L2; an independent anchor defeats replay at L3.</span></li>
+<li><strong>Content policy (L2)</strong><span>Digest-pinned private profiles reject unchanged bytes that were never acceptable.</span></li>
 <li><strong>Privacy</strong><span>Minimized metadata and separately exchanged profiles limit what evidence discloses.</span></li>
 </ol>
 </section>

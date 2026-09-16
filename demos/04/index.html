@@ -80,7 +80,7 @@
 <span class="kicker">Case 04 · configuration postmortem</span>
 <h1>The config changed on Saturday. Which data did it change?</h1>
 <p class="lead">A service account reduces batch size and Monday throughput collapses. The audit question is not only who changed the file. It is which exact outputs were produced under that configuration, and whether the record of what ran is still the record that was signed.</p>
-<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
 
 <section>
 <h2>The problem</h2>
@@ -169,6 +169,9 @@ env:
   # Pinned so these fixtures replay identically. Delete this line to
   # evaluate against the runner clock.
   EVALUATION_TIME: "2026-09-16T16:00:00Z"
+  # Minimum assurance level to accept. L3 (anchored) is the only level
+  # that implies an allow decision; a deny still fails at any level.
+  REQUIRED_LEVEL: L3
 
 jobs:
   gate:
@@ -189,11 +192,12 @@ jobs:
       - uses: actions/checkout@v4
       # Pin the verifier to an exact core commit, like any dependency.
       # Run it from a checkout: the CLI resolves its core schemas from
-      # the repository tree.
+      # the repository tree. This commit adds `makoto report level`
+      # (makoto-project/makoto#5); move the pin to the merged release.
       - uses: actions/checkout@v4
         with:
           repository: makoto-project/makoto
-          ref: 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+          ref: 731c5c9e3dc59161bd797de70d1d478115bb4c8c
           path: .makoto-core
           persist-credentials: false
       - uses: astral-sh/setup-uv@v6
@@ -217,6 +221,8 @@ jobs:
           status=0
           verify --json &gt; makoto-report.json || status=$?
           verify || true
+          uv run --project .makoto-core makoto report level makoto-report.json \
+            --require "$REQUIRED_LEVEL" || status=1
           exit "$status"
       - name: Keep the verification report
         if: always()
@@ -234,6 +240,7 @@ jobs:
       - name: Refresh the postmortem evidence index
         run: echo "replace with your existing step"</code></pre>
 <p><a href="makoto-gate.yml">Download makoto-gate.yml</a>.</p>
+<p>The gate also requires an assurance level. After writing the report it runs <code>makoto report level --require "$REQUIRED_LEVEL"</code>; this workflow requires <a href="/levels/">L3</a>, the only level that implies an allow decision.</p>
 <h3>What the receiver requires of every handoff</h3>
 <p>The receiver trusts one handoff key and requires the manifest, head, and final artifact to match its own pinned expectations.</p>
 <pre><code class="language-bash">$ jq '{handoff: .handoff | {authorizedKeyIds, requireExpectedManifest, requireExpectedHead, requireExpectedArtifacts}}' receiver/policy.json
@@ -372,6 +379,16 @@ $ echo $?
     }
   ]
 }</code></pre>
+<h3>The assurance level it reaches</h3>
+<p>The edited record's signature fails, so it reaches <strong>no level</strong>.</p>
+<pre><code class="language-bash">$ makoto report level makoto-report.edited-signed-metadata.json --require L3
+FAIL        L1 Provenance is authentic: signatures fail
+FAIL        L2 Provenance is authorized and complete: authorization-thresholds fail, authorization fail, graph skipped, roots-and-heads skipped, completeness-anchor fail, artifact-bytes skipped, artifact-profiles skipped
+FAIL        L3 Provenance is anchored: decision deny
+LEVEL       none
+REQUIRED    L3 not met
+$ echo $?
+1</code></pre>
 <p><a href="/demos/v0.2-end-to-end/artifacts/reports/edited-signed-metadata.json">Open the complete edited-signed-metadata report</a>.</p>
 <h3>Edited payload under an old index entry</h3>
 <p>The verifier recomputes every statement digest from the decoded payload before trusting the index. <code>index-payloads</code> fails with <code>E_STATEMENT_DIGEST</code> as the primary error. Because the edited statement is no longer the head the manifest signed, the verifier also reports the required final-artifact profile as absent from that head.</p>
@@ -504,6 +521,16 @@ $ echo $?
     }
   ]
 }</code></pre>
+<h3>The assurance level it reaches</h3>
+<p>The index no longer matches the payload, so <code>index-payloads</code> fails and the bundle reaches <strong>no level</strong>.</p>
+<pre><code class="language-bash">$ makoto report level makoto-report.statement-digest-mismatch.json --require L3
+FAIL        L1 Provenance is authentic: index-payloads fail
+FAIL        L2 Provenance is authorized and complete: graph skipped, roots-and-heads skipped, completeness-anchor fail, artifact-bytes skipped, artifact-profiles fail
+FAIL        L3 Provenance is anchored: decision deny
+LEVEL       none
+REQUIRED    L3 not met
+$ echo $?
+1</code></pre>
 <p><a href="/demos/v0.2-end-to-end/artifacts/reports/statement-digest-mismatch.json">Open the complete statement-digest-mismatch report</a>.</p>
 </div></li>
 </ol>
