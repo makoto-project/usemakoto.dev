@@ -204,8 +204,24 @@ def test_validation_and_language_recipes_are_substantive_and_truthful() -> None:
     assert "nonzero process status" in go
 
 
-def test_mutable_latest_schema_alias_is_not_deployed() -> None:
-    assert not (check_site.ROOT / "schema/latest.json").exists()
+def test_latest_schema_alias_is_a_labelled_pointer_not_an_identifier() -> None:
+    # Section 17: the alias MAY remain for humans, and documentation MUST warn it
+    # is not an immutable protocol identifier.
+    warning = "not an immutable protocol identifier"
+    latest = check_site.ROOT / "schema/latest.json"
+    pointer = json.loads(latest.read_text(encoding="utf-8"))
+    catalog = check_site.ROOT / "schema/v0.2/catalog.json"
+    pin = json.loads((check_site.ROOT / "schema/core-candidate.json").read_text(encoding="utf-8"))
+
+    assert "$id" not in pointer and "$schema" not in pointer
+    assert (
+        pointer["catalog"]["digest"]["sha256"] == hashlib.sha256(catalog.read_bytes()).hexdigest()
+    )
+    assert warning in pointer["note"]
+    assert all(entry["path"] != "/schema/latest.json" for entry in pin["schemas"])
+    for relative in ("spec/index.html", "spec/schemas/index.html"):
+        content = (check_site.ROOT / relative).read_text(encoding="utf-8")
+        assert 'href="/schema/latest.json"' in content and warning in content, relative
 
 
 def test_integration_field_notes_share_current_shell_and_status_boundary() -> None:
@@ -220,10 +236,7 @@ def test_integration_field_notes_share_current_shell_and_status_boundary() -> No
 def test_current_integrations_reject_obsolete_protocol_constructs() -> None:
     for relative in check_site.CURRENT_INTEGRATION_PAGES:
         content = (check_site.ROOT / relative).read_text(encoding="utf-8")
-        assert all(marker not in content for marker in check_site.STALE_INTEGRATION_MARKERS), (
-            relative
-        )
-        assert re.search(r"\blevel\s*=", content, flags=re.IGNORECASE) is None, relative
+        assert check_site.stale_integration_markers(content) == [], relative
 
 
 def test_assurance_model_does_not_publish_numbered_security_levels() -> None:
@@ -259,20 +272,147 @@ def test_narrative_pages_have_no_visible_version_labels() -> None:
         ), relative
 
 
-def test_html_does_not_reference_retired_protocol_version() -> None:
+def test_html_references_retired_protocol_version_only_where_required() -> None:
     for path in sorted(check_site.ROOT.rglob("*.html")):
+        relative = path.relative_to(check_site.ROOT).as_posix()
         content = path.read_text(encoding="utf-8", errors="replace")
-        assert re.search(r"v0\.1", content, flags=re.IGNORECASE) is None, path.relative_to(
-            check_site.ROOT
-        )
+        assert check_site.retired_version_errors(relative, content) == [], relative
+
+
+def test_superseded_pages_remain_published_and_labelled() -> None:
+    for relative in check_site.SUPERSEDED_FORMAT_PAGES:
+        content = (check_site.ROOT / relative).read_text(encoding="utf-8")
+        assert 'http-equiv="refresh"' not in content, relative
+        assert len(content) > 20_000, relative
+
+
+# Section 8.3: each level is a fixed, cumulative set of report checks.
+LEVEL_CHECKS = {
+    "spec/l1-requirements.html": (
+        "load-safely",
+        "parse-strictly",
+        "index-payloads",
+        "core-schemas",
+        "signatures",
+    ),
+    "spec/l2-requirements.html": (
+        "authorization-thresholds",
+        "authorization",
+        "graph",
+        "roots-and-heads",
+        "completeness-anchor",
+        "artifact-bytes",
+        "metadata-profiles",
+        "graph-dependency-artifacts",
+        "artifact-profiles",
+    ),
+    "spec/l3-requirements.html": ("freshness-anchors",),
+}
+
+
+def test_level_pages_document_current_levels_not_superseded_history() -> None:
+    assert set(LEVEL_CHECKS) == set(check_site.LEVEL_PAGES)
+    hub = (check_site.ROOT / "spec/index.html").read_text(encoding="utf-8")
+    assert 'id="levels"' in hub and "superseded" not in hub.casefold()
+    for relative, checks in LEVEL_CHECKS.items():
+        content = (check_site.ROOT / relative).read_text(encoding="utf-8")
+        assert relative not in check_site.TECHNICAL_VERSION_PAGES
+        assert "superseded" not in content.casefold(), relative
+        assert "historical" not in content.casefold(), relative
+        assert f'href="/{relative}"' in hub, relative
+        for check in checks:
+            assert f"<code>{check}</code>" in content, (relative, check)
+    l3 = (check_site.ROOT / "spec/l3-requirements.html").read_text(encoding="utf-8")
+    assert "<code>allow</code>" in l3 and "allowReplayableHandoff" in l3
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "<p>Require L1, L2, or L3 before accepting a handoff.</p>",
+        'report = assurance_level(report); assert report["level"] == "L2"',
+        'result = check(level="L3")',
+        '<code>level=</code><span>"L1"</span>',
+        "makoto report level report.json --require L3",
+        "from makoto.levels import assurance_level",
+        '{"decision": "allow", "level": "L3", "levels": []}',
+    ],
+)
+def test_current_string_levels_pass_the_retired_level_guards(content: str) -> None:
+    assert check_site.stale_integration_markers(content) == []
+    assert all(re.search(pattern, content) is None for pattern in check_site.STALE_JSON_PATTERNS)
+    assert check_site.retired_version_errors("integrations/index.html", content) == []
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "MakotoResult(level=2)",
+        'makoto_callback(level=<span class="yaml-number">2</span>)',
+        "@attest.origin(LEVEL = '3')",
+        'transforms: { "makoto.level": 2 }',
+    ],
+)
+def test_retired_numeric_levels_are_still_rejected(content: str) -> None:
+    assert check_site.stale_integration_markers(content) != []
+
+
+@pytest.mark.parametrize("content", ['{"level": 2}', '{"makotoLevel": "L2"}'])
+def test_retired_numeric_json_levels_are_still_rejected(content: str) -> None:
+    assert any(re.search(pattern, content) for pattern in check_site.STALE_JSON_PATTERNS)
+
+
+BANNER = (
+    '<div class="superseded-banner"><p><strong>Historical v0.1 material.</strong> '
+    "It is not wire-compatible with the current protocol.</p></div>"
+)
+
+
+@pytest.mark.parametrize(
+    ("relative", "content", "expected"),
+    [
+        ("index.html", "<p>See v0.1.</p>", "retired protocol version remains in HTML"),
+        ("spec/index.html", "<a href='/schema/V0.1.json'>x</a>", "retired protocol version"),
+        ("spec/signature-guide.html", "<p>Guide.</p>", "no longer names the retired version"),
+        ("spec/signature-guide.html", "<p>v0.1 guide</p>", "banner is missing or incomplete"),
+        ("spec/l1-requirements.html", "<p>v0.1 levels</p>", "retired protocol version remains"),
+        (
+            "spec/signature-guide.html",
+            '<div class="superseded-banner"><p>Historical v0.1 material.</p></div>',
+            "banner is missing or incomplete",
+        ),
+        (
+            "spec/signature-guide.html",
+            (
+                '<div class="superseded-banner"><p>Old.</p></div>'
+                "<p>Historical v0.1 material. not wire-compatible</p>"
+            ),
+            "banner is missing or incomplete",
+        ),
+    ],
+)
+def test_retired_version_rule_rejects_regressions(
+    relative: str, content: str, expected: str
+) -> None:
+    errors = check_site.retired_version_errors(relative, content)
+
+    assert len(errors) == 1 and expected in errors[0]
+
+
+@pytest.mark.parametrize(
+    ("relative", "content"),
+    [
+        ("index.html", "<p>Current protocol.</p>"),
+        ("spec/signature-guide.html", BANNER),
+        ("spec/text/index.html", "<p>v0.2 is not wire-compatible with v0.1.</p>"),
+    ],
+)
+def test_retired_version_rule_accepts_required_mentions(relative: str, content: str) -> None:
+    assert check_site.retired_version_errors(relative, content) == []
 
 
 def test_deployable_json_does_not_expose_retired_wire_constructs() -> None:
-    patterns = (
-        r"makoto\.dev/(?:origin|transform)/v1",
-        r'"makotoLevel"',
-        r'"level"\s*:\s*[123](?:\s*[,}])',
-    )
+    patterns = check_site.STALE_JSON_PATTERNS
     for path in sorted(check_site.ROOT.rglob("*.json")):
         if ".codex-work" in path.parts:
             continue

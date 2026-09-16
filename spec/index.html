@@ -17,6 +17,25 @@
   <h1>One signed claim per event. One verifiable history at handoff.</h1>
   <p class="lead">Makoto is a source-first protocol for data provenance. It records an origin, appends independently signed transformation statements, lets data teams attach private JSON Schema rules by digest, and gives the recipient enough evidence to verify the history and the bytes it actually received.</p>
   <p class="editorial-note"><strong>Publication status.</strong> The normative text and implementation are available for public review. They are not yet an immutable tagged release.</p>
+  <p class="spec-jump"><a href="/spec/text/">Normative text</a><a href="/spec/schemas/">Hosted schemas</a><a href="/spec/v0.2/spec.md">Raw specification</a><a href="/schema/v0.2/catalog.json">Schema catalog</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a></p>
+
+  <section aria-labelledby="normative"><h2 id="normative">Read the normative text</h2>
+    <p>Everything below this section is orientation. The obligations themselves — encodings, digest and signature rules, the statement model, profile resolution limits, the handoff anchor, the trust-policy grammar, the ordered verification algorithm, and every diagnostic code — are fixed in one document, reproduced in full at <a href="/spec/text/">the normative text</a> and served raw at <a href="/spec/v0.2/spec.md"><code>/spec/v0.2/spec.md</code></a>.</p>
+    <table class="stack-table part-table"><thead><tr><th scope="col">Section</th><th scope="col">What it fixes</th></tr></thead><tbody>
+      <tr><td><a href="/spec/text/#7-terminology">Terminology</a></td><td>The exact words: subject, artifact, statement, predecessor, root, head, closure, handoff.</td></tr>
+      <tr><td><a href="/spec/text/#8-guarantee-model">Guarantee model</a></td><td>What a conforming verifier may conclude, and the list of things it may never conclude.</td></tr>
+      <tr><td><a href="/spec/text/#10-normative-encoding-and-cryptography">Encoding and cryptography</a></td><td>JSON and DSSE rules, canonical digests, accepted signature algorithms, lexical limits.</td></tr>
+      <tr><td><a href="/spec/text/#11-normative-statement-model">Statement model</a></td><td>The in-toto wrapper, the common predicate fields, and both predicate shapes.</td></tr>
+      <tr><td><a href="/spec/text/#12-profiles-and-organizational-extensibility">Profiles</a></td><td>Digest-pinned closures, the bounded schema dialect, offline resolution, and content validation.</td></tr>
+      <tr><td><a href="/spec/text/#13-handoff-manifest-and-bundle">Handoff and bundle</a></td><td>Why completeness needs its own anchor, the manifest payload, and the reference layout.</td></tr>
+      <tr><td><a href="/spec/text/#14-consumer-trust-policy">Trust policy</a></td><td>The receiver-owned grammar: keys, roles, thresholds, freshness, and resource limits.</td></tr>
+      <tr><td><a href="/spec/text/#15-verification-algorithm">Verification algorithm</a></td><td>The ordered steps, the decision rules, and the per-check status contract.</td></tr>
+      <tr><td><a href="/spec/text/#16-reference-cli-and-library-contract">CLI and library contract</a></td><td>Required commands, library operations, output shapes, and exit codes.</td></tr>
+      <tr><td><a href="/spec/text/#17-hosted-schemas-and-versioning">Hosted schemas and versioning</a></td><td>Which URLs are stable, what immutability means here, and how a correction is issued.</td></tr>
+      <tr><td><a href="/spec/text/#22-security-and-privacy-requirements">Security and privacy</a></td><td>Threats in scope, required mitigations, and the privacy model.</td></tr>
+      <tr><td><a href="/spec/text/#appendix-c-stable-diagnostic-trigger-map">Diagnostic map</a></td><td>Every stable error and warning code, and the step that emits it.</td></tr>
+    </tbody></table>
+  </section>
 
   <section aria-labelledby="record"><h2 id="record">The record has four parts</h2>
     <ol class="provenance-spine">
@@ -25,6 +44,38 @@
       <li><strong>Attestations</strong><span>Each statement is carried in a DSSE envelope. Signatures authenticate exact payload bytes; receiver-owned policy separately decides whether those keys were authorized for those claims.</span></li>
       <li><strong>Handoff</strong><span>The sender signs the exact statement set, roots, heads, final artifacts, recipients, and required profiles being transferred. That commitment lets a receiver distinguish a complete handoff from a merely continuous fragment.</span></li>
     </ol>
+  </section>
+
+  <section aria-labelledby="shown"><h2 id="shown">What one record actually looks like</h2>
+    <p>This is the origin statement from the runnable proof, decoded from the signed envelope that ships in the bundle. It is not an illustration written for this page: the digest below is the one the verifier recomputes, and the same bytes are what the transformation that follows names as its predecessor.</p>
+    <figure class="codeblock">
+      <figcaption class="codeblock-head"><span class="codeblock-title">Origin statement, decoded from <a href="/demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json">the published envelope</a></span><span class="codeblock-lang">json</span></figcaption>
+<pre class="language-json"><code class="language-json">{
+  &quot;_type&quot;: &quot;https://in-toto.io/Statement/v1&quot;,
+  &quot;predicate&quot;: {
+    &quot;event&quot;: {
+      &quot;id&quot;: &quot;urn:uuid:11111111-1111-4111-8111-111111111111&quot;,
+      &quot;occurredAt&quot;: &quot;2026-09-16T16:00:00Z&quot;
+    },
+    &quot;profiles&quot;: [],
+    &quot;schemaVersion&quot;: &quot;0.2&quot;,
+    &quot;source&quot;: {
+      &quot;kind&quot;: &quot;urn:makoto:demo:source:synthetic-file&quot;,
+      &quot;uri&quot;: &quot;urn:makoto:demo:v0.2:source:customers-raw&quot;
+    }
+  },
+  &quot;predicateType&quot;: &quot;https://usemakoto.dev/predicate/v0.2/origin&quot;,
+  &quot;subject&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919&quot;
+      },
+      &quot;name&quot;: &quot;customers.raw.json&quot;
+    }
+  ]
+}</code></pre>
+    </figure>
+    <p class="code-note">The envelope around it carries the signature. A signature authenticates these exact payload bytes and says nothing about whether that signer was allowed to make this claim — that is the receiver's policy decision, kept deliberately separate.</p>
   </section>
 
   <section aria-labelledby="objects"><h2 id="objects">Core objects and their jobs</h2>
@@ -56,8 +107,34 @@
     <p><a href="/levels/">Read the assurance model</a> · <a href="/verify/">Follow the verification sequence</a></p>
   </section>
 
-  <section aria-labelledby="resources"><h2 id="resources">Normative resources</h2>
-    <p>The <a href="/schema/v0.2/catalog.json">hosted schema catalog</a> exposes the exact machine-readable resources. The <a href="/spec/v0.2/spec.md">complete normative text</a> fixes algorithms, limits, diagnostics, and conformance fixtures. The <a href="/demos/v0.2-end-to-end/">runnable proof</a> exercises an allowed handoff and seven deterministic denials against the pinned reference implementation.</p>
+  <section aria-labelledby="resources"><h2 id="resources">Machine-readable resources</h2>
+    <p>Thirteen resources are served at stable URLs and pinned by digest in the catalog. <a href="/spec/schemas/">The schema index</a> reproduces every one of them in full, next to its identifier and its catalog digest, so a claim on a page can be checked against the bytes a resolver will actually fetch. <a href="/schema/latest.json">The release pointer</a> resolves the name “latest” to the current catalog, as a convenience for people. It is not an immutable protocol identifier: it moves when a new version is published, so never cite it as a schema <code>$id</code>, a <code>$schema</code>, or a pinned reference. Pin the versioned resource and its digest instead.</p>
+    <table class="stack-table schema-table"><thead><tr><th scope="col">Resource</th><th scope="col">Constrains</th></tr></thead><tbody>
+      <tr><td><a href="/spec/schemas/#statement-schema-json">statement.schema.json</a></td><td>The common wrapper every predicate is carried in.</td></tr>
+      <tr><td><a href="/spec/schemas/#origin-schema-json">origin.schema.json</a></td><td>Source claims, event identity and time, first-observed subjects.</td></tr>
+      <tr><td><a href="/spec/schemas/#transform-schema-json">transform.schema.json</a></td><td>Operation metadata, exact predecessors, inputs, output subjects.</td></tr>
+      <tr><td><a href="/spec/schemas/#envelope-schema-json">envelope.schema.json</a></td><td>The DSSE envelope and its signatures over exact payload bytes.</td></tr>
+      <tr><td><a href="/spec/schemas/#profile-reference-schema-json">profile-reference.schema.json</a></td><td>A profile root plus its complete digest-pinned closure.</td></tr>
+      <tr><td><a href="/spec/schemas/#profile-dialect-schema-json">profile-dialect.schema.json</a></td><td>The bounded schema dialect a private profile may use.</td></tr>
+      <tr><td><a href="/spec/schemas/#handoff-schema-json">handoff.schema.json</a></td><td>Roots, heads, statement set, required profiles, recipients.</td></tr>
+      <tr><td><a href="/spec/schemas/#bundle-schema-json">bundle.schema.json</a></td><td>The on-disk layout a sender actually transfers.</td></tr>
+      <tr><td><a href="/spec/schemas/#dataset-manifest-schema-json">dataset-manifest.schema.json</a></td><td>A partitioned dataset described as one subject.</td></tr>
+      <tr><td><a href="/spec/schemas/#trust-policy-schema-json">trust-policy.schema.json</a></td><td>Receiver-owned keys, roles, thresholds, and limits.</td></tr>
+      <tr><td><a href="/spec/schemas/#verification-report-schema-json">verification-report.schema.json</a></td><td>Per-check outcomes, never one collapsed verdict.</td></tr>
+      <tr><td><a href="/spec/schemas/#catalog-schema-json">catalog.schema.json</a></td><td>The index itself, so a resolver can validate it before trusting it.</td></tr>
+      <tr><td><a href="/spec/schemas/#catalog-json">catalog.json</a></td><td>The published index and the digests everything else is pinned by.</td></tr>
+    </tbody></table>
+    <p>The <a href="/demos/v0.2-end-to-end/">runnable proof</a> exercises an allowed handoff and seven deterministic denials against the pinned reference implementation.</p>
+  </section>
+
+  <section aria-labelledby="levels"><h2 id="levels">Assurance levels</h2>
+    <p>Like SLSA, Makoto names cumulative levels. Each level is a fixed set of verification-report checks, so a receiver can require “L2 or higher” and still read exactly which check fell short. A level is derived from a completed report; deriving it never changes a check, a diagnostic, or the <code>allow</code>/<code>deny</code> decision.</p>
+    <table class="stack-table level-table"><thead><tr><th scope="col">Level</th><th scope="col">Means</th><th scope="col">Adds</th></tr></thead><tbody>
+      <tr><td><a href="/spec/l1-requirements.html">L1</a></td><td>Provenance is authentic</td><td>Well-formed statements signed by configured keys.</td></tr>
+      <tr><td><a href="/spec/l2-requirements.html">L2</a></td><td>Provenance is authorized and complete</td><td>Authorized signers, a continuous graph, a matching signed handoff, and matching received bytes.</td></tr>
+      <tr><td><a href="/spec/l3-requirements.html">L3</a></td><td>Provenance is anchored</td><td>An independent freshness anchor and an <code>allow</code> decision.</td></tr>
+    </tbody></table>
+    <p>No level asserts that a signer told the truth, that a transformation executed as described, or that evidence is unforgeable.</p>
   </section>
 
   <section aria-labelledby="limits"><h2 id="limits">What Makoto does not claim</h2>
@@ -67,5 +144,6 @@
   <section class="community-band" aria-labelledby="review"><span class="kicker">Public technical review</span><h2 id="review">Challenge the protocol with an actual handoff.</h2><p>Bring a source, two transformations, a private rule, a signer boundary, and a receiving decision. The useful contribution is the smallest case that exposes an ambiguity or produces a new conformance fixture.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Open an issue on GitHub</a><a class="button secondary" href="/demos/setup/">Run the proof locally</a></div></section>
 </main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
 </div>
+<script defer src="/assets/prism.js"></script>
 </body>
 </html>
