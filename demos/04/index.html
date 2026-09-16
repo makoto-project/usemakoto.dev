@@ -79,7 +79,435 @@
 <main id="main" class="page wide">
 <span class="kicker">Case 04 · configuration postmortem</span>
 <h1>The config changed on Saturday. Which data did it change?</h1>
-<p class="lead">A service account reduces batch size and Monday throughput collapses. The audit question is not only who changed the file. It is which exact outputs were produced under that configuration.</p>
+<p class="lead">A service account reduces batch size and Monday throughput collapses. The audit question is not only who changed the file. It is which exact outputs were produced under that configuration, and whether the record of what ran is still the record that was signed.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
+
+<section>
+<h2>The problem</h2>
+<p>Monday morning an alert fires: pipeline throughput dropped sharply over the weekend. The configuration shows a batch size nobody remembers setting. Version control says a service account made the change. Chat search finds nothing. Two hours of cross-referencing later, someone finds that an engineer lowered it to debug a memory error and never reverted it.</p>
+<p>A postmortem is only as good as the record it reads. If the record of what an operation did can be edited after the fact, whether to tidy it up or to cover a mistake, the investigation reconstructs a history that never happened.</p>
+<p>The runnable fixture tests exactly that. After the reference handoff is signed, the recorded operation of the final step is rewritten. One variant ships the edited statement with its original signature. The other edits the payload in place, leaving the bundle index still claiming the original statement digest.</p>
+</section>
+
+<ol class="setup-sequence">
+<li><div>
+<h2>The raw example</h2>
+<p>This is the signed record of the final step: what operation ran, when, and exactly which input bytes and predecessor statement it consumed.</p>
+<pre><code class="language-bash">$ statement() { b=handoffs/$1/bundle; d=$(jq -r '.artifacts[0].statementDigest.sha256' $b/bundle.json); jq -r .payload $b/attestations/$d.dsse.json | base64 -d; }
+$ statement positive | jq '.predicate | {operation, event, inputs}'
+{
+  "operation": {
+    "name": "Remove direct identifiers and bucket ages",
+    "type": "urn:makoto:demo:operation:public-safe"
+  },
+  "event": {
+    "id": "urn:uuid:33333333-3333-4333-8333-333333333333",
+    "occurredAt": "2026-09-16T16:00:00Z"
+  },
+  "inputs": [
+    {
+      "digest": {
+        "sha256": "421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8"
+      },
+      "name": "normalized",
+      "provenance": {
+        "statementDigest": {
+          "sha256": "1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848"
+        },
+        "subjectName": "customers.normalized.json"
+      }
+    }
+  ]
+}</code></pre>
+</div></li>
+
+<li><div>
+<h2>How it failed</h2>
+<p><strong>Variant one, an edited record.</strong> The operation name is rewritten. The signature is copied unchanged, so the envelope still looks signed.</p>
+<p><strong>Variant two, an edited payload under an old index entry.</strong> The same edit is written into the envelope file in place. The bundle index still names the file by the original statement digest, <code>962be717…</code>, but the bytes inside now hash to <code>e03d959d…</code>.</p>
+<pre><code class="language-bash">$ statement() { b=handoffs/$1/bundle; d=$(jq -r '.artifacts[0].statementDigest.sha256' $b/bundle.json); jq -r .payload $b/attestations/$d.dsse.json | base64 -d; }
+$ envelope() { b=handoffs/$1/bundle; d=$(jq -r '.artifacts[0].statementDigest.sha256' $b/bundle.json); cat $b/attestations/$d.dsse.json; }
+$ diff &lt;(statement positive | jq .predicate.operation) &lt;(statement edited-signed-metadata | jq .predicate.operation)
+2c2
+&lt;   "name": "Remove direct identifiers and bucket ages",
+---
+&gt;   "name": "Attacker-edited metadata",
+$ diff &lt;(envelope positive | jq .signatures) &lt;(envelope edited-signed-metadata | jq .signatures) &amp;&amp; echo 'signature bytes: unchanged'
+signature bytes: unchanged
+$ b=handoffs/statement-digest-mismatch/bundle
+$ jq -r '.attestations[2].statementDigest.sha256' $b/bundle.json
+962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+$ jq -r .payload $b/$(jq -r '.attestations[2].path' $b/bundle.json) | base64 -d | shasum -a 256
+e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932  -</code></pre>
+</div></li>
+
+<li><div>
+<h2>Put Makoto in the path</h2>
+<p>History is re-verified on a schedule, not only when it is first received. A nightly job re-runs the gate over every archived handoff, so an after-the-fact edit is found the next morning instead of in the middle of the next incident.</p>
+<h3>The workflow</h3>
+<pre><code class="language-yaml"># Nightly re-verification of archived handoffs. An edit to the
+# recorded history after the fact fails here instead of in the
+# middle of the next postmortem.
+#
+# Copy to .github/workflows/makoto-gate.yml in the repository that
+# receives handoffs. Layout it expects:
+#   handoffs/&lt;name&gt;/bundle/                  what the sender transferred
+#   receiver/policy.json                     receiver-owned trust policy
+#   receiver/catalog.json, receiver/resources/  pinned private schemas
+#   receiver/expected/&lt;name&gt;.artifact.json   expected final artifact
+name: Makoto nightly archive re-verification
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: read
+
+env:
+  # Pinned so these fixtures replay identically. Delete this line to
+  # evaluate against the runner clock.
+  EVALUATION_TIME: "2026-09-16T16:00:00Z"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The sender publishes manifest and head digests out of band.
+          # The receiver pins them here, never inside the bundle.
+          - handoff: edited-signed-metadata
+            manifest: sha256:68ad42d12c69eccb2ba40b3323eaedde67597ee237d02574c48d9497a1cf914c
+            head: sha256:e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932
+          - handoff: statement-digest-mismatch
+            manifest: sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+            head: sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+    steps:
+      - uses: actions/checkout@v4
+      # Pin the verifier to an exact core commit, like any dependency.
+      # Run it from a checkout: the CLI resolves its core schemas from
+      # the repository tree.
+      - uses: actions/checkout@v4
+        with:
+          repository: makoto-project/makoto
+          ref: 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+          path: .makoto-core
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Verify the received bundle
+        id: verify
+        shell: bash
+        env:
+          HANDOFF: ${{ matrix.handoff }}
+          EXPECTED_MANIFEST: ${{ matrix.manifest }}
+          EXPECTED_HEAD: ${{ matrix.head }}
+        run: |
+          verify() {
+            uv run --project .makoto-core makoto verify bundle "handoffs/$HANDOFF/bundle" \
+              --policy receiver/policy.json \
+              --schema-catalog receiver/catalog.json \
+              --expected-manifest "$EXPECTED_MANIFEST" \
+              --expected-head "$EXPECTED_HEAD" \
+              --expected-artifact "receiver/expected/$HANDOFF.artifact.json" \
+              --evaluation-time "$EVALUATION_TIME" "$@"
+          }
+          status=0
+          verify --json &gt; makoto-report.json || status=$?
+          verify || true
+          exit "$status"
+      - name: Keep the verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: makoto-report-${{ matrix.handoff }}
+          path: makoto-report.json
+
+  postmortem-index:
+    # Runs only when every handoff in the matrix was allowed.
+    needs: gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Refresh the postmortem evidence index
+        run: echo "replace with your existing step"</code></pre>
+<p><a href="makoto-gate.yml">Download makoto-gate.yml</a>.</p>
+<h3>What the receiver requires of every handoff</h3>
+<p>The receiver trusts one handoff key and requires the manifest, head, and final artifact to match its own pinned expectations.</p>
+<pre><code class="language-bash">$ jq '{handoff: .handoff | {authorizedKeyIds, requireExpectedManifest, requireExpectedHead, requireExpectedArtifacts}}' receiver/policy.json
+{
+  "handoff": {
+    "authorizedKeyIds": [
+      "sha256:d016df3d83373617c06b5e1d6359caa06eeba8b3af2c7077234f109f2194516c"
+    ],
+    "requireExpectedManifest": true,
+    "requireExpectedHead": true,
+    "requireExpectedArtifacts": true
+  }
+}</code></pre>
+</div></li>
+
+<li><div>
+<h2>The output that catches it</h2>
+<h3>Edited record</h3>
+<p>The copied signature does not verify over the edited payload, so <code>signatures</code> fails and no rule can authorize the statement.</p>
+<pre><code class="language-bash">$ makoto verify bundle handoffs/edited-signed-metadata/bundle \
+  --policy receiver/policy.json \
+  --schema-catalog receiver/catalog.json \
+  --expected-manifest sha256:68ad42d12c69eccb2ba40b3323eaedde67597ee237d02574c48d9497a1cf914c \
+  --expected-head sha256:e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932 \
+  --expected-artifact receiver/expected/edited-signed-metadata.artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+FAIL        signatures
+FAIL        authorization-thresholds
+PASS        metadata-profiles
+FAIL        authorization
+PASS        graph-dependency-artifacts
+SKIPPED     graph
+SKIPPED     roots-and-heads
+FAIL        completeness-anchor
+PASS        freshness-anchors
+SKIPPED     artifact-bytes
+SKIPPED     artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:68ad42d12c69eccb2ba40b3323eaedde67597ee237d02574c48d9497a1cf914c
+E_SIGNATURE_INVALID: signature verification failed
+E_SIGNER_UNAUTHORIZED: no matching policy rule met its signature threshold
+E_MANIFEST_SET: final artifact is not an exact terminal subject of its declared head
+E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle index
+$ echo $?
+1</code></pre>
+<p class="editorial-note">Output of <code>jq &#x27;{decision, primaryError, errors, notPassed: [.checks[] | select(.status != &quot;pass&quot;) | {id, status}]}&#x27; makoto-report.edited-signed-metadata.json</code> against the report the workflow step wrote.</p><pre><code class="language-json">{
+  "decision": "deny",
+  "primaryError": "E_SIGNATURE_INVALID",
+  "errors": [
+    {
+      "causedByCheck": "signatures",
+      "code": "E_SIGNATURE_INVALID",
+      "context": {
+        "keyid": "sha256:8cef065b7af83669150b7d32704d3d3e75c3e9aee0d4f6740544c68e81b377aa",
+        "statementDigest": {
+          "sha256": "e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932"
+        }
+      },
+      "message": "signature verification failed",
+      "step": 5
+    },
+    {
+      "causedByCheck": "authorization-thresholds",
+      "code": "E_SIGNER_UNAUTHORIZED",
+      "context": {
+        "statementDigest": {
+          "sha256": "e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932"
+        }
+      },
+      "message": "no matching policy rule met its signature threshold",
+      "step": 6
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "artifactDigest": {
+          "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+        },
+        "bundleId": "urn:makoto:demo:negative:edited-signed-metadata",
+        "head": {
+          "sha256": "e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932"
+        },
+        "subjectName": "customers.public.json"
+      },
+      "message": "final artifact is not an exact terminal subject of its declared head",
+      "step": 11
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "bundleId": "urn:makoto:demo:negative:edited-signed-metadata"
+      },
+      "message": "signed manifest sets do not equal the verified graph and bundle index",
+      "step": 11
+    }
+  ],
+  "notPassed": [
+    {
+      "id": "signatures",
+      "status": "fail"
+    },
+    {
+      "id": "authorization-thresholds",
+      "status": "fail"
+    },
+    {
+      "id": "authorization",
+      "status": "fail"
+    },
+    {
+      "id": "graph",
+      "status": "skipped"
+    },
+    {
+      "id": "roots-and-heads",
+      "status": "skipped"
+    },
+    {
+      "id": "completeness-anchor",
+      "status": "fail"
+    },
+    {
+      "id": "artifact-bytes",
+      "status": "skipped"
+    },
+    {
+      "id": "artifact-profiles",
+      "status": "skipped"
+    }
+  ]
+}</code></pre>
+<p><a href="/demos/v0.2-end-to-end/artifacts/reports/edited-signed-metadata.json">Open the complete edited-signed-metadata report</a>.</p>
+<h3>Edited payload under an old index entry</h3>
+<p>The verifier recomputes every statement digest from the decoded payload before trusting the index. <code>index-payloads</code> fails with <code>E_STATEMENT_DIGEST</code> as the primary error. Because the edited statement is no longer the head the manifest signed, the verifier also reports the required final-artifact profile as absent from that head.</p>
+<pre><code class="language-bash">$ makoto verify bundle handoffs/statement-digest-mismatch/bundle \
+  --policy receiver/policy.json \
+  --schema-catalog receiver/catalog.json \
+  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
+  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-artifact receiver/expected/statement-digest-mismatch.artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z
+PASS        load-safely
+PASS        parse-strictly
+FAIL        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+SKIPPED     graph
+SKIPPED     roots-and-heads
+FAIL        completeness-anchor
+PASS        freshness-anchors
+SKIPPED     artifact-bytes
+FAIL        artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+E_STATEMENT_DIGEST: indexed statement digest differs from decoded payload bytes
+E_MANIFEST_SET: final artifact is not an exact terminal subject of its declared head
+E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle index
+E_REQUIRED_PROFILE_MISSING: required final-artifact profile is absent from its signed head
+E_REQUIRED_PROFILE_MISSING: required final-artifact profile is absent from its signed head
+$ echo $?
+1</code></pre>
+<p class="editorial-note">Output of <code>jq &#x27;{decision, primaryError, errors, notPassed: [.checks[] | select(.status != &quot;pass&quot;) | {id, status}]}&#x27; makoto-report.statement-digest-mismatch.json</code> against the report the workflow step wrote.</p><pre><code class="language-json">{
+  "decision": "deny",
+  "primaryError": "E_STATEMENT_DIGEST",
+  "errors": [
+    {
+      "causedByCheck": "index-payloads",
+      "code": "E_STATEMENT_DIGEST",
+      "context": {
+        "declared": {
+          "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+        },
+        "statementDigest": {
+          "sha256": "e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932"
+        }
+      },
+      "message": "indexed statement digest differs from decoded payload bytes",
+      "step": 3
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "artifactDigest": {
+          "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+        },
+        "bundleId": "urn:uuid:55555555-5555-4555-8555-555555555555",
+        "head": {
+          "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+        },
+        "subjectName": "customers.public.json"
+      },
+      "message": "final artifact is not an exact terminal subject of its declared head",
+      "step": 11
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "bundleId": "urn:uuid:55555555-5555-4555-8555-555555555555"
+      },
+      "message": "signed manifest sets do not equal the verified graph and bundle index",
+      "step": 11
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_REQUIRED_PROFILE_MISSING",
+      "context": {
+        "profileDigest": {
+          "sha256": "68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb"
+        },
+        "profileId": "https://schemas.example.internal/makoto/customer-public-v1.schema.json",
+        "subjectName": "customers.public.json"
+      },
+      "message": "required final-artifact profile is absent from its signed head",
+      "step": 11
+    },
+    {
+      "causedByCheck": "artifact-profiles",
+      "code": "E_REQUIRED_PROFILE_MISSING",
+      "context": {
+        "profileDigest": {
+          "sha256": "68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb"
+        },
+        "profileId": "https://schemas.example.internal/makoto/customer-public-v1.schema.json",
+        "subjectName": "customers.public.json"
+      },
+      "message": "required final-artifact profile is absent from its signed head",
+      "step": 13
+    }
+  ],
+  "notPassed": [
+    {
+      "id": "index-payloads",
+      "status": "fail"
+    },
+    {
+      "id": "graph",
+      "status": "skipped"
+    },
+    {
+      "id": "roots-and-heads",
+      "status": "skipped"
+    },
+    {
+      "id": "completeness-anchor",
+      "status": "fail"
+    },
+    {
+      "id": "artifact-bytes",
+      "status": "skipped"
+    },
+    {
+      "id": "artifact-profiles",
+      "status": "fail"
+    }
+  ]
+}</code></pre>
+<p><a href="/demos/v0.2-end-to-end/artifacts/reports/statement-digest-mismatch.json">Open the complete statement-digest-mismatch report</a>.</p>
+</div></li>
+</ol>
+
 <section>
 <h2>Model configuration as transformation evidence</h2>
 <ol class="provenance-spine">
@@ -105,7 +533,19 @@
 <h2>What remains outside Makoto</h2>
 <p>Change approval, human intent, alerting, and root-cause judgment remain separate systems. Makoto supplies attributable, tamper-evident claims about artifacts; it does not decide whether the configuration was wise.</p>
 </section>
-<section><h2>Concrete postmortem record</h2><table><tbody><tr><th>Before</th><td>Configuration artifact A is bound to outputs produced under the earlier settings.</td></tr><tr><th>Change</th><td>Configuration artifact B is committed; the next transformation statement names its digest and authorized workload signer.</td></tr><tr><th>Blast radius</th><td>Traverse descendants produced after B and before corrective artifact C.</td></tr><tr><th>Finding</th><td>The report identifies attributable claims and affected bytes without pretending to know whether the human change was justified.</td></tr></tbody></table><p>Configuration belongs in the evidence as an exact input artifact, not merely a free-text note or ticket URL.</p></section>
+<section><h2>Concrete postmortem record</h2><table><tbody><tr><th>Before</th><td>Configuration artifact A is bound to outputs produced under the earlier settings.</td></tr><tr><th>Change</th><td>Configuration artifact B is committed; the next transformation statement names its digest and authorized workload signer.</td></tr><tr><th>Blast radius</th><td>Traverse descendants produced after B and before corrective artifact C.</td></tr><tr><th>Finding</th><td>The report identifies attributable claims and affected bytes without pretending to know whether the human change was justified.</td></tr></tbody></table><p>Configuration belongs in the evidence as an exact input artifact, not merely a free-text note or ticket URL. The reference fixture does not yet bind a configuration file as an input; the tamper checks shown above apply unchanged when it does.</p></section>
+
+<section>
+<h2>What else this handles</h2>
+<ul>
+<li>Feature-flag changes that cause regressions in production.</li>
+<li>Connection-pool or retry settings modified during on-call firefighting.</li>
+<li>Infrastructure-as-code drift, where deployed state diverges from the recorded plan.</li>
+<li>Audits that require a complete, unedited history of configuration changes.</li>
+</ul>
+<p class="callout"><strong>Key insight.</strong> Configuration is data too. A signed record makes the postmortem fast, and re-verifying that record makes it honest: an edit to history fails verification instead of becoming the history.</p>
+</section>
+
 <section class="community-band">
 <span class="kicker">Make the postmortem reproducible</span>
 <h2>Attach the exact configuration and output bytes to the transformation claim.</h2>
@@ -114,6 +554,11 @@
 <a class="button secondary" href="/examples/#postmortem">Read the casebook entry</a>
 </div>
 </section>
+
+<nav class="actions" aria-label="Casebook sequence">
+<a class="button secondary" href="/demos/03/">← Case 03: dataset release</a>
+<a class="button secondary" href="/demos/05/">Case 05: AI dataset gate →</a>
+</nav>
 </main>
 <footer class="footer">
 <div class="footer-inner">Makoto demo · Configuration postmortem · Claim-to-artifact impact</div>

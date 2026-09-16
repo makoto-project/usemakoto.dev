@@ -1,0 +1,88 @@
+# Render-safety gate for source files. The receiver policy only
+# authorizes origin claims that carry a passing render-safety scan.
+#
+# Copy to .github/workflows/makoto-gate.yml in the repository that
+# receives handoffs. Layout it expects:
+#   handoffs/<name>/bundle/                  what the sender transferred
+#   receiver/policy.json                     receiver-owned trust policy
+#   receiver/catalog.json, receiver/resources/  pinned private schemas
+#   receiver/expected/<name>.artifact.json   expected final artifact
+name: Makoto render-safety gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "handoffs/**"
+
+permissions:
+  contents: read
+
+env:
+  # Pinned so these fixtures replay identically. Delete this line to
+  # evaluate against the runner clock.
+  EVALUATION_TIME: "2026-09-16T16:00:00Z"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The sender publishes manifest and head digests out of band.
+          # The receiver pins them here, never inside the bundle.
+          - handoff: safe-visible
+            manifest: sha256:a1020fcb3d691dbbad9d6567c1d33bea36b96a4b99c6282e8958d59472bdb1f6
+            head: sha256:44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3
+          - handoff: flagged-invisible
+            manifest: sha256:ad9c3c7abc51c1dee1fb3939e9ef23c4345203bd1c96a3f2c5ccdff74737e89e
+            head: sha256:6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274
+    steps:
+      - uses: actions/checkout@v4
+      # Pin the verifier to an exact core commit, like any dependency.
+      # Run it from a checkout: the CLI resolves its core schemas from
+      # the repository tree.
+      - uses: actions/checkout@v4
+        with:
+          repository: makoto-project/makoto
+          ref: 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+          path: .makoto-core
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Verify the received bundle
+        id: verify
+        shell: bash
+        env:
+          HANDOFF: ${{ matrix.handoff }}
+          EXPECTED_MANIFEST: ${{ matrix.manifest }}
+          EXPECTED_HEAD: ${{ matrix.head }}
+        run: |
+          verify() {
+            uv run --project .makoto-core makoto verify bundle "handoffs/$HANDOFF/bundle" \
+              --policy receiver/policy.json \
+              --schema-catalog receiver/catalog.json \
+              --expected-manifest "$EXPECTED_MANIFEST" \
+              --expected-head "$EXPECTED_HEAD" \
+              --expected-artifact "receiver/expected/$HANDOFF.artifact.json" \
+              --evaluation-time "$EVALUATION_TIME" "$@"
+          }
+          status=0
+          verify --json > makoto-report.json || status=$?
+          verify || true
+          exit "$status"
+      - name: Keep the verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: makoto-report-${{ matrix.handoff }}
+          path: makoto-report.json
+
+  merge-check:
+    # Runs only when every handoff in the matrix was allowed.
+    needs: gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Report the render-safety result
+        run: echo "replace with your existing step"
