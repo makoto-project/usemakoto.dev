@@ -1,0 +1,24 @@
+{
+  "$schema": "https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json",
+  "$id": "https://schemas.example.internal/makoto/render-safe-origin-v1.schema.json",
+  "type": "object",
+  "required": ["schemaVersion", "event", "source", "extensions"],
+  "properties": {
+    "schemaVersion": { "const": "0.2" },
+    "extensions": {
+      "type": "object",
+      "required": ["urn:makoto:demo:render-safe"],
+      "properties": {
+        "urn:makoto:demo:render-safe": {
+          "type": "object",
+          "required": ["scanner", "normalization", "contains_invisible_codepoints", "verdict"],
+          "properties": {
+            "normalization": { "const": "NFC" },
+            "contains_invisible_codepoints": { "const": false },
+            "verdict": { "const": "pass" }
+          }
+        }
+      }
+    }
+  }
+}

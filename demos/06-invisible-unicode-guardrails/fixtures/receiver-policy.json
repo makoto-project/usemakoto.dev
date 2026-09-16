@@ -1,0 +1,79 @@
+{
+  "handoff": {
+    "allowReplayableHandoff": false,
+    "authorizedKeyIds": [
+      "sha256:43cc820f3d2c48aa0c055b49ce8e7de4cdb471325978662e5ed5e7befe7f2ae2"
+    ],
+    "minimumSignatures": 1,
+    "requireExpectedArtifacts": true,
+    "requireExpectedHead": true,
+    "requireExpectedManifest": true,
+    "requireNonce": false,
+    "requireRecipient": false
+  },
+  "keys": {
+    "sha256:43cc820f3d2c48aa0c055b49ce8e7de4cdb471325978662e5ed5e7befe7f2ae2": {
+      "label": "insecure demo-only handoff key",
+      "publicKey": "MCowBQYDK2VwAyEACiujJLmEu3mm/CKkm8mi175hk6+N1o57wYgloa6jUew=",
+      "type": "ed25519"
+    },
+    "sha256:472887aa21e3c36ab999ea1661e03cf232fca7957f1e502698216a8bf1185a01": {
+      "label": "insecure demo-only scanner key",
+      "publicKey": "MCowBQYDK2VwAyEA5mo16jTibJ/l8BsufRSi1UW4d46GiGn/7ycfUOAgSsY=",
+      "type": "ed25519"
+    }
+  },
+  "limits": {
+    "maxAggregateArtifactBytes": 53687091200,
+    "maxArtifactBytesPerFile": 10737418240,
+    "maxArtifactValidationBytes": 104857600,
+    "maxBundleFiles": 10000,
+    "maxDiagnostics": 10000,
+    "maxJsonDepth": 128,
+    "maxJsonExponentMagnitude": 10000,
+    "maxJsonNumberChars": 1024,
+    "maxMetadataBytes": 104857600,
+    "maxNdjsonLineBytes": 1048576,
+    "maxProfileEvaluations": 10000,
+    "maxRegexLength": 4096,
+    "maxReportBytes": 67108864,
+    "maxReportRecords": 20000,
+    "maxSchemaBytes": 2097152,
+    "maxSchemaEvaluationDepth": 256,
+    "maxSchemaOperations": 10000000,
+    "maxSchemaResources": 256,
+    "maxSignaturesTotal": 10000,
+    "maxSnapshotBytes": 53687091200,
+    "profileEvaluationTimeoutSeconds": 5,
+    "profileWorkerMemoryBytes": 536870912
+  },
+  "requiredProfiles": [],
+  "rules": [
+    {
+      "authorizedKeyIds": [
+        "sha256:472887aa21e3c36ab999ea1661e03cf232fca7957f1e502698216a8bf1185a01"
+      ],
+      "id": "urn:makoto:demo:rule:render-safe-origin",
+      "minimumSignatures": 1,
+      "predicateTypes": [
+        "https://usemakoto.dev/predicate/v0.2/origin"
+      ],
+      "profileConstraints": [
+        {
+          "closureDigest": {
+            "sha256": "14a57a9dbc837c5c904cb7aa4bc9d23e80b4696fa70e9cdd9d6e10add499457c"
+          },
+          "digest": {
+            "sha256": "bd43c68df4621b055f6f2a5d4e5069331206f7fe78a1eda240064259b31ce508"
+          },
+          "id": "https://schemas.example.internal/makoto/render-safe-origin-v1.schema.json",
+          "target": "predicate"
+        }
+      ],
+      "sourceKinds": [
+        "urn:makoto:demo:source:repository-file"
+      ]
+    }
+  ],
+  "version": "0.2"
+}

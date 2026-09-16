@@ -1,0 +1,279 @@
+{
+  "actualHeads": [
+    {
+      "sha256": "6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274"
+    }
+  ],
+  "actualNonce": null,
+  "actualRecipient": "example:review-team",
+  "artifacts": [
+    {
+      "applicableProfileCount": 0,
+      "artifactKind": "ordinary",
+      "digest": {
+        "sha256": "0dba71c75cdeefbbe428436db262721ac91543266c460920d76c2fa55c27d85c"
+      },
+      "digestPrerequisiteChecks": [
+        "completeness-anchor"
+      ],
+      "digestStatus": "skipped",
+      "head": {
+        "sha256": "6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274"
+      },
+      "lifecycleRole": "final",
+      "profilePrerequisiteChecks": [
+        "completeness-anchor"
+      ],
+      "profileStatus": "skipped",
+      "statementDigest": {
+        "sha256": "6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274"
+      },
+      "subjectName": "flagged-invisible.js"
+    }
+  ],
+  "bundleId": "urn:makoto:demo:06:flagged",
+  "checks": [
+    {
+      "id": "load-safely",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "parse-strictly",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "index-payloads",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "core-schemas",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "signatures",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "authorization-thresholds",
+      "prerequisiteChecks": [],
+      "status": "fail"
+    },
+    {
+      "id": "metadata-profiles",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "authorization",
+      "prerequisiteChecks": [],
+      "status": "fail"
+    },
+    {
+      "id": "graph-dependency-artifacts",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "graph",
+      "prerequisiteChecks": [
+        "authorization"
+      ],
+      "status": "skipped"
+    },
+    {
+      "id": "roots-and-heads",
+      "prerequisiteChecks": [
+        "graph"
+      ],
+      "status": "skipped"
+    },
+    {
+      "id": "completeness-anchor",
+      "prerequisiteChecks": [],
+      "status": "fail"
+    },
+    {
+      "id": "freshness-anchors",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "artifact-bytes",
+      "prerequisiteChecks": [
+        "completeness-anchor"
+      ],
+      "status": "skipped"
+    },
+    {
+      "id": "artifact-profiles",
+      "prerequisiteChecks": [
+        "completeness-anchor"
+      ],
+      "status": "skipped"
+    },
+    {
+      "id": "decision",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    }
+  ],
+  "coreCatalogDigest": {
+    "sha256": "298f55040022b6fe7c71e7a37d6ec4a75317d1c0b52a679dcca744cb4a3eaaf3"
+  },
+  "datasetEntries": [],
+  "decision": "deny",
+  "errors": [
+    {
+      "causedByCheck": "authorization-thresholds",
+      "code": "E_SIGNER_UNAUTHORIZED",
+      "context": {
+        "statementDigest": {
+          "sha256": "6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274"
+        }
+      },
+      "message": "no matching policy rule met its signature threshold",
+      "step": 6
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "artifactDigest": {
+          "sha256": "0dba71c75cdeefbbe428436db262721ac91543266c460920d76c2fa55c27d85c"
+        },
+        "bundleId": "urn:makoto:demo:06:flagged",
+        "head": {
+          "sha256": "6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274"
+        },
+        "subjectName": "flagged-invisible.js"
+      },
+      "message": "final artifact is not an exact terminal subject of its declared head",
+      "step": 11
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "bundleId": "urn:makoto:demo:06:flagged"
+      },
+      "message": "signed manifest sets do not equal the verified graph and bundle index",
+      "step": 11
+    }
+  ],
+  "evaluationTime": "2026-09-16T16:00:00Z",
+  "expectedArtifacts": [
+    {
+      "digest": {
+        "sha256": "0dba71c75cdeefbbe428436db262721ac91543266c460920d76c2fa55c27d85c"
+      },
+      "head": {
+        "sha256": "6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274"
+      },
+      "subjectName": "flagged-invisible.js"
+    }
+  ],
+  "expectedHeads": [
+    {
+      "sha256": "6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274"
+    }
+  ],
+  "expectedManifestDigest": {
+    "sha256": "ad9c3c7abc51c1dee1fb3939e9ef23c4345203bd1c96a3f2c5ccdff74737e89e"
+  },
+  "expectedNonce": null,
+  "expectedRecipient": null,
+  "handoff": {
+    "authorization": "pass",
+    "completeness": "fail",
+    "freshnessChecks": {
+      "expected-artifacts": "pass",
+      "expected-heads": "pass",
+      "expected-manifest": "pass",
+      "max-age": "not_checked",
+      "nonce": "not_checked"
+    },
+    "freshnessMethod": "multiple",
+    "freshnessStatus": "pass",
+    "signatures": [
+      {
+        "cryptographic": "pass",
+        "keyKnown": true,
+        "keyid": "sha256:43cc820f3d2c48aa0c055b49ce8e7de4cdb471325978662e5ed5e7befe7f2ae2"
+      }
+    ]
+  },
+  "manifestDigest": {
+    "sha256": "ad9c3c7abc51c1dee1fb3939e9ef23c4345203bd1c96a3f2c5ccdff74737e89e"
+  },
+  "nonceStatus": "not_checked",
+  "policyDigest": {
+    "sha256": "815a77e2d1548eb37f1751818935c22fbee354964712573b3ea793bccf505ed8"
+  },
+  "policyDigestEncoding": "exact-input-bytes",
+  "primaryError": "E_SIGNER_UNAUTHORIZED",
+  "profiles": [],
+  "quarantinedStatements": [],
+  "recipientStatus": "not_checked",
+  "reportTruncated": false,
+  "reportVersion": "0.2",
+  "roots": [],
+  "statements": [
+    {
+      "authorization": "fail",
+      "authorizationPrerequisiteChecks": [],
+      "authorizingRuleIds": [],
+      "candidateRuleIds": [],
+      "coreSchema": "pass",
+      "coreSchemaPrerequisiteChecks": [],
+      "digest": {
+        "sha256": "6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274"
+      },
+      "eventId": "urn:uuid:06000002-0600-4600-8600-060000000002",
+      "graph": "skipped",
+      "graphPrerequisiteChecks": [
+        "authorization"
+      ],
+      "predicateType": "https://usemakoto.dev/predicate/v0.2/origin",
+      "signatures": [
+        {
+          "cryptographic": "pass",
+          "keyKnown": true,
+          "keyid": "sha256:472887aa21e3c36ab999ea1661e03cf232fca7957f1e502698216a8bf1185a01"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "artifactsChecked": 0,
+    "artifactsDeclared": 1,
+    "heads": 0,
+    "historicalMaterialsChecked": 0,
+    "historicalMaterialsDeclared": 0,
+    "manifestSignaturesAuthorized": 1,
+    "manifestSignaturesRequired": 1,
+    "manifestSignaturesValid": 1,
+    "profilesDeclared": 0,
+    "profilesValidated": 0,
+    "quarantinedStatementsTotal": 0,
+    "roots": 0,
+    "signaturesChecked": 2,
+    "signaturesTotal": 2,
+    "signaturesValid": 2,
+    "statementsAuthorized": 0,
+    "statementsReachable": 0,
+    "statementsTotal": 1,
+    "statementsValid": 1
+  },
+  "tool": {
+    "name": "makoto",
+    "version": "0.2.0a0"
+  },
+  "unindexedEnvelopes": [],
+  "unreferencedFiles": [],
+  "warnings": []
+}

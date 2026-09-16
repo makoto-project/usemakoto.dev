@@ -79,7 +79,302 @@
 <main id="main" class="page wide">
 <span class="kicker">Case 01 · poisoned pipeline</span>
 <h1>Find every artifact descended from the bad source.</h1>
-<p class="lead">A corrupted sensor batch contains impossible readings, duplicate rows, and a payload hidden in a text field. The immediate gate matters, but so does the blast radius after the batch has already moved.</p>
+<p class="lead">Bytes change after they were signed. The signatures still check out and the metadata still describes the original. The immediate gate matters, and so does the blast radius once the batch has already moved.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
+
+<section>
+<h2>The problem</h2>
+<p>An ingestion pipeline takes files from partner systems every hour and loads them straight into analytics. Nobody checks where a file came from or whether it changed on the way. The pipeline trusts whatever lands in the drop directory.</p>
+<p>One morning a file slips through that is not the file the producer released. Dashboards absorb it, alerts fire on phantom anomalies, and the team spends days finding the source, because there is no record of who produced the file, which exact bytes they vouched for, or what else was built from it.</p>
+<p>This case runs that failure against the reference customer-data handoff: a source export, two signed transformations, and a signed handoff to a downstream team. After the handoff is signed, one byte is appended to the final artifact.</p>
+</section>
+
+<ol class="setup-sequence">
+<li><div>
+<h2>The raw example</h2>
+<p>This is what the downstream team is supposed to receive: three customer records with direct identifiers removed and ages bucketed. The final signed statement names those exact bytes by SHA-256 digest.</p>
+<pre><code class="language-bash">$ final=artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin
+$ jq . handoffs/positive/bundle/$final
+[
+  {
+    "age_band": "0-17",
+    "customer_id": "2da7dbbb0e3f243b06cb",
+    "marketing_consent": true,
+    "region": "CA"
+  },
+  {
+    "age_band": "25-34",
+    "customer_id": "3fb57f8f4d704855a7aa",
+    "marketing_consent": true,
+    "region": "US"
+  },
+  {
+    "age_band": "65+",
+    "customer_id": "ce76ddf0a0df7f1d0add",
+    "marketing_consent": false,
+    "region": "GB"
+  }
+]
+$ statement() { b=handoffs/$1/bundle; d=$(jq -r '.artifacts[0].statementDigest.sha256' $b/bundle.json); jq -r .payload $b/attestations/$d.dsse.json | base64 -d; }
+$ statement positive | jq .subject
+[
+  {
+    "digest": {
+      "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+    },
+    "name": "customers.public.json"
+  }
+]</code></pre>
+<p>Inspect the <a href="/demos/v0.2-end-to-end/artifacts/data/customers.raw.json">source export</a>, the <a href="/demos/v0.2-end-to-end/artifacts/data/customers.normalized.json">normalized intermediate</a>, and the <a href="/demos/v0.2-end-to-end/artifacts/data/customers.public.json">final public-safe file</a>.</p>
+</div></li>
+
+<li><div>
+<h2>How it failed</h2>
+<p>The poisoned copy differs from the signed file by a single trailing byte. Everything that describes the file is untouched: the signed handoff manifest and all three signed statements are byte-identical to the good bundle. A pipeline that trusts the metadata, or only checks that the signatures are valid, accepts it.</p>
+<pre><code class="language-bash">$ final=artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin
+$ cmp handoffs/positive/bundle/$final handoffs/mutated-final-data/bundle/$final
+cmp: EOF on 'handoffs/positive/bundle/artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin' after byte 291, line 1
+$ tail -c 24 handoffs/mutated-final-data/bundle/$final | od -c | tail -n 3
+0000000    :   f   a   l   s   e   ,   "   r   e   g   i   o   n   "   :
+0000020    "   G   B   "   }   ]  \n   x                                
+0000030
+$ shasum -a 256 handoffs/*/bundle/$final
+08c9a837dc92517fb621d5cafc2d9b54011d5a6e68cd21423b967a9d5612e485  handoffs/mutated-final-data/bundle/artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin
+2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4  handoffs/positive/bundle/artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin
+$ cmp handoffs/positive/bundle/manifest.dsse.json handoffs/mutated-final-data/bundle/manifest.dsse.json &amp;&amp; echo 'signed handoff manifest: byte-identical'
+signed handoff manifest: byte-identical
+$ diff -r handoffs/positive/bundle/attestations handoffs/mutated-final-data/bundle/attestations &amp;&amp; echo 'signed statements: byte-identical'
+signed statements: byte-identical</code></pre>
+<p>The signed digest is <code>2f4fe11d…</code>. The bytes that arrived hash to <code>08c9a837…</code>. Nothing in the bundle says so; only a receiver that hashes what it actually received can tell.</p>
+</div></li>
+
+<li><div>
+<h2>Put Makoto in the path</h2>
+<p>The receiver adds one gate job in front of the load job. It checks out the verifier at a pinned core commit, runs <code>makoto verify bundle</code> against every received handoff, keeps the machine-readable report as a build artifact, and fails the job on any deny. The load job declares <code>needs: gate</code>, so poisoned bytes never reach it.</p>
+<h3>The workflow</h3>
+<pre><code class="language-yaml"># Receiver-side gate for the poisoned-pipeline case. Nothing
+# downstream loads until Makoto allows the exact bytes that arrived.
+#
+# Copy to .github/workflows/makoto-gate.yml in the repository that
+# receives handoffs. Layout it expects:
+#   handoffs/&lt;name&gt;/bundle/                  what the sender transferred
+#   receiver/policy.json                     receiver-owned trust policy
+#   receiver/catalog.json, receiver/resources/  pinned private schemas
+#   receiver/expected/&lt;name&gt;.artifact.json   expected final artifact
+name: Makoto gate before load
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "handoffs/**"
+
+permissions:
+  contents: read
+
+env:
+  # Pinned so these fixtures replay identically. Delete this line to
+  # evaluate against the runner clock.
+  EVALUATION_TIME: "2026-09-16T16:00:00Z"
+  # Minimum assurance level to accept. L3 (anchored) is the only level
+  # that implies an allow decision; a deny still fails at any level.
+  REQUIRED_LEVEL: L3
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The sender publishes manifest and head digests out of band.
+          # The receiver pins them here, never inside the bundle.
+          - handoff: positive
+            manifest: sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+            head: sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+          - handoff: mutated-final-data
+            manifest: sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+            head: sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+    steps:
+      - uses: actions/checkout@v4
+      # Pin the verifier to an exact core commit, like any dependency.
+      # Run it from a checkout: the CLI resolves its core schemas from
+      # the repository tree. This commit adds `makoto report level`
+      # (makoto-project/makoto#5); move the pin to the merged release.
+      - uses: actions/checkout@v4
+        with:
+          repository: makoto-project/makoto
+          ref: 731c5c9e3dc59161bd797de70d1d478115bb4c8c
+          path: .makoto-core
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Verify the received bundle
+        id: verify
+        shell: bash
+        env:
+          HANDOFF: ${{ matrix.handoff }}
+          EXPECTED_MANIFEST: ${{ matrix.manifest }}
+          EXPECTED_HEAD: ${{ matrix.head }}
+        run: |
+          verify() {
+            uv run --project .makoto-core makoto verify bundle "handoffs/$HANDOFF/bundle" \
+              --policy receiver/policy.json \
+              --schema-catalog receiver/catalog.json \
+              --expected-manifest "$EXPECTED_MANIFEST" \
+              --expected-head "$EXPECTED_HEAD" \
+              --expected-artifact "receiver/expected/$HANDOFF.artifact.json" \
+              --evaluation-time "$EVALUATION_TIME" "$@"
+          }
+          status=0
+          verify --json &gt; makoto-report.json || status=$?
+          verify || true
+          uv run --project .makoto-core makoto report level makoto-report.json \
+            --require "$REQUIRED_LEVEL" || status=1
+          exit "$status"
+      - name: Keep the verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: makoto-report-${{ matrix.handoff }}
+          path: makoto-report.json
+
+  load:
+    # Runs only when every handoff in the matrix was allowed.
+    needs: gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load the verified customer data
+        run: echo "replace with your existing step"</code></pre>
+<p><a href="makoto-gate.yml">Download makoto-gate.yml</a>. The matrix carries both the untampered handoff and the poisoned one so the same step shows an allow and a deny.</p>
+<p>The gate also requires an assurance level. After writing the report it runs <code>makoto report level --require "$REQUIRED_LEVEL"</code>; this workflow requires <a href="/levels/">L3</a>, the only level that implies an allow decision.</p>
+<h3>What the receiver pins</h3>
+<p>The expected artifact is receiver-owned. It lives outside the bundle, so a sender cannot rewrite it along with the bytes.</p>
+<pre><code class="language-bash">$ jq . receiver/expected/mutated-final-data.artifact.json
+{
+  "digest": {
+    "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+  },
+  "head": {
+    "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+  },
+  "subjectName": "customers.public.json"
+}</code></pre>
+<p>The trust policy and private schema catalog are the published <a href="/demos/v0.2-end-to-end/artifacts/receiver/policy.json">receiver policy</a> and <a href="/demos/v0.2-end-to-end/artifacts/receiver/catalog.json">catalog</a>.</p>
+</div></li>
+
+<li><div>
+<h2>The output that catches it</h2>
+<p>The gate step runs the verifier twice: once with <code>--json</code> to write the report, once for the human-readable log. This is the second run, exactly as the step invokes it, followed by its exit status. Every check passes except <code>artifact-bytes</code>, and the job exits 1.</p>
+<pre><code class="language-bash">$ makoto verify bundle handoffs/mutated-final-data/bundle \
+  --policy receiver/policy.json \
+  --schema-catalog receiver/catalog.json \
+  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
+  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-artifact receiver/expected/mutated-final-data.artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+PASS        graph
+PASS        roots-and-heads
+PASS        completeness-anchor
+PASS        freshness-anchors
+FAIL        artifact-bytes
+PASS        artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
+$ echo $?
+1</code></pre>
+<h3>The machine-readable report</h3>
+<p class="editorial-note">Output of <code>jq &#x27;{decision, primaryError, errors, notPassed: [.checks[] | select(.status != &quot;pass&quot;) | {id, status}]}&#x27; makoto-report.mutated-final-data.json</code> against the report the workflow step wrote.</p><pre><code class="language-json">{
+  "decision": "deny",
+  "primaryError": "E_ARTIFACT_DIGEST",
+  "errors": [
+    {
+      "causedByCheck": "artifact-bytes",
+      "code": "E_ARTIFACT_DIGEST",
+      "context": {
+        "artifactDigest": {
+          "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+        },
+        "head": {
+          "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+        },
+        "subjectName": "customers.public.json"
+      },
+      "message": "final artifact bytes differ from the signed digest",
+      "step": 12
+    }
+  ],
+  "notPassed": [
+    {
+      "id": "artifact-bytes",
+      "status": "fail"
+    }
+  ]
+}</code></pre>
+<h3>The assurance level it reaches</h3>
+<p>The signatures and structure still pass, so the tampered handoff reaches <strong>L1</strong>. L2 needs the received bytes to match, and <code>artifact-bytes</code> failed, so the required L3 is not met.</p>
+<pre><code class="language-bash">$ makoto report level makoto-report.mutated-final-data.json --require L3
+PASS        L1 Provenance is authentic
+FAIL        L2 Provenance is authorized and complete: artifact-bytes fail
+FAIL        L3 Provenance is anchored: decision deny
+LEVEL       L1
+REQUIRED    L3 not met
+$ echo $?
+1</code></pre>
+<p><a href="/demos/v0.2-end-to-end/artifacts/reports/mutated-final-data.json">Open the complete denial report</a>. It records sixteen checks, the evaluation time, the expected and actual heads, and the catalog digest the receiver used.</p>
+<details><summary>Control run: the untampered handoff through the same gate</summary><div>
+<pre><code class="language-bash">$ makoto verify bundle handoffs/positive/bundle \
+  --policy receiver/policy.json \
+  --schema-catalog receiver/catalog.json \
+  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
+  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-artifact receiver/expected/positive.artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+PASS        graph
+PASS        roots-and-heads
+PASS        completeness-anchor
+PASS        freshness-anchors
+PASS        artifact-bytes
+PASS        artifact-profiles
+PASS        decision
+ALLOW       decision
+manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+$ echo $?
+0</code></pre>
+<p>The same report reaches <strong>L3</strong>, so the level requirement is met and the job exits 0.</p>
+<pre><code class="language-bash">$ makoto report level makoto-report.positive.json --require L3
+PASS        L1 Provenance is authentic
+PASS        L2 Provenance is authorized and complete
+PASS        L3 Provenance is anchored
+LEVEL       L3
+REQUIRED    L3 met
+$ echo $?
+0</code></pre>
+<p><a href="/demos/v0.2-end-to-end/artifacts/reports/positive.json">Open the complete allow report</a>.</p>
+</div></details>
+</div></li>
+</ol>
+
 <section>
 <h2>The evidence path</h2>
 <ol class="provenance-spine">
@@ -97,26 +392,42 @@
 </li>
 <li>
 <strong>Receiver gate</strong>
-<span>A required profile rejects the forbidden record or field, while predecessor links identify every affected descendant.</span>
+<span>The receiver hashes the bytes that arrived, while predecessor links identify every affected descendant.</span>
 </li>
 </ol>
 </section>
+
 <section>
 <h2>What the scenario proves</h2>
 <table>
 <tbody>
 <tr>
 <th>Useful result</th>
-<td>A deterministic deny with the failing profile path, plus a graph that supports impact analysis.</td>
+<td>A deterministic deny naming the failed check, plus a graph that supports impact analysis.</td>
 </tr>
 <tr>
 <th>It does not prove</th>
 <td>That every hidden copy participates, that the source was truthful, or that a signature alone makes the batch safe.</td>
 </tr>
+<tr>
+<th>Why metadata alone fails</th>
+<td>The manifest and statements in the poisoned bundle are byte-identical to the good ones. Only hashing the received bytes against the signed subject digest exposes the change.</td>
+</tr>
 </tbody>
 </table>
 </section>
-<section><h2>Concrete handoff</h2><table><tbody><tr><th>Input</th><td><code>customers.raw.json</code> plus its signed origin statement.</td></tr><tr><th>Steps</th><td>Normalize the records, then create the public-safe output; each statement binds the prior payload and exact input artifact.</td></tr><tr><th>Mutation</th><td>Change one byte in the final artifact after the handoff is signed.</td></tr><tr><th>Expected result</th><td>The receiver denies with <code>E_ARTIFACT_DIGEST</code> while the unchanged signed metadata remains inspectable.</td></tr></tbody></table><p><a href="/demos/v0.2-end-to-end/artifacts/reports/mutated-final-data.json">Open the exact denial report</a> · <a href="/demos/v0.2-end-to-end/artifacts/data/customers.raw.json">Inspect the source bytes</a></p></section>
+
+<section>
+<h2>What else this handles</h2>
+<ul>
+<li>Third-party data feeds where you cannot inspect the source infrastructure.</li>
+<li>Regulated environments that require data lineage documentation.</li>
+<li>Multi-team pipelines where one team's output is another team's input.</li>
+<li>Automated exchanges between organizations with different trust levels.</li>
+</ul>
+<p class="callout"><strong>Key insight.</strong> Without verified provenance a pipeline has no immune system: it accepts everything, including poison. With it, the receiver's own expectations, not the sender's metadata, decide what loads.</p>
+</section>
+
 <section class="community-band">
 <span class="kicker">Reproduce the denial</span>
 <h2>The complete fixture mutates final data and expects an artifact-digest failure.</h2>
@@ -125,11 +436,16 @@
 <a class="button secondary" href="/examples/#poisoned-pipeline">Read the casebook entry</a>
 </div>
 </section>
+
+<nav class="actions" aria-label="Casebook sequence">
+<a class="button secondary" href="/demos/setup/">← Setup guide</a>
+<a class="button secondary" href="/demos/02/">Case 02: reproducibility →</a>
+</nav>
 </main>
 <footer class="footer">
 <div class="footer-inner">Makoto demo · Poisoned pipeline · Exact denial evidence</div>
 </footer>
 </div>
 </div>
-</body>
+<script defer src="/assets/prism.js"></script></body>
 </html>
