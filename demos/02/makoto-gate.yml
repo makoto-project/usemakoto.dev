@@ -1,0 +1,88 @@
+# Reproducibility gate for a paper's evidence bundles. A figure
+# is rebuilt only from a handoff whose whole lineage verifies.
+#
+# Copy to .github/workflows/makoto-gate.yml in the repository that
+# receives handoffs. Layout it expects:
+#   handoffs/<name>/bundle/                  what the sender transferred
+#   receiver/policy.json                     receiver-owned trust policy
+#   receiver/catalog.json, receiver/resources/  pinned private schemas
+#   receiver/expected/<name>.artifact.json   expected final artifact
+name: Makoto gate before figure rebuild
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "handoffs/**"
+
+permissions:
+  contents: read
+
+env:
+  # Pinned so these fixtures replay identically. Delete this line to
+  # evaluate against the runner clock.
+  EVALUATION_TIME: "2026-09-16T16:00:00Z"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The sender publishes manifest and head digests out of band.
+          # The receiver pins them here, never inside the bundle.
+          - handoff: removed-predecessor
+            manifest: sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+            head: sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+          - handoff: rewired-step
+            manifest: sha256:53af716cac4f889c569b687927f627a537311446521c51603077007b2581019b
+            head: sha256:2177e987c877a726576703926b2ab69caa46a5f9326d1df8ac7d60056cd9c348
+    steps:
+      - uses: actions/checkout@v4
+      # Pin the verifier to an exact core commit, like any dependency.
+      # Run it from a checkout: the CLI resolves its core schemas from
+      # the repository tree.
+      - uses: actions/checkout@v4
+        with:
+          repository: makoto-project/makoto
+          ref: 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+          path: .makoto-core
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Verify the received bundle
+        id: verify
+        shell: bash
+        env:
+          HANDOFF: ${{ matrix.handoff }}
+          EXPECTED_MANIFEST: ${{ matrix.manifest }}
+          EXPECTED_HEAD: ${{ matrix.head }}
+        run: |
+          verify() {
+            uv run --project .makoto-core makoto verify bundle "handoffs/$HANDOFF/bundle" \
+              --policy receiver/policy.json \
+              --schema-catalog receiver/catalog.json \
+              --expected-manifest "$EXPECTED_MANIFEST" \
+              --expected-head "$EXPECTED_HEAD" \
+              --expected-artifact "receiver/expected/$HANDOFF.artifact.json" \
+              --evaluation-time "$EVALUATION_TIME" "$@"
+          }
+          status=0
+          verify --json > makoto-report.json || status=$?
+          verify || true
+          exit "$status"
+      - name: Keep the verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: makoto-report-${{ matrix.handoff }}
+          path: makoto-report.json
+
+  rebuild-figures:
+    # Runs only when every handoff in the matrix was allowed.
+    needs: gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild figures from verified bytes
+        run: echo "replace with your existing step"

@@ -80,6 +80,381 @@
 <span class="kicker">Case 02 · scientific reproducibility</span>
 <h1>The chart survived. The method did not.</h1>
 <p class="lead">A paper cites an experiment file, but the source instrument export, outlier rule, normalization parameters, and exact plotting input disappeared when the postdoc left.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
+
+<section>
+<h2>The problem</h2>
+<p>A postdoc submits a paper. The methods section cites one data file that supports the central claim. The reviewer asks four questions: which version of the raw data is this, were outliers removed and by what rule, who prepared the file, and can we get back to the original instrument readings?</p>
+<p>Nobody can answer. The file passed through three hands over six months, the person who ran the cleaning step has graduated, and the parameters lived in a notebook nobody can find. The result is not a forged dataset. It is a lineage with a hole in it, and a hole looks exactly like a shortcut.</p>
+<p>The runnable fixture uses the reference handoff, which has the same shape as a lab pipeline: a source export, two transformations, and a signed handoff. Two poisoned variants of the published evidence are tested: one drops the origin statement, one rewrites a step to claim it consumed the raw export directly.</p>
+</section>
+
+<ol class="setup-sequence">
+<li><div>
+<h2>The raw example</h2>
+<p>A complete evidence bundle answers the reviewer's questions from the statements themselves. Decoding each signed statement in the good bundle shows the chain: an origin claim over the raw export, a normalization step that consumed it, and a public-safe step that consumed the normalized file.</p>
+<pre><code class="language-bash">$ for f in handoffs/positive/bundle/attestations/*.dsse.json; do
+  jq -r .payload "$f" | base64 -d | jq -c '{
+    operation: (.predicate.operation.name // "origin"),
+    input: .predicate.inputs[0]?.provenance.subjectName,
+    output: .subject[0].name}'
+done
+{"operation":"Normalize customer records","input":"customers.raw.json","output":"customers.normalized.json"}
+{"operation":"origin","input":null,"output":"customers.raw.json"}
+{"operation":"Remove direct identifiers and bucket ages","input":"customers.normalized.json","output":"customers.public.json"}</code></pre>
+<p>The <a href="/demos/v0.2-end-to-end/artifacts/data/customers.raw.json">source export</a> and <a href="/demos/v0.2-end-to-end/artifacts/data/customers.normalized.json">normalized intermediate</a> are published beside the <a href="/demos/v0.2-end-to-end/artifacts/data/customers.public.json">final file</a>, so every step's input and output bytes can be checked.</p>
+</div></li>
+
+<li><div>
+<h2>How it failed</h2>
+<p><strong>Variant one, a missing step.</strong> The republished bundle simply leaves out the origin statement. Every remaining signature is still valid and the final bytes are unchanged, so a checksum or signature check passes. The bundle index now lists two statements instead of three.</p>
+<p><strong>Variant two, a rewritten step.</strong> The final statement is edited to say it consumed the raw export directly, skipping normalization, and is re-wrapped in a new bundle with the original signature copied across.</p>
+<pre><code class="language-bash">$ jq -r '.attestations[].path' handoffs/positive/bundle/bundle.json
+attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json
+attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json
+attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json
+$ jq -r '.attestations[].path' handoffs/removed-predecessor/bundle/bundle.json
+attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json
+attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json
+$ statement() { b=handoffs/$1/bundle; d=$(jq -r '.artifacts[0].statementDigest.sha256' $b/bundle.json); jq -r .payload $b/attestations/$d.dsse.json | base64 -d; }
+$ statement positive | jq '.predicate.inputs[0].provenance'
+{
+  "statementDigest": {
+    "sha256": "1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848"
+  },
+  "subjectName": "customers.normalized.json"
+}
+$ statement rewired-step | jq '.predicate.inputs[0].provenance'
+{
+  "statementDigest": {
+    "sha256": "56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a"
+  },
+  "subjectName": "customers.raw.json"
+}
+$ envelope() { b=handoffs/$1/bundle; d=$(jq -r '.artifacts[0].statementDigest.sha256' $b/bundle.json); cat $b/attestations/$d.dsse.json; }
+$ diff &lt;(envelope positive | jq .signatures) &lt;(envelope rewired-step | jq .signatures) &amp;&amp; echo 'signature bytes: copied unchanged from the original statement'
+signature bytes: copied unchanged from the original statement</code></pre>
+<p>The rewired statement now points at <code>56b7be43…</code> (the origin) instead of <code>1f28b72b…</code> (normalization), while its signature bytes are unchanged.</p>
+</div></li>
+
+<li><div>
+<h2>Put Makoto in the path</h2>
+<p>Figures are rebuilt only from evidence that verifies end to end. A pull request that adds or changes a handoff runs the gate for each bundle the paper cites; the figure rebuild job depends on it.</p>
+<h3>The workflow</h3>
+<pre><code class="language-yaml"># Reproducibility gate for a paper's evidence bundles. A figure
+# is rebuilt only from a handoff whose whole lineage verifies.
+#
+# Copy to .github/workflows/makoto-gate.yml in the repository that
+# receives handoffs. Layout it expects:
+#   handoffs/&lt;name&gt;/bundle/                  what the sender transferred
+#   receiver/policy.json                     receiver-owned trust policy
+#   receiver/catalog.json, receiver/resources/  pinned private schemas
+#   receiver/expected/&lt;name&gt;.artifact.json   expected final artifact
+name: Makoto gate before figure rebuild
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "handoffs/**"
+
+permissions:
+  contents: read
+
+env:
+  # Pinned so these fixtures replay identically. Delete this line to
+  # evaluate against the runner clock.
+  EVALUATION_TIME: "2026-09-16T16:00:00Z"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The sender publishes manifest and head digests out of band.
+          # The receiver pins them here, never inside the bundle.
+          - handoff: removed-predecessor
+            manifest: sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+            head: sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+          - handoff: rewired-step
+            manifest: sha256:53af716cac4f889c569b687927f627a537311446521c51603077007b2581019b
+            head: sha256:2177e987c877a726576703926b2ab69caa46a5f9326d1df8ac7d60056cd9c348
+    steps:
+      - uses: actions/checkout@v4
+      # Pin the verifier to an exact core commit, like any dependency.
+      # Run it from a checkout: the CLI resolves its core schemas from
+      # the repository tree.
+      - uses: actions/checkout@v4
+        with:
+          repository: makoto-project/makoto
+          ref: 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+          path: .makoto-core
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Verify the received bundle
+        id: verify
+        shell: bash
+        env:
+          HANDOFF: ${{ matrix.handoff }}
+          EXPECTED_MANIFEST: ${{ matrix.manifest }}
+          EXPECTED_HEAD: ${{ matrix.head }}
+        run: |
+          verify() {
+            uv run --project .makoto-core makoto verify bundle "handoffs/$HANDOFF/bundle" \
+              --policy receiver/policy.json \
+              --schema-catalog receiver/catalog.json \
+              --expected-manifest "$EXPECTED_MANIFEST" \
+              --expected-head "$EXPECTED_HEAD" \
+              --expected-artifact "receiver/expected/$HANDOFF.artifact.json" \
+              --evaluation-time "$EVALUATION_TIME" "$@"
+          }
+          status=0
+          verify --json &gt; makoto-report.json || status=$?
+          verify || true
+          exit "$status"
+      - name: Keep the verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: makoto-report-${{ matrix.handoff }}
+          path: makoto-report.json
+
+  rebuild-figures:
+    # Runs only when every handoff in the matrix was allowed.
+    needs: gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild figures from verified bytes
+        run: echo "replace with your existing step"</code></pre>
+<p><a href="makoto-gate.yml">Download makoto-gate.yml</a>. Note the second matrix entry pins the manifest and head that the rewired bundle's own handoff declares. Even when the expectations match what was sent, the lineage still has to verify.</p>
+<h3>Which identity may sign which step</h3>
+<p>The receiver's trust policy binds each operation type to one authorized key. A statement cannot borrow another step's authority.</p>
+<pre><code class="language-bash">$ jq '.rules[] | {id, operationTypes, authorizedKeyIds}' receiver/policy.json
+{
+  "id": "urn:makoto:demo:rule:normalize",
+  "operationTypes": [
+    "urn:makoto:demo:operation:normalize"
+  ],
+  "authorizedKeyIds": [
+    "sha256:47dea58ea00fae9417ee19d76755bfef690899021132effb04fe1f9e4f0c8059"
+  ]
+}
+{
+  "id": "urn:makoto:demo:rule:origin",
+  "operationTypes": null,
+  "authorizedKeyIds": [
+    "sha256:fd110d301d2f077de1414b8f99f441b1403fab207b2052fbd2c065e4ee8e7dc2"
+  ]
+}
+{
+  "id": "urn:makoto:demo:rule:public-safe",
+  "operationTypes": [
+    "urn:makoto:demo:operation:public-safe"
+  ],
+  "authorizedKeyIds": [
+    "sha256:8cef065b7af83669150b7d32704d3d3e75c3e9aee0d4f6740544c68e81b377aa"
+  ]
+}</code></pre>
+</div></li>
+
+<li><div>
+<h2>The output that catches it</h2>
+<h3>Missing step</h3>
+<p>Signatures, authorization, and final bytes all pass. The <code>graph</code> check fails because the normalization statement names a predecessor that is not in the bundle, and <code>completeness-anchor</code> fails because the signed manifest committed to three statements.</p>
+<pre><code class="language-bash">$ makoto verify bundle handoffs/removed-predecessor/bundle \
+  --policy receiver/policy.json \
+  --schema-catalog receiver/catalog.json \
+  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
+  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-artifact receiver/expected/removed-predecessor.artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+FAIL        graph
+PASS        roots-and-heads
+FAIL        completeness-anchor
+PASS        freshness-anchors
+PASS        artifact-bytes
+PASS        artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+E_PREDECESSOR_MISSING: predecessor 56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a is absent
+E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle index
+$ echo $?
+1</code></pre>
+<p class="editorial-note">Output of <code>jq &#x27;{decision, primaryError, errors, notPassed: [.checks[] | select(.status != &quot;pass&quot;) | {id, status}]}&#x27; makoto-report.removed-predecessor.json</code> against the report the workflow step wrote.</p><pre><code class="language-json">{
+  "decision": "deny",
+  "primaryError": "E_PREDECESSOR_MISSING",
+  "errors": [
+    {
+      "causedByCheck": "graph",
+      "code": "E_PREDECESSOR_MISSING",
+      "context": {
+        "statementDigest": {
+          "sha256": "1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848"
+        }
+      },
+      "message": "predecessor 56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a is absent",
+      "step": 9
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "bundleId": "urn:uuid:55555555-5555-4555-8555-555555555555"
+      },
+      "message": "signed manifest sets do not equal the verified graph and bundle index",
+      "step": 11
+    }
+  ],
+  "notPassed": [
+    {
+      "id": "graph",
+      "status": "fail"
+    },
+    {
+      "id": "completeness-anchor",
+      "status": "fail"
+    }
+  ]
+}</code></pre>
+<p><a href="/demos/v0.2-end-to-end/artifacts/reports/removed-predecessor.json">Open the complete removed-predecessor report</a>.</p>
+<h3>Rewritten step</h3>
+<p>The copied signature no longer matches the edited payload, so <code>signatures</code> fails first. Without a valid signature no policy rule is satisfied, and the graph checks that depend on it are skipped rather than reported as passing.</p>
+<pre><code class="language-bash">$ makoto verify bundle handoffs/rewired-step/bundle \
+  --policy receiver/policy.json \
+  --schema-catalog receiver/catalog.json \
+  --expected-manifest sha256:53af716cac4f889c569b687927f627a537311446521c51603077007b2581019b \
+  --expected-head sha256:2177e987c877a726576703926b2ab69caa46a5f9326d1df8ac7d60056cd9c348 \
+  --expected-artifact receiver/expected/rewired-step.artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+FAIL        signatures
+FAIL        authorization-thresholds
+PASS        metadata-profiles
+FAIL        authorization
+PASS        graph-dependency-artifacts
+SKIPPED     graph
+SKIPPED     roots-and-heads
+FAIL        completeness-anchor
+PASS        freshness-anchors
+SKIPPED     artifact-bytes
+SKIPPED     artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:53af716cac4f889c569b687927f627a537311446521c51603077007b2581019b
+E_SIGNATURE_INVALID: signature verification failed
+E_SIGNER_UNAUTHORIZED: no matching policy rule met its signature threshold
+E_MANIFEST_SET: final artifact is not an exact terminal subject of its declared head
+E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle index
+$ echo $?
+1</code></pre>
+<p class="editorial-note">Output of <code>jq &#x27;{decision, primaryError, errors, notPassed: [.checks[] | select(.status != &quot;pass&quot;) | {id, status}]}&#x27; makoto-report.rewired-step.json</code> against the report the workflow step wrote.</p><pre><code class="language-json">{
+  "decision": "deny",
+  "primaryError": "E_SIGNATURE_INVALID",
+  "errors": [
+    {
+      "causedByCheck": "signatures",
+      "code": "E_SIGNATURE_INVALID",
+      "context": {
+        "keyid": "sha256:8cef065b7af83669150b7d32704d3d3e75c3e9aee0d4f6740544c68e81b377aa",
+        "statementDigest": {
+          "sha256": "2177e987c877a726576703926b2ab69caa46a5f9326d1df8ac7d60056cd9c348"
+        }
+      },
+      "message": "signature verification failed",
+      "step": 5
+    },
+    {
+      "causedByCheck": "authorization-thresholds",
+      "code": "E_SIGNER_UNAUTHORIZED",
+      "context": {
+        "statementDigest": {
+          "sha256": "2177e987c877a726576703926b2ab69caa46a5f9326d1df8ac7d60056cd9c348"
+        }
+      },
+      "message": "no matching policy rule met its signature threshold",
+      "step": 6
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "artifactDigest": {
+          "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+        },
+        "bundleId": "urn:makoto:demo:negative:rewired-step",
+        "head": {
+          "sha256": "2177e987c877a726576703926b2ab69caa46a5f9326d1df8ac7d60056cd9c348"
+        },
+        "subjectName": "customers.public.json"
+      },
+      "message": "final artifact is not an exact terminal subject of its declared head",
+      "step": 11
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "bundleId": "urn:makoto:demo:negative:rewired-step"
+      },
+      "message": "signed manifest sets do not equal the verified graph and bundle index",
+      "step": 11
+    }
+  ],
+  "notPassed": [
+    {
+      "id": "signatures",
+      "status": "fail"
+    },
+    {
+      "id": "authorization-thresholds",
+      "status": "fail"
+    },
+    {
+      "id": "authorization",
+      "status": "fail"
+    },
+    {
+      "id": "graph",
+      "status": "skipped"
+    },
+    {
+      "id": "roots-and-heads",
+      "status": "skipped"
+    },
+    {
+      "id": "completeness-anchor",
+      "status": "fail"
+    },
+    {
+      "id": "artifact-bytes",
+      "status": "skipped"
+    },
+    {
+      "id": "artifact-profiles",
+      "status": "skipped"
+    }
+  ]
+}</code></pre>
+<p><a href="/demos/v0.2-end-to-end/artifacts/reports/rewired-step.json">Open the complete rewired-step report</a>.</p>
+</div></li>
+</ol>
+
 <section>
 <h2>Publish the evidence beside the result</h2>
 <ol class="provenance-spine">
@@ -106,6 +481,18 @@
 <p>Makoto can preserve the inputs and signed claims needed to reproduce the workflow. It cannot reconstruct missing intermediate bytes after publication or prove that an instrument was calibrated merely because its identifier was signed.</p>
 </section>
 <section><h2>Concrete publication bundle</h2><table><tbody><tr><th>Input</th><td>Instrument export, calibration reference, collection parameters, and a signed origin statement over the exact raw bytes.</td></tr><tr><th>Steps</th><td>Append outlier-removal, normalization, analysis, and plotting statements; bind code and parameter artifacts where available.</td></tr><tr><th>Handoff</th><td>Publish the final figure data with the signed graph, required profiles, and exact terminal artifacts.</td></tr><tr><th>Reproduction check</th><td>A new researcher verifies the received bytes and can identify every missing intermediate instead of guessing it.</td></tr></tbody></table><p>The checked-in customer-data proof uses the same source → two transforms → signed handoff structure with downloadable intermediate artifacts.</p></section>
+
+<section>
+<h2>What else this handles</h2>
+<ul>
+<li>Journal submissions that require data availability statements with verifiable provenance.</li>
+<li>Clinical datasets where every processing step must be auditable by a regulator.</li>
+<li>Collaborative research where datasets pass between institutions over months.</li>
+<li>Machine-learning papers where preprocessing of the training data changes the result.</li>
+</ul>
+<p class="callout"><strong>Key insight.</strong> Reproducibility is not about trusting people. It is about data that can answer questions about its own history, and refusing the answer when a step is missing or rewritten.</p>
+</section>
+
 <section class="community-band">
 <span class="kicker">Make the next paper inspectable</span>
 <h2>Start the graph when data leaves the instrument, not when the PDF is submitted.</h2>
@@ -114,6 +501,11 @@
 <a class="button secondary" href="/examples/#reproducibility">Read the casebook entry</a>
 </div>
 </section>
+
+<nav class="actions" aria-label="Casebook sequence">
+<a class="button secondary" href="/demos/01/">← Case 01: poisoned pipeline</a>
+<a class="button secondary" href="/demos/03/">Case 03: dataset release →</a>
+</nav>
 </main>
 <footer class="footer">
 <div class="footer-inner">Makoto demo · Scientific reproducibility · Source to published result</div>

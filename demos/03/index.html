@@ -80,6 +80,295 @@
 <span class="kicker">Case 03 · dataset release</span>
 <h1>Ship the data and the evidence needed to refuse it.</h1>
 <p class="lead">A release process can attach more than a checksum. It can publish signed origin and transformation statements, required profiles, an exact handoff, and the verifier inputs a consumer needs.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>0e41afb</code>. The verification report is byte-for-byte the file published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
+
+<section>
+<h2>The problem</h2>
+<p>A team releases data every sprint: refreshed training sets, configuration bundles, public extracts. Each release should carry evidence of where the data came from and who vouched for it. When that evidence is a manual step it gets skipped, and when it is only a checksum it proves nothing about who produced the bytes.</p>
+<p>The harder case is a release that looks perfect. Here the data is byte-identical to the legitimate release, the signed claim is byte-identical to the legitimate claim, and the signature is cryptographically valid. The only difference is whose key made it. A consumer that checks "is this signature valid?" instead of "is this signer allowed to make this claim?" mirrors it.</p>
+</section>
+
+<ol class="setup-sequence">
+<li><div>
+<h2>The raw example</h2>
+<p>The release receipt is a signed handoff manifest. Decoded, it commits to the exact final artifact digest, the graph head that produced it, the root it traces to, and every statement in between.</p>
+<pre><code class="language-bash">$ jq -r .payload handoffs/unauthorized-signer/bundle/manifest.dsse.json | base64 -d \
+  | jq '{bundleId, recipient, issuedAt, artifacts, heads, roots, statements}'
+{
+  "bundleId": "urn:makoto:demo:negative:unauthorized-signer",
+  "recipient": "example:downstream-team",
+  "issuedAt": "2026-09-16T16:00:00Z",
+  "artifacts": [
+    {
+      "digest": {
+        "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+      },
+      "head": {
+        "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+      },
+      "mediaType": "application/json",
+      "name": "customers.public.json"
+    }
+  ],
+  "heads": [
+    {
+      "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+    }
+  ],
+  "roots": [
+    {
+      "sha256": "56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a"
+    }
+  ],
+  "statements": [
+    {
+      "sha256": "1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848"
+    },
+    {
+      "sha256": "56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a"
+    },
+    {
+      "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+    }
+  ]
+}</code></pre>
+</div></li>
+
+<li><div>
+<h2>How it failed</h2>
+<p>The data in the poisoned release hashes to the same digest as the real one, and the head statement has the same digest, <code>962be717…</code>, as the legitimate public-safe statement. What changed is the key that signed that statement.</p>
+<pre><code class="language-bash">$ final=artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin
+$ shasum -a 256 handoffs/positive/bundle/$final
+2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4  handoffs/positive/bundle/artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin
+$ shasum -a 256 handoffs/unauthorized-signer/bundle/artifacts/final/*.bin
+2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4  handoffs/unauthorized-signer/bundle/artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin
+$ envelope() { b=handoffs/$1/bundle; d=$(jq -r '.artifacts[0].statementDigest.sha256' $b/bundle.json); cat $b/attestations/$d.dsse.json; }
+$ envelope positive | jq -r '.signatures[].keyid'
+sha256:8cef065b7af83669150b7d32704d3d3e75c3e9aee0d4f6740544c68e81b377aa
+$ envelope unauthorized-signer | jq -r '.signatures[].keyid'
+sha256:3774845b9147b50cf00771ca20eb29cc3043c078f79ee13ebd0c63062a133b4d</code></pre>
+<p>The legitimate release was signed by <code>8cef065b…</code>. The poisoned one by <code>3774845b…</code>. Both signatures verify against their own public keys.</p>
+</div></li>
+
+<li><div>
+<h2>Put Makoto in the path</h2>
+<p>The consumer mirrors a release internally only after the gate allows it. The gate is the same verifier run as every other case; what makes this case bite is the receiver's trust policy.</p>
+<h3>The workflow</h3>
+<pre><code class="language-yaml"># Consumer-side gate for a published dataset release. The
+# release is mirrored internally only after Makoto allows it.
+#
+# Copy to .github/workflows/makoto-gate.yml in the repository that
+# receives handoffs. Layout it expects:
+#   handoffs/&lt;name&gt;/bundle/                  what the sender transferred
+#   receiver/policy.json                     receiver-owned trust policy
+#   receiver/catalog.json, receiver/resources/  pinned private schemas
+#   receiver/expected/&lt;name&gt;.artifact.json   expected final artifact
+name: Makoto gate before release mirror
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "handoffs/**"
+
+permissions:
+  contents: read
+
+env:
+  # Pinned so these fixtures replay identically. Delete this line to
+  # evaluate against the runner clock.
+  EVALUATION_TIME: "2026-09-16T16:00:00Z"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The sender publishes manifest and head digests out of band.
+          # The receiver pins them here, never inside the bundle.
+          - handoff: unauthorized-signer
+            manifest: sha256:362917a88b0f144d29126e0d05a845c2c58864244b1be0c85cff4d23db76b706
+            head: sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+    steps:
+      - uses: actions/checkout@v4
+      # Pin the verifier to an exact core commit, like any dependency.
+      # Run it from a checkout: the CLI resolves its core schemas from
+      # the repository tree.
+      - uses: actions/checkout@v4
+        with:
+          repository: makoto-project/makoto
+          ref: 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+          path: .makoto-core
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Verify the received bundle
+        id: verify
+        shell: bash
+        env:
+          HANDOFF: ${{ matrix.handoff }}
+          EXPECTED_MANIFEST: ${{ matrix.manifest }}
+          EXPECTED_HEAD: ${{ matrix.head }}
+        run: |
+          verify() {
+            uv run --project .makoto-core makoto verify bundle "handoffs/$HANDOFF/bundle" \
+              --policy receiver/policy.json \
+              --schema-catalog receiver/catalog.json \
+              --expected-manifest "$EXPECTED_MANIFEST" \
+              --expected-head "$EXPECTED_HEAD" \
+              --expected-artifact "receiver/expected/$HANDOFF.artifact.json" \
+              --evaluation-time "$EVALUATION_TIME" "$@"
+          }
+          status=0
+          verify --json &gt; makoto-report.json || status=$?
+          verify || true
+          exit "$status"
+      - name: Keep the verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: makoto-report-${{ matrix.handoff }}
+          path: makoto-report.json
+
+  mirror:
+    # Runs only when every handoff in the matrix was allowed.
+    needs: gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mirror the verified release
+        run: echo "replace with your existing step"</code></pre>
+<p><a href="makoto-gate.yml">Download makoto-gate.yml</a>.</p>
+<h3>Knowing a key is not authorizing it</h3>
+<p>This receiver has deliberately configured the attacker's public key, so the signature is not simply unknown. The policy lists five keys, but the only rule for the public-safe operation authorizes exactly one of them.</p>
+<pre><code class="language-bash">$ jq -r '.keys | to_entries[] | "\(.key)  \(.value.label)"' receiver/policy.json
+sha256:3774845b9147b50cf00771ca20eb29cc3043c078f79ee13ebd0c63062a133b4d  insecure demo-only attacker key
+sha256:47dea58ea00fae9417ee19d76755bfef690899021132effb04fe1f9e4f0c8059  insecure demo-only normalize key
+sha256:8cef065b7af83669150b7d32704d3d3e75c3e9aee0d4f6740544c68e81b377aa  insecure demo-only public key
+sha256:d016df3d83373617c06b5e1d6359caa06eeba8b3af2c7077234f109f2194516c  insecure demo-only handoff key
+sha256:fd110d301d2f077de1414b8f99f441b1403fab207b2052fbd2c065e4ee8e7dc2  insecure demo-only origin key
+$ jq '.rules[] | select(.operationTypes | index("urn:makoto:demo:operation:public-safe")) | {id, authorizedKeyIds, minimumSignatures}' receiver/policy.json
+{
+  "id": "urn:makoto:demo:rule:public-safe",
+  "authorizedKeyIds": [
+    "sha256:8cef065b7af83669150b7d32704d3d3e75c3e9aee0d4f6740544c68e81b377aa"
+  ],
+  "minimumSignatures": 1
+}</code></pre>
+<p>Inspect the <a href="/demos/v0.2-end-to-end/artifacts/receiver/attacker-known-policy.json">attacker-known policy</a> used for this run.</p>
+</div></li>
+
+<li><div>
+<h2>The output that catches it</h2>
+<p><code>signatures</code> passes: the math is sound. <code>authorization-thresholds</code> and <code>authorization</code> fail, because no rule for this operation lists the signing key. Checks that depend on an authorized graph are skipped, and the job exits 1.</p>
+<pre><code class="language-bash">$ makoto verify bundle handoffs/unauthorized-signer/bundle \
+  --policy receiver/policy.json \
+  --schema-catalog receiver/catalog.json \
+  --expected-manifest sha256:362917a88b0f144d29126e0d05a845c2c58864244b1be0c85cff4d23db76b706 \
+  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-artifact receiver/expected/unauthorized-signer.artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+FAIL        authorization-thresholds
+PASS        metadata-profiles
+FAIL        authorization
+PASS        graph-dependency-artifacts
+SKIPPED     graph
+SKIPPED     roots-and-heads
+FAIL        completeness-anchor
+PASS        freshness-anchors
+SKIPPED     artifact-bytes
+SKIPPED     artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:362917a88b0f144d29126e0d05a845c2c58864244b1be0c85cff4d23db76b706
+E_SIGNER_UNAUTHORIZED: no matching policy rule met its signature threshold
+E_MANIFEST_SET: final artifact is not an exact terminal subject of its declared head
+E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle index
+$ echo $?
+1</code></pre>
+<h3>The machine-readable report</h3>
+<p class="editorial-note">Output of <code>jq &#x27;{decision, primaryError, errors, notPassed: [.checks[] | select(.status != &quot;pass&quot;) | {id, status}]}&#x27; makoto-report.unauthorized-signer.json</code> against the report the workflow step wrote.</p><pre><code class="language-json">{
+  "decision": "deny",
+  "primaryError": "E_SIGNER_UNAUTHORIZED",
+  "errors": [
+    {
+      "causedByCheck": "authorization-thresholds",
+      "code": "E_SIGNER_UNAUTHORIZED",
+      "context": {
+        "statementDigest": {
+          "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+        }
+      },
+      "message": "no matching policy rule met its signature threshold",
+      "step": 6
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "artifactDigest": {
+          "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+        },
+        "bundleId": "urn:makoto:demo:negative:unauthorized-signer",
+        "head": {
+          "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+        },
+        "subjectName": "customers.public.json"
+      },
+      "message": "final artifact is not an exact terminal subject of its declared head",
+      "step": 11
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "bundleId": "urn:makoto:demo:negative:unauthorized-signer"
+      },
+      "message": "signed manifest sets do not equal the verified graph and bundle index",
+      "step": 11
+    }
+  ],
+  "notPassed": [
+    {
+      "id": "authorization-thresholds",
+      "status": "fail"
+    },
+    {
+      "id": "authorization",
+      "status": "fail"
+    },
+    {
+      "id": "graph",
+      "status": "skipped"
+    },
+    {
+      "id": "roots-and-heads",
+      "status": "skipped"
+    },
+    {
+      "id": "completeness-anchor",
+      "status": "fail"
+    },
+    {
+      "id": "artifact-bytes",
+      "status": "skipped"
+    },
+    {
+      "id": "artifact-profiles",
+      "status": "skipped"
+    }
+  ]
+}</code></pre>
+<p><a href="/demos/v0.2-end-to-end/artifacts/reports/unauthorized-signer.json">Open the complete unauthorized-signer report</a>.</p>
+</div></li>
+</ol>
+
 <section>
 <h2>A release has two independently reviewed artifacts</h2>
 <table>
@@ -109,7 +398,19 @@
 <h2>CI is a trigger, not the attester</h2>
 <p>A workflow event can initiate generation after release bytes are final. The signer identity, key custody, source claim, exact predecessor graph, and expected release manifest still require explicit policy. A green CI badge alone is not provenance.</p>
 </section>
-<section><h2>Concrete release receipt</h2><table><tbody><tr><th>Input</th><td>The exact dataset files or deterministic dataset manifest selected for publication.</td></tr><tr><th>Release step</th><td>CI triggers generation only after bytes are final; a release signer attests the exact graph and handoff.</td></tr><tr><th>Consumer step</th><td>The recipient downloads the release and hashes those bytes against the signed final-artifact binding.</td></tr><tr><th>Expected failures</th><td>A changed file denies on artifact digest; a correctly signed receipt from an untrusted key denies on authorization.</td></tr></tbody></table><p><a href="/demos/v0.2-end-to-end/artifacts/reports/unauthorized-signer.json">Open the unauthorized-signer report</a></p></section>
+<section><h2>Concrete release receipt</h2><table><tbody><tr><th>Input</th><td>The exact dataset files or deterministic dataset manifest selected for publication.</td></tr><tr><th>Release step</th><td>CI triggers generation only after bytes are final; a release signer attests the exact graph and handoff.</td></tr><tr><th>Consumer step</th><td>The recipient downloads the release and hashes those bytes against the signed final-artifact binding.</td></tr><tr><th>Expected failures</th><td>A changed file denies on artifact digest (<a href="/demos/01/">case 01</a>); a correctly signed receipt from an untrusted key denies on authorization (this case).</td></tr></tbody></table></section>
+
+<section>
+<h2>What else this handles</h2>
+<ul>
+<li>Evidence generated on every release tag instead of remembered by a person.</li>
+<li>Existing pipelines on any CI system, because the gate is one command and a report file.</li>
+<li>Batch releases of many files through a signed dataset manifest.</li>
+<li>Rotating or revoking a release signer by editing receiver policy, without touching published data.</li>
+</ul>
+<p class="callout"><strong>Key insight.</strong> Authenticity asks whether a signature is valid for a key. Authorization asks whether the receiver trusts that key for this claim. A release gate that only asks the first question will mirror a perfect forgery.</p>
+</section>
+
 <section class="community-band">
 <span class="kicker">Release the failure cases too</span>
 <h2>Consumers need to see the same verifier deny a mutated artifact and unauthorized signer.</h2>
@@ -118,6 +419,11 @@
 <a class="button secondary" href="/examples/#release">Read the casebook entry</a>
 </div>
 </section>
+
+<nav class="actions" aria-label="Casebook sequence">
+<a class="button secondary" href="/demos/02/">← Case 02: reproducibility</a>
+<a class="button secondary" href="/demos/04/">Case 04: configuration postmortem →</a>
+</nav>
 </main>
 <footer class="footer">
 <div class="footer-inner">Makoto demo · Dataset release · Data plus independently verifiable evidence</div>
