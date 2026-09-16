@@ -955,8 +955,8 @@ def reference_page(name: str) -> str:
     <dt>Identifier</dt><dd>{html.escape(identifier)}</dd>
     <dt>Digest</dt><dd>sha256:{digest}</dd>
     <dt>Raw</dt><dd><a href="/schema/v0.2/{html.escape(name)}">/schema/v0.2/{html.escape(name)}</a></dd>
-    <dt>Carried in</dt><dd>{SCHEMA_CARRIERS[name]}</dd>
-    {f"<dt>Responsibility</dt><dd>{inline(responsibility)}</dd>" if responsibility else ""}
+    <dt>Carried in</dt><dd class="prose">{SCHEMA_CARRIERS[name]}</dd>
+    {f'<dt>Responsibility</dt><dd class="prose">{inline(responsibility)}</dd>' if responsibility else ""}
   </dl>
   <p class="spec-jump"><a href="/spec/schemas/">All schemas</a>{spec_links}<a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
   {example_block}

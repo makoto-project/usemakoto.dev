@@ -22,8 +22,8 @@
     <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/envelope.schema.json</dd>
     <dt>Digest</dt><dd>sha256:49de7cf790e3a0c7bd3b83ee7322164d2a5a829648fe1407c79c07f4d74a0f66</dd>
     <dt>Raw</dt><dd><a href="/schema/v0.2/envelope.schema.json">/schema/v0.2/envelope.schema.json</a></dd>
-    <dt>Carried in</dt><dd>Every signed file in a bundle: <code>attestations/&lt;digest&gt;.dsse.json</code> carries one statement, and <code>manifest.dsse.json</code> carries the handoff.</dd>
-    <dt>Responsibility</dt><dd>DSSE transport fields, payload type, base64 payload, and signature entries.</dd>
+    <dt>Carried in</dt><dd class="prose">Every signed file in a bundle: <code>attestations/&lt;digest&gt;.dsse.json</code> carries one statement, and <code>manifest.dsse.json</code> carries the handoff.</dd>
+    <dt>Responsibility</dt><dd class="prose">DSSE transport fields, payload type, base64 payload, and signature entries.</dd>
   </dl>
   <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#101-json-and-dsse">§10.1</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
   <figure class="lead-exhibit"><figcaption><strong>A real instance.</strong> Read from <code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json</code>, which validates against this schema.</figcaption><pre data-filename="1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json"><code class="language-json">{

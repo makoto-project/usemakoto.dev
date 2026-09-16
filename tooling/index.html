@@ -10,7 +10,7 @@
 <span class="kicker">Tooling map</span><h1>Use what exists. See exactly what does not.</h1><p class="lead">Makoto has a tested reference CLI and Python library in the core source tree, hosted schemas, conformance fixtures, and a cloneable handoff demo. Python and JavaScript experiments in this site remain useful API research, but they are not published distributions.</p>
 <table id="language-tools" class="status-table"><thead><tr><th>Surface</th><th>Availability</th><th>Use it for</th></tr></thead><tbody><tr><td>Reference CLI and Python library</td><td>Source checkout</td><td>Create, sign, bundle, and verify evidence from the core repository.</td></tr><tr><td>Hosted JSON Schemas</td><td>Public review URLs</td><td>Validate core resources and resolve exact digest-pinned profile schemas.</td></tr><tr><td>End-to-end handoff</td><td>Runnable and tested</td><td>Exercise source, transform, handoff, receiver policy, and final-byte verification.</td></tr><tr><td>Python and JavaScript experiments</td><td>API research</td><td>Study earlier generation and verification ideas; do not install them as supported Makoto packages.</td></tr><tr><td>Platform adapters</td><td>Design notes</td><td>Explore attachment points; no maintained adapter package is claimed.</td></tr></tbody></table>
 
-<h2>Run the reference implementation</h2><pre><code>git clone https://github.com/makoto-project/makoto.git
+<h2>Run the reference implementation</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto
 uv sync --locked --dev
 uv run makoto --help
@@ -20,5 +20,5 @@ uv run makoto --help
 
 <div class="community-band"><span class="kicker">Missing the interface you need?</span><h2>Turn the SDK question into a public design input.</h2><p>Share the language, runtime, data system, trust boundary, and workflow you need. A concrete producer-to-consumer use case is more useful than a generic package request.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Propose tooling on GitHub</a><a class="button secondary" href="/community/">Contribution paths</a></div></div>
 </main><footer class="footer"><div class="footer-inner">Makoto tooling · Apache-2.0 · No published SDK or adapter package is claimed</div></footer></div></div>
-<script defer src="/assets/code.js"></script>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
 </body></html>
