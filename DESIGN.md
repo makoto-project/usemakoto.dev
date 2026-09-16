@@ -48,12 +48,47 @@ Rhythm comes from tokens, never one-off values: `--space-1` to `--space-9`,
 `--hero-pad-*`, `--frame-pad-x/y` (inside code frames), `--card-pad`, and
 `--grid-gap`. Narrow screens retune the tokens, not the rules.
 
+Corners come from three tokens by role: `--radius` (frames, cards, callouts,
+buttons), `--radius-sm` (inline code, chips) and `--radius-lg` (the dark
+band and full-width panels). Nothing is rounder than `--radius-lg`.
+
+Prose measure is set with zero specificity (`:where(.page) :is(p, li)`), so
+any component class (a record row, a jump list, a grid cell) overrides it
+without a specificity fight.
+
 ## Type
 
 Self-hosted in `assets/fonts/` (OFL, licences alongside): Archivo (variable
 weight and width) for everything readable, JetBrains Mono for code, labels,
 and identifiers. Mono is for code, data, and labels only, never decoration.
 Functional text stays at or above 11px.
+
+One scale for the whole site: every page title, in a hero or at the top of a
+document, is `--t-display`; every section heading `--t-h2`; card and record
+headings `--t-h3`; leads `--t-lead`; captions and footer `--t-small`; table
+headers and record labels `--t-meta`; code `--t-code`. Narrow screens retune
+`--t-display` and `--t-h2` in the 560px query, nothing else.
+
+## Records
+
+Lists that are registers (the casebook, the provenance spine, the consequence
+index, a schema's metadata, a definition block) are ruled: a strong rule
+opens them, hairlines separate rows, the first column sits flush with the
+heading above, numerals are tabular, and nothing lights up under the pointer.
+Tables follow the same rule: no cell inset on the first column, no row hover.
+
+## Shell
+
+Every styled page carries the same footer: the page's own closing line
+(`.footer-line`), the site's fixed points (`.footer-nav`: specification,
+hosted schemas, runnable proof, examples, community, privacy) and the licence
+line. Generated pages take it from `spec/index.html`.
+
+Every page's `<head>` carries a canonical URL and Open Graph and Twitter
+metadata with its own title and description; the card is
+`/assets/og-card.png` (1200 × 630), rendered from `scripts/og_card.html`
+with the site's own type and tokens. The generated pages get the block from
+`STYLE_HEAD` in `scripts/render_spec.py`.
 
 ## Code blocks
 
@@ -85,9 +120,11 @@ Where content describes a flow, chain, graph or handoff, draw it. A host with
 `data-flow` gets connector lines and small travelling points from `flow.js`,
 in an `aria-hidden` SVG layer beneath opaque nodes: `chain` joins consecutive
 `.dag-node`s, `spread` fans `.spread-source` out to every `.spread-node`
-(`data-copies="3"` draws three lines), and `lifecycle` / `overwrite` use the
-edge lists in `flow.js` over `[data-flow-id]` nodes. Geometry is measured and
-redrawn on resize, stacked layouts route lines down a gutter, and under
+(`data-copies="3"` draws three lines; stacked in one column the copies share
+one trunk down the gutter and branch off at their node), and `handoff` /
+`lifecycle` / `overwrite` use the edge lists in `flow.js` over
+`[data-flow-id]` nodes. The homepage hero is a `handoff`: the gate's frame to
+the run's frame. Geometry is measured and redrawn on resize, and under
 reduced motion the lines stay and nothing moves. Load
 `<script defer src="/assets/flow.js"></script>` on those pages.
 

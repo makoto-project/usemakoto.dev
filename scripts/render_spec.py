@@ -61,11 +61,30 @@ SCHEMA_NOTES = {
     "verification-report.schema.json": "The report contract. Separate outcomes per check, never a single collapsed verdict.",
 }
 
+SOCIAL_CARD = "https://usemakoto.dev/assets/og-card.png"
+SOCIAL_CARD_ALT = (
+    "Makoto: know where data began, what changed, and who attested to it. "
+    "A receiver's verification run refuses a handoff whose final bytes changed after signing."
+)
+
 STYLE_HEAD = """  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="{description}">
   <title>{title}</title>
   <link rel="canonical" href="https://usemakoto.dev{canonical}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Makoto">
+  <meta property="og:title" content="{title}">
+  <meta property="og:description" content="{description}">
+  <meta property="og:url" content="https://usemakoto.dev{canonical}">
+  <meta property="og:image" content="{card}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{card_alt}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{title}">
+  <meta name="twitter:description" content="{description}">
+  <meta name="twitter:image" content="{card}">
   <link rel="stylesheet" href="/assets/v02.css">
   <script src="/assets/theme.js"></script>
 """
@@ -89,7 +108,11 @@ def shell_fragments() -> tuple[str, str, str]:
 def page(*, title: str, description: str, canonical: str, main: str) -> str:
     topbar, sidebar, footer = shell_fragments()
     head = STYLE_HEAD.format(
-        title=html.escape(title), description=html.escape(description), canonical=canonical
+        title=html.escape(title, quote=True),
+        description=html.escape(description, quote=True),
+        canonical=canonical,
+        card=SOCIAL_CARD,
+        card_alt=html.escape(SOCIAL_CARD_ALT, quote=True),
     )
     return (
         '<!doctype html>\n<html lang="en">\n<head>\n'
