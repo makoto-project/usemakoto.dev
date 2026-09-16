@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Generate the rendered specification and schema pages from canonical sources.
 
-Two pages are generated, never hand-edited:
+Two pages and one pointer are generated, never hand-edited:
 
 * ``spec/text/index.html``    — the full normative text of ``spec/v0.2/spec.md``.
 * ``spec/schemas/index.html`` — every hosted schema under ``schema/v0.2/``.
+* ``schema/latest.json``      — the convenience pointer to the current catalog.
 
 Both are derived, so the published prose and JSON cannot drift from the bytes
-the pin and the catalog digest. ``tests/test_render_spec.py`` re-runs this with
-``--check`` so a stale page fails the suite rather than the reader.
+the pin and the catalog digest. ``tests/test_render_spec.py`` runs the ``--check`` comparison so a stale page
+fails the suite rather than the reader.
 
 The page shell (topbar, docs sidebar, footer) is lifted verbatim from
 ``spec/index.html`` rather than duplicated here: the navigation link sets have a
@@ -178,7 +179,20 @@ def schema_page() -> str:
         digest = (
             listed.get(path, {}).get("digest", {}).get("sha256") or hashlib.sha256(raw).hexdigest()
         )
-        pretty = html.escape(json.dumps(document, indent=2, ensure_ascii=False))
+        # Show the published bytes, not a re-serialisation, so the page shows what
+        # is digested. The catalog is canonical single-line JSON, which nobody can
+        # read in a code block, so that one is formatted and says so.
+        text = raw.decode("utf-8").rstrip("\n")
+        formatted = "\n" not in text
+        if formatted:
+            text = json.dumps(document, indent=2, ensure_ascii=False)
+        published = html.escape(text)
+        caption = (
+            "Formatted for reading. The digested bytes are canonical single-line JSON; "
+            "fetch the raw URL to compare them."
+            if formatted
+            else "The published bytes, unmodified."
+        )
         index_rows.append(
             f'<tr><td><a href="#{slug}"><code>{html.escape(path)}</code></a></td>'
             f"<td>{html.escape(note)}</td></tr>"
@@ -193,13 +207,16 @@ def schema_page() -> str:
             f'<dt>Raw</dt><dd><a href="/schema/v0.2/{html.escape(path)}">/schema/v0.2/{html.escape(path)}</a></dd>'
             "</dl>"
             f"<details><summary>Read the document ({len(raw):,} bytes)</summary><div>"
-            f'<pre class="language-json"><code class="language-json">{pretty}</code></pre>'
+            f'<pre class="language-json"><code class="language-json">{published}</code></pre>'
+            f'<p class="code-note">{caption}</p>'
             "</div></details></article>"
         )
     main = f"""  <span class="kicker">Machine-readable resources</span>
   <h1>Every hosted schema, with the bytes it is pinned by.</h1>
   <p class="lead">These are the resources a verifier resolves. Each one is served at a stable URL, digested in the catalog, and reproduced below exactly as published, so a reader can compare what a page claims against what the resolver will actually fetch.</p>
   <p class="spec-jump"><a href="/spec/">Specification overview</a><a href="/spec/text/">Normative text</a><a href="/schema/v0.2/catalog.json">Catalog</a><a href="/schema/latest.json">Current release pointer</a></p>
+
+  <p class="editorial-note"><strong>Pin versioned URLs.</strong> <a href="/schema/latest.json"><code>/schema/latest.json</code></a> is a convenience pointer to the current catalog for people. It is not an immutable protocol identifier and changes when a new version is published; cite the versioned resource and its digest instead.</p>
 
   <section aria-labelledby="index"><h2 id="index">Resource index</h2>
     <table class="stack-table schema-table"><thead><tr><th scope="col">Resource</th><th scope="col">What it constrains</th></tr></thead><tbody>{"".join(index_rows)}</tbody></table>
@@ -244,9 +261,12 @@ def latest_pointer() -> str:
             "resources": len(catalog["resources"]),
         },
         "note": (
-            "This document resolves the name 'latest' to the current schema catalog. "
-            "It is a pointer, not a schema: validate against the catalog's resources, "
-            "each of which is served at its own stable URL and pinned by digest."
+            "This document resolves the name 'latest' to the current schema catalog, "
+            "as a convenience for people. It is not an immutable protocol identifier: "
+            "it changes when a new version is published, so never use it as a $id, "
+            "$schema, or pinned reference. It is a pointer, not a schema: validate "
+            "against the catalog's resources, each served at its own versioned URL "
+            "and pinned by digest."
         ),
         "status": status,
         "supersedes": {
