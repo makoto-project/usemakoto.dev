@@ -272,7 +272,7 @@ jobs:
     "additionalProperties": false
   }
 }</code></pre>
-<p>Output of <code>jq . receiver/resources/68169d04….schema.json</code>. The policy requires that profile for every matching final artifact:</p>
+<p>That is the receiver's pinned schema resource, printed with <code>jq .</code>. Its SHA-256 digest, <code>68169d04…</code>, is the profile digest. The policy requires that profile for every matching final artifact:</p>
 <pre><code class="language-json">[
   {
     "closureDigest": {
