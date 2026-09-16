@@ -299,3 +299,174 @@ th { border-top: 1px solid var(--ink); background: transparent; font-family: var
   .assurance-table td:nth-child(3)::before { content: "Does not establish"; }
   .page table th { border-top: 0; }
 }
+
+/* ---------------------------------------------------------------------------
+   Shared code, syntax-highlighting, and specification layout.
+
+   Everything below is generic on purpose: a page gets highlighting by writing
+   <pre><code class="language-json"> and loading /assets/prism.js. No per-page
+   CSS, no per-language wiring. Token colours are tokens so a page-level dark
+   theme can retune them without touching selectors; every value is measured
+   at 7:1 or better against its own code surface.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --code-bg: #15211c;
+  --code-ink: #edf0eb;
+  --code-edge: rgba(23,33,29,.9);
+  --code-rule: rgba(237,240,235,.16);
+  --code-comment: #a6b3ab;
+  --code-punct: #b2beb7;
+  --code-key: #f2b5ae;
+  --code-string: #a9d6b6;
+  --code-number: #e8c98a;
+  --code-keyword: #c9b6ea;
+  --code-function: #9ecbe8;
+  --code-warn: #f0a09a;
+}
+
+.codeblock { margin: 1.4rem 0; padding: 0; border: 1px solid var(--code-edge); background: var(--code-bg); }
+.codeblock-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: .6rem .95rem; border-bottom: 1px solid var(--code-rule); color: var(--code-comment); font: 700 .68rem/1.5 var(--mono); letter-spacing: .07em; text-transform: uppercase; }
+.codeblock-head a { color: var(--code-string); }
+.codeblock-head a:visited { color: var(--code-string); }
+.codeblock-head a:hover { color: var(--code-ink); }
+.codeblock-title { min-width: 0; overflow-wrap: anywhere; text-transform: none; letter-spacing: .03em; }
+.codeblock-lang { flex: 0 0 auto; color: var(--code-key); }
+.codeblock pre { margin: 0; border: 0; }
+.code-note { margin: .5rem 0 0; color: var(--muted); font-size: .86rem; }
+
+/* Prism normalisation: the site owns the surface, the theme owns the tokens. */
+pre[class*="language-"], code[class*="language-"] { color: var(--code-ink); background: none; font-family: var(--mono); font-size: .82rem; line-height: 1.65; text-shadow: none; tab-size: 2; hyphens: none; }
+pre[class*="language-"] { margin: 1.4rem 0; padding: 1.1rem 1.15rem; overflow: auto; background: var(--code-bg); }
+:not(pre) > code[class*="language-"] { padding: .12em .35em; background: var(--code-bg); }
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection { color: var(--code-ink); background: rgba(179,58,47,.55); }
+
+.token.comment, .token.prolog, .token.cdata, .token.doctype { color: var(--code-comment); font-style: italic; }
+.token.punctuation, .token.operator, .token.entity, .token.url { color: var(--code-punct); }
+.token.property, .token.tag, .token.symbol, .token.constant, .token.attr-name { color: var(--code-key); }
+.token.string, .token.char, .token.attr-value, .token.builtin, .token.inserted { color: var(--code-string); }
+.token.number, .token.boolean, .token.null, .token.important { color: var(--code-number); }
+.token.keyword, .token.atrule, .token.selector, .token.class-name { color: var(--code-keyword); }
+.token.function, .token.variable, .token.regex { color: var(--code-function); }
+.token.deleted { color: var(--code-warn); }
+.token.namespace { opacity: .75; }
+.token.bold, .token.important { font-weight: 800; }
+.token.italic { font-style: italic; }
+
+/* Specification surface. */
+.spec-jump { margin: 1.6rem 0 0; padding: 1rem 0 0; border-top: 1px solid var(--ink); display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; font: 700 .76rem/1.6 var(--mono); }
+.spec-toc { margin: 1.5rem 0 0; padding: 0; list-style: none; border-top: 2px solid var(--ink); counter-reset: spec-part; }
+.spec-toc > li { display: grid; grid-template-columns: 3.4rem minmax(0,1fr); gap: 1.2rem; padding: 1.1rem 0; border-bottom: 1px solid var(--line); counter-increment: spec-part; }
+.spec-toc > li::before { content: counter(spec-part, decimal-leading-zero); color: var(--seal-dark); font: 700 .74rem/1.6 var(--mono); }
+.spec-toc h3 { margin: 0 0 .25rem; font-family: var(--display); font-size: 1.15rem; }
+.spec-toc p { margin: 0; color: var(--muted); }
+.spec-toc ul { margin: .5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .3rem 1.1rem; list-style: none; font-size: .86rem; }
+
+.doc-body { max-width: var(--measure); }
+.doc-body h2 { margin-top: 2.8rem; padding-top: 1rem; border-top: 2px solid var(--ink); scroll-margin-top: calc(var(--topbar-height) + 1rem); }
+.doc-body h3, .doc-body h4 { margin-top: 2rem; font-family: var(--display); scroll-margin-top: calc(var(--topbar-height) + 1rem); }
+.doc-body table { margin: 1.3rem 0; }
+.doc-body blockquote { margin: 1.3rem 0; padding: 0 0 0 1.1rem; border-left: 3px solid var(--seal); color: var(--muted); }
+.doc-body li { margin: .3rem 0; }
+.doc-body li > p { margin: .25rem 0; }
+.doc-body :not(pre) > code { padding: .1em .3em; background: var(--paper-deep); overflow-wrap: anywhere; }
+.doc-body hr { margin: 2.4rem 0; border: 0; border-top: 1px solid var(--line); }
+/* Rendered normative prose: wide reference tables scroll rather than squeeze the
+   measure, and task boxes stay readable without becoming interactive. */
+.table-scroll { margin: 1.3rem 0; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.doc-table { min-width: 34rem; margin: 0; font-size: .92rem; }
+.doc-table th { white-space: nowrap; }
+.doc-table code { overflow-wrap: anywhere; }
+.task-list { padding-left: 0; list-style: none; }
+.task-list .task { display: grid; grid-template-columns: 1.15rem minmax(0,1fr); gap: .6rem; align-items: baseline; }
+.task-list input { margin: 0; accent-color: var(--seal); }
+.anchor-link { margin-left: .45rem; color: var(--line-strong); font-size: .68em; text-decoration: none; opacity: 0; }
+:is(h2,h3,h4):hover > .anchor-link, .anchor-link:focus-visible { opacity: 1; }
+
+.schema-index { margin: 1.5rem 0 0; }
+.schema-entry { margin: 0; padding: 1.6rem 0; border-bottom: 1px solid var(--line); }
+.schema-entry:first-of-type { border-top: 2px solid var(--ink); }
+.schema-entry h3 { margin: 0 0 .3rem; font-family: var(--mono); font-size: 1.05rem; }
+.schema-entry > p { margin: 0 0 .5rem; color: var(--muted); max-width: var(--measure); }
+.schema-entry details { border-top: 0; }
+.schema-meta { margin: .6rem 0 0; display: grid; grid-template-columns: max-content minmax(0,1fr); gap: .3rem 1rem; font-size: .84rem; }
+.schema-meta dt { color: var(--muted); font: 700 .66rem/1.7 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.schema-meta dd { margin: 0; font-family: var(--mono); font-size: .78rem; overflow-wrap: anywhere; }
+
+/* Generic document components. These carry the restored requirement pages and
+   are deliberately unbranded so the sibling example, binding, and threat pages
+   can reuse them instead of inventing another card. */
+.note { margin: 1.2rem 0; padding: 1.1rem 0 0; border: 0; border-top: 1px solid var(--line-strong); border-radius: 0; background: transparent; }
+.note > :first-child { margin-top: 0; }
+.note > :last-child { margin-bottom: 0; }
+.note h3, .note h4 { margin: 0 0 .5rem; font-family: var(--display); font-size: 1.15rem; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,17rem),1fr)); gap: 1.5rem; margin: 1.3rem 0; }
+.card-grid .note { margin: 0; }
+.text-muted { color: var(--muted); }
+
+/* A normative obligation, shown as identifier / strength / title. The strength
+   badge is the scannable part, so it gets the colour and the mono weight. */
+.req-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: .55rem .9rem; margin-bottom: .6rem; }
+.req-id { color: var(--seal-dark); font: 800 .74rem/1.5 var(--mono); letter-spacing: .04em; }
+.req-level { padding: .2rem .45rem; font: 800 .66rem/1.3 var(--mono); letter-spacing: .07em; }
+.req-must { color: var(--seal-dark); background: var(--red-soft); }
+.req-should { color: var(--moss); background: var(--moss-soft); }
+.req-may { color: var(--muted); background: var(--paper-deep); }
+.req-title { flex: 1 1 14rem; min-width: 0; font-family: var(--display); font-size: 1.1rem; font-weight: 700; }
+
+/* A short identifier used inline in a table cell: threat id, tier name. */
+.tag { display: inline-block; padding: .15rem .4rem; background: var(--paper-deep); color: var(--ink); font: 800 .68rem/1.4 var(--mono); letter-spacing: .05em; white-space: nowrap; }
+
+.threat-row { display: grid; grid-template-columns: 2.4rem minmax(0,1fr); gap: 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--line); }
+.threat-row:first-of-type { border-top: 1px solid var(--ink); }
+.threat-mark { font-size: 1.3rem; line-height: 1.3; }
+.threat-row h4 { margin: 0 0 .3rem; font-family: var(--display); font-size: 1.1rem; }
+.threat-row p { margin: 0; color: var(--muted); }
+.pipeline-stage-icon { margin-bottom: .35rem; font-size: 1.25rem; }
+
+.toc-section { margin: 2rem 0; padding: 1.2rem 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.toc-section h3 { margin: 0 0 .6rem; font: 750 .7rem/1.4 var(--mono); letter-spacing: .09em; text-transform: uppercase; }
+.toc-section ul { margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem 1.5rem; list-style: none; font-size: .9rem; }
+
+/* Superseded-format pages. The protocol requires these URLs stay reachable,
+   so the banner has to read as a boundary, not as decoration. */
+.superseded-banner { margin: 0 0 2rem; padding: 1rem 1.15rem; border: 0; border-left: 4px solid var(--seal); background: var(--red-soft); color: var(--ink); }
+.superseded-banner p { margin: 0; max-width: var(--measure); }
+.superseded-banner p + p { margin-top: .5rem; }
+.superseded-banner strong { font-weight: 800; }
+
+@media (max-width: 900px) {
+  .spec-toc > li { grid-template-columns: 2.75rem minmax(0,1fr); gap: .9rem; }
+  .schema-meta { grid-template-columns: 1fr; gap: .1rem; }
+  .schema-meta dd { margin-bottom: .5rem; }
+}
+@media (max-width: 560px) {
+  .codeblock-head { flex-direction: column; gap: .2rem; }
+  pre[class*="language-"] { padding: .9rem .8rem; font-size: .76rem; }
+  .anchor-link { opacity: 1; }
+  .requirement-table td:nth-child(1)::before { content: "Requirement"; }
+  .requirement-table td:nth-child(2)::before { content: "Description"; }
+  .schema-table td:nth-child(1)::before { content: "Resource"; }
+  .schema-table td:nth-child(2)::before { content: "Constrains"; }
+  .part-table td:nth-child(1)::before { content: "Section"; }
+  .part-table td:nth-child(2)::before { content: "Fixes"; }
+}
+
+/* A page-level dark theme deepens the code surface so it still separates from
+   the page, and lifts every token to keep the measured ratios. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --code-bg: #0e1714;
+    --code-edge: rgba(237,240,235,.22);
+    --code-rule: rgba(237,240,235,.14);
+    --code-comment: #a6b3ab;
+    --code-punct: #bcc7c0;
+    --code-key: #f6c4bd;
+    --code-string: #b6e0c2;
+    --code-number: #eed39a;
+    --code-keyword: #d3c2f0;
+    --code-function: #aad5ef;
+  }
+  .doc-body :not(pre) > code { background: rgba(237,240,235,.1); }
+  .superseded-banner { background: rgba(163,47,38,.22); }
+}

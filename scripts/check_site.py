@@ -49,11 +49,29 @@ CANONICAL_PRESENTATION_PAGES = (
     "verify/index.html",
     "why-lineage/index.html",
 )
+# Superseded-format pages. The specification requires these URLs to stay
+# reachable and labelled (sections 17 and 21), so the retired version string is
+# expected here and its absence is the error, not its presence.
+SUPERSEDED_FORMAT_PAGES = (
+    "spec/l1-requirements.html",
+    "spec/l2-requirements.html",
+    "spec/l3-requirements.html",
+    "spec/signature-guide.html",
+)
+SUPERSEDED_BANNER = "Historical v0.1 material."
+# Pages that reproduce canonical source text verbatim. The retired version is
+# discussed by the specification itself, so a faithful rendering has to contain
+# it; scripts/render_spec.py --check is what keeps these honest.
+VERBATIM_SOURCE_PAGES = ("spec/text/index.html",)
+# Pages permitted to display a version label at all.
 TECHNICAL_VERSION_PAGES = {
     "predicate/v0.2/origin/index.html",
     "predicate/v0.2/transform/index.html",
     "source/file/index.html",
+    "spec/schemas/index.html",
+    "spec/text/index.html",
     "vocab/v0.2/bounded-pattern/index.html",
+    *SUPERSEDED_FORMAT_PAGES,
 }
 CURRENT_SHELL_PAGES = (
     "community/index.html",
@@ -724,7 +742,13 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
         relative = path.relative_to(ROOT).as_posix()
         content = path.read_text(encoding="utf-8", errors="replace")
         if re.search(r"v0\.1", content, flags=re.IGNORECASE):
-            errors.append(f"retired protocol version remains in HTML: {relative}")
+            if relative in SUPERSEDED_FORMAT_PAGES:
+                if SUPERSEDED_BANNER not in content:
+                    errors.append(f"superseded-format banner is missing: {relative}")
+            elif relative not in VERBATIM_SOURCE_PAGES:
+                errors.append(f"retired protocol version remains in HTML: {relative}")
+        elif relative in SUPERSEDED_FORMAT_PAGES:
+            errors.append(f"superseded-format page no longer names the retired version: {relative}")
         if relative in TECHNICAL_VERSION_PAGES:
             continue
         parser = PageParser()
