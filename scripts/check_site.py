@@ -49,11 +49,33 @@ CANONICAL_PRESENTATION_PAGES = (
     "verify/index.html",
     "why-lineage/index.html",
 )
+# Superseded-format pages. They stay reachable and labelled (sections 17 and 21),
+# so the retired version string is expected here and its absence is the error.
+# The L1-L3 pages are not in this set: they document the current Section 8.3
+# assurance levels.
+SUPERSEDED_FORMAT_PAGES = ("spec/signature-guide.html",)
+LEVEL_PAGES = (
+    "spec/l1-requirements.html",
+    "spec/l2-requirements.html",
+    "spec/l3-requirements.html",
+)
+# Section 21 also requires the superseded pages to state the incompatibility, so
+# the banner has to carry both markers, inside the banner element itself.
+SUPERSEDED_BANNER_CLASS = 'class="superseded-banner"'
+SUPERSEDED_BANNER_TEXT = ("Historical v0.1 material.", "not wire-compatible")
+# Pages that reproduce canonical source text verbatim. The retired version is
+# discussed by the specification itself, so a faithful rendering has to contain
+# it; scripts/render_spec.py --check is what keeps these honest.
+VERBATIM_SOURCE_PAGES = ("spec/text/index.html",)
+# Pages permitted to display a version label at all.
 TECHNICAL_VERSION_PAGES = {
     "predicate/v0.2/origin/index.html",
     "predicate/v0.2/transform/index.html",
     "source/file/index.html",
+    "spec/schemas/index.html",
+    "spec/text/index.html",
     "vocab/v0.2/bounded-pattern/index.html",
+    *SUPERSEDED_FORMAT_PAGES,
 }
 CURRENT_SHELL_PAGES = (
     "community/index.html",
@@ -99,10 +121,21 @@ CURRENT_INTEGRATION_PAGES = tuple(
     )
 )
 CURRENT_SHELL_PAGES += CURRENT_INTEGRATION_PAGES
+# Retired numeric-level constructs. These must not match the current string
+# levels "L1"-"L3" defined by Section 8.3.
+STALE_LEVEL_PATTERNS = (
+    ("makoto.level", r"\bmakoto\.level\b"),
+    # Tags and quotes may sit between the name and the number in highlighted markup.
+    ("numeric level assignment", r"(?i)\blevel\s*=\s*(?:<[^>]*>|[\"'])*\s*[123]\b"),
+)
+STALE_JSON_PATTERNS = (
+    r"makoto\.dev/(?:origin|transform)/v1",
+    r'"makotoLevel"',
+    r'"level"\s*:\s*[123](?:\s*[,}])',
+)
 STALE_INTEGRATION_MARKERS = (
     "origin/v1",
     "transform/v1",
-    "makoto.level",
     "makoto_airflow",
     "makoto_dagster",
     "makoto_databricks",
@@ -719,12 +752,45 @@ def check_tracked_files(errors: list[str]) -> None:
         errors.append(f"forbidden tracked dependencies/caches: {forbidden[:10]!r}")
 
 
+def stale_integration_markers(content: str) -> list[str]:
+    """Return the retired constructs an integration page still uses.
+
+    The numeric-level guards target only the old forms: a ``makoto.level``
+    attribute and a ``level = 1..3`` assignment. The current string levels
+    (``"L1"``-``"L3"``, ``--require L2``) and the ``makoto.levels`` module pass.
+    """
+    found = [marker for marker in STALE_INTEGRATION_MARKERS if marker in content]
+    found += [label for label, pattern in STALE_LEVEL_PATTERNS if re.search(pattern, content)]
+    return found
+
+
+def retired_version_errors(relative: str, content: str) -> list[str]:
+    """Apply the retired-version rule to one HTML page.
+
+    The retired version may appear only where the specification requires it:
+    on the superseded pages, which must carry the labelled banner, and on the
+    verbatim rendering of the specification, which discusses it. Anywhere else
+    it is a regression.
+    """
+    names_retired = re.search(r"v0\.1", content, flags=re.IGNORECASE) is not None
+    if relative in SUPERSEDED_FORMAT_PAGES:
+        if not names_retired:
+            return [f"superseded-format page no longer names the retired version: {relative}"]
+        _, has_banner, after = content.partition(SUPERSEDED_BANNER_CLASS)
+        banner = after.split("</div>", 1)[0]
+        if not has_banner or not all(text in banner for text in SUPERSEDED_BANNER_TEXT):
+            return [f"superseded-format banner is missing or incomplete: {relative}"]
+        return []
+    if names_retired and relative not in VERBATIM_SOURCE_PAGES:
+        return [f"retired protocol version remains in HTML: {relative}"]
+    return []
+
+
 def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None:
     for path in sorted(ROOT.rglob("*.html")):
         relative = path.relative_to(ROOT).as_posix()
         content = path.read_text(encoding="utf-8", errors="replace")
-        if re.search(r"v0\.1", content, flags=re.IGNORECASE):
-            errors.append(f"retired protocol version remains in HTML: {relative}")
+        errors.extend(retired_version_errors(relative, content))
         if relative in TECHNICAL_VERSION_PAGES:
             continue
         parser = PageParser()
@@ -735,16 +801,11 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
                 errors.append(
                     f"visible version label remains in narrative page {relative}: {forbidden}"
                 )
-    stale_json_patterns = (
-        r"makoto\.dev/(?:origin|transform)/v1",
-        r'"makotoLevel"',
-        r'"level"\s*:\s*[123](?:\s*[,}])',
-    )
     for path in sorted(ROOT.rglob("*.json")):
         if ".codex-work" in path.parts:
             continue
         content = path.read_text(encoding="utf-8", errors="replace")
-        for pattern in stale_json_patterns:
+        for pattern in STALE_JSON_PATTERNS:
             if re.search(pattern, content):
                 errors.append(
                     "retired protocol construct remains in deployable JSON: "
@@ -760,11 +821,10 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
                 errors.append(f"presentation version label remains in {relative}: {forbidden}")
     for relative in CURRENT_INTEGRATION_PAGES:
         content = (ROOT / relative).read_text(encoding="utf-8", errors="replace")
-        for marker in STALE_INTEGRATION_MARKERS:
-            if marker in content:
-                errors.append(f"stale integration construct remains in {relative}: {marker}")
-        if re.search(r"\blevel\s*=", content, flags=re.IGNORECASE):
-            errors.append(f"stale level assignment remains in {relative}")
+        errors.extend(
+            f"stale integration construct remains in {relative}: {marker}"
+            for marker in stale_integration_markers(content)
+        )
     for relative in CURRENT_SHELL_PAGES:
         path = ROOT / relative
         if not path.is_file():
