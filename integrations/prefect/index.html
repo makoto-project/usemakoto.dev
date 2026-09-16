@@ -7,7 +7,7 @@
 <p class="lead">A Prefect task result may be an in-memory value, cached object, pointer, or stable data artifact. Makoto attaches only where the flow can name the exact persisted bytes and their predecessors. This flow signs each file after it is written, retries tool failures, and never retries a denial.</p>
 <p class="editorial-note"><strong>Implementation boundary.</strong> This is a pattern built from the platform&rsquo;s own APIs and the pinned reference CLI. It is not a shipped adapter, plugin, or package. Executed with Prefect 3.8.6 on a local ephemeral server, once clean and once with the bundle corrupted in transit.</p>
 <section aria-labelledby="placement"><h2 id="placement">Where Makoto sits</h2><p>Each producing task returns a path to bytes it has already written. A separate signing task turns that path into evidence, and a <code>retry_condition_fn</code> separates transient tool failures from verdicts.</p><ol class="provenance-spine"><li><strong><code>extract</code> &rarr; <code>attest_origin</code></strong><span>Write the raw export, then sign an origin statement over its bytes.</span></li><li><strong><code>normalize</code> &rarr; <code>attest_normalize</code></strong><span>Write the output, then sign a transformation bound to the raw bytes and origin statement.</span></li><li><strong><code>create_handoff</code> &rarr; <code>deliver</code></strong><span>Build the bundle and move it to the receiver; a flow parameter can corrupt it on the way.</span></li><li><strong><code>makoto_gate</code></strong><span>Verifies. <code>MakotoDenied</code> fails the task; <code>retry_unless_denied</code> declines to retry it.</span></li><li><strong><code>publish</code></strong><span>Takes the gate&rsquo;s result as an input, so it cannot run after a failed gate.</span></li></ol></section>
-<ol class="setup-sequence"><li><div><h2 id="install">Install</h2><p>Every platform on this site uses the same two files from <a href="/integrations/#helper">the integration index</a>: <code>makoto_boundary.py</code>, a standard-library helper that signs, hands off, and verifies through the pinned CLI, and <code>makoto_bootstrap.py</code>, which creates one key per claim role and the receiver&rsquo;s trust policy. Put both next to the code below.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git /opt/makoto
+<section aria-labelledby="install"><h2 id="install">1. Install</h2><p>Every platform on this site uses the same two files from <a href="/integrations/#helper">the integration index</a>: <code>makoto_boundary.py</code>, a standard-library helper that signs, hands off, and verifies through the pinned CLI, and <code>makoto_bootstrap.py</code>, which creates one key per claim role and the receiver&rsquo;s trust policy. Put both next to the code below.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git /opt/makoto
 git -C /opt/makoto checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
 (cd /opt/makoto &amp;&amp; uv sync --locked --dev)
 export MAKOTO_CORE=/opt/makoto
@@ -15,7 +15,7 @@ uv pip install "prefect==3.8.6"</code></pre><pre><code class="language-bash">uv 
   --source-kind urn:example:source:orders-export \
   --source-uri urn:example:orders:daily \
   --operation-type urn:example:operation:normalize-orders
-export MAKOTO_KEYS=/srv/makoto/keys MAKOTO_POLICY=/srv/makoto/policy.json</code></pre></div></li><li><div><h2 id="code">The flow</h2><p>Save this as <code>orders_flow.py</code>.</p><pre><code class="language-python">"""A Prefect flow that signs each task output and refuses a handoff Makoto denies."""
+export MAKOTO_KEYS=/srv/makoto/keys MAKOTO_POLICY=/srv/makoto/policy.json</code></pre></section><section aria-labelledby="code"><h2 id="code">2. The flow</h2><p>Save this as <code>orders_flow.py</code>.</p><pre><code class="language-python">"""A Prefect flow that signs each task output and refuses a handoff Makoto denies."""
 
 import os
 import shutil
@@ -135,7 +135,7 @@ def makoto_orders(tamper_in_transit: bool = False) -&gt; None:
 
 
 if __name__ == "__main__":
-    makoto_orders(tamper_in_transit="--tamper-in-transit" in sys.argv)</code></pre></div></li><li><div><h2 id="run">Run it</h2><pre><code class="language-bash">export MAKOTO_WORK=/srv/makoto/work
+    makoto_orders(tamper_in_transit="--tamper-in-transit" in sys.argv)</code></pre></section><section aria-labelledby="run"><h2 id="run">3. Run it</h2><pre><code class="language-bash">export MAKOTO_WORK=/srv/makoto/work
 python orders_flow.py</code></pre><p>Flow log, timestamps and task-run suffixes trimmed:</p><pre><code class="language-bash">| INFO    | Flow run - Beginning flow run for flow 'makoto-orders'
 | INFO    | Task run 'extract' - Finished in state Completed()
 | INFO    | Task run 'attest_origin' - Finished in state Completed()
@@ -146,7 +146,7 @@ python orders_flow.py</code></pre><p>Flow log, timestamps and task-run suffixes 
 | INFO    | Task run 'makoto_gate' - Finished in state Completed()
 | INFO    | Task run 'publish' - publishing orders.normalized.csv under Makoto allow (policy 4bd642394c20)
 | INFO    | Task run 'publish' - Finished in state Completed()
-| INFO    | Flow run - Finished in state Completed()</code></pre></div></li><li><div><h2 id="failure">What a gate failure looks like</h2><pre><code class="language-bash">python orders_flow.py --tamper-in-transit</code></pre><pre><code class="language-bash">| INFO    | Flow run - Beginning flow run for flow 'makoto-orders'
+| INFO    | Flow run - Finished in state Completed()</code></pre></section><section aria-labelledby="failure"><h2 id="failure">4. What a gate failure looks like</h2><pre><code class="language-bash">python orders_flow.py --tamper-in-transit</code></pre><pre><code class="language-bash">| INFO    | Flow run - Beginning flow run for flow 'makoto-orders'
 | INFO    | Task run 'extract' - Finished in state Completed()
 | INFO    | Task run 'attest_origin' - Finished in state Completed()
 | INFO    | Task run 'normalize' - Finished in state Completed()
@@ -154,7 +154,7 @@ python orders_flow.py</code></pre><p>Flow log, timestamps and task-run suffixes 
 | INFO    | Task run 'create_handoff' - Finished in state Completed()
 | INFO    | Task run 'deliver' - Finished in state Completed()
 | ERROR   | Task run 'makoto_gate' - Finished in state Failed('Task run encountered an exception MakotoDenied: Makoto deny (E_ARTIFACT_DIGEST): step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest')
-| INFO    | Flow run - Finished in state Failed('Flow run encountered an exception: MakotoDenied: Makoto deny (E_ARTIFACT_DIGEST): step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest')</code></pre><p><code>makoto_gate</code> fails on its first attempt with no retry, <code>publish</code> never starts, and the flow run ends <code>Failed</code> with the primary error in its message.</p></div></li></ol>
+| INFO    | Flow run - Finished in state Failed('Flow run encountered an exception: MakotoDenied: Makoto deny (E_ARTIFACT_DIGEST): step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest')</code></pre><p><code>makoto_gate</code> fails on its first attempt with no retry, <code>publish</code> never starts, and the flow run ends <code>Failed</code> with the primary error in its message.</p></section>
 <section aria-labelledby="retries"><h2 id="retries">Retries that respect a verdict</h2><p>Prefect calls <code>retry_condition_fn</code> with the failed state. Re-raising the state&rsquo;s exception is how the function sees what went wrong. A <code>MakotoDenied</code> or <code>MakotoConflict</code> will be the same on every attempt, so the function returns <code>False</code>; anything else, including <code>MakotoToolError</code>, is retried.</p><pre><code class="language-python">def retry_unless_denied(task, task_run, state) -&gt; bool:
     """Retry tool failures; never retry a verdict or a conflicting signature."""
     try:

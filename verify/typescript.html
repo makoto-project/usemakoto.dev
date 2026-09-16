@@ -3,8 +3,7 @@
 <h1>Type the report before your code trusts it.</h1>
 <p class="lead">The same gate as the JavaScript binding, with declared types for the decision, check identifiers, statuses, and diagnostics, and a guard that narrows <code>JSON.parse</code> output from <code>unknown</code> before any branch reads it. Both files pass <code>tsc --strict</code> and run directly on Node.js 26 with native type stripping.</p>
 <p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>0e41afbd0c3f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
-<ol class="setup-sequence">
-<li><div><h2 id="install">Install the verifier and the toolchain</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
+<section aria-labelledby="install"><h2 id="install">1. Install the verifier and the toolchain</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto
 git checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
 uv sync --locked --dev
@@ -27,8 +26,7 @@ npm install --save-dev typescript@5 @types/node</code></pre><p>This <code>tsconf
     "skipLibCheck": true
   },
   "files": ["makoto-gate.ts", "makoto-report.ts"]
-}</code></pre></div></li>
-<li><div><h2 id="types">Declare the report contract</h2><p>Save this as <code>makoto-report.ts</code>. It types the fields a gate reads, not every field the report carries; the authoritative shape is the <a href="/schema/v0.2/verification-report.schema.json">verification-report schema</a>. The check identifiers are the sixteen <code>checks[].id</code> values the verifier emits, in order.</p><pre><code class="language-typescript">// Types for the fields a gate reads from a Makoto verification report.
+}</code></pre></section><section aria-labelledby="types"><h2 id="types">2. Declare the report contract</h2><p>Save this as <code>makoto-report.ts</code>. It types the fields a gate reads, not every field the report carries; the authoritative shape is the <a href="/schema/v0.2/verification-report.schema.json">verification-report schema</a>. The check identifiers are the sixteen <code>checks[].id</code> values the verifier emits, in order.</p><pre><code class="language-typescript">// Types for the fields a gate reads from a Makoto verification report.
 // Authoritative shape: https://usemakoto.dev/schema/v0.2/verification-report.schema.json
 
 export type Decision = "allow" | "deny" | "indeterminate";
@@ -91,8 +89,7 @@ export function isVerificationReport(value: unknown): value is VerificationRepor
     Array.isArray(r.errors) &amp;&amp;
     typeof r.summary === "object" &amp;&amp; r.summary !== null
   );
-}</code></pre><p>The guard is deliberately shallow: it establishes the fields the gate branches on. If you persist or forward reports, validate them against the hosted schema with AJV as well.</p></div></li>
-<li><div><h2 id="program">The complete program</h2><p>Save this as <code>makoto-gate.ts</code> beside the types file.</p><pre><code class="language-typescript">// Validate, attest, verify, and gate on a Makoto report from TypeScript.
+}</code></pre><p>The guard is deliberately shallow: it establishes the fields the gate branches on. If you persist or forward reports, validate them against the hosted schema with AJV as well.</p></section><section aria-labelledby="program"><h2 id="program">3. The complete program</h2><p>Save this as <code>makoto-gate.ts</code> beside the types file.</p><pre><code class="language-typescript">// Validate, attest, verify, and gate on a Makoto report from TypeScript.
 import { spawnSync, type SpawnSyncReturns } from "node:child_process";
 import { cpSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -232,8 +229,7 @@ decision=allow primaryError=null
 decision=deny primaryError=E_ARTIFACT_DIGEST
   check artifact-bytes: fail []
   step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
-  signatures 4/4 valid, policy 614eb137303b</code></pre></div></li>
-<li><div><h2 id="verify">Verify, narrow, and handle a denial</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-typescript">export function verifyBundle(bundleDir: string): VerificationReport {
+  signatures 4/4 valid, policy 614eb137303b</code></pre></section><section aria-labelledby="verify"><h2 id="verify">4. Verify, narrow, and handle a denial</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-typescript">export function verifyBundle(bundleDir: string): VerificationReport {
   const result = makoto(
     "verify", "bundle", bundleDir,
     "--policy", join(DEMO, "receiver/policy.json"),
@@ -274,8 +270,7 @@ try {
   if (!(error instanceof MakotoDenied)) throw error;
   explain(error.report);
   process.exitCode = error.report.primaryError === "E_ARTIFACT_DIGEST" ? 0 : 1;
-}</code></pre></div></li>
-<li><div><h2 id="report">Read the verification report</h2><p><code>CheckId</code> is a closed union, so a typo in a check name fails compilation rather than matching nothing at runtime.</p><pre><code class="language-typescript">export function explain(report: VerificationReport): void {
+}</code></pre></section><section aria-labelledby="report"><h2 id="report">5. Read the verification report</h2><p><code>CheckId</code> is a closed union, so a typo in a check name fails compilation rather than matching nothing at runtime.</p><pre><code class="language-typescript">export function explain(report: VerificationReport): void {
   console.log(`decision=${report.decision} primaryError=${report.primaryError}`);
   for (const check of report.checks.filter((c) =&gt; c.status !== "pass")) {
     console.log(`  check ${check.id}: ${check.status}`, check.prerequisiteChecks);
@@ -285,8 +280,7 @@ try {
   }
   const s = report.summary;
   console.log(`  signatures ${s.signaturesValid}/${s.signaturesTotal} valid, policy ${report.policyDigest.sha256.slice(0, 12)}`);
-}</code></pre><p>Structure-only validation with AJV is identical to <a href="/verify/nodejs.html#validate">the JavaScript binding</a>.</p></div></li>
-</ol>
+}</code></pre><p>Structure-only validation with AJV is identical to <a href="/verify/nodejs.html#validate">the JavaScript binding</a>.</p></section>
 <section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><dl class="troubleshooting">
 <dt><code>0</code> &middot; allow</dt><dd>Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</dd>
 <dt><code>1</code> &middot; deny or indeterminate</dt><dd>stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</dd>

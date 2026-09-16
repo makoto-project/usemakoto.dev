@@ -7,7 +7,7 @@
 <p class="lead">A dbt model, manifest, and run result explain how warehouse relations were built. A recipient-verifiable handoff still needs a stable artifact whose exact bytes both sides can hash. This page wraps <code>dbt build</code> with <code>dbtRunner</code>, exports the model to a file, and signs that file against the seed it was built from.</p>
 <p class="editorial-note"><strong>Implementation boundary.</strong> This is a pattern built from the platform&rsquo;s own APIs and the pinned reference CLI. It is not a shipped adapter, plugin, or package. Executed with dbt-core 1.12.5 and dbt-duckdb 1.11.0, once clean and once with the bundle corrupted in transit. The same wrapper applies to warehouse adapters that unload to files.</p>
 <section aria-labelledby="placement"><h2 id="placement">Where Makoto sits</h2><p>dbt hooks run SQL inside the warehouse; they cannot hash a file or hold a signing key. The attachment point is therefore the process that invokes dbt, using dbt&rsquo;s own <code>manifest.json</code> and <code>run_results.json</code> to find exactly what was built.</p><ol class="provenance-spine"><li><strong>Seed</strong><span>Signed as the origin before dbt reads it.</span></li><li><strong><code>dbt build</code></strong><span>Loads the seed and builds the model. A failure stops the wrapper before anything is attested.</span></li><li><strong>External materialization</strong><span>dbt-duckdb writes the model to <code>target/orders_normalized.csv</code>; the path is read back from the manifest, not hard-coded twice.</span></li><li><strong>Transformation statement</strong><span>Binds the exported file to the seed bytes and origin statement, with the model&rsquo;s <code>unique_id</code> as the operation name.</span></li><li><strong>Gate</strong><span>The receiver verifies the delivered bundle before loading it anywhere.</span></li></ol></section>
-<ol class="setup-sequence"><li><div><h2 id="install">Install</h2><p>Every platform on this site uses the same two files from <a href="/integrations/#helper">the integration index</a>: <code>makoto_boundary.py</code>, a standard-library helper that signs, hands off, and verifies through the pinned CLI, and <code>makoto_bootstrap.py</code>, which creates one key per claim role and the receiver&rsquo;s trust policy. Put both next to the code below.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git /opt/makoto
+<section aria-labelledby="install"><h2 id="install">1. Install</h2><p>Every platform on this site uses the same two files from <a href="/integrations/#helper">the integration index</a>: <code>makoto_boundary.py</code>, a standard-library helper that signs, hands off, and verifies through the pinned CLI, and <code>makoto_bootstrap.py</code>, which creates one key per claim role and the receiver&rsquo;s trust policy. Put both next to the code below.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git /opt/makoto
 git -C /opt/makoto checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
 (cd /opt/makoto &amp;&amp; uv sync --locked --dev)
 export MAKOTO_CORE=/opt/makoto
@@ -15,7 +15,7 @@ uv pip install "dbt-core==1.12.5" "dbt-duckdb==1.11.0"</code></pre><pre><code cl
   --source-kind urn:example:source:orders-export \
   --source-uri urn:example:orders:daily \
   --operation-type urn:example:operation:dbt-model
-export MAKOTO_KEYS=/srv/makoto/keys MAKOTO_POLICY=/srv/makoto/policy.json</code></pre></div></li><li><div><h2 id="project">The project</h2><p>A two-node project: one seed and one model exported as a file.</p><pre><code class="language-yaml"># dbt_project.yml
+export MAKOTO_KEYS=/srv/makoto/keys MAKOTO_POLICY=/srv/makoto/policy.json</code></pre></section><section aria-labelledby="project"><h2 id="project">2. The project</h2><p>A two-node project: one seed and one model exported as a file.</p><pre><code class="language-yaml"># dbt_project.yml
 name: orders
 version: "1.0.0"
 profile: orders
@@ -37,7 +37,7 @@ select
     lower(trim(region)) as region,
     total
 from {{ ref("orders_raw") }}
-order by order_id</code></pre></div></li><li><div><h2 id="code">The wrapper</h2><p>Save this as <code>makoto_dbt.py</code> in the project root.</p><pre><code class="language-python">"""Run dbt, sign the exported model against the seed it read, and gate the handoff.
+order by order_id</code></pre></section><section aria-labelledby="code"><h2 id="code">3. The wrapper</h2><p>Save this as <code>makoto_dbt.py</code> in the project root.</p><pre><code class="language-python">"""Run dbt, sign the exported model against the seed it read, and gate the handoff.
 
     python makoto_dbt.py                      # build, attest, hand off, verify
     python makoto_dbt.py --tamper-in-transit  # same, with the delivered bytes changed
@@ -115,11 +115,11 @@ def main() -&gt; int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())</code></pre></div></li><li><div><h2 id="run">Run it</h2><pre><code class="language-bash">python makoto_dbt.py</code></pre><pre><code class="language-bash">13:04:21  1 of 2 OK loaded seed file main.orders_raw ..................................... [INSERT 2 in 0.03s]
+    sys.exit(main())</code></pre></section><section aria-labelledby="run"><h2 id="run">4. Run it</h2><pre><code class="language-bash">python makoto_dbt.py</code></pre><pre><code class="language-bash">13:04:21  1 of 2 OK loaded seed file main.orders_raw ..................................... [INSERT 2 in 0.03s]
 13:04:21  2 of 2 OK created sql external model main.orders_normalized .................... [OK in 0.04s]
 13:04:21  Done. PASS=2 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=2
-ALLOWED orders_normalized.csv: 2 statements, policy c74202b1c774</code></pre></div></li><li><div><h2 id="failure">What a gate failure looks like</h2><pre><code class="language-bash">python makoto_dbt.py --tamper-in-transit</code></pre><pre><code class="language-bash">13:04:25  Done. PASS=2 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=2
-REFUSED orders_normalized.csv: Makoto deny (E_ARTIFACT_DIGEST): step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest</code></pre><p>dbt itself succeeded; the export was signed honestly. The refusal happens where it belongs, before the receiver loads the file.</p></div></li></ol>
+ALLOWED orders_normalized.csv: 2 statements, policy c74202b1c774</code></pre></section><section aria-labelledby="failure"><h2 id="failure">5. What a gate failure looks like</h2><pre><code class="language-bash">python makoto_dbt.py --tamper-in-transit</code></pre><pre><code class="language-bash">13:04:25  Done. PASS=2 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=2
+REFUSED orders_normalized.csv: Makoto deny (E_ARTIFACT_DIGEST): step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest</code></pre><p>dbt itself succeeded; the export was signed honestly. The refusal happens where it belongs, before the receiver loads the file.</p></section>
 
 <section aria-labelledby="attachment"><h2 id="attachment">Other attachment points on this platform</h2><dl class="troubleshooting"><dt>Model materialization</dt><dd>Capture model unique ID, compiled SQL digest, invocation ID, adapter, relation, and test results after the materialization succeeds.</dd><dt>Exact artifact</dt><dd>Export a stable file set or create a deterministic manifest over the handed-off relation snapshot. A relation name alone is mutable.</dd><dt>Predecessors</dt><dd>Resolve exact upstream artifact and statement digests; do not equate the dbt DAG edge with a signed Makoto edge.</dd><dt>Project boundary</dt><dd>Create the signed handoff only when the exact output set and required private profiles are known.</dd></dl></section>
 <section aria-labelledby="evidence"><h2 id="evidence">What the evidence can say</h2><p>It can bind a stable dbt-produced export to compiled-model context and exact predecessors. It cannot prove SQL semantics, regulatory compliance, or a warehouse relation’s future contents.</p></section>

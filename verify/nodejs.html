@@ -3,8 +3,7 @@
 <h1>Gate a Node.js service on a Makoto verdict.</h1>
 <p class="lead">One complete ES module: compile the hosted trust-policy schema with AJV&rsquo;s Draft 2020-12 build, sign an origin statement, spawn the pinned verifier, refuse a tampered bundle, and surface the primary error to the caller. It was executed on Node.js 26 against the pinned core before publication.</p>
 <p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>0e41afbd0c3f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
-<ol class="setup-sequence">
-<li><div><h2 id="install">Install the verifier and one dependency</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
+<section aria-labelledby="install"><h2 id="install">1. Install the verifier and one dependency</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto
 git checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
 uv sync --locked --dev
@@ -14,8 +13,7 @@ uv sync --locked --dev
 
 export MAKOTO_CORE="$PWD"</code></pre><p>The binding needs a single npm package for structural validation. The verifier itself has no JavaScript dependency.</p><pre><code class="language-bash">mkdir makoto-gate &amp;&amp; cd makoto-gate
 npm init -y &amp;&amp; npm pkg set type=module
-npm install ajv@8</code></pre></div></li>
-<li><div><h2 id="program">The complete module</h2><p>Save this as <code>makoto-gate.mjs</code>. The functions are exported so a service can import them; the bottom of the file runs the demonstration.</p><pre><code class="language-javascript">// Validate, attest, verify, and gate on a Makoto report from Node.js 20+.
+npm install ajv@8</code></pre></section><section aria-labelledby="program"><h2 id="program">2. The complete module</h2><p>Save this as <code>makoto-gate.mjs</code>. The functions are exported so a service can import them; the bottom of the file runs the demonstration.</p><pre><code class="language-javascript">// Validate, attest, verify, and gate on a Makoto report from Node.js 20+.
 import { spawnSync } from "node:child_process";
 import { cpSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -160,8 +158,7 @@ decision=allow primaryError=null
 decision=deny primaryError=E_ARTIFACT_DIGEST
   check artifact-bytes: fail []
   step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
-  signatures 4/4 valid, policy 614eb137303b</code></pre></div></li>
-<li><div><h2 id="validate">Validate structure with AJV</h2><p>Fetch the hosted schema, compile it once, and reuse the compiled validator. <code>allErrors</code> reports every problem in one pass, which is what a person fixing a policy file wants.</p><pre><code class="language-javascript">export async function validateStructure(instancePath, schemaName) {
+  signatures 4/4 valid, policy 614eb137303b</code></pre></section><section aria-labelledby="validate"><h2 id="validate">3. Validate structure with AJV</h2><p>Fetch the hosted schema, compile it once, and reuse the compiled validator. <code>allErrors</code> reports every problem in one pass, which is what a person fixing a policy file wants.</p><pre><code class="language-javascript">export async function validateStructure(instancePath, schemaName) {
   const response = await fetch(SCHEMA_BASE + schemaName);
   if (!response.ok) throw new MakotoToolError(`schema fetch failed: ${response.status}`);
   const ajv = new Ajv2020({ allErrors: true, strict: false });
@@ -170,8 +167,7 @@ decision=deny primaryError=E_ARTIFACT_DIGEST
   return validate(instance)
     ? []
     : validate.errors.map((e) =&gt; `${e.instancePath || "(root)"} ${e.message}`);
-}</code></pre><p>Structure is not verification. <a href="/validate/">The validator catalogue</a> shows the same schemas in other tools.</p></div></li>
-<li><div><h2 id="attest">Generate an attestation</h2><p>The producer side is two CLI calls: an Ed25519 key pair, then a signed origin statement over the exact bytes of the new file. Pass arguments as an array, never through a shell string, so a file name can never become a flag.</p><pre><code class="language-javascript">export function attestOrigin(artifactPath, workDir) {
+}</code></pre><p>Structure is not verification. <a href="/validate/">The validator catalogue</a> shows the same schemas in other tools.</p></section><section aria-labelledby="attest"><h2 id="attest">4. Generate an attestation</h2><p>The producer side is two CLI calls: an Ed25519 key pair, then a signed origin statement over the exact bytes of the new file. Pass arguments as an array, never through a shell string, so a file name can never become a flag.</p><pre><code class="language-javascript">export function attestOrigin(artifactPath, workDir) {
   const privateKey = join(workDir, "producer.private.pem");
   const out = join(workDir, "origin.dsse.json");
   for (const args of [
@@ -189,8 +185,7 @@ decision=deny primaryError=E_ARTIFACT_DIGEST
     if (result.status !== 0) throw new MakotoToolError(result.stderr.trim());
   }
   return out;
-}</code></pre></div></li>
-<li><div><h2 id="verify">Verify a bundle and handle a denial</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-javascript">export class MakotoToolError extends Error {}
+}</code></pre></section><section aria-labelledby="verify"><h2 id="verify">5. Verify a bundle and handle a denial</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-javascript">export class MakotoToolError extends Error {}
 
 export class MakotoDenied extends Error {
   constructor(report) {
@@ -236,8 +231,7 @@ try {
   if (!(error instanceof MakotoDenied)) throw error;
   explain(error.report);
   process.exitCode = error.report.primaryError === "E_ARTIFACT_DIGEST" ? 0 : 1;
-}</code></pre></div></li>
-<li><div><h2 id="report">Read the verification report</h2><p>Route on <code>primaryError</code>, show the checks that did not pass, and keep the policy digest with anything you store.</p><pre><code class="language-javascript">export function explain(report) {
+}</code></pre></section><section aria-labelledby="report"><h2 id="report">6. Read the verification report</h2><p>Route on <code>primaryError</code>, show the checks that did not pass, and keep the policy digest with anything you store.</p><pre><code class="language-javascript">export function explain(report) {
   console.log(`decision=${report.decision} primaryError=${report.primaryError}`);
   for (const check of report.checks.filter((c) =&gt; c.status !== "pass")) {
     console.log(`  check ${check.id}: ${check.status}`, check.prerequisiteChecks);
@@ -247,8 +241,7 @@ try {
   }
   const s = report.summary;
   console.log(`  signatures ${s.signaturesValid}/${s.signaturesTotal} valid, policy ${report.policyDigest.sha256.slice(0, 12)}`);
-}</code></pre><p>For declared types over the same report, see <a href="/verify/typescript.html">the TypeScript binding</a>.</p></div></li>
-</ol>
+}</code></pre><p>For declared types over the same report, see <a href="/verify/typescript.html">the TypeScript binding</a>.</p></section>
 <section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><dl class="troubleshooting">
 <dt><code>0</code> &middot; allow</dt><dd>Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</dd>
 <dt><code>1</code> &middot; deny or indeterminate</dt><dd>stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</dd>

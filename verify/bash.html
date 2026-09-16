@@ -3,8 +3,7 @@
 <h1>Make the shell fail closed.</h1>
 <p class="lead">In a pipeline step there is no object model, only an exit status and a JSON document. Call the reference verifier directly. This page builds one script that validates structure, signs an origin statement, verifies a bundle, branches on the verdict, and reads the report with <code>jq</code>, then wires the same gate into a CI job.</p>
 <p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>0e41afbd0c3f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
-<ol class="setup-sequence">
-<li><div><h2 id="install">Install the verifier and the fixtures</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
+<section aria-labelledby="install"><h2 id="install">1. Install the verifier and the fixtures</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto
 git checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
 uv sync --locked --dev
@@ -12,8 +11,7 @@ uv sync --locked --dev
 # Writes the deterministic fixture set: one allowed bundle, seven denials.
 ./scripts/demo-v0.2.sh --acceptance
 
-export MAKOTO_CORE="$PWD"</code></pre><p>The script also uses <code>jq</code> and runs <a href="https://github.com/python-jsonschema/check-jsonschema">check-jsonschema</a> through <code>uvx</code>, so nothing else needs installing.</p></div></li>
-<li><div><h2 id="program">The complete script</h2><p>Save this as <code>makoto-gate.sh</code> and run it with <code>bash</code>.</p><pre><code class="language-bash">#!/usr/bin/env bash
+export MAKOTO_CORE="$PWD"</code></pre><p>The script also uses <code>jq</code> and runs <a href="https://github.com/python-jsonschema/check-jsonschema">check-jsonschema</a> through <code>uvx</code>, so nothing else needs installing.</p></section><section aria-labelledby="program"><h2 id="program">2. The complete script</h2><p>Save this as <code>makoto-gate.sh</code> and run it with <code>bash</code>.</p><pre><code class="language-bash">#!/usr/bin/env bash
 # Validate, attest, verify, and gate on a Makoto report from a pipeline step.
 set -euo pipefail
 
@@ -104,12 +102,10 @@ refused: deny E_ARTIFACT_DIGEST
     }
   ],
   "policyDigest": "614eb137303bcea78f25ded2e332a10649358484f9582984c1730ddc106ebfcd"
-}</code></pre></div></li>
-<li><div><h2 id="validate">Validate structure</h2><p>A structural check needs no keys and no checkout, which makes it the right pre-flight at the edge of a pipeline. It says nothing about who signed what.</p><pre><code class="language-bash"># 1. Structure: cheap, keyless, and not a verdict.
+}</code></pre></section><section aria-labelledby="validate"><h2 id="validate">3. Validate structure</h2><p>A structural check needs no keys and no checkout, which makes it the right pre-flight at the edge of a pipeline. It says nothing about who signed what.</p><pre><code class="language-bash"># 1. Structure: cheap, keyless, and not a verdict.
 uvx --quiet check-jsonschema \
   --schemafile https://usemakoto.dev/schema/v0.2/trust-policy.schema.json \
-  "$DEMO/receiver/policy.json"</code></pre></div></li>
-<li><div><h2 id="attest">Generate an attestation</h2><p><code>--subject</code> takes <code>name=path</code>: the name is what later steps and bindings refer to, and the digest is computed from the bytes at the path.</p><pre><code class="language-bash"># 2. Produce: a key pair and a signed origin statement for new data.
+  "$DEMO/receiver/policy.json"</code></pre></section><section aria-labelledby="attest"><h2 id="attest">4. Generate an attestation</h2><p><code>--subject</code> takes <code>name=path</code>: the name is what later steps and bindings refer to, and the digest is computed from the bytes at the path.</p><pre><code class="language-bash"># 2. Produce: a key pair and a signed origin statement for new data.
 printf 'order_id,total\n1001,42.00\n' &gt; "$WORK/orders.csv"
 makoto key generate \
   --private-out "$WORK/producer.private.pem" \
@@ -120,8 +116,7 @@ makoto attest origin \
   --source-uri urn:example:orders:2026-09-16 \
   --key "$WORK/producer.private.pem" \
   --out "$WORK/origin.dsse.json"
-makoto envelope inspect --envelope "$WORK/origin.dsse.json" --json | jq .</code></pre><p>For a derived output, <code>makoto attest transform</code> takes <code>--operation-type</code> and one <code>--input-binding</code> JSON file per input with <code>name</code>, <code>path</code>, <code>predecessor</code>, and <code>subjectName</code>. The <a href="/demos/v0.2-end-to-end/">runnable walkthrough</a> shows a three-step chain and its handoff.</p></div></li>
-<li><div><h2 id="verify">Verify and branch on the verdict</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-bash"># 3. Verify: exit 0 allow, 1 deny or indeterminate, 2 bad input, 3 internal.
+makoto envelope inspect --envelope "$WORK/origin.dsse.json" --json | jq .</code></pre><p>For a derived output, <code>makoto attest transform</code> takes <code>--operation-type</code> and one <code>--input-binding</code> JSON file per input with <code>name</code>, <code>path</code>, <code>predecessor</code>, and <code>subjectName</code>. The <a href="/demos/v0.2-end-to-end/">runnable walkthrough</a> shows a three-step chain and its handoff.</p></section><section aria-labelledby="verify"><h2 id="verify">5. Verify and branch on the verdict</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-bash"># 3. Verify: exit 0 allow, 1 deny or indeterminate, 2 bad input, 3 internal.
 verify() {
   makoto verify bundle "$1" \
     --policy "$DEMO/receiver/policy.json" \
@@ -152,16 +147,14 @@ printf '\n' &gt;&gt; "$(ls "$WORK"/tampered-bundle/artifacts/final/*.bin)"
 if gate "$WORK/tampered-bundle" "$WORK/tampered.json"; then
   echo "tampered bundle was accepted" &gt;&amp;2
   exit 1
-fi</code></pre></div></li>
-<li><div><h2 id="report">Read the verification report</h2><p>List what did not pass and keep the policy digest. A <code>skipped</code> entry with a non-empty <code>prerequisiteChecks</code> means the check was never tested.</p><pre><code class="language-bash"># 6. Read the report: what failed, and what was never established.
+fi</code></pre></section><section aria-labelledby="report"><h2 id="report">6. Read the verification report</h2><p>List what did not pass and keep the policy digest. A <code>skipped</code> entry with a non-empty <code>prerequisiteChecks</code> means the check was never tested.</p><pre><code class="language-bash"># 6. Read the report: what failed, and what was never established.
 jq '{decision, primaryError,
      notPassed: [.checks[] | select(.status != "pass") | {id, status, prerequisiteChecks}],
      policyDigest: .policyDigest.sha256}' "$WORK/tampered.json"</code></pre><pre><code class="language-bash"># Every error code, by step, from a stored report:
 jq -r '.errors[] | "\(.step)\t\(.code)\t\(.causedByCheck)"' report.json
 
 # Fail a job unless every check passed (stricter than the decision alone):
-jq -e 'all(.checks[]; .status == "pass")' report.json &gt; /dev/null</code></pre></div></li>
-</ol>
+jq -e 'all(.checks[]; .status == "pass")' report.json &gt; /dev/null</code></pre></section>
 <section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><dl class="troubleshooting">
 <dt><code>0</code> &middot; allow</dt><dd>Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</dd>
 <dt><code>1</code> &middot; deny or indeterminate</dt><dd>stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</dd>

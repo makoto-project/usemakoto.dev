@@ -3,8 +3,7 @@
 <h1>Keep the reference verifier behind an explicit process boundary.</h1>
 <p class="lead">A single <code>main.go</code>: validate the trust policy against the hosted schema, sign an origin statement, run the pinned verifier with <code>os/exec</code>, decode the report into structs, and fail closed on anything that is not a clean allow. It passes <code>go vet</code> and was run on Go 1.26 against the pinned core.</p>
 <p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>0e41afbd0c3f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
-<ol class="setup-sequence">
-<li><div><h2 id="install">Install the verifier and one module</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
+<section aria-labelledby="install"><h2 id="install">1. Install the verifier and one module</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto
 git checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
 uv sync --locked --dev
@@ -14,8 +13,7 @@ uv sync --locked --dev
 
 export MAKOTO_CORE="$PWD"</code></pre><pre><code class="language-bash">mkdir makoto-gate &amp;&amp; cd makoto-gate
 go mod init example.com/makotogate
-go get github.com/santhosh-tekuri/jsonschema/v6@v6.0.3</code></pre></div></li>
-<li><div><h2 id="program">The complete program</h2><p>Save this as <code>main.go</code>.</p><pre><code class="language-go">// Command makotogate validates, attests, verifies, and gates on a Makoto report.
+go get github.com/santhosh-tekuri/jsonschema/v6@v6.0.3</code></pre></section><section aria-labelledby="program"><h2 id="program">2. The complete program</h2><p>Save this as <code>main.go</code>.</p><pre><code class="language-go">// Command makotogate validates, attests, verifies, and gates on a Makoto report.
 package main
 
 import (
@@ -284,8 +282,7 @@ decision=allow primaryError=&lt;none&gt;
 decision=deny primaryError=E_ARTIFACT_DIGEST
   check artifact-bytes: fail []
   step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
-  signatures 4/4 valid, policy 614eb137303b</code></pre></div></li>
-<li><div><h2 id="validate">Validate structure against the hosted schema</h2><p>Register the fetched schema under its own URL, compile once, and validate decoded JSON. The validator&rsquo;s error lists every failing location.</p><pre><code class="language-go">func validateStructure(instancePath, schemaName string) error {
+  signatures 4/4 valid, policy 614eb137303b</code></pre></section><section aria-labelledby="validate"><h2 id="validate">3. Validate structure against the hosted schema</h2><p>Register the fetched schema under its own URL, compile once, and validate decoded JSON. The validator&rsquo;s error lists every failing location.</p><pre><code class="language-go">func validateStructure(instancePath, schemaName string) error {
 	resp, err := http.Get(schemaBase + schemaName)
 	if err != nil {
 		return err
@@ -316,8 +313,7 @@ decision=deny primaryError=E_ARTIFACT_DIGEST
 		return err
 	}
 	return schema.Validate(instance)
-}</code></pre></div></li>
-<li><div><h2 id="attest">Generate an attestation</h2><p><code>exec.Command</code> takes arguments as a slice and never involves a shell. The private key file is written with mode 0600 by the verifier itself.</p><pre><code class="language-go">func makoto(core string, args ...string) (stdout []byte, stderr []byte, runErr error) {
+}</code></pre></section><section aria-labelledby="attest"><h2 id="attest">4. Generate an attestation</h2><p><code>exec.Command</code> takes arguments as a slice and never involves a shell. The private key file is written with mode 0600 by the verifier itself.</p><pre><code class="language-go">func makoto(core string, args ...string) (stdout []byte, stderr []byte, runErr error) {
 	cmd := exec.Command("uv", append([]string{"run", "--quiet", "makoto"}, args...)...)
 	cmd.Dir = core
 	var out, errOut bytes.Buffer
@@ -342,8 +338,7 @@ decision=deny primaryError=E_ARTIFACT_DIGEST
 		}
 	}
 	return out, nil
-}</code></pre></div></li>
-<li><div><h2 id="verify">Verify a bundle and handle a denial</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-go">func verifyBundle(core, demo, bundle string) (Report, error) {
+}</code></pre></section><section aria-labelledby="verify"><h2 id="verify">5. Verify a bundle and handle a denial</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-go">func verifyBundle(core, demo, bundle string) (Report, error) {
 	output, stderr, runErr := makoto(core,
 		"verify", "bundle", bundle,
 		"--policy", filepath.Join(demo, "receiver/policy.json"),
@@ -386,8 +381,7 @@ decision=deny primaryError=E_ARTIFACT_DIGEST
 	explain(denied.Report)
 	if deref(denied.Report.PrimaryError) != "E_ARTIFACT_DIGEST" {
 		return fmt.Errorf("unexpected primary error %s", deref(denied.Report.PrimaryError))
-	}</code></pre></div></li>
-<li><div><h2 id="report">Read the verification report</h2><p>The structs decode the fields a gate needs. <code>PrimaryError</code> is a pointer because it is JSON <code>null</code> on an allow.</p><pre><code class="language-go">type Check struct {
+	}</code></pre></section><section aria-labelledby="report"><h2 id="report">6. Read the verification report</h2><p>The structs decode the fields a gate needs. <code>PrimaryError</code> is a pointer because it is JSON <code>null</code> on an allow.</p><pre><code class="language-go">type Check struct {
 	ID                 string   `json:"id"`
 	Status             string   `json:"status"`
 	PrerequisiteChecks []string `json:"prerequisiteChecks"`
@@ -422,8 +416,7 @@ type Report struct {
 	}
 	fmt.Printf("  signatures %d/%d valid, policy %.12s\n",
 		r.Summary["signaturesValid"], r.Summary["signaturesTotal"], r.PolicyDigest["sha256"])
-}</code></pre></div></li>
-</ol>
+}</code></pre></section>
 <section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><dl class="troubleshooting">
 <dt><code>0</code> &middot; allow</dt><dd>Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</dd>
 <dt><code>1</code> &middot; deny or indeterminate</dt><dd>stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</dd>

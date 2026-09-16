@@ -19,8 +19,7 @@
 <li><strong><code>publish</code></strong><span>Runs only on an allow, and records the manifest and policy digests the decision was made under.</span></li>
 </ol></section>
 
-<ol class="setup-sequence">
-<li><div><h2 id="install">Install the verifier beside Airflow</h2><p>The workers call the reference CLI, so the pinned core checkout and <code>uv</code> must exist on every machine that runs a Makoto task. Airflow and Makoto keep separate Python environments; nothing is imported across them.</p><pre><code class="language-bash"># The reference verifier, pinned and synced once per worker image.
+<section aria-labelledby="install"><h2 id="install">1. Install the verifier beside Airflow</h2><p>The workers call the reference CLI, so the pinned core checkout and <code>uv</code> must exist on every machine that runs a Makoto task. Airflow and Makoto keep separate Python environments; nothing is imported across them.</p><pre><code class="language-bash"># The reference verifier, pinned and synced once per worker image.
 git clone https://github.com/makoto-project/makoto.git /opt/makoto
 git -C /opt/makoto checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
 (cd /opt/makoto &amp;&amp; uv sync --locked --dev)
@@ -31,8 +30,7 @@ uv pip install "apache-airflow==3.3.1" \
 
 # Every scheduler, DAG processor, and worker needs both variables.
 export MAKOTO_CORE=/opt/makoto
-export MAKOTO_WORK=/srv/makoto</code></pre></div></li>
-<li><div><h2 id="bootstrap">Create role keys and the receiver policy</h2><p>Run this once per environment, outside Airflow. It creates one Ed25519 key pair per claim role and writes the receiver&rsquo;s trust policy: which key may sign origins for which source, which key may sign which operation, and what the handoff must prove. The last line runs <code>makoto policy check</code>, so a malformed policy fails here rather than inside a task.</p><pre><code class="language-python">"""One-time setup: signing keys per claim role and the receiver's trust policy.
+export MAKOTO_WORK=/srv/makoto</code></pre></section><section aria-labelledby="bootstrap"><h2 id="bootstrap">2. Create role keys and the receiver policy</h2><p>Run this once per environment, outside Airflow. It creates one Ed25519 key pair per claim role and writes the receiver&rsquo;s trust policy: which key may sign origins for which source, which key may sign which operation, and what the handoff must prove. The last line runs <code>makoto policy check</code>, so a malformed policy fails here rather than inside a task.</p><pre><code class="language-python">"""One-time setup: signing keys per claim role and the receiver's trust policy.
 
 Run once per environment, outside Airflow:
     MAKOTO_CORE=/path/to/makoto MAKOTO_WORK=/srv/makoto uv run bootstrap_makoto.py
@@ -144,8 +142,7 @@ policy_path = WORK / "receiver" / "policy.json"
 policy_path.write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
 makoto("policy", "check", "--policy", policy_path)
 print(f"keys in {WORK / 'keys'}; policy checked at {policy_path}")</code></pre><pre><code class="language-bash">MAKOTO_CORE=/opt/makoto MAKOTO_WORK=/srv/makoto uv run bootstrap_makoto.py
-keys in /srv/makoto/keys; policy checked at /srv/makoto/receiver/policy.json</code></pre><p class="editorial-note"><strong>In a real deployment these are two parties.</strong> The producer holds the private keys. The receiver owns <code>policy.json</code> and needs only the public keys. The script creates both halves in one place so the example runs on one machine.</p></div></li>
-<li><div><h2 id="dag">The DAG</h2><p>Save this as <code>dags/makoto_orders.py</code>. It uses only the Airflow Task SDK and the standard library.</p><pre><code class="language-python">"""Attest every task boundary with Makoto, hand off a bundle, and gate on the verdict."""
+keys in /srv/makoto/keys; policy checked at /srv/makoto/receiver/policy.json</code></pre><p class="editorial-note"><strong>In a real deployment these are two parties.</strong> The producer holds the private keys. The receiver owns <code>policy.json</code> and needs only the public keys. The script creates both halves in one place so the example runs on one machine.</p></section><section aria-labelledby="dag"><h2 id="dag">3. The DAG</h2><p>Save this as <code>dags/makoto_orders.py</code>. It uses only the Airflow Task SDK and the standard library.</p><pre><code class="language-python">"""Attest every task boundary with Makoto, hand off a bundle, and gate on the verdict."""
 
 from __future__ import annotations
 
@@ -361,10 +358,8 @@ def makoto_orders():
     publish(verdict, normalized)
 
 
-makoto_orders()</code></pre></div></li>
-<li><div><h2 id="run">Run it</h2><pre><code class="language-bash">airflow db migrate
-airflow dags test makoto_orders</code></pre><p>All eight tasks succeed. The <code>publish</code> task logs the decision and the digests it was made under:</p><pre><code class="language-bash">publishing /srv/makoto/runs/manual__2026-09-16T12_46_35.467633_00_00/data/orders.normalized.csv under Makoto allow (manifest 712954fd6b0d, policy b0b749267a9b)</code></pre></div></li>
-<li><div><h2 id="failure">What a gate failure looks like</h2><p>Trigger the same DAG with the data corrupted between handoff and verification. Everything upstream still succeeds, because every signature was honest when it was made. The gate is where the change is caught.</p><pre><code class="language-bash">airflow dags test makoto_orders -c '{"tamper_in_transit": true}'</code></pre><pre><code class="language-bash">airflow.sdk.exceptions.AirflowFailException: Makoto deny (E_ARTIFACT_DIGEST); report at /srv/makoto/runs/manual__2026-09-16T12_46_45.122670_00_00/reports/verification.json; step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest</code></pre><p>Task states for that run. <code>makoto_gate</code> fails once with no retries, and <code>publish</code> never starts:</p><pre><code class="language-bash">task_id state
+makoto_orders()</code></pre></section><section aria-labelledby="run"><h2 id="run">4. Run it</h2><pre><code class="language-bash">airflow db migrate
+airflow dags test makoto_orders</code></pre><p>All eight tasks succeed. The <code>publish</code> task logs the decision and the digests it was made under:</p><pre><code class="language-bash">publishing /srv/makoto/runs/manual__2026-09-16T12_46_35.467633_00_00/data/orders.normalized.csv under Makoto allow (manifest 712954fd6b0d, policy b0b749267a9b)</code></pre></section><section aria-labelledby="failure"><h2 id="failure">5. What a gate failure looks like</h2><p>Trigger the same DAG with the data corrupted between handoff and verification. Everything upstream still succeeds, because every signature was honest when it was made. The gate is where the change is caught.</p><pre><code class="language-bash">airflow dags test makoto_orders -c '{"tamper_in_transit": true}'</code></pre><pre><code class="language-bash">airflow.sdk.exceptions.AirflowFailException: Makoto deny (E_ARTIFACT_DIGEST); report at /srv/makoto/runs/manual__2026-09-16T12_46_45.122670_00_00/reports/verification.json; step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest</code></pre><p>Task states for that run. <code>makoto_gate</code> fails once with no retries, and <code>publish</code> never starts:</p><pre><code class="language-bash">task_id state
 extract success
 attest_origin success
 normalize success
@@ -395,8 +390,7 @@ publish upstream_failed</code></pre><p>The report written by the gate says preci
   ],
   "recipient": "example:analytics-team",
   "policy": "b0b749267a9b3bbfce5dc0a8a9fd570f49525af8a4332c43aa11d9ce1d529a69"
-}</code></pre></div></li>
-</ol>
+}</code></pre></section>
 
 <section aria-labelledby="signing"><h2 id="signing">Signing that survives retries</h2><p>Airflow retries tasks. Signed evidence must not fork because of it. <code>sign</code> derives the event identifier from the DAG, run, and statement name, so a retry produces the same event. If the envelope already exists, it is reused only when it covers the same bytes; if the task output changed between attempts, the task fails permanently instead of emitting a second, conflicting history.</p><pre><code class="language-python">def sign(kind: str, role: str, subject: Path, out: Path, *extra: object) -&gt; str:
     """Sign once. A retry reuses the envelope only if it covers the same bytes."""
