@@ -54,7 +54,7 @@
 </div>
 <div class="docs-nav-group">
 <p class="docs-nav-title">Build</p>
-<a href="/schema/v0.2/catalog.json">Hosted schemas</a>
+<a href="/spec/schemas/">Hosted schemas</a>
 <a href="/verify/">Verification</a>
 <a href="/tooling/">Tooling &amp; SDKs</a>
 <a href="/integrations/">Integration patterns</a>
@@ -80,6 +80,14 @@
 <span class="kicker">Case 05 · AI dataset gate</span>
 <h1>Do not train on a label and a checksum.</h1>
 <p class="lead">A shared dataset looks plausible and is validly signed by the producer you trust. Its records carry a field the receiver never allows in training data. Before training, the model builder needs exact bytes, signed source and transformation claims, required content profiles, an authorized handoff, and an independent expectation of what should arrive.</p>
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#code-the-assurance-level-it-reaches">The assurance level it reaches</a> below.</figcaption><pre><code class="language-bash">$ makoto report level makoto-report.private-schema-violation.json --require L3
+PASS        L1 Provenance is authentic
+FAIL        L2 Provenance is authorized and complete: artifact-profiles fail
+FAIL        L3 Provenance is anchored: decision deny
+LEVEL       L1
+REQUIRED    L3 not met
+$ echo $?
+1</code></pre></figure>
 <p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification report is byte-for-byte the file published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
 
 <section>
@@ -358,7 +366,7 @@ $ echo $?
     }
   ]
 }</code></pre>
-<h3>The assurance level it reaches</h3>
+<h3 id="code-the-assurance-level-it-reaches">The assurance level it reaches</h3>
 <p>Signatures pass, so the dataset reaches <strong>L1</strong>. L2 requires every required profile to pass, and <code>artifact-profiles</code> failed, so the training gate's L3 requirement is not met.</p>
 <pre><code class="language-bash">$ makoto report level makoto-report.private-schema-violation.json --require L3
 PASS        L1 Provenance is authentic

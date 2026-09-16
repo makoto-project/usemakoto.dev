@@ -2,6 +2,14 @@
 <span class="kicker">TypeScript binding</span>
 <h1>Type the report before your code trusts it.</h1>
 <p class="lead">The same gate as the JavaScript binding, with declared types for the decision, check identifiers, statuses, and diagnostics, and a guard that narrows <code>JSON.parse</code> output from <code>unknown</code> before any branch reads it. Both files pass <code>tsc --strict</code> and run directly on Node.js 26 with native type stripping.</p>
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#program">3. The complete program</a> below.</figcaption><pre><code class="language-bash">policy structure: valid
+signed /var/folders/22/0hyg7lbs2fb34hr0ryq3sl1m0000gn/T/makoto-W3KsF0/origin.dsse.json
+decision=allow primaryError=null
+  signatures 4/4 valid, policy 614eb137303b
+decision=deny primaryError=E_ARTIFACT_DIGEST
+  check artifact-bytes: fail []
+  step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
+  signatures 4/4 valid, policy 614eb137303b</code></pre></figure>
 <p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>0e41afbd0c3f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
 <section aria-labelledby="install"><h2 id="install">1. Install the verifier and the toolchain</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto

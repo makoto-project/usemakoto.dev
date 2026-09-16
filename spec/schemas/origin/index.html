@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Field-by-field reference for the hosted Makoto resource origin.schema.json: types, requirements, constraints, rules, and real example values.">
+  <title>origin.schema.json reference — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/spec/schemas/origin/">
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+  <span class="kicker">Schema reference</span>
+  <h1><code>origin.schema.json</code></h1>
+  <p class="lead">The origin predicate. Source claims, event identity and time, and the exact subjects first observed.</p>
+  <dl class="schema-meta">
+    <dt>Title</dt><dd>Makoto v0.2 Origin Predicate</dd>
+    <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/origin.schema.json</dd>
+    <dt>Digest</dt><dd>sha256:3f56d68d758bb72c2bcbabd922e1ac7d6eb6dd9c3e6baa78a9f104cf0a64badc</dd>
+    <dt>Raw</dt><dd><a href="/schema/v0.2/origin.schema.json">/schema/v0.2/origin.schema.json</a></dd>
+    <dt>Carried in</dt><dd>The <code>predicate</code> of a statement whose <code>predicateType</code> is <code>https://usemakoto.dev/predicate/v0.2/origin</code>.</dd>
+    <dt>Responsibility</dt><dd>Common event fields plus source fields and prohibition of predecessors.</dd>
+  </dl>
+  <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#112-common-makoto-predicate-fields">§11.2</a><a href="/spec/text/#113-origin-predicate">§11.3</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
+  <figure class="lead-exhibit"><figcaption><strong>A real instance.</strong> Read from <code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json → predicate</code>, which validates against this schema.</figcaption><pre data-filename="56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json"><code class="language-json">{
+  &quot;event&quot;: {
+    &quot;id&quot;: &quot;urn:uuid:11111111-1111-4111-8111-111111111111&quot;,
+    &quot;occurredAt&quot;: &quot;2026-09-16T16:00:00Z&quot;
+  },
+  &quot;profiles&quot;: [],
+  &quot;schemaVersion&quot;: &quot;0.2&quot;,
+  &quot;source&quot;: {
+    &quot;kind&quot;: &quot;urn:makoto:demo:source:synthetic-file&quot;,
+    &quot;uri&quot;: &quot;urn:makoto:demo:v0.2:source:customers-raw&quot;
+  }
+}</code></pre></figure>
+  <section aria-labelledby="used-by"><h2 id="used-by">Referenced by</h2><ul class="used-by"><li><a href="/spec/schemas/statement/"><code>statement.schema.json</code> → predicate</a></li></ul></section>
+<section aria-labelledby="fields"><h2 id="fields">Fields</h2><p class="spec-jump"><a href="#def-root">Top level</a><a href="#def-timestamp">timestamp</a><a href="#def-event">event</a><a href="#def-source">source</a><a href="#def-extensions">extensions</a></p><section class="def-block" id="def-root" aria-labelledby="def-root-title"><h3 id="def-root-title">Top level<a class="anchor-link" href="#def-root" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-root-schemaVersion"><span class="field-name">schemaVersion</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;0.2&quot;</li></ul><div>Makoto predicate version.</div><div class="field-example"><code>&quot;0.2&quot;</code></div></td></tr><tr><td id="f-root-event"><span class="field-name">event</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-event">event</a></td><td><div class="field-example"><code>{&quot;id&quot;: &quot;urn:uuid:11111111-1111-4111-8111-111111111111&quot;, &quot;occurredAt&quot;: &quot;2026-09-16T16:00:00Z&quot;}</code></div></td></tr><tr><td id="f-root-source"><span class="field-name">source</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-source">source</a></td><td><div class="field-example"><code>{&quot;kind&quot;: &quot;urn:makoto:demo:source:synthetic-file&quot;, &quot;uri&quot;: &quot;urn:makoto:demo:v0.2:source:customers…</code></div></td></tr><tr><td id="f-root-profiles"><span class="field-name">profiles</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">array of <a href="/spec/schemas/profile-reference/">profile-reference.schema.json</a></td><td><div>Additional schemas to apply.</div><div class="field-example"><code>[]</code></div></td></tr><tr><td id="f-root-extensions"><span class="field-name">extensions</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-extensions">extensions</a></td><td><div>URI-namespaced extension values.</div></td></tr></tbody></table></div></section><section class="def-block" id="def-timestamp" aria-labelledby="def-timestamp-title"><h3 id="def-timestamp-title">timestamp<a class="anchor-link" href="#def-timestamp" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">string</span><ul class="field-constraints"><li>min length 20</li><li>max length 30</li></ul><p class="text-muted">Appears at <code>event.occurredAt</code>, <code>source.retrievedAt</code></p></div></section><section class="def-block" id="def-event" aria-labelledby="def-event-title"><h3 id="def-event-title">event<a class="anchor-link" href="#def-event" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>event</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-event-id"><span class="field-name">id</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Producer-selected event identifier; uniqueness is enforced across the verified graph.</div><div class="field-example"><code>&quot;urn:uuid:11111111-1111-4111-8111-111111111111&quot;</code></div></td></tr><tr><td id="f-event-occurredAt"><span class="field-name">occurredAt</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-timestamp">timestamp</a></td><td><div>Signer-asserted event time; not a trusted timestamp unless policy adds that guarantee.</div><div class="field-example"><code>&quot;2026-09-16T16:00:00Z&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-source" aria-labelledby="def-source-title"><h3 id="def-source-title">source<a class="anchor-link" href="#def-source" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>source</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-source-kind"><span class="field-name">kind</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Machine-readable source category.</div><div class="field-example"><code>&quot;urn:makoto:demo:source:synthetic-file&quot;</code></div></td></tr><tr><td id="f-source-uri"><span class="field-name">uri</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Source locator. It may be omitted or redacted for privacy; an empty string is invalid when the member is present.</div><div class="field-example"><code>&quot;urn:makoto:demo:v0.2:source:customers-raw&quot;</code></div></td></tr><tr><td id="f-source-name"><span class="field-name">name</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>max length 4096</li></ul><div>Human-readable source name.</div></td></tr><tr><td id="f-source-mediaType"><span class="field-name">mediaType</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>max length 255</li></ul><div>Media type observed at collection.</div></td></tr><tr><td id="f-source-retrievedAt"><span class="field-name">retrievedAt</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-timestamp">timestamp</a></td><td><div>Time the producer retrieved or observed the source.</div></td></tr><tr><td id="f-source-version"><span class="field-name">version</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>max length 4096</li></ul><div>Source-controlled version or revision.</div></td></tr></tbody></table></div></section><section class="def-block" id="def-extensions" aria-labelledby="def-extensions-title"><h3 id="def-extensions-title">extensions<a class="anchor-link" href="#def-extensions" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><p class="text-muted">Appears at <code>extensions</code></p></div></section></section>
+  <section aria-labelledby="examples"><h2 id="examples">Real documents that validate</h2><ul class="schema-list"><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json → predicate</code></li></ul></section>
+  <section aria-labelledby="raw"><h2 id="raw">Raw JSON</h2>
+    <details><summary>The published document (1,643 bytes)</summary><div>
+      <pre data-filename="origin.schema.json"><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;$id&quot;: &quot;https://usemakoto.dev/schema/v0.2/origin.schema.json&quot;,
+  &quot;title&quot;: &quot;Makoto v0.2 Origin Predicate&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [&quot;schemaVersion&quot;, &quot;event&quot;, &quot;source&quot;],
+  &quot;properties&quot;: {
+    &quot;schemaVersion&quot;: { &quot;const&quot;: &quot;0.2&quot; },
+    &quot;event&quot;: { &quot;$ref&quot;: &quot;#/$defs/event&quot; },
+    &quot;source&quot;: { &quot;$ref&quot;: &quot;#/$defs/source&quot; },
+    &quot;profiles&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;https://usemakoto.dev/schema/v0.2/profile-reference.schema.json&quot; }
+    },
+    &quot;extensions&quot;: { &quot;$ref&quot;: &quot;#/$defs/extensions&quot; }
+  },
+  &quot;$defs&quot;: {
+    &quot;timestamp&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 20,
+      &quot;maxLength&quot;: 30
+    },
+    &quot;event&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;id&quot;, &quot;occurredAt&quot;],
+      &quot;properties&quot;: {
+        &quot;id&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;occurredAt&quot;: { &quot;$ref&quot;: &quot;#/$defs/timestamp&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;source&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;kind&quot;],
+      &quot;properties&quot;: {
+        &quot;kind&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;uri&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;name&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;maxLength&quot;: 4096 },
+        &quot;mediaType&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;maxLength&quot;: 255
+        },
+        &quot;retrievedAt&quot;: { &quot;$ref&quot;: &quot;#/$defs/timestamp&quot; },
+        &quot;version&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;maxLength&quot;: 4096 }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;extensions&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: true
+    }
+  },
+  &quot;additionalProperties&quot;: false
+}</code></pre>
+      <p class="code-note">The published bytes, unmodified.</p>
+    </div></details>
+  </section>
+</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body>
+</html>

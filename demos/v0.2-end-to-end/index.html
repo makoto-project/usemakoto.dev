@@ -3,12 +3,23 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Runnable Makoto source-to-receiver walkthrough."><title>End-to-end handoff proof — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/" aria-current="page">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><p class="mobile-section">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
-<div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/" aria-current="page">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside><div class="site-main">
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/" aria-current="page">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/" aria-current="page">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside><div class="site-main">
 <main id="main" class="page wide">
   <span class="kicker">Runnable reference proof · browser page is not a verifier</span>
   <h1>From source bytes to an independently verified handoff</h1>
   <p class="lead">This deterministic walkthrough starts with synthetic customer data, records an origin, applies normalization and public-safe transformations, signs the exact handoff, and lets a receiver verify schemas, signatures, authorization, graph completeness, and final bytes.</p>
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#code-send-the-bundle-verify-as-the-receiver">Send the bundle; verify as the receiver</a> below.</figcaption><pre><code class="language-bash">MAKOTO_RECEIVER_DIR="$(mktemp -d)"
+cp -R demos/v0.2-end-to-end/generated/positive-bundle "$MAKOTO_RECEIVER_DIR/bundle"
+
+uv run makoto verify bundle "$MAKOTO_RECEIVER_DIR/bundle" \
+  --policy demos/v0.2-end-to-end/generated/receiver/policy.json \
+  --schema-catalog demos/v0.2-end-to-end/generated/receiver/catalog.json \
+  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
+  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-artifact demos/v0.2-end-to-end/generated/receiver/expected-artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z \
+  --json</code></pre></figure>
   <p class="editorial-note"><strong>Evidence boundary.</strong> This page presents checked-in evidence; it does not perform verification. Trust these bytes only when the website pin identifies the exact core revision and the receiver command below returns <code>allow</code>.</p>
 
   <h2>The complete story</h2>
@@ -23,15 +34,15 @@
 
   <h2>Clone and run</h2>
   <p>These are the repository's canonical acceptance commands.</p>
-  <pre><code>git clone https://github.com/makoto-project/makoto.git
+  <pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto
 uv sync --locked --dev
 ./scripts/demo-v0.2.sh --acceptance</code></pre>
   <p>The measured run creates all three provenance events plus the handoff, verifies the positive bundle, checks seven negative fixtures, and removes its ignored work directory. It requires no cloud credentials, service, or Docker.</p>
 
-  <h2>Send the bundle; verify as the receiver</h2>
+  <h2 id="code-send-the-bundle-verify-as-the-receiver">Send the bundle; verify as the receiver</h2>
   <p>The sender transfers only the signed bundle. The receiver keeps its trust policy, schema catalog, and expected artifact outside that bundle, then runs the verifier against the received bytes.</p>
-  <pre><code>MAKOTO_RECEIVER_DIR="$(mktemp -d)"
+  <pre><code class="language-bash">MAKOTO_RECEIVER_DIR="$(mktemp -d)"
 cp -R demos/v0.2-end-to-end/generated/positive-bundle "$MAKOTO_RECEIVER_DIR/bundle"
 
 uv run makoto verify bundle "$MAKOTO_RECEIVER_DIR/bundle" \
@@ -50,7 +61,7 @@ uv run makoto verify bundle "$MAKOTO_RECEIVER_DIR/bundle" \
   <details><summary>Private organizational profiles</summary><div><p>The final statement references one predicate profile and one structured-artifact profile by URI, root digest, and closure digest. The receiver resolves both from an external catalog; the producer bundle does not carry or control the private schema bytes.</p><ul><li><a href="artifacts/receiver/public-transform-metadata.profile.json">Predicate profile reference</a></li><li><a href="artifacts/receiver/customer-public.profile.json">Artifact profile reference</a></li><li><a href="artifacts/receiver/catalog.json">Receiver schema catalog</a></li></ul></div></details>
   <details><summary>Consumer trust policy</summary><div><p>The policy maps key IDs to public keys, selects allowed source/operation claims, sets signature thresholds, requires a freshness anchor, pins profile requirements, and carries resource ceilings.</p><p><a href="artifacts/receiver/policy.json">Open the exact policy</a></p></div></details>
   <details><summary>Signed handoff manifest and bundle index</summary><div><p>The handoff signs the exact statement, root, head, final-artifact, recipient, and profile-requirement sets. The unsigned bundle index only maps those logical identities to transport paths.</p><ul><li><a href="artifacts/positive-bundle/manifest.dsse.json">Signed handoff envelope</a></li><li><a href="artifacts/positive-bundle/bundle.json">Bundle index</a></li><li><a href="artifacts/manifest.json">Export digest manifest</a></li></ul></div></details>
-  <details><summary>Positive verification report</summary><div><p><a href="artifacts/reports/positive.json">Open the complete report</a>. It records separate checks for schemas, cryptography, authorization, profiles, graph, completeness/freshness, and artifact bytes.</p><pre><code>decision: allow
+  <details><summary>Positive verification report</summary><div><p><a href="artifacts/reports/positive.json">Open the complete report</a>. It records separate checks for schemas, cryptography, authorization, profiles, graph, completeness/freshness, and artifact bytes.</p><pre><code class="language-bash">decision: allow
 manifestDigest: b83a5cd1…
 head: 962be717…
 artifact: 2f4fe11d…</code></pre></div></details>
@@ -72,5 +83,5 @@ artifact: 2f4fe11d…</code></pre></div></details>
 </main>
 <footer class="footer"><div class="footer-inner">Generated from the pinned Makoto core · browser presentation is not live verification · Apache-2.0 · <a href="/community/">Contribute on GitHub</a></div></footer>
 </div></div>
-<script defer src="/assets/code.js"></script>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
 </body></html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Field-by-field reference for the hosted Makoto resource dataset-manifest.schema.json: types, requirements, constraints, rules, and real example values.">
+  <title>dataset-manifest.schema.json reference — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/spec/schemas/dataset-manifest/">
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+  <span class="kicker">Schema reference</span>
+  <h1><code>dataset-manifest.schema.json</code></h1>
+  <p class="lead">A partitioned dataset described as one subject: member parts, their digests, and the manifest that binds them.</p>
+  <dl class="schema-meta">
+    <dt>Title</dt><dd>Makoto v0.2 Dataset Manifest</dd>
+    <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/dataset-manifest.schema.json</dd>
+    <dt>Digest</dt><dd>sha256:5a0498a2911bbe3029c9dbcbcbbbb2c2ce683d280b796a5f09ad271d8e9b034f</dd>
+    <dt>Raw</dt><dd><a href="/schema/v0.2/dataset-manifest.schema.json">/schema/v0.2/dataset-manifest.schema.json</a></dd>
+    <dt>Carried in</dt><dd>A partitioned dataset handed off as one subject (Section 12.5).</dd>
+    <dt>Responsibility</dt><dd>Sorted finite partition entries and their digests.</dd>
+  </dl>
+  <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#125-partitioned-dataset-manifests">§12.5</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
+  <p class="editorial-note"><strong>No real instance on hand.</strong> No document in this repository validates against this schema yet, so no example values are shown rather than inventing one. <a href="/community/">Contribute a fixture</a>.</p>
+  
+<section aria-labelledby="fields"><h2 id="fields">Fields</h2><p class="spec-jump"><a href="#def-root">Top level</a><a href="#def-digest">digest</a><a href="#def-logicalPath">logicalPath</a><a href="#def-entry">entry</a></p><section class="def-block" id="def-root" aria-labelledby="def-root-title"><h3 id="def-root-title">Top level<a class="anchor-link" href="#def-root" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-root-version"><span class="field-name">version</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;0.2&quot;</li></ul></td></tr><tr><td id="f-root-entries"><span class="field-name">entries</span><br><span class="field-req is-required">required</span></td><td class="field-type">array of <a href="#def-entry">entry</a></td><td><ul class="field-constraints"><li>min items 1</li></ul></td></tr></tbody></table></div></section><section class="def-block" id="def-digest" aria-labelledby="def-digest-title"><h3 id="def-digest-title">digest<a class="anchor-link" href="#def-digest" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>entries[].digest</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-digest-sha256"><span class="field-name">sha256</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 64</li><li>max length 64</li></ul></td></tr></tbody></table></div></section><section class="def-block" id="def-logicalPath" aria-labelledby="def-logicalPath-title"><h3 id="def-logicalPath-title">logicalPath<a class="anchor-link" href="#def-logicalPath" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">string</span><ul class="field-constraints"><li>min length 1</li><li>max length 1024</li></ul><p class="text-muted">Appears at <code>entries[].name</code></p></div></section><section class="def-block" id="def-entry" aria-labelledby="def-entry-title"><h3 id="def-entry-title">entry<a class="anchor-link" href="#def-entry" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>entries[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-entry-name"><span class="field-name">name</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-logicalPath">logicalPath</a></td><td></td></tr><tr><td id="f-entry-digest"><span class="field-name">digest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td></td></tr><tr><td id="f-entry-size"><span class="field-name">size</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 0</li><li>≤ 9223372036854775807</li></ul></td></tr><tr><td id="f-entry-mediaType"><span class="field-name">mediaType</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>max length 255</li></ul></td></tr></tbody></table></div></section></section>
+  
+  <section aria-labelledby="raw"><h2 id="raw">Raw JSON</h2>
+    <details><summary>The published document (1,182 bytes)</summary><div>
+      <pre data-filename="dataset-manifest.schema.json"><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;$id&quot;: &quot;https://usemakoto.dev/schema/v0.2/dataset-manifest.schema.json&quot;,
+  &quot;title&quot;: &quot;Makoto v0.2 Dataset Manifest&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [&quot;version&quot;, &quot;entries&quot;],
+  &quot;properties&quot;: {
+    &quot;version&quot;: { &quot;const&quot;: &quot;0.2&quot; },
+    &quot;entries&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;minItems&quot;: 1,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/entry&quot; }
+    }
+  },
+  &quot;$defs&quot;: {
+    &quot;digest&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;sha256&quot;],
+      &quot;properties&quot;: { &quot;sha256&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 64, &quot;maxLength&quot;: 64 } },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;logicalPath&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1,
+      &quot;maxLength&quot;: 1024
+    },
+    &quot;entry&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;name&quot;, &quot;digest&quot;],
+      &quot;properties&quot;: {
+        &quot;name&quot;: { &quot;$ref&quot;: &quot;#/$defs/logicalPath&quot; },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;size&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 0, &quot;maximum&quot;: 9223372036854775807 },
+        &quot;mediaType&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;maxLength&quot;: 255
+        }
+      },
+      &quot;additionalProperties&quot;: false
+    }
+  },
+  &quot;additionalProperties&quot;: false
+}</code></pre>
+      <p class="code-note">The published bytes, unmodified.</p>
+    </div></details>
+  </section>
+</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Field-by-field reference for the hosted Makoto resource trust-policy.schema.json: types, requirements, constraints, rules, and real example values.">
+  <title>trust-policy.schema.json reference — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/spec/schemas/trust-policy/">
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+  <span class="kicker">Schema reference</span>
+  <h1><code>trust-policy.schema.json</code></h1>
+  <p class="lead">The receiver-owned policy: which keys may make which claims, under which thresholds and resource limits.</p>
+  <dl class="schema-meta">
+    <dt>Title</dt><dd>Makoto v0.2 Consumer Trust Policy</dd>
+    <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/trust-policy.schema.json</dd>
+    <dt>Digest</dt><dd>sha256:1a056bc1605174d1eb90c8491d74dc5db7398c4aa15f9bc6033eae55e8664aca</dd>
+    <dt>Raw</dt><dd><a href="/schema/v0.2/trust-policy.schema.json">/schema/v0.2/trust-policy.schema.json</a></dd>
+    <dt>Carried in</dt><dd>The receiver-owned policy passed to <code>makoto verify bundle --policy</code>.</dd>
+    <dt>Responsibility</dt><dd>Verification keys, authorization rules, digest-pinned required profiles, handoff/replay rules, evaluation-time behavior, and resource limits.</dd>
+  </dl>
+  <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#14-consumer-trust-policy">§14</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
+  <figure class="lead-exhibit"><figcaption><strong>A real instance.</strong> Read from <code>demos/v0.2-end-to-end/artifacts/receiver/policy.json</code>, which validates against this schema.</figcaption><pre data-filename="policy.json"><code class="language-json">{
+  &quot;handoff&quot;: {
+    &quot;allowReplayableHandoff&quot;: false,
+    &quot;authorizedKeyIds&quot;: [
+      &quot;sha256:d016df3d83373617c06b5e1d6359caa06eeba8b3af2c7077234f109f2194516c&quot;
+    ],
+    &quot;minimumSignatures&quot;: 1,
+    &quot;requireExpectedArtifacts&quot;: true,
+    &quot;requireExpectedHead&quot;: true,
+    &quot;requireExpectedManifest&quot;: true,
+    &quot;requireNonce&quot;: false,
+    &quot;requireRecipient&quot;: false
+  },
+  &quot;keys&quot;: {
+    &quot;sha256:47dea58ea00fae9417ee19d76755bfef690899021132effb04fe1f9e4f0c8059&quot;: {
+      &quot;label&quot;: &quot;insecure demo-only normalize key&quot;,
+      &quot;publicKey&quot;: &quot;MCowBQYDK2VwAyEAgTl3Dqh9F19Wo1Rmw0x+zMuNipG07jeiXfYPW4/Js5Q=&quot;,
+      &quot;type&quot;: &quot;ed25519&quot;
+    },
+    &quot;sha256:8cef065b7af83669150b7d32704d3d3e75c3e9aee0d4f6740544c68e81b377aa&quot;: {
+      &quot;label&quot;: &quot;insecure demo-only public key&quot;,
+      &quot;publicKey&quot;: &quot;MCowBQYDK2VwAyEA7UkoxijRwsbq6QM4kFmVYSlZJzpcY/k2NsFGFKyHN9E=&quot;,
+      &quot;type&quot;: &quot;ed25519&quot;
+    },
+    &quot;sha256:d016df3d83373617c06b5e1d6359caa06eeba8b3af2c7077234f109f2194516c&quot;: {
+      &quot;label&quot;: &quot;insecure demo-only handoff key&quot;,
+      &quot;publicKey&quot;: &quot;MCowBQYDK2VwAyEAypOsFwUYcHHWe4PH/w7+gQjo7EUwV113JoeTM9vavnw=&quot;,
+      &quot;type&quot;: &quot;ed25519&quot;
+    },
+    &quot;sha256:fd110d301d2f077de1414b8f99f441b1403fab207b2052fbd2c065e4ee8e7dc2&quot;: {
+      &quot;label&quot;: &quot;insecure demo-only origin key&quot;,
+      &quot;publicKey&quot;: &quot;MCowBQYDK2VwAyEAiojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w=&quot;,
+      &quot;type&quot;: &quot;ed25519&quot;
+    }
+  },
+  &quot;limits&quot;: {
+    &quot;maxAggregateArtifactBytes&quot;: 53687091200,
+    &quot;maxArtifactBytesPerFile&quot;: 10737418240,
+    &quot;maxArtifactValidationBytes&quot;: 104857600,
+    &quot;maxBundleFiles&quot;: 10000,
+    &quot;maxDiagnostics&quot;: 10000,
+    &quot;maxJsonDepth&quot;: 128,
+    &quot;maxJsonExponentMagnitude&quot;: 10000,
+    &quot;maxJsonNumberChars&quot;: 1024,
+    &quot;maxMetadataBytes&quot;: 104857600,
+    &quot;maxNdjsonLineBytes&quot;: 1048576,
+    &quot;maxProfileEvaluations&quot;: 10000,
+    &quot;maxRegexLength&quot;: 4096,
+    &quot;maxReportBytes&quot;: 67108864,
+    &quot;maxReportRecords&quot;: 20000,
+    &quot;maxSchemaBytes&quot;: 2097152,
+    &quot;maxSchemaEvaluationDepth&quot;: 256,
+    &quot;maxSchemaOperations&quot;: 10000000,
+    &quot;maxSchemaResources&quot;: 256,
+    &quot;maxSignaturesTotal&quot;: 10000,
+    &quot;maxSnapshotBytes&quot;: 53687091200,
+    &quot;profileEvaluationTimeoutSeconds&quot;: 5,
+    &quot;profileWorkerMemoryBytes&quot;: 536870912
+  },
+  &quot;requiredProfiles&quot;: [
+    {
+      &quot;closureDigest&quot;: {
+        &quot;sha256&quot;: &quot;57eec614be9b2141ad536f486ff4400b514d79b8b1cc9642a839cf1a39b10794&quot;
+      },
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb&quot;
+      },
+      &quot;id&quot;: &quot;https://schemas.example.internal/makoto/customer-public-v1.schema.json&quot;,
+      &quot;mediaType&quot;: &quot;application/json&quot;,
+      &quot;scope&quot;: &quot;eachMatchingFinalArtifact&quot;,
+      &quot;subjectName&quot;: &quot;customers.public.json&quot;,
+      &quot;target&quot;: &quot;artifact&quot;
+    }
+  ],
+  &quot;rules&quot;: [
+    {
+      &quot;authorizedKeyIds&quot;: [
+        &quot;sha256:47dea58ea00fae9417ee19d76755bfef690899021132effb04fe1f9e4f0c8059&quot;
+      ],
+      &quot;id&quot;: &quot;urn:makoto:demo:rule:normalize&quot;,
+      &quot;minimumSignatures&quot;: 1,
+      &quot;operationTypes&quot;: [
+        &quot;urn:makoto:demo:operation:normalize&quot;
+      ],
+      &quot;predicateTypes&quot;: [
+        &quot;https://usemakoto.dev/predicate/v0.2/transform&quot;
+      ]
+    },
+    {
+      &quot;authorizedKeyIds&quot;: [
+        &quot;sha256:fd110d301d2f077de1414b8f99f441b1403fab207b2052fbd2c065e4ee8e7dc2&quot;
+      ],
+      &quot;id&quot;: &quot;urn:makoto:demo:rule:origin&quot;,
+      &quot;minimumSignatures&quot;: 1,
+      &quot;predicateTypes&quot;: [
+        &quot;https://usemakoto.dev/predicate/v0.2/origin&quot;
+      ],
+      &quot;sourceKinds&quot;: [
+        &quot;urn:makoto:demo:source:synthetic-file&quot;
+      ],
+      &quot;sourceUris&quot;: [
+        &quot;urn:makoto:demo:v0.2:source:customers-raw&quot;
+      ]
+    },
+    {
+      &quot;authorizedKeyIds&quot;: [
+        &quot;sha256:8cef065b7af83669150b7d32704d3d3e75c3e9aee0d4f6740544c68e81b377aa&quot;
+      ],
+      &quot;id&quot;: &quot;urn:makoto:demo:rule:public-safe&quot;,
+      &quot;minimumSignatures&quot;: 1,
+      &quot;operationTypes&quot;: [
+        &quot;urn:makoto:demo:operation:public-safe&quot;
+      ],
+      &quot;predicateTypes&quot;: [
+        &quot;https://usemakoto.dev/predicate/v0.2/transform&quot;
+      ],
+      &quot;profileConstraints&quot;: [
+        {
+          &quot;closureDigest&quot;: {
+            &quot;sha256&quot;: &quot;8c13490145ccdfe6958163ef0c578afb57da07772c2071932f8a4d98870e776e&quot;
+          },
+          &quot;digest&quot;: {
+            &quot;sha256&quot;: &quot;31934d2cf8fa7b5af2f8e4cf591d96278c4f59ddb6bb190afccb93701244f9eb&quot;
+          },
+          &quot;id&quot;: &quot;https://schemas.example.internal/makoto/public-transform-metadata-v1.schema.json&quot;,
+          &quot;target&quot;: &quot;predicate&quot;
+        }
+      ]
+    }
+  ],
+  &quot;version&quot;: &quot;0.2&quot;
+}</code></pre></figure>
+  
+<section aria-labelledby="fields"><h2 id="fields">Fields</h2><p class="spec-jump"><a href="#def-root">Top level</a><a href="#def-digest">digest</a><a href="#def-timestamp">timestamp</a><a href="#def-mediaType">mediaType</a><a href="#def-keyIds">keyIds</a><a href="#def-uris">uris</a><a href="#def-key">key</a><a href="#def-profileConstraint">profileConstraint</a><a href="#def-rule">rule</a><a href="#def-handoffRule">handoffRule</a><a href="#def-requiredProfile">requiredProfile</a><a href="#def-positiveInteger">positiveInteger</a><a href="#def-limits">limits</a></p><section class="def-block" id="def-root" aria-labelledby="def-root-title"><h3 id="def-root-title">Top level<a class="anchor-link" href="#def-root" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-root-version"><span class="field-name">version</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;0.2&quot;</li></ul><div class="field-example"><code>&quot;0.2&quot;</code></div></td></tr><tr><td id="f-root-keys"><span class="field-name">keys</span><br><span class="field-req is-required">required</span></td><td class="field-type">map of <a href="#def-key">key</a></td><td><ul class="field-constraints"><li>keys: min length 71; max length 71</li></ul><div class="field-example"><code>{&quot;sha256:47dea58ea00fae9417ee19d76755bfef690899021132effb04fe1f9e4f0c8059&quot;: {&quot;label&quot;: &quot;insecure…</code></div></td></tr><tr><td id="f-root-rules"><span class="field-name">rules</span><br><span class="field-req is-required">required</span></td><td class="field-type">array of <a href="#def-rule">rule</a></td><td><ul class="field-constraints"><li>max items 1024</li></ul><div class="field-example"><code>[{&quot;authorizedKeyIds&quot;: [&quot;sha256:47dea58ea00fae9417ee19d76755bfef690899021132effb04fe1f9e4f0c8059…</code></div></td></tr><tr><td id="f-root-handoff"><span class="field-name">handoff</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-handoffRule">handoffRule</a></td><td><div class="field-example"><code>{&quot;allowReplayableHandoff&quot;: false, &quot;authorizedKeyIds&quot;: [&quot;sha256:d016df3d83373617c06b5e1d6359caa0…</code></div></td></tr><tr><td id="f-root-requiredProfiles"><span class="field-name">requiredProfiles</span><br><span class="field-req is-required">required</span></td><td class="field-type">array of <a href="#def-requiredProfile">requiredProfile</a></td><td><div class="field-example"><code>[{&quot;closureDigest&quot;: {&quot;sha256&quot;: &quot;57eec614be9b2141ad536f486ff4400b514d79b8b1cc9642a839cf1a39b10794…</code></div></td></tr><tr><td id="f-root-limits"><span class="field-name">limits</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-limits">limits</a></td><td><div class="field-example"><code>{&quot;maxAggregateArtifactBytes&quot;: 53687091200, &quot;maxArtifactBytesPerFile&quot;: 10737418240, &quot;maxArtifact…</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-digest" aria-labelledby="def-digest-title"><h3 id="def-digest-title">digest<a class="anchor-link" href="#def-digest" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>requiredProfiles[].closureDigest</code>, <code>requiredProfiles[].digest</code>, <code>rules[].profileConstraints[].closureDigest</code>, <code>rules[].profileConstraints[].digest</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-digest-sha256"><span class="field-name">sha256</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 64</li><li>max length 64</li></ul><div class="field-example"><code>&quot;31934d2cf8fa7b5af2f8e4cf591d96278c4f59ddb6bb190afccb93701244f9eb&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-timestamp" aria-labelledby="def-timestamp-title"><h3 id="def-timestamp-title">timestamp<a class="anchor-link" href="#def-timestamp" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">string</span><ul class="field-constraints"><li>min length 20</li><li>max length 30</li></ul><p class="text-muted">Appears at <code>keys.*.validFrom</code>, <code>keys.*.validUntil</code></p></div></section><section class="def-block" id="def-mediaType" aria-labelledby="def-mediaType-title"><h3 id="def-mediaType-title">mediaType<a class="anchor-link" href="#def-mediaType" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">string</span><ul class="field-constraints"><li>max length 255</li></ul><p class="text-muted">Appears at <code>requiredProfiles[].mediaType</code></p></div></section><section class="def-block" id="def-keyIds" aria-labelledby="def-keyIds-title"><h3 id="def-keyIds-title">keyIds<a class="anchor-link" href="#def-keyIds" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">array of string</span><ul class="field-constraints"><li>min items 1</li><li>each: min length 71</li><li>each: max length 71</li></ul><p class="text-muted">Appears at <code>handoff.authorizedKeyIds</code>, <code>rules[].authorizedKeyIds</code></p></div></section><section class="def-block" id="def-uris" aria-labelledby="def-uris-title"><h3 id="def-uris-title">uris<a class="anchor-link" href="#def-uris" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">array of string</span><ul class="field-constraints"><li>min items 1</li><li>each: min length 1</li><li>each: max length 4096</li></ul><p class="text-muted">Appears at <code>rules[].operationTypes</code>, <code>rules[].predicateTypes</code>, <code>rules[].sourceKinds</code>, <code>rules[].sourceUris</code></p></div></section><section class="def-block" id="def-key" aria-labelledby="def-key-title"><h3 id="def-key-title">key<a class="anchor-link" href="#def-key" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>keys.*</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-key-type"><span class="field-name">type</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;ed25519&quot;</li></ul><div class="field-example"><code>&quot;ed25519&quot;</code></div></td></tr><tr><td id="f-key-publicKey"><span class="field-name">publicKey</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 60</li><li>max length 60</li></ul><div class="field-example"><code>&quot;MCowBQYDK2VwAyEAgTl3Dqh9F19Wo1Rmw0x+zMuNipG07jeiXfYPW4/Js5Q=&quot;</code></div></td></tr><tr><td id="f-key-label"><span class="field-name">label</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>max length 4096</li></ul><div class="field-example"><code>&quot;insecure demo-only normalize key&quot;</code></div></td></tr><tr><td id="f-key-validFrom"><span class="field-name">validFrom</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-timestamp">timestamp</a></td><td></td></tr><tr><td id="f-key-validUntil"><span class="field-name">validUntil</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-timestamp">timestamp</a></td><td></td></tr></tbody></table></div></section><section class="def-block" id="def-profileConstraint" aria-labelledby="def-profileConstraint-title"><h3 id="def-profileConstraint-title">profileConstraint<a class="anchor-link" href="#def-profileConstraint" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object, one of 2 <a href="#variants-profileConstraint">variants</a></span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>rules[].profileConstraints[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-profileConstraint-id"><span class="field-name">id</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div class="field-example"><code>&quot;https://schemas.example.internal/makoto/public-transform-metadata-v1.schema.json&quot;</code></div></td></tr><tr><td id="f-profileConstraint-digest"><span class="field-name">digest</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;31934d2cf8fa7b5af2f8e4cf591d96278c4f59ddb6bb190afccb93701244f9eb&quot;}</code></div></td></tr><tr><td id="f-profileConstraint-closureDigest"><span class="field-name">closureDigest</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;8c13490145ccdfe6958163ef0c578afb57da07772c2071932f8a4d98870e776e&quot;}</code></div></td></tr><tr><td id="f-profileConstraint-target"><span class="field-name">target</span><br><span class="field-req is-required">required</span></td><td class="field-type">enum</td><td><ul class="field-constraints"><li>one of: &quot;statement&quot;, &quot;predicate&quot;</li></ul><div class="field-example"><code>&quot;predicate&quot;</code></div></td></tr></tbody></table></div><h4 id="variants-profileConstraint">Variants (2)</h4><p>Exactly one of these shapes must match.</p><div class="table-scroll"><table class="doc-table variant-table"><thead><tr><th scope="col">#</th><th scope="col">Base</th></tr></thead><tbody><tr><td>1</td><td class="field-type">any</td></tr><tr><td>2</td><td class="field-type">any</td></tr></tbody></table></div></section><section class="def-block" id="def-rule" aria-labelledby="def-rule-title"><h3 id="def-rule-title">rule<a class="anchor-link" href="#def-rule" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>rules[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-rule-id"><span class="field-name">id</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div class="field-example"><code>&quot;urn:makoto:demo:rule:normalize&quot;</code></div></td></tr><tr><td id="f-rule-predicateTypes"><span class="field-name">predicateTypes</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-uris">uris</a></td><td><div class="field-example"><code>[&quot;https://usemakoto.dev/predicate/v0.2/transform&quot;]</code></div></td></tr><tr><td id="f-rule-authorizedKeyIds"><span class="field-name">authorizedKeyIds</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-keyIds">keyIds</a></td><td><div class="field-example"><code>[&quot;sha256:47dea58ea00fae9417ee19d76755bfef690899021132effb04fe1f9e4f0c8059&quot;]</code></div></td></tr><tr><td id="f-rule-minimumSignatures"><span class="field-name">minimumSignatures</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li></ul><div class="field-example"><code>1</code></div></td></tr><tr><td id="f-rule-sourceKinds"><span class="field-name">sourceKinds</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-uris">uris</a></td><td><div class="field-example"><code>[&quot;urn:makoto:demo:source:synthetic-file&quot;]</code></div></td></tr><tr><td id="f-rule-sourceUris"><span class="field-name">sourceUris</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-uris">uris</a></td><td><div class="field-example"><code>[&quot;urn:makoto:demo:v0.2:source:customers-raw&quot;]</code></div></td></tr><tr><td id="f-rule-operationTypes"><span class="field-name">operationTypes</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-uris">uris</a></td><td><div class="field-example"><code>[&quot;urn:makoto:demo:operation:normalize&quot;]</code></div></td></tr><tr><td id="f-rule-profileConstraints"><span class="field-name">profileConstraints</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">array of <a href="#def-profileConstraint">profileConstraint</a></td><td><ul class="field-constraints"><li>min items 1</li></ul><div class="field-example"><code>[{&quot;closureDigest&quot;: {&quot;sha256&quot;: &quot;8c13490145ccdfe6958163ef0c578afb57da07772c2071932f8a4d98870e776e…</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-handoffRule" aria-labelledby="def-handoffRule-title"><h3 id="def-handoffRule-title">handoffRule<a class="anchor-link" href="#def-handoffRule" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object, one of 2 <a href="#variants-handoffRule">variants</a></span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>handoff</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-handoffRule-authorizedKeyIds"><span class="field-name">authorizedKeyIds</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-keyIds">keyIds</a></td><td><div class="field-example"><code>[&quot;sha256:d016df3d83373617c06b5e1d6359caa06eeba8b3af2c7077234f109f2194516c&quot;]</code></div></td></tr><tr><td id="f-handoffRule-minimumSignatures"><span class="field-name">minimumSignatures</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li></ul><div class="field-example"><code>1</code></div></td></tr><tr><td id="f-handoffRule-requireExpectedManifest"><span class="field-name">requireExpectedManifest</span><br><span class="field-req is-required">required</span></td><td class="field-type">boolean</td><td><div class="field-example"><code>true</code></div></td></tr><tr><td id="f-handoffRule-requireExpectedHead"><span class="field-name">requireExpectedHead</span><br><span class="field-req is-required">required</span></td><td class="field-type">boolean</td><td><div class="field-example"><code>true</code></div></td></tr><tr><td id="f-handoffRule-requireExpectedArtifacts"><span class="field-name">requireExpectedArtifacts</span><br><span class="field-req is-required">required</span></td><td class="field-type">boolean</td><td><div class="field-example"><code>true</code></div></td></tr><tr><td id="f-handoffRule-requireRecipient"><span class="field-name">requireRecipient</span><br><span class="field-req is-required">required</span></td><td class="field-type">boolean</td><td><div class="field-example"><code>false</code></div></td></tr><tr><td id="f-handoffRule-requireNonce"><span class="field-name">requireNonce</span><br><span class="field-req is-required">required</span></td><td class="field-type">boolean</td><td><div class="field-example"><code>false</code></div></td></tr><tr><td id="f-handoffRule-allowReplayableHandoff"><span class="field-name">allowReplayableHandoff</span><br><span class="field-req is-required">required</span></td><td class="field-type">boolean</td><td><div class="field-example"><code>false</code></div></td></tr><tr><td id="f-handoffRule-maxAgeSeconds"><span class="field-name">maxAgeSeconds</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 0</li><li>≤ 315576000</li></ul></td></tr><tr><td id="f-handoffRule-maxFutureSkewSeconds"><span class="field-name">maxFutureSkewSeconds</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 0</li><li>≤ 315576000</li></ul></td></tr></tbody></table></div><h4 id="variants-handoffRule">Variants (2)</h4><p>Exactly one of these shapes must match.</p><div class="table-scroll"><table class="doc-table variant-table"><thead><tr><th scope="col">#</th><th scope="col">Base</th></tr></thead><tbody><tr><td>1</td><td class="field-type">any</td></tr><tr><td>2</td><td class="field-type">any</td></tr></tbody></table></div></section><section class="def-block" id="def-requiredProfile" aria-labelledby="def-requiredProfile-title"><h3 id="def-requiredProfile-title">requiredProfile<a class="anchor-link" href="#def-requiredProfile" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>requiredProfiles[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-requiredProfile-id"><span class="field-name">id</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div class="field-example"><code>&quot;https://schemas.example.internal/makoto/customer-public-v1.schema.json&quot;</code></div></td></tr><tr><td id="f-requiredProfile-digest"><span class="field-name">digest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb&quot;}</code></div></td></tr><tr><td id="f-requiredProfile-closureDigest"><span class="field-name">closureDigest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;57eec614be9b2141ad536f486ff4400b514d79b8b1cc9642a839cf1a39b10794&quot;}</code></div></td></tr><tr><td id="f-requiredProfile-target"><span class="field-name">target</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;artifact&quot;</li></ul><div class="field-example"><code>&quot;artifact&quot;</code></div></td></tr><tr><td id="f-requiredProfile-subjectName"><span class="field-name">subjectName</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div class="field-example"><code>&quot;customers.public.json&quot;</code></div></td></tr><tr><td id="f-requiredProfile-mediaType"><span class="field-name">mediaType</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-mediaType">mediaType</a></td><td><div class="field-example"><code>&quot;application/json&quot;</code></div></td></tr><tr><td id="f-requiredProfile-scope"><span class="field-name">scope</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;eachMatchingFinalArtifact&quot;</li></ul><div class="field-example"><code>&quot;eachMatchingFinalArtifact&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-positiveInteger" aria-labelledby="def-positiveInteger-title"><h3 id="def-positiveInteger-title">positiveInteger<a class="anchor-link" href="#def-positiveInteger" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">integer</span><ul class="field-constraints"><li>≥ 1</li></ul></div></section><section class="def-block" id="def-limits" aria-labelledby="def-limits-title"><h3 id="def-limits-title">limits<a class="anchor-link" href="#def-limits" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>limits</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-limits-maxBundleFiles"><span class="field-name">maxBundleFiles</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 20000</li></ul><div class="field-example"><code>10000</code></div></td></tr><tr><td id="f-limits-maxMetadataBytes"><span class="field-name">maxMetadataBytes</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 268435456</li></ul><div class="field-example"><code>104857600</code></div></td></tr><tr><td id="f-limits-maxArtifactBytesPerFile"><span class="field-name">maxArtifactBytesPerFile</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 1099511627776</li></ul><div class="field-example"><code>10737418240</code></div></td></tr><tr><td id="f-limits-maxAggregateArtifactBytes"><span class="field-name">maxAggregateArtifactBytes</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 2199023255552</li></ul><div class="field-example"><code>53687091200</code></div></td></tr><tr><td id="f-limits-maxSnapshotBytes"><span class="field-name">maxSnapshotBytes</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 2199023255552</li></ul><div class="field-example"><code>53687091200</code></div></td></tr><tr><td id="f-limits-maxArtifactValidationBytes"><span class="field-name">maxArtifactValidationBytes</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 1073741824</li></ul><div class="field-example"><code>104857600</code></div></td></tr><tr><td id="f-limits-maxJsonDepth"><span class="field-name">maxJsonDepth</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 8</li><li>≤ 256</li></ul><div class="field-example"><code>128</code></div></td></tr><tr><td id="f-limits-maxJsonNumberChars"><span class="field-name">maxJsonNumberChars</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 4096</li></ul><div class="field-example"><code>1024</code></div></td></tr><tr><td id="f-limits-maxJsonExponentMagnitude"><span class="field-name">maxJsonExponentMagnitude</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 100000</li></ul><div class="field-example"><code>10000</code></div></td></tr><tr><td id="f-limits-maxSchemaBytes"><span class="field-name">maxSchemaBytes</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 268435456</li></ul><div class="field-example"><code>2097152</code></div></td></tr><tr><td id="f-limits-maxSchemaResources"><span class="field-name">maxSchemaResources</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 4096</li></ul><div class="field-example"><code>256</code></div></td></tr><tr><td id="f-limits-maxSchemaEvaluationDepth"><span class="field-name">maxSchemaEvaluationDepth</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 1024</li></ul><div class="field-example"><code>256</code></div></td></tr><tr><td id="f-limits-maxSchemaOperations"><span class="field-name">maxSchemaOperations</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 1000000000</li></ul><div class="field-example"><code>10000000</code></div></td></tr><tr><td id="f-limits-maxRegexLength"><span class="field-name">maxRegexLength</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 65536</li></ul><div class="field-example"><code>4096</code></div></td></tr><tr><td id="f-limits-profileEvaluationTimeoutSeconds"><span class="field-name">profileEvaluationTimeoutSeconds</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 60</li></ul><div class="field-example"><code>5</code></div></td></tr><tr><td id="f-limits-profileWorkerMemoryBytes"><span class="field-name">profileWorkerMemoryBytes</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 4294967296</li></ul><div class="field-example"><code>536870912</code></div></td></tr><tr><td id="f-limits-maxNdjsonLineBytes"><span class="field-name">maxNdjsonLineBytes</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 67108864</li></ul><div class="field-example"><code>1048576</code></div></td></tr><tr><td id="f-limits-maxSignaturesTotal"><span class="field-name">maxSignaturesTotal</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 100000</li></ul><div class="field-example"><code>10000</code></div></td></tr><tr><td id="f-limits-maxProfileEvaluations"><span class="field-name">maxProfileEvaluations</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 100000</li></ul><div class="field-example"><code>10000</code></div></td></tr><tr><td id="f-limits-maxDiagnostics"><span class="field-name">maxDiagnostics</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 1</li><li>≤ 100000</li></ul><div class="field-example"><code>10000</code></div></td></tr><tr><td id="f-limits-maxReportRecords"><span class="field-name">maxReportRecords</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 64</li><li>≤ 200000</li></ul><div class="field-example"><code>20000</code></div></td></tr><tr><td id="f-limits-maxReportBytes"><span class="field-name">maxReportBytes</span><br><span class="field-req is-required">required</span></td><td class="field-type">integer</td><td><ul class="field-constraints"><li>≥ 65536</li><li>≤ 268435456</li></ul><div class="field-example"><code>67108864</code></div></td></tr></tbody></table></div></section></section>
+  <section aria-labelledby="examples"><h2 id="examples">Real documents that validate</h2><ul class="schema-list"><li><code>demos/v0.2-end-to-end/artifacts/receiver/policy.json</code></li><li><code>demos/v0.2-end-to-end/artifacts/receiver/attacker-known-policy.json</code></li></ul></section>
+  <section aria-labelledby="raw"><h2 id="raw">Raw JSON</h2>
+    <details><summary>The published document (7,905 bytes)</summary><div>
+      <pre data-filename="trust-policy.schema.json"><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;$id&quot;: &quot;https://usemakoto.dev/schema/v0.2/trust-policy.schema.json&quot;,
+  &quot;title&quot;: &quot;Makoto v0.2 Consumer Trust Policy&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [&quot;version&quot;, &quot;keys&quot;, &quot;rules&quot;, &quot;handoff&quot;, &quot;requiredProfiles&quot;, &quot;limits&quot;],
+  &quot;properties&quot;: {
+    &quot;version&quot;: { &quot;const&quot;: &quot;0.2&quot; },
+    &quot;keys&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;propertyNames&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 71, &quot;maxLength&quot;: 71 },
+      &quot;additionalProperties&quot;: { &quot;$ref&quot;: &quot;#/$defs/key&quot; }
+    },
+    &quot;rules&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;maxItems&quot;: 1024,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/rule&quot; }
+    },
+    &quot;handoff&quot;: { &quot;$ref&quot;: &quot;#/$defs/handoffRule&quot; },
+    &quot;requiredProfiles&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/requiredProfile&quot; }
+    },
+    &quot;limits&quot;: { &quot;$ref&quot;: &quot;#/$defs/limits&quot; }
+  },
+  &quot;$defs&quot;: {
+    &quot;digest&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;sha256&quot;],
+      &quot;properties&quot;: { &quot;sha256&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 64, &quot;maxLength&quot;: 64 } },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;timestamp&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 20,
+      &quot;maxLength&quot;: 30
+    },
+    &quot;mediaType&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;maxLength&quot;: 255
+    },
+    &quot;keyIds&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;minItems&quot;: 1,
+      &quot;items&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 71, &quot;maxLength&quot;: 71 }
+    },
+    &quot;uris&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;minItems&quot;: 1,
+      &quot;items&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 }
+    },
+    &quot;key&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;type&quot;, &quot;publicKey&quot;],
+      &quot;properties&quot;: {
+        &quot;type&quot;: { &quot;const&quot;: &quot;ed25519&quot; },
+        &quot;publicKey&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 60, &quot;maxLength&quot;: 60 },
+        &quot;label&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;maxLength&quot;: 4096 },
+        &quot;validFrom&quot;: { &quot;$ref&quot;: &quot;#/$defs/timestamp&quot; },
+        &quot;validUntil&quot;: { &quot;$ref&quot;: &quot;#/$defs/timestamp&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;profileConstraint&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;id&quot;, &quot;target&quot;],
+      &quot;properties&quot;: {
+        &quot;id&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;closureDigest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;target&quot;: { &quot;enum&quot;: [&quot;statement&quot;, &quot;predicate&quot;] }
+      },
+      &quot;oneOf&quot;: [
+        { &quot;required&quot;: [&quot;digest&quot;, &quot;closureDigest&quot;] },
+        {
+          &quot;properties&quot;: {
+            &quot;digest&quot;: false,
+            &quot;closureDigest&quot;: false
+          }
+        }
+      ],
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;rule&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;id&quot;, &quot;predicateTypes&quot;, &quot;authorizedKeyIds&quot;, &quot;minimumSignatures&quot;],
+      &quot;properties&quot;: {
+        &quot;id&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;predicateTypes&quot;: { &quot;$ref&quot;: &quot;#/$defs/uris&quot; },
+        &quot;authorizedKeyIds&quot;: { &quot;$ref&quot;: &quot;#/$defs/keyIds&quot; },
+        &quot;minimumSignatures&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1 },
+        &quot;sourceKinds&quot;: { &quot;$ref&quot;: &quot;#/$defs/uris&quot; },
+        &quot;sourceUris&quot;: { &quot;$ref&quot;: &quot;#/$defs/uris&quot; },
+        &quot;operationTypes&quot;: { &quot;$ref&quot;: &quot;#/$defs/uris&quot; },
+        &quot;profileConstraints&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;minItems&quot;: 1,
+          &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/profileConstraint&quot; }
+        }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;handoffRule&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [
+        &quot;authorizedKeyIds&quot;,
+        &quot;minimumSignatures&quot;,
+        &quot;requireExpectedManifest&quot;,
+        &quot;requireExpectedHead&quot;,
+        &quot;requireExpectedArtifacts&quot;,
+        &quot;requireRecipient&quot;,
+        &quot;requireNonce&quot;,
+        &quot;allowReplayableHandoff&quot;
+      ],
+      &quot;properties&quot;: {
+        &quot;authorizedKeyIds&quot;: { &quot;$ref&quot;: &quot;#/$defs/keyIds&quot; },
+        &quot;minimumSignatures&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1 },
+        &quot;requireExpectedManifest&quot;: { &quot;type&quot;: &quot;boolean&quot; },
+        &quot;requireExpectedHead&quot;: { &quot;type&quot;: &quot;boolean&quot; },
+        &quot;requireExpectedArtifacts&quot;: { &quot;type&quot;: &quot;boolean&quot; },
+        &quot;requireRecipient&quot;: { &quot;type&quot;: &quot;boolean&quot; },
+        &quot;requireNonce&quot;: { &quot;type&quot;: &quot;boolean&quot; },
+        &quot;allowReplayableHandoff&quot;: { &quot;type&quot;: &quot;boolean&quot; },
+        &quot;maxAgeSeconds&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 0, &quot;maximum&quot;: 315576000 },
+        &quot;maxFutureSkewSeconds&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 0, &quot;maximum&quot;: 315576000 }
+      },
+      &quot;oneOf&quot;: [
+        { &quot;required&quot;: [&quot;maxAgeSeconds&quot;, &quot;maxFutureSkewSeconds&quot;] },
+        {
+          &quot;properties&quot;: {
+            &quot;maxAgeSeconds&quot;: false,
+            &quot;maxFutureSkewSeconds&quot;: false
+          }
+        }
+      ],
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;requiredProfile&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;id&quot;, &quot;digest&quot;, &quot;closureDigest&quot;, &quot;target&quot;, &quot;subjectName&quot;, &quot;mediaType&quot;, &quot;scope&quot;],
+      &quot;properties&quot;: {
+        &quot;id&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;closureDigest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;target&quot;: { &quot;const&quot;: &quot;artifact&quot; },
+        &quot;subjectName&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;mediaType&quot;: { &quot;$ref&quot;: &quot;#/$defs/mediaType&quot; },
+        &quot;scope&quot;: { &quot;const&quot;: &quot;eachMatchingFinalArtifact&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;positiveInteger&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1 },
+    &quot;limits&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [
+        &quot;maxBundleFiles&quot;, &quot;maxMetadataBytes&quot;, &quot;maxArtifactBytesPerFile&quot;,
+        &quot;maxAggregateArtifactBytes&quot;, &quot;maxSnapshotBytes&quot;, &quot;maxArtifactValidationBytes&quot;,
+        &quot;maxJsonDepth&quot;, &quot;maxJsonNumberChars&quot;, &quot;maxJsonExponentMagnitude&quot;,
+        &quot;maxSchemaBytes&quot;, &quot;maxSchemaResources&quot;, &quot;maxSchemaEvaluationDepth&quot;,
+        &quot;maxSchemaOperations&quot;, &quot;maxRegexLength&quot;, &quot;profileEvaluationTimeoutSeconds&quot;,
+        &quot;profileWorkerMemoryBytes&quot;, &quot;maxNdjsonLineBytes&quot;, &quot;maxSignaturesTotal&quot;,
+        &quot;maxProfileEvaluations&quot;, &quot;maxDiagnostics&quot;, &quot;maxReportRecords&quot;, &quot;maxReportBytes&quot;
+      ],
+      &quot;properties&quot;: {
+        &quot;maxBundleFiles&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 20000 },
+        &quot;maxMetadataBytes&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 268435456 },
+        &quot;maxArtifactBytesPerFile&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 1099511627776 },
+        &quot;maxAggregateArtifactBytes&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 2199023255552 },
+        &quot;maxSnapshotBytes&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 2199023255552 },
+        &quot;maxArtifactValidationBytes&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 1073741824 },
+        &quot;maxJsonDepth&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 8, &quot;maximum&quot;: 256 },
+        &quot;maxJsonNumberChars&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 4096 },
+        &quot;maxJsonExponentMagnitude&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 100000 },
+        &quot;maxSchemaBytes&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 268435456 },
+        &quot;maxSchemaResources&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 4096 },
+        &quot;maxSchemaEvaluationDepth&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 1024 },
+        &quot;maxSchemaOperations&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 1000000000 },
+        &quot;maxRegexLength&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 65536 },
+        &quot;profileEvaluationTimeoutSeconds&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 60 },
+        &quot;profileWorkerMemoryBytes&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 4294967296 },
+        &quot;maxNdjsonLineBytes&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 67108864 },
+        &quot;maxSignaturesTotal&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 100000 },
+        &quot;maxProfileEvaluations&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 100000 },
+        &quot;maxDiagnostics&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1, &quot;maximum&quot;: 100000 },
+        &quot;maxReportRecords&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 64, &quot;maximum&quot;: 200000 },
+        &quot;maxReportBytes&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 65536, &quot;maximum&quot;: 268435456 }
+      },
+      &quot;additionalProperties&quot;: false
+    }
+  },
+  &quot;additionalProperties&quot;: false
+}</code></pre>
+      <p class="code-note">The published bytes, unmodified.</p>
+    </div></details>
+  </section>
+</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body>
+</html>

@@ -2,6 +2,14 @@
 <span class="kicker">Go binding</span>
 <h1>Keep the reference verifier behind an explicit process boundary.</h1>
 <p class="lead">A single <code>main.go</code>: validate the trust policy against the hosted schema, sign an origin statement, run the pinned verifier with <code>os/exec</code>, decode the report into structs, and fail closed on anything that is not a clean allow. It passes <code>go vet</code> and was run on Go 1.26 against the pinned core.</p>
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#program">2. The complete program</a> below.</figcaption><pre><code class="language-bash">policy structure: valid
+signed /var/folders/22/0hyg7lbs2fb34hr0ryq3sl1m0000gn/T/makoto-1865024480/origin.dsse.json
+decision=allow primaryError=&lt;none&gt;
+  signatures 4/4 valid, policy 614eb137303b
+decision=deny primaryError=E_ARTIFACT_DIGEST
+  check artifact-bytes: fail []
+  step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
+  signatures 4/4 valid, policy 614eb137303b</code></pre></figure>
 <p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>0e41afbd0c3f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
 <section aria-labelledby="install"><h2 id="install">1. Install the verifier and one module</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Field-by-field reference for the hosted Makoto resource handoff.schema.json: types, requirements, constraints, rules, and real example values.">
+  <title>handoff.schema.json reference — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/spec/schemas/handoff/">
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+  <span class="kicker">Schema reference</span>
+  <h1><code>handoff.schema.json</code></h1>
+  <p class="lead">The completeness anchor: roots, heads, statement set, required profiles, final artifacts, and named recipients.</p>
+  <dl class="schema-meta">
+    <dt>Title</dt><dd>Makoto v0.2 Handoff Manifest</dd>
+    <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/handoff.schema.json</dd>
+    <dt>Digest</dt><dd>sha256:762746d6636a9521382c58d6861f7ac87fd11fea990845d70389b68b4977f0d6</dd>
+    <dt>Raw</dt><dd><a href="/schema/v0.2/handoff.schema.json">/schema/v0.2/handoff.schema.json</a></dd>
+    <dt>Carried in</dt><dd>The decoded payload of <code>manifest.dsse.json</code>, payload type <code>application/vnd.makoto.handoff.v0.2+json</code>.</dd>
+    <dt>Responsibility</dt><dd>Exact roots, heads, statement set, final artifacts, required profiles, recipient, and nonce.</dd>
+  </dl>
+  <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#132-handoff-payload">§13.2</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
+  <figure class="lead-exhibit"><figcaption><strong>A real instance.</strong> Read from <code>demos/v0.2-end-to-end/artifacts/positive-bundle/manifest.dsse.json</code>, which validates against this schema.</figcaption><pre data-filename="manifest.dsse.json"><code class="language-json">{
+  &quot;artifacts&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4&quot;
+      },
+      &quot;head&quot;: {
+        &quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;
+      },
+      &quot;mediaType&quot;: &quot;application/json&quot;,
+      &quot;name&quot;: &quot;customers.public.json&quot;
+    }
+  ],
+  &quot;bundleId&quot;: &quot;urn:uuid:55555555-5555-4555-8555-555555555555&quot;,
+  &quot;heads&quot;: [
+    {
+      &quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;
+    }
+  ],
+  &quot;issuedAt&quot;: &quot;2026-09-16T16:00:00Z&quot;,
+  &quot;recipient&quot;: &quot;example:downstream-team&quot;,
+  &quot;requiredProfiles&quot;: [
+    {
+      &quot;closureDigest&quot;: {
+        &quot;sha256&quot;: &quot;57eec614be9b2141ad536f486ff4400b514d79b8b1cc9642a839cf1a39b10794&quot;
+      },
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb&quot;
+      },
+      &quot;head&quot;: {
+        &quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;
+      },
+      &quot;id&quot;: &quot;https://schemas.example.internal/makoto/customer-public-v1.schema.json&quot;,
+      &quot;mediaType&quot;: &quot;application/json&quot;,
+      &quot;scope&quot;: &quot;eachMatchingFinalArtifact&quot;,
+      &quot;subjectName&quot;: &quot;customers.public.json&quot;,
+      &quot;target&quot;: &quot;artifact&quot;
+    }
+  ],
+  &quot;roots&quot;: [
+    {
+      &quot;sha256&quot;: &quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a&quot;
+    }
+  ],
+  &quot;statements&quot;: [
+    {
+      &quot;sha256&quot;: &quot;1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848&quot;
+    },
+    {
+      &quot;sha256&quot;: &quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a&quot;
+    },
+    {
+      &quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;
+    }
+  ],
+  &quot;version&quot;: &quot;0.2&quot;
+}</code></pre></figure>
+  
+<section aria-labelledby="fields"><h2 id="fields">Fields</h2><p class="spec-jump"><a href="#def-root">Top level</a><a href="#def-digest">digest</a><a href="#def-timestamp">timestamp</a><a href="#def-audience">audience</a><a href="#def-mediaType">mediaType</a><a href="#def-nonemptyDigests">nonemptyDigests</a><a href="#def-artifact">artifact</a><a href="#def-requiredProfile">requiredProfile</a></p><section class="def-block" id="def-root" aria-labelledby="def-root-title"><h3 id="def-root-title">Top level<a class="anchor-link" href="#def-root" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-root-version"><span class="field-name">version</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;0.2&quot;</li></ul><div>Exact string <code>0.2</code>.</div><div class="field-example"><code>&quot;0.2&quot;</code></div></td></tr><tr><td id="f-root-bundleId"><span class="field-name">bundleId</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Section 10.4 canonical lowercase UUID grammar or absolute URI, nonempty and at most 4096 UTF-8 bytes; no additional version/variant-bit rule, nil UUID allowed, correlation only.</div><div class="field-example"><code>&quot;urn:uuid:55555555-5555-4555-8555-555555555555&quot;</code></div></td></tr><tr><td id="f-root-issuedAt"><span class="field-name">issuedAt</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-timestamp">timestamp</a></td><td><div>Section 10.4 timestamp; signer asserted unless age policy applies.</div><div class="field-example"><code>&quot;2026-09-16T16:00:00Z&quot;</code></div></td></tr><tr><td id="f-root-recipient"><span class="field-name">recipient</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-audience">audience</a></td><td><div>Optional bounded audience string under the lexical rule below.</div><div class="field-example"><code>&quot;example:downstream-team&quot;</code></div></td></tr><tr><td id="f-root-roots"><span class="field-name">roots</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-nonemptyDigests">nonemptyDigests</a></td><td><div>Nonempty sorted unique statement-digest objects.</div><div class="field-example"><code>[{&quot;sha256&quot;: &quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a&quot;}]</code></div></td></tr><tr><td id="f-root-heads"><span class="field-name">heads</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-nonemptyDigests">nonemptyDigests</a></td><td><div>Nonempty sorted unique statement-digest objects.</div><div class="field-example"><code>[{&quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;}]</code></div></td></tr><tr><td id="f-root-statements"><span class="field-name">statements</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-nonemptyDigests">nonemptyDigests</a></td><td><div>Nonempty sorted unique statement-digest objects.</div><div class="field-example"><code>[{&quot;sha256&quot;: &quot;1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848&quot;}, {&quot;sha256&quot;: &quot;56…</code></div></td></tr><tr><td id="f-root-artifacts"><span class="field-name">artifacts</span><br><span class="field-req is-required">required</span></td><td class="field-type">array of <a href="#def-artifact">artifact</a></td><td><ul class="field-constraints"><li>min items 1</li></ul><div>Nonempty sorted unique final-artifact entries; each requires <code>name</code>, <code>digest</code>, and <code>head</code>, with optional <code>mediaType</code>.</div><div class="field-example"><code>[{&quot;digest&quot;: {&quot;sha256&quot;: &quot;2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4&quot;}, &quot;he…</code></div></td></tr><tr><td id="f-root-requiredProfiles"><span class="field-name">requiredProfiles</span><br><span class="field-req is-required">required</span></td><td class="field-type">array of <a href="#def-requiredProfile">requiredProfile</a></td><td><div>Sorted unique artifact-only requirements; may be empty.</div><div class="field-example"><code>[{&quot;closureDigest&quot;: {&quot;sha256&quot;: &quot;57eec614be9b2141ad536f486ff4400b514d79b8b1cc9642a839cf1a39b10794…</code></div></td></tr><tr><td id="f-root-nonce"><span class="field-name">nonce</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-audience">audience</a></td><td><div>Optional bounded replay-challenge string under the lexical rule below.</div></td></tr></tbody></table></div></section><section class="def-block" id="def-digest" aria-labelledby="def-digest-title"><h3 id="def-digest-title">digest<a class="anchor-link" href="#def-digest" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>artifacts[].digest</code>, <code>artifacts[].head</code>, <code>heads[]</code>, <code>requiredProfiles[].closureDigest</code>, <code>requiredProfiles[].digest</code>, <code>requiredProfiles[].head</code>, <code>roots[]</code>, <code>statements[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-digest-sha256"><span class="field-name">sha256</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 64</li><li>max length 64</li></ul><div class="field-example"><code>&quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-timestamp" aria-labelledby="def-timestamp-title"><h3 id="def-timestamp-title">timestamp<a class="anchor-link" href="#def-timestamp" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">string</span><ul class="field-constraints"><li>min length 20</li><li>max length 30</li></ul><p class="text-muted">Appears at <code>issuedAt</code></p></div></section><section class="def-block" id="def-audience" aria-labelledby="def-audience-title"><h3 id="def-audience-title">audience<a class="anchor-link" href="#def-audience" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">string</span><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><p class="text-muted">Appears at <code>nonce</code>, <code>recipient</code></p></div></section><section class="def-block" id="def-mediaType" aria-labelledby="def-mediaType-title"><h3 id="def-mediaType-title">mediaType<a class="anchor-link" href="#def-mediaType" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">string</span><ul class="field-constraints"><li>max length 255</li></ul><p class="text-muted">Appears at <code>artifacts[].mediaType</code>, <code>requiredProfiles[].mediaType</code></p></div></section><section class="def-block" id="def-nonemptyDigests" aria-labelledby="def-nonemptyDigests-title"><h3 id="def-nonemptyDigests-title">nonemptyDigests<a class="anchor-link" href="#def-nonemptyDigests" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">array of <a href="#def-digest">digest</a></span><ul class="field-constraints"><li>min items 1</li></ul><p class="text-muted">Appears at <code>heads</code>, <code>roots</code>, <code>statements</code></p></div></section><section class="def-block" id="def-artifact" aria-labelledby="def-artifact-title"><h3 id="def-artifact-title">artifact<a class="anchor-link" href="#def-artifact" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>artifacts[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-artifact-name"><span class="field-name">name</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div class="field-example"><code>&quot;customers.public.json&quot;</code></div></td></tr><tr><td id="f-artifact-digest"><span class="field-name">digest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4&quot;}</code></div></td></tr><tr><td id="f-artifact-mediaType"><span class="field-name">mediaType</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-mediaType">mediaType</a></td><td><div class="field-example"><code>&quot;application/json&quot;</code></div></td></tr><tr><td id="f-artifact-head"><span class="field-name">head</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;}</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-requiredProfile" aria-labelledby="def-requiredProfile-title"><h3 id="def-requiredProfile-title">requiredProfile<a class="anchor-link" href="#def-requiredProfile" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>requiredProfiles[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-requiredProfile-head"><span class="field-name">head</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;}</code></div></td></tr><tr><td id="f-requiredProfile-id"><span class="field-name">id</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div class="field-example"><code>&quot;https://schemas.example.internal/makoto/customer-public-v1.schema.json&quot;</code></div></td></tr><tr><td id="f-requiredProfile-digest"><span class="field-name">digest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb&quot;}</code></div></td></tr><tr><td id="f-requiredProfile-closureDigest"><span class="field-name">closureDigest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;57eec614be9b2141ad536f486ff4400b514d79b8b1cc9642a839cf1a39b10794&quot;}</code></div></td></tr><tr><td id="f-requiredProfile-target"><span class="field-name">target</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;artifact&quot;</li></ul><div class="field-example"><code>&quot;artifact&quot;</code></div></td></tr><tr><td id="f-requiredProfile-subjectName"><span class="field-name">subjectName</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div class="field-example"><code>&quot;customers.public.json&quot;</code></div></td></tr><tr><td id="f-requiredProfile-mediaType"><span class="field-name">mediaType</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-mediaType">mediaType</a></td><td><div class="field-example"><code>&quot;application/json&quot;</code></div></td></tr><tr><td id="f-requiredProfile-scope"><span class="field-name">scope</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;eachMatchingFinalArtifact&quot;</li></ul><div class="field-example"><code>&quot;eachMatchingFinalArtifact&quot;</code></div></td></tr></tbody></table></div></section></section>
+  <section aria-labelledby="examples"><h2 id="examples">Real documents that validate</h2><ul class="schema-list"><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/manifest.dsse.json</code></li></ul></section>
+  <section aria-labelledby="raw"><h2 id="raw">Raw JSON</h2>
+    <details><summary>The published document (2,672 bytes)</summary><div>
+      <pre data-filename="handoff.schema.json"><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;$id&quot;: &quot;https://usemakoto.dev/schema/v0.2/handoff.schema.json&quot;,
+  &quot;title&quot;: &quot;Makoto v0.2 Handoff Manifest&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [&quot;version&quot;, &quot;bundleId&quot;, &quot;issuedAt&quot;, &quot;roots&quot;, &quot;heads&quot;, &quot;statements&quot;, &quot;artifacts&quot;, &quot;requiredProfiles&quot;],
+  &quot;properties&quot;: {
+    &quot;version&quot;: { &quot;const&quot;: &quot;0.2&quot; },
+    &quot;bundleId&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+    &quot;issuedAt&quot;: { &quot;$ref&quot;: &quot;#/$defs/timestamp&quot; },
+    &quot;recipient&quot;: { &quot;$ref&quot;: &quot;#/$defs/audience&quot; },
+    &quot;roots&quot;: { &quot;$ref&quot;: &quot;#/$defs/nonemptyDigests&quot; },
+    &quot;heads&quot;: { &quot;$ref&quot;: &quot;#/$defs/nonemptyDigests&quot; },
+    &quot;statements&quot;: { &quot;$ref&quot;: &quot;#/$defs/nonemptyDigests&quot; },
+    &quot;artifacts&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;minItems&quot;: 1,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/artifact&quot; }
+    },
+    &quot;requiredProfiles&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/requiredProfile&quot; }
+    },
+    &quot;nonce&quot;: { &quot;$ref&quot;: &quot;#/$defs/audience&quot; }
+  },
+  &quot;$defs&quot;: {
+    &quot;digest&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;sha256&quot;],
+      &quot;properties&quot;: { &quot;sha256&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 64, &quot;maxLength&quot;: 64 } },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;timestamp&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 20,
+      &quot;maxLength&quot;: 30
+    },
+    &quot;audience&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1,
+      &quot;maxLength&quot;: 4096
+    },
+    &quot;mediaType&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;maxLength&quot;: 255
+    },
+    &quot;nonemptyDigests&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;minItems&quot;: 1,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; }
+    },
+    &quot;artifact&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;name&quot;, &quot;digest&quot;, &quot;head&quot;],
+      &quot;properties&quot;: {
+        &quot;name&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;mediaType&quot;: { &quot;$ref&quot;: &quot;#/$defs/mediaType&quot; },
+        &quot;head&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;requiredProfile&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;head&quot;, &quot;id&quot;, &quot;digest&quot;, &quot;closureDigest&quot;, &quot;target&quot;, &quot;subjectName&quot;, &quot;mediaType&quot;, &quot;scope&quot;],
+      &quot;properties&quot;: {
+        &quot;head&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;id&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;closureDigest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;target&quot;: { &quot;const&quot;: &quot;artifact&quot; },
+        &quot;subjectName&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;mediaType&quot;: { &quot;$ref&quot;: &quot;#/$defs/mediaType&quot; },
+        &quot;scope&quot;: { &quot;const&quot;: &quot;eachMatchingFinalArtifact&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    }
+  },
+  &quot;additionalProperties&quot;: false
+}</code></pre>
+      <p class="code-note">The published bytes, unmodified.</p>
+    </div></details>
+  </section>
+</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body>
+</html>

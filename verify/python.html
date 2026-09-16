@@ -2,6 +2,15 @@
 <span class="kicker">Python binding</span>
 <h1>Gate a Python ingestion job on a Makoto verdict.</h1>
 <p class="lead">This page builds one complete, runnable program: validate a trust policy against the hosted schema with <code>jsonschema</code>, sign an origin statement for new data, verify a handoff bundle, refuse a tampered copy, and read the report that explains why. Every line below was executed against the pinned core before it was published.</p>
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#program">2. The complete program</a> below.</figcaption><pre><code class="language-bash">policy structure: valid
+signed {'payloadDigest': {'sha256': '0411bf08b3fb75a8c723d3b8a4e93ae03e3150a163930785aeb9eb6ddbec77aa'}, 'payloadType': 'application/vnd.in-toto+json', 'signatureKeyIds': ['sha256:1090f3864e8d67bde4dcdf76e03adfc1815e6b2a59f7b2392afac448c31a64e2']}
+decision=allow primaryError=None
+  statements 3/3 valid, signatures 4/4 valid, policy 614eb137303b
+decision=deny primaryError=E_ARTIFACT_DIGEST
+  check artifact-bytes: fail []
+  step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
+  statements 3/3 valid, signatures 4/4 valid, policy 614eb137303b
+tampered bundle refused, as it should be</code></pre></figure>
 <p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>0e41afbd0c3f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
 <section aria-labelledby="install"><h2 id="install">1. Install the verifier and the fixtures</h2><p>Clone the core repository at the documented revision, sync its locked environment, and generate the fixture set every example uses.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto

@@ -791,7 +791,9 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
         relative = path.relative_to(ROOT).as_posix()
         content = path.read_text(encoding="utf-8", errors="replace")
         errors.extend(retired_version_errors(relative, content))
-        if relative in TECHNICAL_VERSION_PAGES:
+        # Schema reference pages quote identifiers and titles that carry the
+        # version by definition, like the schema index they hang off.
+        if relative in TECHNICAL_VERSION_PAGES or relative.startswith("spec/schemas/"):
             continue
         parser = PageParser()
         parser.feed(content)

@@ -2,6 +2,22 @@
 <span class="kicker">JavaScript binding</span>
 <h1>Gate a Node.js service on a Makoto verdict.</h1>
 <p class="lead">One complete ES module: compile the hosted trust-policy schema with AJV&rsquo;s Draft 2020-12 build, sign an origin statement, spawn the pinned verifier, refuse a tampered bundle, and surface the primary error to the caller. It was executed on Node.js 26 against the pinned core before publication.</p>
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#program">2. The complete module</a> below.</figcaption><pre><code class="language-bash">policy structure: valid
+signed {
+  payloadDigest: {
+    sha256: 'd62472eee50d2816f5234f51ac7f3fb8aaafa1783c167138f92db8a4548d9eb7'
+  },
+  payloadType: 'application/vnd.in-toto+json',
+  signatureKeyIds: [
+    'sha256:32297b2f194c32d8782c367250245076e172646a8e9f7b7e21f5bc5816414584'
+  ]
+}
+decision=allow primaryError=null
+  signatures 4/4 valid, policy 614eb137303b
+decision=deny primaryError=E_ARTIFACT_DIGEST
+  check artifact-bytes: fail []
+  step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
+  signatures 4/4 valid, policy 614eb137303b</code></pre></figure>
 <p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>0e41afbd0c3f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
 <section aria-labelledby="install"><h2 id="install">1. Install the verifier and one dependency</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto

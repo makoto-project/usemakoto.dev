@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Field-by-field reference for the hosted Makoto resource bundle.schema.json: types, requirements, constraints, rules, and real example values.">
+  <title>bundle.schema.json reference — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/spec/schemas/bundle/">
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+  <span class="kicker">Schema reference</span>
+  <h1><code>bundle.schema.json</code></h1>
+  <p class="lead">The on-disk bundle layout a sender transfers: statements, attestations, schema closure, and final artifacts.</p>
+  <dl class="schema-meta">
+    <dt>Title</dt><dd>Makoto v0.2 Bundle Index</dd>
+    <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/bundle.schema.json</dd>
+    <dt>Digest</dt><dd>sha256:2a6ca7b341abcbc0995369e5bf338e95f531cfaaa417715906da8169e5f829c8</dd>
+    <dt>Raw</dt><dd><a href="/schema/v0.2/bundle.schema.json">/schema/v0.2/bundle.schema.json</a></dd>
+    <dt>Carried in</dt><dd><code>bundle.json</code> at the root of every handoff bundle.</dd>
+    <dt>Responsibility</dt><dd>Untrusted safe relative-path index with complete identity tuples.</dd>
+  </dl>
+  <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#133-reference-bundle-layout">§13.3</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
+  <figure class="lead-exhibit"><figcaption><strong>A real instance.</strong> Read from <code>demos/v0.2-end-to-end/artifacts/positive-bundle/bundle.json</code>, which validates against this schema.</figcaption><pre data-filename="bundle.json"><code class="language-json">{
+  &quot;artifacts&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4&quot;
+      },
+      &quot;path&quot;: &quot;artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin&quot;,
+      &quot;statementDigest&quot;: {
+        &quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;
+      },
+      &quot;subjectName&quot;: &quot;customers.public.json&quot;
+    }
+  ],
+  &quot;attestations&quot;: [
+    {
+      &quot;path&quot;: &quot;attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json&quot;,
+      &quot;statementDigest&quot;: {
+        &quot;sha256&quot;: &quot;1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848&quot;
+      }
+    },
+    {
+      &quot;path&quot;: &quot;attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json&quot;,
+      &quot;statementDigest&quot;: {
+        &quot;sha256&quot;: &quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a&quot;
+      }
+    },
+    {
+      &quot;path&quot;: &quot;attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json&quot;,
+      &quot;statementDigest&quot;: {
+        &quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;
+      }
+    }
+  ],
+  &quot;datasetEntries&quot;: [],
+  &quot;manifest&quot;: &quot;manifest.dsse.json&quot;,
+  &quot;schemaCatalog&quot;: &quot;schemas/catalog.json&quot;,
+  &quot;version&quot;: &quot;0.2&quot;
+}</code></pre></figure>
+  
+<section aria-labelledby="fields"><h2 id="fields">Fields</h2><p class="spec-jump"><a href="#def-root">Top level</a><a href="#def-digest">digest</a><a href="#def-path">path</a><a href="#def-attestation">attestation</a><a href="#def-artifact">artifact</a><a href="#def-datasetEntry">datasetEntry</a></p><section class="def-block" id="def-root" aria-labelledby="def-root-title"><h3 id="def-root-title">Top level<a class="anchor-link" href="#def-root" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-root-version"><span class="field-name">version</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;0.2&quot;</li></ul><div class="field-example"><code>&quot;0.2&quot;</code></div></td></tr><tr><td id="f-root-manifest"><span class="field-name">manifest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-path">path</a></td><td><div class="field-example"><code>&quot;manifest.dsse.json&quot;</code></div></td></tr><tr><td id="f-root-attestations"><span class="field-name">attestations</span><br><span class="field-req is-required">required</span></td><td class="field-type">array of <a href="#def-attestation">attestation</a></td><td><div class="field-example"><code>[{&quot;path&quot;: &quot;attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.j…</code></div></td></tr><tr><td id="f-root-artifacts"><span class="field-name">artifacts</span><br><span class="field-req is-required">required</span></td><td class="field-type">array of <a href="#def-artifact">artifact</a></td><td><div class="field-example"><code>[{&quot;digest&quot;: {&quot;sha256&quot;: &quot;2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4&quot;}, &quot;pa…</code></div></td></tr><tr><td id="f-root-datasetEntries"><span class="field-name">datasetEntries</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">array of <a href="#def-datasetEntry">datasetEntry</a></td><td><div class="field-example"><code>[]</code></div></td></tr><tr><td id="f-root-schemaCatalog"><span class="field-name">schemaCatalog</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-path">path</a></td><td><div class="field-example"><code>&quot;schemas/catalog.json&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-digest" aria-labelledby="def-digest-title"><h3 id="def-digest-title">digest<a class="anchor-link" href="#def-digest" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>artifacts[].digest</code>, <code>artifacts[].statementDigest</code>, <code>attestations[].statementDigest</code>, <code>datasetEntries[].digest</code>, <code>datasetEntries[].manifestStatementDigest</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-digest-sha256"><span class="field-name">sha256</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 64</li><li>max length 64</li></ul><div class="field-example"><code>&quot;1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-path" aria-labelledby="def-path-title"><h3 id="def-path-title">path<a class="anchor-link" href="#def-path" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">string</span><ul class="field-constraints"><li>min length 1</li><li>max length 1024</li></ul><p class="text-muted">Appears at <code>artifacts[].path</code>, <code>attestations[].path</code>, <code>datasetEntries[].path</code>, <code>manifest</code>, <code>schemaCatalog</code></p></div></section><section class="def-block" id="def-attestation" aria-labelledby="def-attestation-title"><h3 id="def-attestation-title">attestation<a class="anchor-link" href="#def-attestation" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>attestations[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-attestation-statementDigest"><span class="field-name">statementDigest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848&quot;}</code></div></td></tr><tr><td id="f-attestation-path"><span class="field-name">path</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-path">path</a></td><td><div class="field-example"><code>&quot;attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-artifact" aria-labelledby="def-artifact-title"><h3 id="def-artifact-title">artifact<a class="anchor-link" href="#def-artifact" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>artifacts[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-artifact-statementDigest"><span class="field-name">statementDigest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977&quot;}</code></div></td></tr><tr><td id="f-artifact-subjectName"><span class="field-name">subjectName</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div class="field-example"><code>&quot;customers.public.json&quot;</code></div></td></tr><tr><td id="f-artifact-digest"><span class="field-name">digest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4&quot;}</code></div></td></tr><tr><td id="f-artifact-path"><span class="field-name">path</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-path">path</a></td><td><div class="field-example"><code>&quot;artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-datasetEntry" aria-labelledby="def-datasetEntry-title"><h3 id="def-datasetEntry-title">datasetEntry<a class="anchor-link" href="#def-datasetEntry" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>datasetEntries[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-datasetEntry-manifestStatementDigest"><span class="field-name">manifestStatementDigest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td></td></tr><tr><td id="f-datasetEntry-manifestSubjectName"><span class="field-name">manifestSubjectName</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul></td></tr><tr><td id="f-datasetEntry-entryName"><span class="field-name">entryName</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 1024</li></ul></td></tr><tr><td id="f-datasetEntry-digest"><span class="field-name">digest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td></td></tr><tr><td id="f-datasetEntry-path"><span class="field-name">path</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-path">path</a></td><td></td></tr></tbody></table></div></section></section>
+  <section aria-labelledby="examples"><h2 id="examples">Real documents that validate</h2><ul class="schema-list"><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/bundle.json</code></li></ul></section>
+  <section aria-labelledby="raw"><h2 id="raw">Raw JSON</h2>
+    <details><summary>The published document (2,275 bytes)</summary><div>
+      <pre data-filename="bundle.schema.json"><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;$id&quot;: &quot;https://usemakoto.dev/schema/v0.2/bundle.schema.json&quot;,
+  &quot;title&quot;: &quot;Makoto v0.2 Bundle Index&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [&quot;version&quot;, &quot;manifest&quot;, &quot;attestations&quot;, &quot;artifacts&quot;],
+  &quot;properties&quot;: {
+    &quot;version&quot;: { &quot;const&quot;: &quot;0.2&quot; },
+    &quot;manifest&quot;: { &quot;$ref&quot;: &quot;#/$defs/path&quot; },
+    &quot;attestations&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/attestation&quot; }
+    },
+    &quot;artifacts&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/artifact&quot; }
+    },
+    &quot;datasetEntries&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/datasetEntry&quot; }
+    },
+    &quot;schemaCatalog&quot;: { &quot;$ref&quot;: &quot;#/$defs/path&quot; }
+  },
+  &quot;$defs&quot;: {
+    &quot;digest&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;sha256&quot;],
+      &quot;properties&quot;: { &quot;sha256&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 64, &quot;maxLength&quot;: 64 } },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;path&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 1,
+      &quot;maxLength&quot;: 1024
+    },
+    &quot;attestation&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;statementDigest&quot;, &quot;path&quot;],
+      &quot;properties&quot;: {
+        &quot;statementDigest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;path&quot;: { &quot;$ref&quot;: &quot;#/$defs/path&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;artifact&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;statementDigest&quot;, &quot;subjectName&quot;, &quot;digest&quot;, &quot;path&quot;],
+      &quot;properties&quot;: {
+        &quot;statementDigest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;subjectName&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;path&quot;: { &quot;$ref&quot;: &quot;#/$defs/path&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;datasetEntry&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;manifestStatementDigest&quot;, &quot;manifestSubjectName&quot;, &quot;entryName&quot;, &quot;digest&quot;, &quot;path&quot;],
+      &quot;properties&quot;: {
+        &quot;manifestStatementDigest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;manifestSubjectName&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;entryName&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 1024 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;path&quot;: { &quot;$ref&quot;: &quot;#/$defs/path&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    }
+  },
+  &quot;additionalProperties&quot;: false
+}</code></pre>
+      <p class="code-note">The published bytes, unmodified.</p>
+    </div></details>
+  </section>
+</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body>
+</html>

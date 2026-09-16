@@ -54,7 +54,7 @@
 </div>
 <div class="docs-nav-group">
 <p class="docs-nav-title">Build</p>
-<a href="/schema/v0.2/catalog.json">Hosted schemas</a>
+<a href="/spec/schemas/">Hosted schemas</a>
 <a href="/verify/">Verification</a>
 <a href="/tooling/">Tooling &amp; SDKs</a>
 <a href="/integrations/">Integration patterns</a>
@@ -80,6 +80,14 @@
 <span class="kicker">Case 01 · poisoned pipeline</span>
 <h1>Find every artifact descended from the bad source.</h1>
 <p class="lead">Bytes change after they were signed. The signatures still check out and the metadata still describes the original. The immediate gate matters, and so does the blast radius once the batch has already moved.</p>
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#code-the-assurance-level-it-reaches">The assurance level it reaches</a> below.</figcaption><pre><code class="language-bash">$ makoto report level makoto-report.mutated-final-data.json --require L3
+PASS        L1 Provenance is authentic
+FAIL        L2 Provenance is authorized and complete: artifact-bytes fail
+FAIL        L3 Provenance is anchored: decision deny
+LEVEL       L1
+REQUIRED    L3 not met
+$ echo $?
+1</code></pre></figure>
 <p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
 
 <section>
@@ -322,7 +330,7 @@ $ echo $?
     }
   ]
 }</code></pre>
-<h3>The assurance level it reaches</h3>
+<h3 id="code-the-assurance-level-it-reaches">The assurance level it reaches</h3>
 <p>The signatures and structure still pass, so the tampered handoff reaches <strong>L1</strong>. L2 needs the received bytes to match, and <code>artifact-bytes</code> failed, so the required L3 is not met.</p>
 <pre><code class="language-bash">$ makoto report level makoto-report.mutated-final-data.json --require L3
 PASS        L1 Provenance is authentic

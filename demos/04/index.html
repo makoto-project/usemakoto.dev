@@ -54,7 +54,7 @@
 </div>
 <div class="docs-nav-group">
 <p class="docs-nav-title">Build</p>
-<a href="/schema/v0.2/catalog.json">Hosted schemas</a>
+<a href="/spec/schemas/">Hosted schemas</a>
 <a href="/verify/">Verification</a>
 <a href="/tooling/">Tooling &amp; SDKs</a>
 <a href="/integrations/">Integration patterns</a>
@@ -80,6 +80,14 @@
 <span class="kicker">Case 04 · configuration postmortem</span>
 <h1>The config changed on Saturday. Which data did it change?</h1>
 <p class="lead">A service account reduces batch size and Monday throughput collapses. The audit question is not only who changed the file. It is which exact outputs were produced under that configuration, and whether the record of what ran is still the record that was signed.</p>
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#code-the-assurance-level-it-reaches">The assurance level it reaches</a> below.</figcaption><pre><code class="language-bash">$ makoto report level makoto-report.edited-signed-metadata.json --require L3
+FAIL        L1 Provenance is authentic: signatures fail
+FAIL        L2 Provenance is authorized and complete: authorization-thresholds fail, authorization fail, graph skipped, roots-and-heads skipped, completeness-anchor fail, artifact-bytes skipped, artifact-profiles skipped
+FAIL        L3 Provenance is anchored: decision deny
+LEVEL       none
+REQUIRED    L3 not met
+$ echo $?
+1</code></pre></figure>
 <p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
 
 <section>
@@ -379,7 +387,7 @@ $ echo $?
     }
   ]
 }</code></pre>
-<h3>The assurance level it reaches</h3>
+<h3 id="code-the-assurance-level-it-reaches">The assurance level it reaches</h3>
 <p>The edited record's signature fails, so it reaches <strong>no level</strong>.</p>
 <pre><code class="language-bash">$ makoto report level makoto-report.edited-signed-metadata.json --require L3
 FAIL        L1 Provenance is authentic: signatures fail

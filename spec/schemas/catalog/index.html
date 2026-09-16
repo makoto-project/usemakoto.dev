@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Field-by-field reference for the hosted Makoto resource catalog.json: types, requirements, constraints, rules, and real example values.">
+  <title>catalog.json reference — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/spec/schemas/catalog/">
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+  <span class="kicker">Schema reference</span>
+  <h1><code>catalog.json</code></h1>
+  <p class="lead">The index of hosted resources and their digests. Not a schema itself; the document a resolver pins against.</p>
+  <dl class="schema-meta">
+    <dt>Title</dt><dd>Schema catalog</dd>
+    <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/catalog.json</dd>
+    <dt>Digest</dt><dd>sha256:298f55040022b6fe7c71e7a37d6ec4a75317d1c0b52a679dcca744cb4a3eaaf3</dd>
+    <dt>Raw</dt><dd><a href="/schema/v0.2/catalog.json">/schema/v0.2/catalog.json</a></dd>
+    <dt>Carried in</dt><dd>The hosted core catalog. Every other resource on these pages is listed in it with its digest, and it is validated by <a href="/spec/schemas/catalog-schema/"><code>catalog.schema.json</code></a>.</dd>
+    
+  </dl>
+  <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#123-schema-catalog">§12.3</a><a href="/spec/text/#17-hosted-schemas-and-versioning">§17</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
+  <figure class="lead-exhibit"><figcaption><strong>A real instance.</strong> Read from <code>schema/v0.2/catalog.json</code>, which validates against this schema.</figcaption><pre data-filename="catalog.json"><code class="language-json">{
+  &quot;resources&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;2a6ca7b341abcbc0995369e5bf338e95f531cfaaa417715906da8169e5f829c8&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/bundle.schema.json&quot;,
+      &quot;path&quot;: &quot;bundle.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;30b478401528256f823a27418d1316ca27b1ccb8ecaf45d1afa2edbbcb1fd797&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/catalog.schema.json&quot;,
+      &quot;path&quot;: &quot;catalog.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;5a0498a2911bbe3029c9dbcbcbbbb2c2ce683d280b796a5f09ad271d8e9b034f&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/dataset-manifest.schema.json&quot;,
+      &quot;path&quot;: &quot;dataset-manifest.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;49de7cf790e3a0c7bd3b83ee7322164d2a5a829648fe1407c79c07f4d74a0f66&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/envelope.schema.json&quot;,
+      &quot;path&quot;: &quot;envelope.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;762746d6636a9521382c58d6861f7ac87fd11fea990845d70389b68b4977f0d6&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/handoff.schema.json&quot;,
+      &quot;path&quot;: &quot;handoff.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;3f56d68d758bb72c2bcbabd922e1ac7d6eb6dd9c3e6baa78a9f104cf0a64badc&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/origin.schema.json&quot;,
+      &quot;path&quot;: &quot;origin.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;563ff211e383732113d7455bf5c6bf07d1a87401dd41e9db68bdd5e99b433fb8&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json&quot;,
+      &quot;path&quot;: &quot;profile-dialect.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;abe12266ae10b57d95d8fd14489c6cdaedd4ed67ef8f7a44db7b18249832665c&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/profile-reference.schema.json&quot;,
+      &quot;path&quot;: &quot;profile-reference.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;dbe4487be9b44521e4fa9b63900992304b9fb4e4985b7899cb23af6916efe5e0&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/statement.schema.json&quot;,
+      &quot;path&quot;: &quot;statement.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;8b8dad3361327578c79a5b69912fe77e747d4ac6d1c6b234327f1a56621b1a23&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/transform.schema.json&quot;,
+      &quot;path&quot;: &quot;transform.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;1a056bc1605174d1eb90c8491d74dc5db7398c4aa15f9bc6033eae55e8664aca&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/trust-policy.schema.json&quot;,
+      &quot;path&quot;: &quot;trust-policy.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;f1d47e7c8273deff5a65a6901d4f0b00f2eecaf7da5d4bc29055508a8877c3ae&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/verification-report.schema.json&quot;,
+      &quot;path&quot;: &quot;verification-report.schema.json&quot;
+    }
+  ],
+  &quot;version&quot;: &quot;0.2&quot;
+}</code></pre></figure>
+  
+<section aria-labelledby="fields"><h2 id="fields">Resources</h2><div class="table-scroll"><table class="doc-table"><thead><tr><th scope="col">Path</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td><a href="/spec/schemas/bundle/"><code>bundle.schema.json</code></a></td><td class="hash">2a6ca7b341abcbc0995369e5bf338e95f531cfaaa417715906da8169e5f829c8</td></tr><tr><td><a href="/spec/schemas/catalog-schema/"><code>catalog.schema.json</code></a></td><td class="hash">30b478401528256f823a27418d1316ca27b1ccb8ecaf45d1afa2edbbcb1fd797</td></tr><tr><td><a href="/spec/schemas/dataset-manifest/"><code>dataset-manifest.schema.json</code></a></td><td class="hash">5a0498a2911bbe3029c9dbcbcbbbb2c2ce683d280b796a5f09ad271d8e9b034f</td></tr><tr><td><a href="/spec/schemas/envelope/"><code>envelope.schema.json</code></a></td><td class="hash">49de7cf790e3a0c7bd3b83ee7322164d2a5a829648fe1407c79c07f4d74a0f66</td></tr><tr><td><a href="/spec/schemas/handoff/"><code>handoff.schema.json</code></a></td><td class="hash">762746d6636a9521382c58d6861f7ac87fd11fea990845d70389b68b4977f0d6</td></tr><tr><td><a href="/spec/schemas/origin/"><code>origin.schema.json</code></a></td><td class="hash">3f56d68d758bb72c2bcbabd922e1ac7d6eb6dd9c3e6baa78a9f104cf0a64badc</td></tr><tr><td><a href="/spec/schemas/profile-dialect/"><code>profile-dialect.schema.json</code></a></td><td class="hash">563ff211e383732113d7455bf5c6bf07d1a87401dd41e9db68bdd5e99b433fb8</td></tr><tr><td><a href="/spec/schemas/profile-reference/"><code>profile-reference.schema.json</code></a></td><td class="hash">abe12266ae10b57d95d8fd14489c6cdaedd4ed67ef8f7a44db7b18249832665c</td></tr><tr><td><a href="/spec/schemas/statement/"><code>statement.schema.json</code></a></td><td class="hash">dbe4487be9b44521e4fa9b63900992304b9fb4e4985b7899cb23af6916efe5e0</td></tr><tr><td><a href="/spec/schemas/transform/"><code>transform.schema.json</code></a></td><td class="hash">8b8dad3361327578c79a5b69912fe77e747d4ac6d1c6b234327f1a56621b1a23</td></tr><tr><td><a href="/spec/schemas/trust-policy/"><code>trust-policy.schema.json</code></a></td><td class="hash">1a056bc1605174d1eb90c8491d74dc5db7398c4aa15f9bc6033eae55e8664aca</td></tr><tr><td><a href="/spec/schemas/verification-report/"><code>verification-report.schema.json</code></a></td><td class="hash">f1d47e7c8273deff5a65a6901d4f0b00f2eecaf7da5d4bc29055508a8877c3ae</td></tr></tbody></table></div></section>
+  <section aria-labelledby="examples"><h2 id="examples">Real documents that validate</h2><ul class="schema-list"><li><code>schema/v0.2/catalog.json</code></li></ul></section>
+  <section aria-labelledby="raw"><h2 id="raw">Raw JSON</h2>
+    <details><summary>The published document (2,274 bytes)</summary><div>
+      <pre data-filename="catalog.json"><code class="language-json">{
+  &quot;resources&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;2a6ca7b341abcbc0995369e5bf338e95f531cfaaa417715906da8169e5f829c8&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/bundle.schema.json&quot;,
+      &quot;path&quot;: &quot;bundle.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;30b478401528256f823a27418d1316ca27b1ccb8ecaf45d1afa2edbbcb1fd797&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/catalog.schema.json&quot;,
+      &quot;path&quot;: &quot;catalog.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;5a0498a2911bbe3029c9dbcbcbbbb2c2ce683d280b796a5f09ad271d8e9b034f&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/dataset-manifest.schema.json&quot;,
+      &quot;path&quot;: &quot;dataset-manifest.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;49de7cf790e3a0c7bd3b83ee7322164d2a5a829648fe1407c79c07f4d74a0f66&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/envelope.schema.json&quot;,
+      &quot;path&quot;: &quot;envelope.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;762746d6636a9521382c58d6861f7ac87fd11fea990845d70389b68b4977f0d6&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/handoff.schema.json&quot;,
+      &quot;path&quot;: &quot;handoff.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;3f56d68d758bb72c2bcbabd922e1ac7d6eb6dd9c3e6baa78a9f104cf0a64badc&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/origin.schema.json&quot;,
+      &quot;path&quot;: &quot;origin.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;563ff211e383732113d7455bf5c6bf07d1a87401dd41e9db68bdd5e99b433fb8&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json&quot;,
+      &quot;path&quot;: &quot;profile-dialect.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;abe12266ae10b57d95d8fd14489c6cdaedd4ed67ef8f7a44db7b18249832665c&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/profile-reference.schema.json&quot;,
+      &quot;path&quot;: &quot;profile-reference.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;dbe4487be9b44521e4fa9b63900992304b9fb4e4985b7899cb23af6916efe5e0&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/statement.schema.json&quot;,
+      &quot;path&quot;: &quot;statement.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;8b8dad3361327578c79a5b69912fe77e747d4ac6d1c6b234327f1a56621b1a23&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/transform.schema.json&quot;,
+      &quot;path&quot;: &quot;transform.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;1a056bc1605174d1eb90c8491d74dc5db7398c4aa15f9bc6033eae55e8664aca&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/trust-policy.schema.json&quot;,
+      &quot;path&quot;: &quot;trust-policy.schema.json&quot;
+    },
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;f1d47e7c8273deff5a65a6901d4f0b00f2eecaf7da5d4bc29055508a8877c3ae&quot;
+      },
+      &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/verification-report.schema.json&quot;,
+      &quot;path&quot;: &quot;verification-report.schema.json&quot;
+    }
+  ],
+  &quot;version&quot;: &quot;0.2&quot;
+}</code></pre>
+      <p class="code-note">Formatted for reading. The digested bytes are canonical single-line JSON; fetch the raw URL to compare them.</p>
+    </div></details>
+  </section>
+</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body>
+</html>

@@ -344,6 +344,9 @@ pre, .table-scroll, .wide-table { scrollbar-width: thin; scrollbar-color: var(--
 .callout.success { border-color: color-mix(in srgb, var(--allow) 45%, var(--line)); background: var(--allow-wash); }
 :not(pre) > code { padding: .08em .34em; border-radius: 4px; background: var(--form-wash); color: var(--ink); font-size: .86em; overflow-wrap: anywhere; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--form) 14%, transparent); }
 a > code, a:hover > code { color: inherit; }
+h1 > code, h2 > code, h3 > code { padding: 0; background: none; box-shadow: none; font-size: .86em; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.field-table td:first-child { width: 24%; }
+.field-table td:nth-child(2) { width: 22%; }
 
 .grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1.25rem; }
 .card-v02 { position: relative; padding: 1.25rem 1.25rem 1.1rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--sheet); box-shadow: var(--shadow); }
@@ -493,7 +496,7 @@ pre ::selection, pre::selection { color: inherit; background: color-mix(in srgb,
 
 /* A lead exhibit: a page opening with the code it is about. */
 .lead-exhibit { margin: 2rem 0 2.5rem; }
-.lead-exhibit > figcaption { display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem .9rem; margin: 0 0 .65rem; color: var(--muted); font-size: .9rem; }
+.lead-exhibit > figcaption { display: block; margin: 0 0 .65rem; color: var(--muted); font-size: .9rem; }
 .lead-exhibit > figcaption strong { color: var(--ink); font-weight: 650; }
 .lead-exhibit .exhibit, .lead-exhibit pre { margin: 0; }
 .lead-exhibit + .lead-exhibit { margin-top: -1rem; }

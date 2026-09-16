@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Field-by-field reference for the hosted Makoto resource profile-dialect.schema.json: types, requirements, constraints, rules, and real example values.">
+  <title>profile-dialect.schema.json reference — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/spec/schemas/profile-dialect/">
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+  <span class="kicker">Schema reference</span>
+  <h1><code>profile-dialect.schema.json</code></h1>
+  <p class="lead">The restricted JSON Schema dialect a private profile may use, bounded so resolution stays offline and terminating.</p>
+  <dl class="schema-meta">
+    <dt>Title</dt><dd>Makoto v0.2 Organizational Profile Dialect</dd>
+    <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json</dd>
+    <dt>Digest</dt><dd>sha256:563ff211e383732113d7455bf5c6bf07d1a87401dd41e9db68bdd5e99b433fb8</dd>
+    <dt>Raw</dt><dd><a href="/schema/v0.2/profile-dialect.schema.json">/schema/v0.2/profile-dialect.schema.json</a></dd>
+    <dt>Carried in</dt><dd>The <code>$schema</code> every private profile resource declares, such as the receiver resources in the runnable proof.</dd>
+    <dt>Responsibility</dt><dd>Makoto's Draft 2020-12-derived vocabulary set, unknown-keyword closure, and bounded-pattern dialect.</dd>
+  </dl>
+  <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#121-profile-reference">§12.1</a><a href="/spec/text/#124-validating-actual-data-contents">§12.4</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
+  <figure class="lead-exhibit"><figcaption><strong>A real instance.</strong> Read from <code>demos/v0.2-end-to-end/artifacts/receiver/resources/31934d2cf8fa7b5af2f8e4cf591d96278c4f59ddb6bb190afccb93701244f9eb.schema.json</code>, which validates against this schema.</figcaption><pre data-filename="31934d2cf8fa7b5af2f8e4cf591d96278c4f59ddb6bb190afccb93701244f9eb.schema.json"><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json&quot;,
+  &quot;$id&quot;: &quot;https://schemas.example.internal/makoto/public-transform-metadata-v1.schema.json&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;schemaVersion&quot;,
+    &quot;event&quot;,
+    &quot;operation&quot;,
+    &quot;inputs&quot;,
+    &quot;extensions&quot;
+  ],
+  &quot;properties&quot;: {
+    &quot;schemaVersion&quot;: {
+      &quot;const&quot;: &quot;0.2&quot;
+    },
+    &quot;event&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [
+        &quot;id&quot;,
+        &quot;occurredAt&quot;
+      ]
+    },
+    &quot;operation&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [
+        &quot;type&quot;
+      ],
+      &quot;properties&quot;: {
+        &quot;type&quot;: {
+          &quot;const&quot;: &quot;urn:makoto:demo:operation:public-safe&quot;
+        }
+      }
+    },
+    &quot;inputs&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;minItems&quot;: 1
+    },
+    &quot;extensions&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [
+        &quot;urn:makoto:demo:privacy-reviewed&quot;
+      ],
+      &quot;properties&quot;: {
+        &quot;urn:makoto:demo:privacy-reviewed&quot;: {
+          &quot;const&quot;: true
+        }
+      }
+    }
+  }
+}</code></pre></figure>
+  
+<section aria-labelledby="fields"><h2 id="fields">Fields</h2><p class="spec-jump"><a href="#def-root">Top level</a><a href="#def-nonnegativeInteger">nonnegativeInteger</a><a href="#def-schemaObject">schemaObject</a><a href="#def-nestedSchema">nestedSchema</a><a href="#def-schemaArray">schemaArray</a><a href="#def-schemaMap">schemaMap</a></p><section class="def-block" id="def-root" aria-labelledby="def-root-title"><h3 id="def-root-title">Top level<a class="anchor-link" href="#def-root" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span></div></section><section class="def-block" id="def-nonnegativeInteger" aria-labelledby="def-nonnegativeInteger-title"><h3 id="def-nonnegativeInteger-title">nonnegativeInteger<a class="anchor-link" href="#def-nonnegativeInteger" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">integer</span><ul class="field-constraints"><li>≥ 0</li></ul><p class="text-muted">Appears at <code>$defs.*.maxContains</code>, <code>$defs.*.maxItems</code>, <code>$defs.*.maxLength</code>, <code>$defs.*.maxProperties</code>, <code>$defs.*.minContains</code>, <code>$defs.*.minItems</code>, <code>$defs.*.minLength</code>, <code>$defs.*.minProperties</code>…</p></div></section><section class="def-block" id="def-schemaObject" aria-labelledby="def-schemaObject-title"><h3 id="def-schemaObject-title">schemaObject<a class="anchor-link" href="#def-schemaObject" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>$defs.*</code>, <code>$defs.*.additionalProperties</code>, <code>$defs.*.contains</code>, <code>$defs.*.contentSchema</code>, <code>$defs.*.else</code>, <code>$defs.*.if</code>, <code>$defs.*.items</code>, <code>$defs.*.not</code>…</p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-schemaObject-$schema"><span class="field-name">$schema</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json&quot;</li></ul><div class="field-example"><code>&quot;https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json&quot;</code></div></td></tr><tr><td id="f-schemaObject-$id"><span class="field-name">$id</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div class="field-example"><code>&quot;https://schemas.example.internal/makoto/public-transform-metadata-v1.schema.json&quot;</code></div></td></tr><tr><td id="f-schemaObject-$comment"><span class="field-name">$comment</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td></td></tr><tr><td id="f-schemaObject-$ref"><span class="field-name">$ref</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td></td></tr><tr><td id="f-schemaObject-$defs"><span class="field-name">$defs</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-schemaMap">schemaMap</a></td><td></td></tr><tr><td id="f-schemaObject-$anchor"><span class="field-name">$anchor</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>pattern &quot;^[A-Za-z_][-A-Za-z0-9._]*$&quot;</li></ul></td></tr><tr><td id="f-schemaObject-type"><span class="field-name">type</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">one of: enum | array of enum</td><td><div class="field-example"><code>&quot;object&quot;</code></div></td></tr><tr><td id="f-schemaObject-enum"><span class="field-name">enum</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">array</td><td><ul class="field-constraints"><li>min items 1</li></ul><div class="field-example"><code>[&quot;0-17&quot;, &quot;18-24&quot;, &quot;25-34&quot;, &quot;35-44&quot;, &quot;45-54&quot;, &quot;55-64&quot;, &quot;65+&quot;]</code></div></td></tr><tr><td id="f-schemaObject-const"><span class="field-name">const</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">any</td><td><div class="field-example"><code>&quot;0.2&quot;</code></div></td></tr><tr><td id="f-schemaObject-multipleOf"><span class="field-name">multipleOf</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">number</td><td><ul class="field-constraints"><li>&gt; 0</li></ul></td></tr><tr><td id="f-schemaObject-maximum"><span class="field-name">maximum</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">number</td><td></td></tr><tr><td id="f-schemaObject-exclusiveMaximum"><span class="field-name">exclusiveMaximum</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">number</td><td></td></tr><tr><td id="f-schemaObject-minimum"><span class="field-name">minimum</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">number</td><td></td></tr><tr><td id="f-schemaObject-exclusiveMinimum"><span class="field-name">exclusiveMinimum</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">number</td><td></td></tr><tr><td id="f-schemaObject-maxLength"><span class="field-name">maxLength</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nonnegativeInteger">nonnegativeInteger</a></td><td><div class="field-example"><code>20</code></div></td></tr><tr><td id="f-schemaObject-minLength"><span class="field-name">minLength</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nonnegativeInteger">nonnegativeInteger</a></td><td><div class="field-example"><code>20</code></div></td></tr><tr><td id="f-schemaObject-makotoPattern"><span class="field-name">makotoPattern</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>max length 65536</li></ul></td></tr><tr><td id="f-schemaObject-maxItems"><span class="field-name">maxItems</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nonnegativeInteger">nonnegativeInteger</a></td><td></td></tr><tr><td id="f-schemaObject-minItems"><span class="field-name">minItems</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nonnegativeInteger">nonnegativeInteger</a></td><td><div class="field-example"><code>1</code></div></td></tr><tr><td id="f-schemaObject-uniqueItems"><span class="field-name">uniqueItems</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">boolean</td><td></td></tr><tr><td id="f-schemaObject-maxContains"><span class="field-name">maxContains</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nonnegativeInteger">nonnegativeInteger</a></td><td></td></tr><tr><td id="f-schemaObject-minContains"><span class="field-name">minContains</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nonnegativeInteger">nonnegativeInteger</a></td><td></td></tr><tr><td id="f-schemaObject-maxProperties"><span class="field-name">maxProperties</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nonnegativeInteger">nonnegativeInteger</a></td><td></td></tr><tr><td id="f-schemaObject-minProperties"><span class="field-name">minProperties</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nonnegativeInteger">nonnegativeInteger</a></td><td></td></tr><tr><td id="f-schemaObject-required"><span class="field-name">required</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">array of string</td><td><ul class="field-constraints"><li>unique items</li></ul><div class="field-example"><code>[&quot;schemaVersion&quot;, &quot;event&quot;, &quot;operation&quot;, &quot;inputs&quot;, &quot;extensions&quot;]</code></div></td></tr><tr><td id="f-schemaObject-dependentRequired"><span class="field-name">dependentRequired</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">map of array of string</td><td></td></tr><tr><td id="f-schemaObject-allOf"><span class="field-name">allOf</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-schemaArray">schemaArray</a></td><td></td></tr><tr><td id="f-schemaObject-anyOf"><span class="field-name">anyOf</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-schemaArray">schemaArray</a></td><td></td></tr><tr><td id="f-schemaObject-oneOf"><span class="field-name">oneOf</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-schemaArray">schemaArray</a></td><td></td></tr><tr><td id="f-schemaObject-not"><span class="field-name">not</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nestedSchema">nestedSchema</a></td><td></td></tr><tr><td id="f-schemaObject-if"><span class="field-name">if</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nestedSchema">nestedSchema</a></td><td></td></tr><tr><td id="f-schemaObject-then"><span class="field-name">then</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nestedSchema">nestedSchema</a></td><td></td></tr><tr><td id="f-schemaObject-else"><span class="field-name">else</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nestedSchema">nestedSchema</a></td><td></td></tr><tr><td id="f-schemaObject-properties"><span class="field-name">properties</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-schemaMap">schemaMap</a></td><td><div class="field-example"><code>{&quot;schemaVersion&quot;: {&quot;const&quot;: &quot;0.2&quot;}, &quot;event&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;required&quot;: [&quot;id&quot;, &quot;occurredAt&quot;…</code></div></td></tr><tr><td id="f-schemaObject-additionalProperties"><span class="field-name">additionalProperties</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nestedSchema">nestedSchema</a></td><td><div class="field-example"><code>false</code></div></td></tr><tr><td id="f-schemaObject-unevaluatedProperties"><span class="field-name">unevaluatedProperties</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nestedSchema">nestedSchema</a></td><td></td></tr><tr><td id="f-schemaObject-propertyNames"><span class="field-name">propertyNames</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nestedSchema">nestedSchema</a></td><td></td></tr><tr><td id="f-schemaObject-dependentSchemas"><span class="field-name">dependentSchemas</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-schemaMap">schemaMap</a></td><td></td></tr><tr><td id="f-schemaObject-prefixItems"><span class="field-name">prefixItems</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-schemaArray">schemaArray</a></td><td></td></tr><tr><td id="f-schemaObject-items"><span class="field-name">items</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nestedSchema">nestedSchema</a></td><td><div class="field-example"><code>{&quot;type&quot;: &quot;object&quot;, &quot;required&quot;: [&quot;age_band&quot;, &quot;customer_id&quot;, &quot;marketing_consent&quot;, &quot;region&quot;], &quot;pro…</code></div></td></tr><tr><td id="f-schemaObject-contains"><span class="field-name">contains</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nestedSchema">nestedSchema</a></td><td></td></tr><tr><td id="f-schemaObject-unevaluatedItems"><span class="field-name">unevaluatedItems</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nestedSchema">nestedSchema</a></td><td></td></tr><tr><td id="f-schemaObject-title"><span class="field-name">title</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td></td></tr><tr><td id="f-schemaObject-description"><span class="field-name">description</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td></td></tr><tr><td id="f-schemaObject-default"><span class="field-name">default</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">any</td><td></td></tr><tr><td id="f-schemaObject-deprecated"><span class="field-name">deprecated</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">boolean</td><td></td></tr><tr><td id="f-schemaObject-readOnly"><span class="field-name">readOnly</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">boolean</td><td></td></tr><tr><td id="f-schemaObject-writeOnly"><span class="field-name">writeOnly</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">boolean</td><td></td></tr><tr><td id="f-schemaObject-examples"><span class="field-name">examples</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">array</td><td></td></tr><tr><td id="f-schemaObject-contentEncoding"><span class="field-name">contentEncoding</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td></td></tr><tr><td id="f-schemaObject-contentMediaType"><span class="field-name">contentMediaType</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td></td></tr><tr><td id="f-schemaObject-contentSchema"><span class="field-name">contentSchema</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-nestedSchema">nestedSchema</a></td><td></td></tr><tr><td id="f-schemaObject-format"><span class="field-name">format</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td></td></tr></tbody></table></div></section><section class="def-block" id="def-nestedSchema" aria-labelledby="def-nestedSchema-title"><h3 id="def-nestedSchema-title">nestedSchema<a class="anchor-link" href="#def-nestedSchema" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">one of 2 <a href="#variants-nestedSchema">variants</a></span><p class="text-muted">Appears at <code>$defs.*</code>, <code>$defs.*.$defs.*</code>, <code>$defs.*.additionalProperties</code>, <code>$defs.*.allOf[]</code>, <code>$defs.*.anyOf[]</code>, <code>$defs.*.contains</code>, <code>$defs.*.contentSchema</code>, <code>$defs.*.dependentSchemas.*</code>…</p></div><h4 id="variants-nestedSchema">Variants (2)</h4><p>Exactly one of these shapes must match.</p><div class="table-scroll"><table class="doc-table variant-table"><thead><tr><th scope="col">#</th><th scope="col">Base</th></tr></thead><tbody><tr><td>1</td><td class="field-type">boolean</td></tr><tr><td>2</td><td class="field-type">any</td></tr></tbody></table></div></section><section class="def-block" id="def-schemaArray" aria-labelledby="def-schemaArray-title"><h3 id="def-schemaArray-title">schemaArray<a class="anchor-link" href="#def-schemaArray" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">array of <a href="#def-nestedSchema">nestedSchema</a></span><ul class="field-constraints"><li>min items 1</li></ul><p class="text-muted">Appears at <code>$defs.*.allOf</code>, <code>$defs.*.anyOf</code>, <code>$defs.*.oneOf</code>, <code>$defs.*.prefixItems</code>, <code>additionalProperties.additionalProperties.allOf</code>, <code>additionalProperties.additionalProperties.anyOf</code>, <code>additionalProperties.additionalProperties.oneOf</code>, <code>additionalProperties.additionalProperties.prefixItems</code>…</p></div></section><section class="def-block" id="def-schemaMap" aria-labelledby="def-schemaMap-title"><h3 id="def-schemaMap-title">schemaMap<a class="anchor-link" href="#def-schemaMap" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">map of <a href="#def-nestedSchema">nestedSchema</a></span><p class="text-muted">Appears at <code>$defs</code>, <code>$defs.*.$defs</code>, <code>$defs.*.dependentSchemas</code>, <code>$defs.*.properties</code>, <code>additionalProperties.$defs</code>, <code>additionalProperties.additionalProperties.$defs</code>, <code>additionalProperties.additionalProperties.dependentSchemas</code>, <code>additionalProperties.additionalProperties.properties</code>…</p></div></section></section>
+  <section aria-labelledby="examples"><h2 id="examples">Real documents that validate</h2><ul class="schema-list"><li><code>demos/v0.2-end-to-end/artifacts/receiver/resources/31934d2cf8fa7b5af2f8e4cf591d96278c4f59ddb6bb190afccb93701244f9eb.schema.json</code></li><li><code>demos/v0.2-end-to-end/artifacts/receiver/resources/68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb.schema.json</code></li></ul></section>
+  <section aria-labelledby="raw"><h2 id="raw">Raw JSON</h2>
+    <details><summary>The published document (5,319 bytes)</summary><div>
+      <pre data-filename="profile-dialect.schema.json"><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;$id&quot;: &quot;https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json&quot;,
+  &quot;$vocabulary&quot;: {
+    &quot;https://json-schema.org/draft/2020-12/vocab/core&quot;: true,
+    &quot;https://json-schema.org/draft/2020-12/vocab/applicator&quot;: true,
+    &quot;https://json-schema.org/draft/2020-12/vocab/validation&quot;: true,
+    &quot;https://json-schema.org/draft/2020-12/vocab/meta-data&quot;: true,
+    &quot;https://json-schema.org/draft/2020-12/vocab/format-annotation&quot;: true,
+    &quot;https://json-schema.org/draft/2020-12/vocab/content&quot;: true,
+    &quot;https://json-schema.org/draft/2020-12/vocab/unevaluated&quot;: true,
+    &quot;https://usemakoto.dev/vocab/v0.2/bounded-pattern&quot;: true
+  },
+  &quot;$dynamicAnchor&quot;: &quot;meta&quot;,
+  &quot;title&quot;: &quot;Makoto v0.2 Organizational Profile Dialect&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [&quot;$schema&quot;, &quot;$id&quot;],
+  &quot;allOf&quot;: [{ &quot;$ref&quot;: &quot;#/$defs/schemaObject&quot; }],
+  &quot;$defs&quot;: {
+    &quot;nonnegativeInteger&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 0 },
+    &quot;schemaObject&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;$schema&quot;: {
+          &quot;const&quot;: &quot;https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json&quot;
+        },
+        &quot;$id&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;$comment&quot;: { &quot;type&quot;: &quot;string&quot; },
+        &quot;$ref&quot;: { &quot;type&quot;: &quot;string&quot; },
+        &quot;$defs&quot;: { &quot;$ref&quot;: &quot;#/$defs/schemaMap&quot; },
+        &quot;$anchor&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;pattern&quot;: &quot;^[A-Za-z_][-A-Za-z0-9._]*$&quot;
+        },
+        &quot;type&quot;: {
+          &quot;oneOf&quot;: [
+            {
+              &quot;enum&quot;: [&quot;null&quot;, &quot;boolean&quot;, &quot;object&quot;, &quot;array&quot;, &quot;number&quot;, &quot;string&quot;, &quot;integer&quot;]
+            },
+            {
+              &quot;type&quot;: &quot;array&quot;,
+              &quot;minItems&quot;: 1,
+              &quot;uniqueItems&quot;: true,
+              &quot;items&quot;: {
+                &quot;enum&quot;: [&quot;null&quot;, &quot;boolean&quot;, &quot;object&quot;, &quot;array&quot;, &quot;number&quot;, &quot;string&quot;, &quot;integer&quot;]
+              }
+            }
+          ]
+        },
+        &quot;enum&quot;: { &quot;type&quot;: &quot;array&quot;, &quot;minItems&quot;: 1 },
+        &quot;const&quot;: true,
+        &quot;multipleOf&quot;: { &quot;type&quot;: &quot;number&quot;, &quot;exclusiveMinimum&quot;: 0 },
+        &quot;maximum&quot;: { &quot;type&quot;: &quot;number&quot; },
+        &quot;exclusiveMaximum&quot;: { &quot;type&quot;: &quot;number&quot; },
+        &quot;minimum&quot;: { &quot;type&quot;: &quot;number&quot; },
+        &quot;exclusiveMinimum&quot;: { &quot;type&quot;: &quot;number&quot; },
+        &quot;maxLength&quot;: { &quot;$ref&quot;: &quot;#/$defs/nonnegativeInteger&quot; },
+        &quot;minLength&quot;: { &quot;$ref&quot;: &quot;#/$defs/nonnegativeInteger&quot; },
+        &quot;makotoPattern&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;maxLength&quot;: 65536 },
+        &quot;maxItems&quot;: { &quot;$ref&quot;: &quot;#/$defs/nonnegativeInteger&quot; },
+        &quot;minItems&quot;: { &quot;$ref&quot;: &quot;#/$defs/nonnegativeInteger&quot; },
+        &quot;uniqueItems&quot;: { &quot;type&quot;: &quot;boolean&quot; },
+        &quot;maxContains&quot;: { &quot;$ref&quot;: &quot;#/$defs/nonnegativeInteger&quot; },
+        &quot;minContains&quot;: { &quot;$ref&quot;: &quot;#/$defs/nonnegativeInteger&quot; },
+        &quot;maxProperties&quot;: { &quot;$ref&quot;: &quot;#/$defs/nonnegativeInteger&quot; },
+        &quot;minProperties&quot;: { &quot;$ref&quot;: &quot;#/$defs/nonnegativeInteger&quot; },
+        &quot;required&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: { &quot;type&quot;: &quot;string&quot; },
+          &quot;uniqueItems&quot;: true
+        },
+        &quot;dependentRequired&quot;: {
+          &quot;type&quot;: &quot;object&quot;,
+          &quot;additionalProperties&quot;: {
+            &quot;type&quot;: &quot;array&quot;,
+            &quot;items&quot;: { &quot;type&quot;: &quot;string&quot; },
+            &quot;uniqueItems&quot;: true
+          }
+        },
+        &quot;allOf&quot;: { &quot;$ref&quot;: &quot;#/$defs/schemaArray&quot; },
+        &quot;anyOf&quot;: { &quot;$ref&quot;: &quot;#/$defs/schemaArray&quot; },
+        &quot;oneOf&quot;: { &quot;$ref&quot;: &quot;#/$defs/schemaArray&quot; },
+        &quot;not&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; },
+        &quot;if&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; },
+        &quot;then&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; },
+        &quot;else&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; },
+        &quot;properties&quot;: { &quot;$ref&quot;: &quot;#/$defs/schemaMap&quot; },
+        &quot;additionalProperties&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; },
+        &quot;unevaluatedProperties&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; },
+        &quot;propertyNames&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; },
+        &quot;dependentSchemas&quot;: { &quot;$ref&quot;: &quot;#/$defs/schemaMap&quot; },
+        &quot;prefixItems&quot;: { &quot;$ref&quot;: &quot;#/$defs/schemaArray&quot; },
+        &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; },
+        &quot;contains&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; },
+        &quot;unevaluatedItems&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; },
+        &quot;title&quot;: { &quot;type&quot;: &quot;string&quot; },
+        &quot;description&quot;: { &quot;type&quot;: &quot;string&quot; },
+        &quot;default&quot;: true,
+        &quot;deprecated&quot;: { &quot;type&quot;: &quot;boolean&quot; },
+        &quot;readOnly&quot;: { &quot;type&quot;: &quot;boolean&quot; },
+        &quot;writeOnly&quot;: { &quot;type&quot;: &quot;boolean&quot; },
+        &quot;examples&quot;: { &quot;type&quot;: &quot;array&quot; },
+        &quot;contentEncoding&quot;: { &quot;type&quot;: &quot;string&quot; },
+        &quot;contentMediaType&quot;: { &quot;type&quot;: &quot;string&quot; },
+        &quot;contentSchema&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; },
+        &quot;format&quot;: { &quot;type&quot;: &quot;string&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;nestedSchema&quot;: {
+      &quot;oneOf&quot;: [
+        { &quot;type&quot;: &quot;boolean&quot; },
+        {
+          &quot;allOf&quot;: [
+            { &quot;$ref&quot;: &quot;#/$defs/schemaObject&quot; },
+            {
+              &quot;not&quot;: {
+                &quot;anyOf&quot;: [
+                  { &quot;required&quot;: [&quot;$schema&quot;] },
+                  { &quot;required&quot;: [&quot;$id&quot;] },
+                  { &quot;required&quot;: [&quot;$vocabulary&quot;] }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    &quot;schemaArray&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;minItems&quot;: 1,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; }
+    },
+    &quot;schemaMap&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: { &quot;$ref&quot;: &quot;#/$defs/nestedSchema&quot; }
+    }
+  }
+}</code></pre>
+      <p class="code-note">The published bytes, unmodified.</p>
+    </div></details>
+  </section>
+</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body>
+</html>
