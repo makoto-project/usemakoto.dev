@@ -1,0 +1,63 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "iot-sensors.window-2026-09-16T10-00.jsonl",
+      "digest": {
+        "sha256": "c4c2f3be19a1f816d5fe22a69b47a221ee84a29e6b3066d2b71241b8ddd14c64"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/origin",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:2e8f4a15-7c03-4d9e-9b16-5a0d3e6f8c27",
+      "occurredAt": "2026-09-16T10:01:00Z"
+    },
+    "source": {
+      "kind": "urn:makoto:example:source:mqtt-stream",
+      "uri": "mqtt://sensors.factory.example.com:1883",
+      "name": "Factory floor section A sensor stream",
+      "mediaType": "application/x-ndjson",
+      "retrievedAt": "2026-09-16T10:01:00Z",
+      "version": "window-2026-09-16T10:00"
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:window": {
+        "note": "Not verifiable from this statement. Makoto v0.2 defines no stream-window predicate; these are producer claims about how the serialized window above was assembled. The subject sha256 is the only binding a v0.2 receiver checks.",
+        "streamId": "iot_sensors",
+        "partitions": [
+          "sensors/temp/readings",
+          "sensors/pressure/readings",
+          "sensors/vibration/readings"
+        ],
+        "type": "tumbling",
+        "duration": "PT1M",
+        "windowStart": "2026-09-16T10:00:00Z",
+        "windowEnd": "2026-09-16T10:01:00Z",
+        "watermark": "2026-09-16T09:59:55Z",
+        "allowedLateness": "PT5S",
+        "recordCount": 12
+      },
+      "urn:makoto:example:merkle": {
+        "note": "Reproducible from the window file, but not covered by any v0.2 verification rule.",
+        "algorithm": "sha256",
+        "leafInput": "one NDJSON line, newline excluded",
+        "internalNode": "sha256(leftDigest || rightDigest) over raw 32-byte digests",
+        "oddNodeRule": "promoted unchanged to the next level",
+        "leafCount": 12,
+        "treeHeight": 4,
+        "root": "75a86974b9b00f412452a096bc6f77afcc32d13760f2e85ebb107aeb1c49cde4"
+      },
+      "urn:makoto:example:collection": {
+        "collector": "urn:makoto:example:collector:factory-edge-01",
+        "collectorVersion": "1.2.0",
+        "location": "factory-floor-section-a",
+        "lateRecords": 0,
+        "droppedRecords": 0
+      }
+    }
+  }
+}

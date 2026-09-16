@@ -1,0 +1,37 @@
+{
+  "version": "0.2",
+  "manifest": "manifest.dsse.json",
+  "attestations": [
+    {
+      "statementDigest": {
+        "sha256": "014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11"
+      },
+      "path": "attestations/014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11.dsse.json"
+    },
+    {
+      "statementDigest": {
+        "sha256": "9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55"
+      },
+      "path": "attestations/9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55.dsse.json"
+    },
+    {
+      "statementDigest": {
+        "sha256": "6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d"
+      },
+      "path": "attestations/6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d.dsse.json"
+    }
+  ],
+  "artifacts": [
+    {
+      "statementDigest": {
+        "sha256": "6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d"
+      },
+      "subjectName": "customers.public.json",
+      "digest": {
+        "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+      },
+      "path": "artifacts/final/2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4.bin"
+    }
+  ],
+  "schemaCatalog": "schemas/catalog.json"
+}

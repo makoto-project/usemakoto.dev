@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A single dataset attested, changed, re-attested, transformed, and re-attested again — with every digest computed from real checked-in bytes."><title>Dataset lifecycle walkthrough — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a><p class="mobile-section">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main">
+<main id="main" class="page wide">
+  <span class="kicker">Worked walkthrough · one dataset, start to finish</span>
+  <h1>Attest it. Change it. Attest it again.</h1>
+  <p class="lead">A dataset is attested, then edited, then transformed again. Each change produces different bytes, so each change needs its own statement, and each new statement carries the identity of the one before it. This page follows a single set of customer records through all three states and shows the evidence each state produced.</p>
+  <p class="editorial-note"><strong>Every value on this page is real.</strong> The records are the fixtures checked into <a href="/demos/v0.2-end-to-end/">the runnable proof</a>, and every digest was computed from those exact bytes. Nothing here is illustrative filler. This page presents evidence; it does not perform verification.</p>
+
+  <div class="dag" role="img" aria-label="Raw customer records are attested by an origin statement, normalized into a second dataset attested by a transformation statement, reduced to a public-safe dataset attested by a third statement, and then handed to a receiver that re-hashes the bytes it was given.">
+    <div class="dag-node"><strong>Raw</strong><small>Origin statement</small><div class="hash">4e90181e…</div></div>
+    <div class="dag-node"><strong>Normalized</strong><small>Transformation statement</small><div class="hash">421e19cf…</div></div>
+    <div class="dag-node"><strong>Public-safe</strong><small>Transformation statement</small><div class="hash">2f4fe11d…</div></div>
+    <div class="dag-node"><strong>Receiver</strong><small>Re-hashes what arrived</small><div class="hash">6c8f8061…</div></div>
+  </div>
+
+  <ol class="setup-sequence">
+
+  <li id="dataset"><div><h2>The dataset as it arrives</h2>
+    <p>Three customer records, straight off a partner API. They have the defects real intake data has: padded whitespace, inconsistent case, and a consent field holding three different spellings of the same two answers.</p>
+    <pre><code class="language-json">[{"age":34,"customer_id":"C-1001","email":" Alice@Example.COM ","marketing_consent":" YES ","region":"us"},{"age":67,"customer_id":"C-1002","email":"BOB@EXAMPLE.COM","marketing_consent":"false","region":"gb"},{"age":17,"customer_id":"C-1003","email":" carol@example.com","marketing_consent":"1","region":"ca"}]</code></pre>
+    <p>These exact bytes hash to one value, and that value is the only thing an attestation can usefully commit to. A file path can be reused; a name can be reassigned. The digest cannot.</p>
+    <dl class="meta-list"><dt>File</dt><dd><code>customers.raw.json</code></dd><dt>Size</dt><dd>311 bytes</dd><dt>SHA-256</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></dd></dl>
+  </div></li>
+
+  <li id="first-attestation"><div><h2>Attest it for the first time</h2>
+    <p>The first statement is an <a href="/predicate/v0.2/origin/">origin</a>. It is the only kind of statement with no predecessor, so it is where a lineage graph is allowed to begin. It answers one question: where did these specific bytes come from?</p>
+    <pre><code class="language-json">{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.raw.json",
+      "digest": {
+        "sha256": "4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/origin",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:9f1c6a02-5d74-4f0b-9a3e-1c6b4d8e77a1",
+      "occurredAt": "2026-09-16T16:00:00Z"
+    },
+    "source": {
+      "kind": "urn:makoto:example:source:partner-api",
+      "uri": "https://api.partner-bank.example/v2/customers",
+      "name": "Partner Bank customer extract",
+      "mediaType": "application/json",
+      "retrievedAt": "2026-09-16T15:58:12Z",
+      "version": "2026-09-16"
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:collection": {
+        "method": "scheduled-pull",
+        "collector": "urn:makoto:example:collector:prod-west-01",
+        "collectorVersion": "1.4.2",
+        "environment": "production",
+        "recordsCollected": 3,
+        "recordsDropped": 0
+      },
+      "urn:makoto:example:governance": {
+        "originGeography": "US-WEST-2",
+        "lawfulBasis": "contractual",
+        "agreementReference": "https://legal.example.com/dpa/partner-bank-2026",
+        "agreementEffective": "2026-01-15T00:00:00Z",
+        "confidentiality": "confidential",
+        "intendedUse": "fraud-detection model training"
+      }
+    }
+  }
+}</code></pre>
+    <p>Read it from the top. <code>subject</code> names the artifact and pins its digest, so the statement is bound to content rather than to a filename. <code>source</code> records what the bytes were pulled from and when. The operational and governance detail that the earlier format carried as first-class fields — collector identity, origin geography, lawful basis — lives under <code>extensions</code>, which the specification leaves open for exactly this.</p>
+    <p>This statement now has an identity of its own, and it is a hash too: the SHA-256 of its canonical serialization. That number is how every later statement will refer back to it.</p>
+    <dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></dd><dt>Statement digest</dt><dd><code class="hash">014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11</code></dd><dt>Document</dt><dd><a href="/attestations/origin-example.json">origin-example.json</a></dd></dl>
+    <p class="editorial-note">The statement digest is taken over the canonical form of the statement — keys sorted, no insignificant whitespace — not over the pretty-printed file above. That is what makes the identity stable: reformatting a statement, or reordering its keys, cannot change what it is. <a href="#reproduce">Reproduce it yourself below.</a></p>
+  </div></li>
+
+  <li id="change"><div><h2>The dataset changes</h2>
+    <p>Now the records get normalized. Whitespace goes, email case is folded, consent becomes a real boolean, region codes are upper-cased.</p>
+    <pre><code class="language-json">[{"age":34,"customer_id":"C-1001","email":"alice@example.com","marketing_consent":true,"region":"US"},{"age":67,"customer_id":"C-1002","email":"bob@example.com","marketing_consent":false,"region":"GB"},{"age":17,"customer_id":"C-1003","email":"carol@example.com","marketing_consent":true,"region":"CA"}]</code></pre>
+    <table class="wide-table"><caption>Field-by-field, for the first record. Scroll sideways on a narrow screen.</caption>
+      <thead><tr><th scope="col">Field</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">What happened</th></tr></thead>
+      <tbody><tr><td><code>email</code></td><td><code>" Alice@Example.COM "</code></td><td><code>"alice@example.com"</code></td><td>Surrounding spaces stripped, case folded.</td></tr><tr><td><code>marketing_consent</code></td><td><code>" YES "</code></td><td><code>true</code></td><td>String token resolved to a boolean.</td></tr><tr><td><code>region</code></td><td><code>"us"</code></td><td><code>"US"</code></td><td>Upper-cased to match the reference list.</td></tr><tr><td><code>age</code></td><td><code>34</code></td><td><code>34</code></td><td>Carried through unchanged.</td></tr><tr><td><code>customer_id</code></td><td><code>"C-1001"</code></td><td><code>"C-1001"</code></td><td>Carried through unchanged.</td></tr></tbody>
+    </table>
+    <p>Different bytes, different digest. This is the moment the record would go stale in a system that tracked datasets by name.</p>
+    <dl class="meta-list"><dt>Digest before</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></dd><dt>Digest after</dt><dd><code class="hash">421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8</code></dd></dl>
+    <p><strong>The origin statement is not invalidated by this.</strong> It was never a claim about a file path or about the current contents of a table; it was a claim about one specific sequence of bytes, and that claim stays true forever. What the change creates is not a contradiction but a gap: there is now a dataset in play that no statement covers.</p>
+  </div></li>
+
+  <li id="re-attest"><div><h2>Re-attest the changed dataset</h2>
+    <p>The gap closes with a <a href="/predicate/v0.2/transform/">transformation</a> statement. It looks much like the origin one at the top, and then it does the thing origins cannot do.</p>
+    <pre><code class="language-json">{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.normalized.json",
+      "digest": {
+        "sha256": "421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/transform",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:4b0d2e11-8a37-4c62-b5d9-2f7e0a9c3b44",
+      "occurredAt": "2026-09-16T16:00:00Z"
+    },
+    "operation": {
+      "type": "urn:makoto:example:operation:normalize",
+      "name": "Normalize customer records",
+      "tool": {
+        "name": "makoto-example-normalizer",
+        "version": "1.2.0",
+        "uri": "git+https://github.com/makoto-project/makoto.git"
+      },
+      "parametersDigest": {
+        "sha256": "c463deba9e6da45408de8cc72cb352026f0f527d9fbd1f6d33f45266862002b2"
+      }
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:execution": {
+        "invocationId": "transform-20260916-160000-4b0d2e",
+        "startedAt": "2026-09-16T16:00:00Z",
+        "finishedAt": "2026-09-16T16:00:01Z",
+        "recordsIn": 3,
+        "recordsOut": 3,
+        "recordsDropped": 0,
+        "deterministic": true
+      }
+    },
+    "inputs": [
+      {
+        "name": "raw",
+        "digest": {
+          "sha256": "4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919"
+        },
+        "provenance": {
+          "statementDigest": {
+            "sha256": "014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11"
+          },
+          "subjectName": "customers.raw.json"
+        }
+      }
+    ]
+  }
+}</code></pre>
+    <p><strong>Look at the bottom of the document.</strong> The <code>inputs</code> block is the new information, and it is what makes this a link rather than an isolated assertion. It carries two digests, and they do different jobs:</p>
+    <dl class="meta-list"><dt>Input digest</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code><br><code>inputs[0].digest</code>: the bytes this step consumed. A receiver checks this against the predecessor's subject digest; if they differ, something was swapped between the steps.</dd><dt>Predecessor</dt><dd><code class="hash">014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11</code><br><code>inputs[0].<wbr>provenance.<wbr>statementDigest</code>: the identity of the origin statement from step 02. This is the edge in the graph.</dd></dl>
+    <p>Because that second value is the hash of the whole previous statement, the edge cannot be rewired quietly. Editing the origin statement in any way — changing a timestamp, adding a field, even reordering it in a way that survives canonicalization — changes its digest, and this pointer stops resolving. Anyone re-signing the origin to cover their tracks has to re-sign every statement downstream of it.</p>
+    <p>Note also <code>operation.parametersDigest</code>. The configuration that drove the run is not copied into the statement; it is hashed, so the parameters can be published, withheld, or kept internal without changing what the statement commits to.</p>
+    <dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8</code></dd><dt>Statement digest</dt><dd><code class="hash">9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55</code></dd><dt>Parameters</dt><dd><code class="hash">c463deba9e6da45408de8cc72cb352026f0f527d9fbd1f6d33f45266862002b2</code><br><a href="/attestations/transform-parameters.json">transform-parameters.json</a></dd><dt>Document</dt><dd><a href="/attestations/transform-example.json">transform-example.json</a></dd></dl>
+  </div></li>
+
+  <li id="transform-again"><div><h2>Transform it again</h2>
+    <p>The normalized data still carries direct identifiers, so it cannot leave. A second transformation produces a public-safe derivative: email dropped, customer id replaced by a pseudonym, exact age generalised into a band.</p>
+    <pre><code class="language-json">[{"age_band":"0-17","customer_id":"2da7dbbb0e3f243b06cb","marketing_consent":true,"region":"CA"},{"age_band":"25-34","customer_id":"3fb57f8f4d704855a7aa","marketing_consent":true,"region":"US"},{"age_band":"65+","customer_id":"ce76ddf0a0df7f1d0add","marketing_consent":false,"region":"GB"}]</code></pre>
+    <table class="wide-table"><caption>Before and after the public-safe step, for the one record in the <code>US</code> region. Region is what lines the two rows up — the identifier no longer can. Scroll sideways on a narrow screen.</caption>
+      <thead><tr><th scope="col">Field</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">What happened</th></tr></thead>
+      <tbody><tr><td><code>email</code></td><td><code>"alice@example.com"</code></td><td><em>not present</em></td><td>Direct identifier removed outright.</td></tr><tr><td><code>customer_id</code></td><td><code>"C-1001"</code></td><td><code>"3fb57f8f4d704855a7aa"</code></td><td>Replaced by a pseudonym; the original value is not recoverable from these bytes.</td></tr><tr><td><code>age</code></td><td><code>34</code></td><td><em>not present</em></td><td>Generalised.</td></tr><tr><td><code>age_band</code></td><td><em>not present</em></td><td><code>"25-34"</code></td><td>Replaces the exact age.</td></tr><tr><td><code>marketing_consent</code></td><td><code>true</code></td><td><code>true</code></td><td>Carried through unchanged.</td></tr><tr><td><code>region</code></td><td><code>"US"</code></td><td><code>"US"</code></td><td>Carried through unchanged.</td></tr></tbody>
+    </table>
+    <p>The shape of the data changed this time, not just its formatting. That is worth attesting precisely because it is the step a downstream consumer most wants assurance about.</p>
+    <dl class="meta-list"><dt>Digest before</dt><dd><code class="hash">421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8</code></dd><dt>Digest after</dt><dd><code class="hash">2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4</code></dd></dl>
+  </div></li>
+
+  <li id="re-attest-again"><div><h2>Re-attest the transformed dataset</h2>
+    <p>The same pattern, one link further along. The <code>inputs</code> block at the foot now points at the statement from step 04 rather than the one from step 02.</p>
+    <pre><code class="language-json">{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.public.json",
+      "digest": {
+        "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/transform",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:7c5a9d38-6e41-4bb0-8f27-3d81c0f5ea62",
+      "occurredAt": "2026-09-16T16:00:00Z"
+    },
+    "operation": {
+      "type": "urn:makoto:example:operation:public-safe",
+      "name": "Remove direct identifiers and bucket ages"
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:privacy": {
+        "directIdentifiersRemoved": [
+          "email"
+        ],
+        "pseudonymised": [
+          "customer_id"
+        ],
+        "generalised": [
+          "age"
+        ],
+        "reviewed": true
+      }
+    },
+    "inputs": [
+      {
+        "name": "normalized",
+        "digest": {
+          "sha256": "421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8"
+        },
+        "provenance": {
+          "statementDigest": {
+            "sha256": "9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55"
+          },
+          "subjectName": "customers.normalized.json"
+        }
+      }
+    ]
+  }
+}</code></pre>
+    <p>Three statements, and the chain reads backwards from any point without consulting a server: the public-safe statement names the normalization statement, which names the origin statement, which names nothing, because it is the root.</p>
+    <dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4</code></dd><dt>Statement digest</dt><dd><code class="hash">6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d</code></dd><dt>Points back to</dt><dd><code class="hash">9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55</code></dd><dt>Document</dt><dd><a href="/attestations/public-transform-example.json">public-transform-example.json</a></dd></dl>
+  </div></li>
+
+  <li id="receiver"><div><h2>What a receiver now sees</h2>
+    <p>A receiver gets the three statements and one file of bytes. It does not get, and does not need, access to the producer's systems. From the head of the chain it walks backwards to the root, and at every hop it has something checkable.</p>
+    <table class="wide-table"><caption>The complete chain as a receiver reconstructs it. Scroll sideways on a narrow screen.</caption>
+      <thead><tr><th scope="col">Step</th><th scope="col">Artifact digest</th><th scope="col">Statement digest</th><th scope="col">Declares its predecessor as</th></tr></thead>
+      <tbody>
+        <tr><td>Origin</td><td><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></td><td><code class="hash">014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11</code></td><td>— <span class="hash">root of the graph</span></td></tr>
+        <tr><td>Normalize</td><td><code class="hash">421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8</code></td><td><code class="hash">9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55</code></td><td><code class="hash">014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11</code></td></tr>
+        <tr><td>Public-safe</td><td><code class="hash">2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4</code></td><td><code class="hash">6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d</code></td><td><code class="hash">9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55</code></td></tr>
+      </tbody>
+    </table>
+    <p>The checks it can run on that, alone, at its own desk:</p>
+    <ul class="result-list">
+      <li><span>Hash the file that actually arrived and compare it to the head statement's subject digest</span><span class="allow">BYTES</span></li>
+      <li><span>Hash each statement's canonical form and compare it to the digest its successor claims</span><span class="allow">GRAPH</span></li>
+      <li><span>Confirm every step but the root declares a predecessor, and that the graph terminates at an origin</span><span class="allow">CONTINUITY</span></li>
+    </ul>
+    <p>Three things this page deliberately does not establish. The statements here are unsigned, so there is no <strong>authenticity</strong> claim: anyone could have written them. Without signatures there is nothing to authorize, so there is no <strong>authorization</strong> claim either — and authorization is a receiver policy decision even when signatures are present, not a property of the document. And a chain that is internally consistent can still be an old one replayed, so <strong>freshness</strong> needs a separate anchor.</p>
+    <p>The <a href="/demos/v0.2-end-to-end/">runnable proof</a> adds all three: Ed25519 signatures over each statement, a receiver-held trust policy that decides which key may sign which kind of step, and an expected manifest, head, and artifact that pin the handoff to this delivery rather than an earlier one. It also carries seven executable tampering cases, each of which breaks exactly one of the checks above.</p>
+    <p>For transport, the three statements and the final bytes go into a bundle index, which maps statement digests to paths without adding any authority of its own: <a href="/attestations/dbom-example.json">dbom-example.json</a>. The set of files themselves can be listed with digests and sizes in a dataset manifest: <a href="/attestations/dataset-manifest-example.json">dataset-manifest-example.json</a>.</p>
+  </div></li>
+
+  </ol>
+
+  <h2 id="reproduce">Reproduce every digest on this page</h2>
+  <p>No tooling required beyond a shell and Python. Artifact digests are plain file hashes:</p>
+  <pre><code class="language-bash">curl -sO https://usemakoto.dev/demos/v0.2-end-to-end/artifacts/data/customers.raw.json
+shasum -a 256 customers.raw.json</code></pre>
+  <p>Statement digests are taken over the canonical serialization, so hash that rather than the file:</p>
+  <pre><code class="language-python">python3 - &lt;&lt;'EOF'
+import hashlib, json, urllib.request
+
+BASE = "https://usemakoto.dev/attestations/"
+for name in ("origin-example", "transform-example", "public-transform-example"):
+    raw = urllib.request.urlopen(BASE + name + ".json").read()
+    canonical = json.dumps(json.loads(raw), sort_keys=True, separators=(",", ":"))
+    print(hashlib.sha256(canonical.encode()).hexdigest(), name)
+EOF</code></pre>
+  <p>That prints the three statement digests quoted above, in order. If any of them differs, this page and the documents it serves have drifted apart, and the documents are the ones to believe.</p>
+
+  <section class="community-band" aria-labelledby="next"><h2 id="next">This walkthrough stops short of signing. The runnable proof does not.</h2>
+    <p>Same three statements, plus signatures, a receiver trust policy, a signed handoff, and seven tampering cases that each produce a denial with a named error code.</p>
+    <div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Run the producer-to-receiver proof</a><a class="button secondary" href="/examples/">Back to the casebook</a></div>
+  </section>
+</main>
+<footer class="footer"><div class="footer-inner">Makoto casebook · every digest on this page is computed from checked-in bytes · <a href="https://github.com/makoto-project/makoto">Open source on GitHub</a></div></footer></div></div>
+</body></html>

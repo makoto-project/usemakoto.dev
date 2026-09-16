@@ -1,0 +1,12 @@
+{"observedAt":"2026-09-16T10:00:00.118Z","partition":"sensors/temp/readings","sequence":0,"value":71.9}
+{"observedAt":"2026-09-16T10:00:00.144Z","partition":"sensors/pressure/readings","sequence":1,"value":101.3}
+{"observedAt":"2026-09-16T10:00:00.203Z","partition":"sensors/vibration/readings","sequence":2,"value":0.02}
+{"observedAt":"2026-09-16T10:00:15.061Z","partition":"sensors/temp/readings","sequence":3,"value":72.4}
+{"observedAt":"2026-09-16T10:00:15.088Z","partition":"sensors/pressure/readings","sequence":4,"value":101.1}
+{"observedAt":"2026-09-16T10:00:15.130Z","partition":"sensors/vibration/readings","sequence":5,"value":0.03}
+{"observedAt":"2026-09-16T10:00:30.004Z","partition":"sensors/temp/readings","sequence":6,"value":72.8}
+{"observedAt":"2026-09-16T10:00:30.052Z","partition":"sensors/pressure/readings","sequence":7,"value":100.9}
+{"observedAt":"2026-09-16T10:00:30.099Z","partition":"sensors/vibration/readings","sequence":8,"value":0.04}
+{"observedAt":"2026-09-16T10:00:45.017Z","partition":"sensors/temp/readings","sequence":9,"value":72.2}
+{"observedAt":"2026-09-16T10:00:45.061Z","partition":"sensors/pressure/readings","sequence":10,"value":101.2}
+{"observedAt":"2026-09-16T10:00:45.144Z","partition":"sensors/vibration/readings","sequence":11,"value":0.03}

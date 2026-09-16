@@ -1,0 +1,52 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.public.json",
+      "digest": {
+        "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/transform",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:7c5a9d38-6e41-4bb0-8f27-3d81c0f5ea62",
+      "occurredAt": "2026-09-16T16:00:00Z"
+    },
+    "operation": {
+      "type": "urn:makoto:example:operation:public-safe",
+      "name": "Remove direct identifiers and bucket ages"
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:privacy": {
+        "directIdentifiersRemoved": [
+          "email"
+        ],
+        "pseudonymised": [
+          "customer_id"
+        ],
+        "generalised": [
+          "age"
+        ],
+        "reviewed": true
+      }
+    },
+    "inputs": [
+      {
+        "name": "normalized",
+        "digest": {
+          "sha256": "421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8"
+        },
+        "provenance": {
+          "statementDigest": {
+            "sha256": "9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55"
+          },
+          "subjectName": "customers.normalized.json"
+        }
+      }
+    ]
+  }
+}
