@@ -1,14 +1,98 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A truthful Makoto attachment pattern for committed Apache Spark datasets and bounded streaming windows."><title>Apache Spark integration pattern — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A PySpark job whose driver signs the committed output file after _SUCCESS, hands it off, and exits non-zero when Makoto denies the delivery."><title>Spark integration — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
 <a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/spec/">Specification</a><p class="mobile-section">Build</p><a href="/verify/">Verification</a><a href="/integrations/spark/" aria-current="page">Spark field note</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a></nav></details></div></header>
 <div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/" aria-current="page">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Platforms</p><a href="/integrations/airflow/">Airflow</a><a href="/integrations/dbt/">dbt</a><a href="/integrations/spark/" aria-current="page">Spark</a><a href="/integrations/kafka/">Kafka</a><a href="/integrations/snowflake/">Snowflake</a><a href="/integrations/databricks/">Databricks</a><a href="/integrations/dagster/">Dagster</a><a href="/integrations/prefect/">Prefect</a><a href="/integrations/expanso/">Expanso</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
-<div class="site-main"><main id="main" class="page wide"><span class="kicker">Integration field note</span><h1>Spark: attest the committed dataset, not the scheduler stage.</h1><p class="lead">Spark can retry and reorder physical work. Stable Makoto evidence belongs after a DataFrame write, table snapshot, or declared streaming window has committed and exact inputs and outputs can be identified.</p><p class="editorial-note"><strong>Implementation boundary.</strong> This is a lifecycle pattern, not a shipped Spark adapter or UDF.</p>
-<h2>The attachment point</h2><table><tbody><tr><th>Batch write</th><td>After the writer commits, build a dataset manifest over the exact output files and append one transformation statement.</td></tr><tr><th>Iceberg or Delta</th><td>Use the committed snapshot identifier as platform context; bind exact files or an authenticated manifest as the artifact.</td></tr><tr><th>Structured Streaming</th><td>Finalize a bounded offset/time window in <code>foreachBatch</code>, then attest that window as one artifact or dataset manifest.</td></tr><tr><th>Listener events</th><td>Capture application, job, stage, retry, and code context as operation metadata. Do not treat the event itself as the data.</td></tr></tbody></table>
-<h2>Control flow</h2><pre><code>// Spark writes and commits the dataset first.
-cleaned.write.mode("overwrite").parquet(outputPath)
+<div class="site-main"><main id="main" class="page wide">
+<span class="kicker">Spark integration</span>
+<h1>Spark: attest the committed dataset, not the scheduler stage.</h1>
+<p class="lead">Spark can retry and reorder physical work. Stable Makoto evidence belongs after a write has committed and exact inputs and outputs can be named. This job signs from the driver, after the output committer has written <code>_SUCCESS</code>.</p>
+<p class="editorial-note"><strong>Implementation boundary.</strong> This is a pattern built from the platform&rsquo;s own APIs and the pinned reference CLI. It is not a shipped adapter, plugin, or package. Executed with PySpark 4.2.0 in local mode on Java 21 using <code>spark-submit</code>, once clean and once with the bundle corrupted in transit.</p>
+<section aria-labelledby="placement"><h2 id="placement">Where Makoto sits</h2><p>Executors never touch key material. The driver waits for the commit marker, then signs one file per artifact.</p><ol class="provenance-spine"><li><strong>Driver start</strong><span>Signs the input file as an origin, keyed by the Spark application ID.</span></li><li><strong>Write</strong><span><code>coalesce(1)</code> produces one part file so the output is one artifact.</span></li><li><strong>Commit marker</strong><span>The driver refuses to sign until <code>_SUCCESS</code> exists.</span></li><li><strong>Transformation statement</strong><span>Binds the part file to the input bytes and origin statement.</span></li><li><strong>Gate</strong><span>Verifies the delivered bundle. A denial exits 1, so a scheduler wrapping <code>spark-submit</code> sees a failed job.</span></li></ol></section>
+<ol class="setup-sequence"><li><div><h2 id="install">Install</h2><p>Every platform on this site uses the same two files from <a href="/integrations/#helper">the integration index</a>: <code>makoto_boundary.py</code>, a standard-library helper that signs, hands off, and verifies through the pinned CLI, and <code>makoto_bootstrap.py</code>, which creates one key per claim role and the receiver&rsquo;s trust policy. Put both next to the code below.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git /opt/makoto
+git -C /opt/makoto checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+(cd /opt/makoto &amp;&amp; uv sync --locked --dev)
+export MAKOTO_CORE=/opt/makoto
+uv pip install "pyspark==4.2.0"
+export JAVA_HOME=/path/to/jdk-21</code></pre><pre><code class="language-bash">uv run makoto_bootstrap.py /srv/makoto \
+  --source-kind urn:example:source:orders-export \
+  --source-uri urn:example:orders:daily \
+  --operation-type urn:example:operation:spark-normalize-orders
+export MAKOTO_KEYS=/srv/makoto/keys MAKOTO_POLICY=/srv/makoto/policy.json</code></pre></div></li><li><div><h2 id="code">The job</h2><p>Save this as <code>orders_job.py</code>.</p><pre><code class="language-python">"""A Spark job whose driver signs the committed output and gates the handoff.
 
-# A post-write task resolves exact input and output artifacts.
-uv run makoto attest transform --help
-# It then supplies predecessor bindings, operation metadata,
-# a signing key, and an output envelope to the checked-out CLI.</code></pre><p>The integration must fail closed if the output set is still changing, a predecessor cannot be resolved, or a partition manifest does not cover the exact handed-off files.</p>
-<h2>What the evidence can say</h2><p>It can bind a committed Spark output to signed predecessor statements and platform context. It cannot prove that every physical stage ran as reported, that Unity Catalog already provides Makoto evidence, or that a signature establishes data quality.</p>
-<section class="community-band"><h2>Make the first adapter a conformance case.</h2><p>Contribute one tested batch write or bounded streaming fixture with exact artifacts and an expected receiver report.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Propose the Spark fixture</a><a class="button secondary" href="/integrations/">Return to integrations</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto + Spark · Lifecycle pattern, not a shipped adapter</div></footer></div></div></body></html>
+    spark-submit orders_job.py &lt;raw.csv&gt; &lt;workdir&gt; [--tamper-in-transit]
+"""
+
+import shutil
+import sys
+import uuid
+from pathlib import Path
+
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+import makoto_boundary as mb
+
+RECIPIENT = "example:analytics-team"
+
+
+def main(raw: Path, work: Path, tamper: bool) -&gt; int:
+    app = SparkSession.builder.appName("makoto-orders").getOrCreate()
+    run_id = app.sparkContext.applicationId  # stable for this application, unique per run
+    run = work / run_id
+    attestations = run / "attestations"
+    event = lambda name: f"urn:uuid:{uuid.uuid5(uuid.NAMESPACE_URL, f'{run_id}/{name}')}"
+
+    origin = mb.sign_origin(
+        raw, attestations / "01-origin.dsse.json",
+        source_kind="urn:example:source:orders-export",
+        source_uri="urn:example:orders:daily",
+        event_id=event("origin"),
+    )
+
+    orders = app.read.option("header", True).csv(str(raw))
+    normalized = orders.withColumn("region", F.lower(F.trim("region"))).orderBy("order_id")
+    output_dir = run / "orders_normalized"
+    # One partition keeps one artifact. For many part files, attest a dataset
+    # manifest that lists every partition instead.
+    normalized.coalesce(1).write.mode("overwrite").option("header", True).csv(str(output_dir))
+    app.stop()
+
+    # Spark's committer writes _SUCCESS last; only then are the part files final.
+    if not (output_dir / "_SUCCESS").exists():
+        raise RuntimeError("output was not committed")
+    (part,) = sorted(output_dir.glob("part-*.csv"))
+
+    head = mb.sign_transform(
+        part, attestations / "02-normalize.dsse.json",
+        inputs=[(raw, origin)],
+        operation_type="urn:example:operation:spark-normalize-orders",
+        operation_name=f"makoto-orders {run_id}",
+        event_id=event("normalize"),
+    )
+    anchors = mb.create_handoff(
+        head, part, attestations, run / "bundle",
+        recipient=RECIPIENT, bundle_id=event("bundle"), media_type="text/csv",
+    )
+
+    delivered = run / "receiver" / "bundle"
+    shutil.copytree(run / "bundle", delivered)
+    if tamper:
+        final = next((delivered / "artifacts" / "final").glob("*.bin"))
+        final.write_bytes(final.read_bytes() + b"1003,us,0.01\n")
+    try:
+        mb.verify(delivered, anchors, recipient=RECIPIENT, report_path=run / "receiver" / "verification.json")
+    except mb.MakotoDenied as denied:
+        print(f"REFUSED {run_id}: {denied}", file=sys.stderr)
+        return 1
+    print(f"ALLOWED {run_id}: {part.name}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve(), "--tamper-in-transit" in sys.argv))</code></pre></div></li><li><div><h2 id="run">Run it</h2><pre><code class="language-bash">spark-submit --master "local[2]" orders_job.py orders.raw.csv work</code></pre><pre><code class="language-bash">ALLOWED local-1789563868552: part-00000-973797d1-9009-4e71-9038-353f47389077-c000.csv</code></pre></div></li><li><div><h2 id="failure">What a gate failure looks like</h2><pre><code class="language-bash">spark-submit --master "local[2]" orders_job.py orders.raw.csv work --tamper-in-transit
+echo $?   # 1</code></pre><pre><code class="language-bash">REFUSED local-1789563873985: Makoto deny (E_ARTIFACT_DIGEST): step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest</code></pre></div></li></ol>
+<section aria-labelledby="scale"><h2 id="scale">Beyond one file</h2><dl class="troubleshooting"><dt>Many part files</dt><dd>Do not coalesce production data to one partition. Author a dataset manifest listing every part file and its digest, attest it with the core dataset-manifest profile, and hand off the partitions a receiver needs. The <a href="/docs/v0.2-integrations.md">integration boundary notes</a> describe the binding fields.</dd><dt>Delta Lake and Iceberg</dt><dd>Record the committed table version or snapshot ID as source metadata, and bind the exact data files, or a manifest over them, as the artifact. A version number alone is not bytes.</dd><dt>Structured Streaming</dt><dd>Close a bounded window in <code>foreachBatch</code>, write it, and sign that batch with the batch ID in the event ID. See the <a href="/integrations/kafka/">Kafka page</a> for why the window itself must be checked too.</dd></dl></section>
+<section aria-labelledby="attachment"><h2 id="attachment">Other attachment points on this platform</h2><dl class="troubleshooting"><dt>Batch write</dt><dd>After the writer commits, build a dataset manifest over the exact output files and append one transformation statement.</dd><dt>Iceberg or Delta</dt><dd>Use the committed snapshot identifier as platform context; bind exact files or an authenticated manifest as the artifact.</dd><dt>Structured Streaming</dt><dd>Finalize a bounded offset/time window in <code>foreachBatch</code>, then attest that window as one artifact or dataset manifest.</dd><dt>Listener events</dt><dd>Capture application, job, stage, retry, and code context as operation metadata. Do not treat the event itself as the data.</dd></dl></section>
+<section aria-labelledby="evidence"><h2 id="evidence">What the evidence can say</h2><p>It can bind a committed Spark output to signed predecessor statements and platform context. It cannot prove that every physical stage ran as reported, that Unity Catalog already provides Makoto evidence, or that a signature establishes data quality.</p></section>
+<section aria-labelledby="trouble"><h2 id="trouble">Troubleshooting</h2><dl class="troubleshooting"><dt><code>Could not find valid SPARK_HOME while searching</code></dt><dd>A pip-installed <code>spark-submit</code> must run with the virtual environment&rsquo;s <code>bin</code> first on <code>PATH</code>, so its helper script finds <code>pyspark</code>.</dd><dt><code>ValueError: too many values to unpack</code> at the part-file line</dt><dd>The output has more than one part file. Either coalesce, or switch to a dataset manifest as described above.</dd></dl></section>
+<section class="community-band"><h2>Run it on a real cluster.</h2><p>Object-store committers, dynamic allocation, and speculative execution change what &ldquo;committed&rdquo; means. Report what you find.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Report a Spark finding</a><a class="button secondary" href="/integrations/airflow/">Airflow exemplar</a><a class="button secondary" href="/integrations/">All integrations</a></div></section>
+</main><footer class="footer"><div class="footer-inner">Makoto + Spark · Lifecycle pattern, not a shipped adapter</div></footer></div></div></body></html>

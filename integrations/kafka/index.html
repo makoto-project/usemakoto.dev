@@ -1,15 +1,170 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A truthful Makoto attachment pattern for bounded Apache Kafka windows and durable stream outputs."><title>Apache Kafka integration pattern — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Close a Kafka offset window, sign its exact bytes, and commit consumer offsets only when Makoto allows the window and the signed offsets match what was read."><title>Kafka integration — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
 <a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/spec/">Specification</a><p class="mobile-section">Build</p><a href="/verify/">Verification</a><a href="/integrations/kafka/" aria-current="page">Kafka field note</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a></nav></details></div></header>
 <div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/" aria-current="page">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Platforms</p><a href="/integrations/airflow/">Airflow</a><a href="/integrations/dbt/">dbt</a><a href="/integrations/spark/">Spark</a><a href="/integrations/kafka/" aria-current="page">Kafka</a><a href="/integrations/snowflake/">Snowflake</a><a href="/integrations/databricks/">Databricks</a><a href="/integrations/dagster/">Dagster</a><a href="/integrations/prefect/">Prefect</a><a href="/integrations/expanso/">Expanso</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
-<div class="site-main"><main id="main" class="page wide"><span class="kicker">Integration field note</span><h1>Kafka: close a window before you sign it.</h1><p class="lead">A topic is an open-ended log, not one finite artifact. Makoto evidence needs a bounded subject: exact topic, partitions, offset ranges, timestamps, serialization context, and the bytes or deterministic manifest covered by that window.</p><p class="editorial-note"><strong>Implementation boundary.</strong> Makoto does not ship a producer interceptor, record header, Schema Registry predicate mapping, or Kafka UI integration.</p>
-<h2>The attachment point</h2><table><tbody><tr><th>Source window</th><td>An authorized finalizer closes declared partition and offset ranges, computes or resolves the exact window artifact, and creates an origin statement.</td></tr><tr><th>Stream transform</th><td>After an output window commits, append a transformation statement binding exact input window and predecessor digests.</td></tr><tr><th>Schema Registry</th><td>Carry schema IDs and serialization details as context or profile references. A schema ID does not become a Makoto predicate automatically.</td></tr><tr><th>Cross-team topic</th><td>Sign a handoff that commits to exact windows, heads, profiles, recipient, and final artifact representation.</td></tr></tbody></table>
-<h2>Control flow</h2><pre><code>topic: sensor.raw
-partitions: 0..7
-offsets: [120000, 128000)
-window-end: 2026-09-16T16:05:00Z
+<div class="site-main"><main id="main" class="page wide">
+<span class="kicker">Kafka integration</span>
+<h1>Kafka: close a window before you sign it.</h1>
+<p class="lead">A topic is an open-ended log, not one finite artifact. Makoto evidence needs a bounded subject: a partition, an offset range, and the exact bytes in it. This producer closes a window and signs it; the consumer rebuilds the same bytes from the broker and commits offsets only after the verifier allows them.</p>
+<p class="editorial-note"><strong>Implementation boundary.</strong> This is a pattern built from the platform&rsquo;s own APIs and the pinned reference CLI. It is not a shipped adapter, plugin, or package. Executed against an Apache Kafka 4.1.0 broker in a local container with <code>confluent-kafka</code> 2.15.1: one allowed window and two refusals.</p>
+<section aria-labelledby="placement"><h2 id="placement">Where Makoto sits</h2><p>The signed artifact is a deterministic rendering of the window: message values in offset order, one per line. Producer and consumer build it with the same function, so the consumer can hash what it actually read.</p><ol class="provenance-spine"><li><strong>Produce and flush</strong><span>Idempotent producer; the window is closed only when every delivery report has returned.</span></li><li><strong>Sign the window</strong><span>An origin statement over the window bytes, with <code>partition=0;offsets=0-2</code> as source metadata.</span></li><li><strong>Announce</strong><span>A notice carries the window, the bundle location, and the anchors. In production it travels through a channel the receiver trusts independently.</span></li><li><strong>Consume the window</strong><span>Auto-commit is off. The consumer reads exactly the announced offsets and hashes what it got.</span></li><li><strong>Verify, then check the window</strong><span>The verifier compares the consumer&rsquo;s digest with the signed artifact; the consumer then checks the signed offsets against the offsets it read. Only then are offsets committed.</span></li></ol></section>
+<ol class="setup-sequence"><li><div><h2 id="install">Install</h2><p>Every platform on this site uses the same two files from <a href="/integrations/#helper">the integration index</a>: <code>makoto_boundary.py</code>, a standard-library helper that signs, hands off, and verifies through the pinned CLI, and <code>makoto_bootstrap.py</code>, which creates one key per claim role and the receiver&rsquo;s trust policy. Put both next to the code below.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git /opt/makoto
+git -C /opt/makoto checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+(cd /opt/makoto &amp;&amp; uv sync --locked --dev)
+export MAKOTO_CORE=/opt/makoto
+uv pip install "confluent-kafka==2.15.1"</code></pre><pre><code class="language-bash">uv run makoto_bootstrap.py /srv/makoto \
+  --source-kind urn:example:source:kafka-offset-window \
+  --source-uri kafka://localhost:9092/orders \
+  --operation-type urn:example:operation:none
+export MAKOTO_KEYS=/srv/makoto/keys MAKOTO_POLICY=/srv/makoto/policy.json</code></pre></div></li><li><div><h2 id="producer">The producer</h2><p>Save this as <code>window_producer.py</code>.</p><pre><code class="language-python">"""Produce a batch, close its offset window, sign the window, and announce it.
 
-# The finalizer writes an immutable window manifest, then uses:
-uv run makoto attest origin --help
-uv run makoto attest transform --help</code></pre><p>The design must specify record encoding, ordering, tombstones, late arrivals, compacted topics, and how the receiver reconstructs or obtains the exact bytes. Signing only offsets leaves content identity underspecified.</p>
-<h2>What the evidence can say</h2><p>It can bind one closed stream window to authorized claims and predecessors. It cannot prove device firmware, infer trust from a producer ID, or turn ongoing CDC into a complete history without an explicit finalization boundary.</p>
-<section class="community-band"><h2>Define one window both sides can reproduce.</h2><p>Contribute a deterministic fixture with partition offsets, exact serialization, late-arrival behavior, and a changed-record denial.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Propose the Kafka fixture</a><a class="button secondary" href="/integrations/">Return to integrations</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto + Kafka · Lifecycle pattern, not a shipped adapter</div></footer></div></div></body></html>
+    python window_producer.py /srv/makoto/windows
+"""
+
+import json
+import sys
+import uuid
+from pathlib import Path
+
+from confluent_kafka import Producer
+
+import makoto_boundary as mb
+
+BROKER = "localhost:9092"
+TOPIC, PARTITION = "orders", 0
+RECIPIENT = "example:analytics-team"
+
+
+def window_bytes(values: list[bytes]) -&gt; bytes:
+    """The window artifact: message values in offset order, one per line.
+    Producer and consumer must build it identically."""
+    return b"".join(value + b"\n" for value in values)
+
+
+def produce(root: Path) -&gt; None:
+    producer = Producer({"bootstrap.servers": BROKER, "enable.idempotence": True})
+    delivered: list[tuple[int, bytes]] = []
+
+    def on_delivery(err, msg):
+        if err is not None:
+            raise RuntimeError(err)
+        delivered.append((msg.offset(), msg.value()))
+
+    for order in ({"order_id": 1001, "region": "us", "total": 42.0},
+                  {"order_id": 1002, "region": "gb", "total": 17.5}):
+        producer.produce(TOPIC, json.dumps(order, sort_keys=True).encode(), partition=PARTITION,
+                         on_delivery=on_delivery)
+    if producer.flush(10) != 0:
+        raise RuntimeError("messages still in flight; the window is not closed")
+
+    delivered.sort()
+    start, end = delivered[0][0], delivered[-1][0] + 1  # [start, end)
+    window = f"{TOPIC}-p{PARTITION}-{start}-{end}"
+    run = root / window
+    artifact = run / f"{window}.ndjson"
+    run.mkdir(parents=True, exist_ok=True)
+    artifact.write_bytes(window_bytes([value for _, value in delivered]))
+
+    event = lambda name: f"urn:uuid:{uuid.uuid5(uuid.NAMESPACE_URL, f'{window}/{name}')}"
+    head = mb.sign_origin(
+        artifact, run / "attestations" / "01-window.dsse.json",
+        source_kind="urn:example:source:kafka-offset-window",
+        source_uri=f"kafka://{BROKER}/{TOPIC}",
+        source_metadata={"version": f"partition={PARTITION};offsets={start}-{end}"},
+        event_id=event("window"),
+    )
+    anchors = mb.create_handoff(
+        head, artifact, run / "attestations", run / "bundle",
+        recipient=RECIPIENT, bundle_id=event("bundle"), media_type="application/x-ndjson",
+    )
+    notice = {"topic": TOPIC, "partition": PARTITION, "start": start, "end": end,
+              "bundle": str(run / "bundle"), "anchors": anchors}
+    (run / "notice.json").write_text(json.dumps(notice))
+    print(json.dumps({"window": window, "notice": str(run / "notice.json")}))
+
+
+if __name__ == "__main__":
+    produce(Path(sys.argv[1]).resolve())</code></pre></div></li><li><div><h2 id="consumer">The consumer</h2><p>Save this as <code>window_consumer.py</code>.</p><pre><code class="language-python">"""Read a signed window from the topic and commit offsets only if Makoto allows it.
+
+    python window_consumer.py /srv/makoto/windows/orders-p0-0-2/notice.json
+"""
+
+import copy
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+from confluent_kafka import Consumer, TopicPartition
+
+import makoto_boundary as mb
+from window_producer import BROKER, RECIPIENT, window_bytes
+
+GROUP = "finance-orders"
+
+
+def consume(notice_path: Path) -&gt; int:
+    notice = json.loads(notice_path.read_text())
+    consumer = Consumer({
+        "bootstrap.servers": BROKER,
+        "group.id": GROUP,
+        "enable.auto.commit": False,  # offsets move only after a verdict
+        "auto.offset.reset": "earliest",
+    })
+    partition = TopicPartition(notice["topic"], notice["partition"], notice["start"])
+    consumer.assign([partition])
+
+    values: list[bytes] = []
+    while len(values) &lt; notice["end"] - notice["start"]:
+        msg = consumer.poll(10)
+        if msg is None:
+            raise RuntimeError("window is incomplete on the broker")
+        if msg.error():
+            raise RuntimeError(msg.error())
+        values.append(msg.value())
+
+    # The expected artifact is what THIS consumer read, not what the bundle claims.
+    anchors = copy.deepcopy(notice["anchors"])
+    anchors["artifact"]["digest"]["sha256"] = hashlib.sha256(window_bytes(values)).hexdigest()
+    try:
+        mb.verify(notice["bundle"], anchors, recipient=RECIPIENT,
+                  report_path=notice_path.parent / "verification.json")
+    except mb.MakotoDenied as denied:
+        consumer.close()  # nothing committed: the window will be read again, or quarantined
+        print(f"REFUSED window {notice['start']}-{notice['end']}: {denied}", file=sys.stderr)
+        return 1
+
+    # Makoto proved these bytes are the signed bytes. It did not prove they came from
+    # these offsets: identical records elsewhere in the log hash the same. Check the
+    # signed window against the window this consumer actually read.
+    head = notice["anchors"]["head"].removeprefix("sha256:")
+    statement = json.loads(mb.payload(Path(notice["bundle"]) / "attestations" / f"{head}.dsse.json"))
+    signed_window = statement["predicate"]["source"]["version"]
+    read_window = f"partition={notice['partition']};offsets={notice['start']}-{notice['end']}"
+    if signed_window != read_window:
+        consumer.close()
+        print(f"REFUSED window {notice['start']}-{notice['end']}: evidence signs {signed_window}", file=sys.stderr)
+        return 1
+
+    # Hand the verified records to the application here, then commit past the window.
+    consumer.commit(offsets=[TopicPartition(notice["topic"], notice["partition"], notice["end"])],
+                    asynchronous=False)
+    consumer.close()
+    print(f"COMMITTED window {notice['start']}-{notice['end']} ({len(values)} records)")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(consume(Path(sys.argv[1]).resolve()))</code></pre></div></li><li><div><h2 id="run">Run it</h2><pre><code class="language-bash">python window_producer.py windows
+python window_producer.py windows   # a second window with identical records
+python window_consumer.py windows/orders-p0-0-2/notice.json</code></pre><pre><code class="language-bash">{"window": "orders-p0-0-2", "notice": "/private/tmp/claude-501/-Users-daaronch--treehouse-usemakoto-dev-e5b6d4-3-usemakoto-dev/7a8e8b40-d349-450c-be40-c39e2d154d0f/scratchpad/integ/kafka/windows/orders-p0-0-2/notice.json"}
+COMMITTED window 0-2 (2 records)</code></pre></div></li><li><div><h2 id="failure">What a gate failure looks like</h2><p>Point the consumer at offsets the evidence does not cover. Shifted by one, the records come back in a different order, the bytes differ, and the verifier refuses:</p><pre><code class="language-bash">jq '.start += 1 | .end += 1' notice.json &gt; shift1.json
+python window_consumer.py shift1.json
+REFUSED window 1-3: Makoto deny (E_EXPECTED_ARTIFACT): step 11 E_EXPECTED_ARTIFACT: expected artifact set does not match</code></pre><p>Shifted by two, the consumer reads the second window. Its records are byte-for-byte identical to the first, so the verifier allows the bytes. The window check refuses it:</p><pre><code class="language-bash">jq '.start += 2 | .end += 2' notice.json &gt; shift2.json
+python window_consumer.py shift2.json
+REFUSED window 2-4: evidence signs partition=0;offsets=0-2</code></pre><p>In both cases no offset is committed, so the consumer group has not advanced past data it could not verify.</p></div></li></ol>
+<section aria-labelledby="bytes"><h2 id="bytes">Bytes are not positions</h2><p>The second refusal is the lesson of this page. Makoto authenticates exact bytes. Identical records at different offsets hash identically, so an artifact digest cannot tell a replay of the same values from the window that was signed. Whenever position is part of meaning, as it is for offsets, time windows, or partitions, put the position in signed metadata and compare it yourself after the verifier allows the bytes.</p></section>
+<section aria-labelledby="attachment"><h2 id="attachment">Other attachment points on this platform</h2><dl class="troubleshooting"><dt>Source window</dt><dd>An authorized finalizer closes declared partition and offset ranges, computes or resolves the exact window artifact, and creates an origin statement.</dd><dt>Stream transform</dt><dd>After an output window commits, append a transformation statement binding exact input window and predecessor digests.</dd><dt>Schema Registry</dt><dd>Carry schema IDs and serialization details as context or profile references. A schema ID does not become a Makoto predicate automatically.</dd><dt>Cross-team topic</dt><dd>Sign a handoff that commits to exact windows, heads, profiles, recipient, and final artifact representation.</dd></dl></section>
+<section aria-labelledby="evidence"><h2 id="evidence">What the evidence can say</h2><p>It can bind one closed stream window to authorized claims and predecessors. It cannot prove device firmware, infer trust from a producer ID, or turn ongoing CDC into a complete history without an explicit finalization boundary.</p></section>
+<section aria-labelledby="trouble"><h2 id="trouble">Troubleshooting</h2><dl class="troubleshooting"><dt><code>Connect to ipv6#[::1]:9092 failed: Connection refused</code></dt><dd>librdkafka tried IPv6 first because the broker advertises <code>localhost</code> and the container published only an IPv4 port. It fell back to IPv4 and every run completed; the message is noise, not a failure.</dd><dt><code>RuntimeError: window is incomplete on the broker</code></dt><dd>Retention, compaction, or a truncated partition removed part of the window. The window can no longer be verified; quarantine it rather than committing past it.</dd><dt>Offsets were committed for a refused window</dt><dd>Auto-commit must be off. Commit explicitly, and only after both the verifier and the window check pass.</dd></dl></section>
+<section class="community-band"><h2>Close windows on a real cluster.</h2><p>Transactions, compacted topics, and Schema Registry serialization all affect what the window bytes are. Tell us how your producers finalize.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Report a Kafka finding</a><a class="button secondary" href="/integrations/airflow/">Airflow exemplar</a><a class="button secondary" href="/integrations/">All integrations</a></div></section>
+</main><footer class="footer"><div class="footer-inner">Makoto + Kafka · Lifecycle pattern, not a shipped adapter</div></footer></div></div></body></html>

@@ -1,14 +1,171 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A truthful Makoto attachment pattern for Prefect task and flow artifact boundaries."><title>Prefect integration pattern — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A Prefect 3 flow whose tasks sign their persisted outputs and whose gate task fails the flow, without retrying, when Makoto denies the handoff."><title>Prefect integration — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
 <a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/spec/">Specification</a><p class="mobile-section">Build</p><a href="/verify/">Verification</a><a href="/integrations/prefect/" aria-current="page">Prefect field note</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a></nav></details></div></header>
 <div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/" aria-current="page">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Platforms</p><a href="/integrations/airflow/">Airflow</a><a href="/integrations/dbt/">dbt</a><a href="/integrations/spark/">Spark</a><a href="/integrations/kafka/">Kafka</a><a href="/integrations/snowflake/">Snowflake</a><a href="/integrations/databricks/">Databricks</a><a href="/integrations/dagster/">Dagster</a><a href="/integrations/prefect/" aria-current="page">Prefect</a><a href="/integrations/expanso/">Expanso</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
-<div class="site-main"><main id="main" class="page wide"><span class="kicker">Integration field note</span><h1>Prefect: attest after persistence, not after a Python return.</h1><p class="lead">A Prefect task result may be an in-memory value, cached object, pointer, or stable data artifact. Makoto should attach only when the integration can identify the exact persisted bytes and their predecessors.</p><p class="editorial-note"><strong>Implementation boundary.</strong> Prefect does not automatically provide Makoto evidence, signer identity, nested graphs, or a Makoto report in its UI.</p>
-<h2>The attachment point</h2><table><tbody><tr><th>Task completion</th><td>Use a post-task hook only after the task has durably committed an artifact whose exact identity can be resolved.</td></tr><tr><th>Flow handoff</th><td>Create a signed handoff when artifacts cross a team, account, region, or external recipient boundary.</td></tr><tr><th>Retries and cache</th><td>Make attestation idempotent; distinguish a reused cached artifact from a newly produced artifact.</td></tr><tr><th>Prefect context</th><td>Carry flow run, task run, deployment, work pool, parameters, and code revision as operation metadata.</td></tr></tbody></table>
-<h2>Control flow</h2><pre><code>@task
-def write_curated_data():
-    artifact_path = persist_exact_bytes()
-    return artifact_path
+<div class="site-main"><main id="main" class="page wide">
+<span class="kicker">Prefect integration</span>
+<h1>Prefect: attest after persistence, not after a Python return.</h1>
+<p class="lead">A Prefect task result may be an in-memory value, cached object, pointer, or stable data artifact. Makoto attaches only where the flow can name the exact persisted bytes and their predecessors. This flow signs each file after it is written, retries tool failures, and never retries a denial.</p>
+<p class="editorial-note"><strong>Implementation boundary.</strong> This is a pattern built from the platform&rsquo;s own APIs and the pinned reference CLI. It is not a shipped adapter, plugin, or package. Executed with Prefect 3.8.6 on a local ephemeral server, once clean and once with the bundle corrupted in transit.</p>
+<section aria-labelledby="placement"><h2 id="placement">Where Makoto sits</h2><p>Each producing task returns a path to bytes it has already written. A separate signing task turns that path into evidence, and a <code>retry_condition_fn</code> separates transient tool failures from verdicts.</p><ol class="provenance-spine"><li><strong><code>extract</code> &rarr; <code>attest_origin</code></strong><span>Write the raw export, then sign an origin statement over its bytes.</span></li><li><strong><code>normalize</code> &rarr; <code>attest_normalize</code></strong><span>Write the output, then sign a transformation bound to the raw bytes and origin statement.</span></li><li><strong><code>create_handoff</code> &rarr; <code>deliver</code></strong><span>Build the bundle and move it to the receiver; a flow parameter can corrupt it on the way.</span></li><li><strong><code>makoto_gate</code></strong><span>Verifies. <code>MakotoDenied</code> fails the task; <code>retry_unless_denied</code> declines to retry it.</span></li><li><strong><code>publish</code></strong><span>Takes the gate&rsquo;s result as an input, so it cannot run after a failed gate.</span></li></ol></section>
+<ol class="setup-sequence"><li><div><h2 id="install">Install</h2><p>Every platform on this site uses the same two files from <a href="/integrations/#helper">the integration index</a>: <code>makoto_boundary.py</code>, a standard-library helper that signs, hands off, and verifies through the pinned CLI, and <code>makoto_bootstrap.py</code>, which creates one key per claim role and the receiver&rsquo;s trust policy. Put both next to the code below.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git /opt/makoto
+git -C /opt/makoto checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+(cd /opt/makoto &amp;&amp; uv sync --locked --dev)
+export MAKOTO_CORE=/opt/makoto
+uv pip install "prefect==3.8.6"</code></pre><pre><code class="language-bash">uv run makoto_bootstrap.py /srv/makoto \
+  --source-kind urn:example:source:orders-export \
+  --source-uri urn:example:orders:daily \
+  --operation-type urn:example:operation:normalize-orders
+export MAKOTO_KEYS=/srv/makoto/keys MAKOTO_POLICY=/srv/makoto/policy.json</code></pre></div></li><li><div><h2 id="code">The flow</h2><p>Save this as <code>orders_flow.py</code>.</p><pre><code class="language-python">"""A Prefect flow that signs each task output and refuses a handoff Makoto denies."""
 
-# A separate task resolves predecessors and invokes the reference CLI.
-uv run makoto attest transform --help</code></pre><p>The wrapper must decide how result storage maps to exact bytes, how signer keys are isolated, and how a retry locates an existing statement instead of silently producing conflicting histories.</p>
-<h2>What the evidence can say</h2><p>It can bind a durable task output to exact inputs and selected Prefect context. It cannot treat an arbitrary return value as an artifact or infer an authorized organizational handoff from flow nesting.</p>
-<section class="community-band"><h2>Prove one result-storage boundary.</h2><p>Contribute a tested local or object-storage fixture with retry behavior and an independent receiver policy.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Propose the Prefect fixture</a><a class="button secondary" href="/integrations/">Return to integrations</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto + Prefect · Lifecycle pattern, not a shipped adapter</div></footer></div></div></body></html>
+import os
+import shutil
+import sys
+import uuid
+from pathlib import Path
+
+from prefect import flow, get_run_logger, task
+from prefect.runtime import flow_run
+
+import makoto_boundary as mb
+
+WORK = Path(os.environ["MAKOTO_WORK"])
+RECIPIENT = "example:analytics-team"
+
+
+def run_dir(*parts: str) -&gt; Path:
+    path = WORK.joinpath("runs", str(flow_run.id), *parts)
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def event_id(name: str) -&gt; str:
+    return f"urn:uuid:{uuid.uuid5(uuid.NAMESPACE_URL, f'{flow_run.id}/{name}')}"
+
+
+def retry_unless_denied(task, task_run, state) -&gt; bool:
+    """Retry tool failures; never retry a verdict or a conflicting signature."""
+    try:
+        state.result()
+    except (mb.MakotoDenied, mb.MakotoConflict):
+        return False
+    except Exception:
+        return True
+    return False
+
+
+@task
+def extract() -&gt; Path:
+    raw = run_dir("data") / "orders.raw.csv"
+    raw.write_text("order_id,region,total\n1001, us ,42.00\n1002,GB,17.50\n")
+    return raw
+
+
+@task(retries=2, retry_condition_fn=retry_unless_denied)
+def attest_origin(raw: Path) -&gt; Path:
+    return mb.sign_origin(
+        raw, run_dir("attestations") / "01-origin.dsse.json",
+        source_kind="urn:example:source:orders-export",
+        source_uri="urn:example:orders:daily",
+        event_id=event_id("origin"),
+    )
+
+
+@task
+def normalize(raw: Path) -&gt; Path:
+    header, *rows = raw.read_text().splitlines()
+    out = run_dir("data") / "orders.normalized.csv"
+    out.write_text("\n".join([header, *(",".join(c.strip().lower() for c in r.split(",")) for r in rows)]) + "\n")
+    return out
+
+
+@task(retries=2, retry_condition_fn=retry_unless_denied)
+def attest_normalize(raw: Path, origin: Path, normalized: Path) -&gt; Path:
+    return mb.sign_transform(
+        normalized, run_dir("attestations") / "02-normalize.dsse.json",
+        inputs=[(raw, origin)],
+        operation_type="urn:example:operation:normalize-orders",
+        event_id=event_id("normalize"),
+    )
+
+
+@task(retries=2, retry_condition_fn=retry_unless_denied)
+def create_handoff(head: Path, normalized: Path) -&gt; dict:
+    anchors = mb.create_handoff(
+        head, normalized, run_dir("attestations"), run_dir() / "bundle",
+        recipient=RECIPIENT, bundle_id=event_id("bundle"), media_type="text/csv",
+    )
+    return {"bundle": str(run_dir() / "bundle"), "anchors": anchors}
+
+
+@task
+def deliver(handoff: dict, tamper_in_transit: bool) -&gt; Path:
+    delivered = run_dir("receiver") / "bundle"
+    shutil.copytree(handoff["bundle"], delivered, dirs_exist_ok=True)
+    if tamper_in_transit:
+        final = next((delivered / "artifacts" / "final").glob("*.bin"))
+        final.write_bytes(final.read_bytes() + b"1003,us,0.01\n")
+    return delivered
+
+
+@task(retries=2, retry_condition_fn=retry_unless_denied)
+def makoto_gate(delivered: Path, handoff: dict) -&gt; dict:
+    report = mb.verify(
+        delivered, handoff["anchors"],
+        recipient=RECIPIENT, report_path=run_dir("receiver") / "verification.json",
+    )
+    return {"decision": report["decision"], "policy": report["policyDigest"]["sha256"]}
+
+
+@task
+def publish(normalized: Path, verdict: dict) -&gt; None:
+    get_run_logger().info(
+        "publishing %s under Makoto %s (policy %s)", normalized.name, verdict["decision"], verdict["policy"][:12]
+    )
+
+
+@flow(name="makoto-orders")
+def makoto_orders(tamper_in_transit: bool = False) -&gt; None:
+    raw = extract()
+    origin = attest_origin(raw)
+    normalized = normalize(raw)
+    head = attest_normalize(raw, origin, normalized)
+    handoff = create_handoff(head, normalized)
+    verdict = makoto_gate(deliver(handoff, tamper_in_transit), handoff)
+    publish(normalized, verdict)
+
+
+if __name__ == "__main__":
+    makoto_orders(tamper_in_transit="--tamper-in-transit" in sys.argv)</code></pre></div></li><li><div><h2 id="run">Run it</h2><pre><code class="language-bash">export MAKOTO_WORK=/srv/makoto/work
+python orders_flow.py</code></pre><p>Flow log, timestamps and task-run suffixes trimmed:</p><pre><code class="language-bash">| INFO    | Flow run - Beginning flow run for flow 'makoto-orders'
+| INFO    | Task run 'extract' - Finished in state Completed()
+| INFO    | Task run 'attest_origin' - Finished in state Completed()
+| INFO    | Task run 'normalize' - Finished in state Completed()
+| INFO    | Task run 'attest_normalize' - Finished in state Completed()
+| INFO    | Task run 'create_handoff' - Finished in state Completed()
+| INFO    | Task run 'deliver' - Finished in state Completed()
+| INFO    | Task run 'makoto_gate' - Finished in state Completed()
+| INFO    | Task run 'publish' - publishing orders.normalized.csv under Makoto allow (policy 4bd642394c20)
+| INFO    | Task run 'publish' - Finished in state Completed()
+| INFO    | Flow run - Finished in state Completed()</code></pre></div></li><li><div><h2 id="failure">What a gate failure looks like</h2><pre><code class="language-bash">python orders_flow.py --tamper-in-transit</code></pre><pre><code class="language-bash">| INFO    | Flow run - Beginning flow run for flow 'makoto-orders'
+| INFO    | Task run 'extract' - Finished in state Completed()
+| INFO    | Task run 'attest_origin' - Finished in state Completed()
+| INFO    | Task run 'normalize' - Finished in state Completed()
+| INFO    | Task run 'attest_normalize' - Finished in state Completed()
+| INFO    | Task run 'create_handoff' - Finished in state Completed()
+| INFO    | Task run 'deliver' - Finished in state Completed()
+| ERROR   | Task run 'makoto_gate' - Finished in state Failed('Task run encountered an exception MakotoDenied: Makoto deny (E_ARTIFACT_DIGEST): step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest')
+| INFO    | Flow run - Finished in state Failed('Flow run encountered an exception: MakotoDenied: Makoto deny (E_ARTIFACT_DIGEST): step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest')</code></pre><p><code>makoto_gate</code> fails on its first attempt with no retry, <code>publish</code> never starts, and the flow run ends <code>Failed</code> with the primary error in its message.</p></div></li></ol>
+<section aria-labelledby="retries"><h2 id="retries">Retries that respect a verdict</h2><p>Prefect calls <code>retry_condition_fn</code> with the failed state. Re-raising the state&rsquo;s exception is how the function sees what went wrong. A <code>MakotoDenied</code> or <code>MakotoConflict</code> will be the same on every attempt, so the function returns <code>False</code>; anything else, including <code>MakotoToolError</code>, is retried.</p><pre><code class="language-python">def retry_unless_denied(task, task_run, state) -&gt; bool:
+    """Retry tool failures; never retry a verdict or a conflicting signature."""
+    try:
+        state.result()
+    except (mb.MakotoDenied, mb.MakotoConflict):
+        return False
+    except Exception:
+        return True
+    return False</code></pre></section>
+<section aria-labelledby="attachment"><h2 id="attachment">Other attachment points on this platform</h2><dl class="troubleshooting"><dt>Task completion</dt><dd>Use a post-task hook only after the task has durably committed an artifact whose exact identity can be resolved.</dd><dt>Flow handoff</dt><dd>Create a signed handoff when artifacts cross a team, account, region, or external recipient boundary.</dd><dt>Retries and cache</dt><dd>Make attestation idempotent; distinguish a reused cached artifact from a newly produced artifact.</dd><dt>Prefect context</dt><dd>Carry flow run, task run, deployment, work pool, parameters, and code revision as operation metadata.</dd></dl></section>
+<section aria-labelledby="evidence"><h2 id="evidence">What the evidence can say</h2><p>It can bind a durable task output to exact inputs and selected Prefect context. It cannot treat an arbitrary return value as an artifact or infer an authorized organizational handoff from flow nesting.</p></section>
+<section aria-labelledby="trouble"><h2 id="trouble">Troubleshooting</h2><dl class="troubleshooting"><dt>A denied gate retries twice before failing</dt><dd>The task needs <code>retry_condition_fn=retry_unless_denied</code> in addition to <code>retries</code>. Without it, Prefect retries every exception.</dd><dt>Cached task results skip signing</dt><dd>If you enable result caching on a producing task, a cache hit returns an old path without rewriting it. Key the cache on the input digest, and let the signing task reuse the existing envelope, which <code>makoto_boundary</code> does when the bytes match.</dd></dl></section>
+<section class="community-band"><h2>Run this under a real work pool.</h2><p>Deployments, remote result storage, and Kubernetes workers each move where files live. Tell us what breaks.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Report a Prefect finding</a><a class="button secondary" href="/integrations/airflow/">Airflow exemplar</a><a class="button secondary" href="/integrations/">All integrations</a></div></section>
+</main><footer class="footer"><div class="footer-inner">Makoto + Prefect · Lifecycle pattern, not a shipped adapter</div></footer></div></div></body></html>
