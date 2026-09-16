@@ -1,0 +1,283 @@
+{
+  "actualHeads": [
+    {
+      "sha256": "44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3"
+    }
+  ],
+  "actualNonce": null,
+  "actualRecipient": "example:review-team",
+  "artifacts": [
+    {
+      "applicableProfileCount": 0,
+      "artifactKind": "ordinary",
+      "digest": {
+        "sha256": "d7dd00740f0860f7f01369cdd036674ddccabba65e702dfc8d40435240fcd46f"
+      },
+      "digestPrerequisiteChecks": [],
+      "digestStatus": "pass",
+      "head": {
+        "sha256": "44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3"
+      },
+      "lifecycleRole": "final",
+      "profilePrerequisiteChecks": [],
+      "profileStatus": "not_checked",
+      "statementDigest": {
+        "sha256": "44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3"
+      },
+      "subjectName": "safe-visible.js"
+    }
+  ],
+  "bundleId": "urn:makoto:demo:06:safe",
+  "checks": [
+    {
+      "id": "load-safely",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "parse-strictly",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "index-payloads",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "core-schemas",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "signatures",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "authorization-thresholds",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "metadata-profiles",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "authorization",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "graph-dependency-artifacts",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "graph",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "roots-and-heads",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "completeness-anchor",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "freshness-anchors",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "artifact-bytes",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "artifact-profiles",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    },
+    {
+      "id": "decision",
+      "prerequisiteChecks": [],
+      "status": "pass"
+    }
+  ],
+  "coreCatalogDigest": {
+    "sha256": "298f55040022b6fe7c71e7a37d6ec4a75317d1c0b52a679dcca744cb4a3eaaf3"
+  },
+  "datasetEntries": [],
+  "decision": "allow",
+  "errors": [],
+  "evaluationTime": "2026-09-16T16:00:00Z",
+  "expectedArtifacts": [
+    {
+      "digest": {
+        "sha256": "d7dd00740f0860f7f01369cdd036674ddccabba65e702dfc8d40435240fcd46f"
+      },
+      "head": {
+        "sha256": "44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3"
+      },
+      "subjectName": "safe-visible.js"
+    }
+  ],
+  "expectedHeads": [
+    {
+      "sha256": "44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3"
+    }
+  ],
+  "expectedManifestDigest": {
+    "sha256": "a1020fcb3d691dbbad9d6567c1d33bea36b96a4b99c6282e8958d59472bdb1f6"
+  },
+  "expectedNonce": null,
+  "expectedRecipient": null,
+  "handoff": {
+    "authorization": "pass",
+    "completeness": "pass",
+    "freshnessChecks": {
+      "expected-artifacts": "pass",
+      "expected-heads": "pass",
+      "expected-manifest": "pass",
+      "max-age": "not_checked",
+      "nonce": "not_checked"
+    },
+    "freshnessMethod": "multiple",
+    "freshnessStatus": "pass",
+    "signatures": [
+      {
+        "cryptographic": "pass",
+        "keyKnown": true,
+        "keyid": "sha256:43cc820f3d2c48aa0c055b49ce8e7de4cdb471325978662e5ed5e7befe7f2ae2"
+      }
+    ]
+  },
+  "manifestDigest": {
+    "sha256": "a1020fcb3d691dbbad9d6567c1d33bea36b96a4b99c6282e8958d59472bdb1f6"
+  },
+  "nonceStatus": "not_checked",
+  "policyDigest": {
+    "sha256": "815a77e2d1548eb37f1751818935c22fbee354964712573b3ea793bccf505ed8"
+  },
+  "policyDigestEncoding": "exact-input-bytes",
+  "primaryError": null,
+  "profiles": [
+    {
+      "closureDigest": {
+        "sha256": "14a57a9dbc837c5c904cb7aa4bc9d23e80b4696fa70e9cdd9d6e10add499457c"
+      },
+      "critical": true,
+      "digest": {
+        "sha256": "bd43c68df4621b055f6f2a5d4e5069331206f7fe78a1eda240064259b31ce508"
+      },
+      "id": "https://schemas.example.internal/makoto/render-safe-origin-v1.schema.json",
+      "mediaType": null,
+      "prerequisiteChecks": [],
+      "requiredByAuthorizationRuleIds": [
+        "urn:makoto:demo:rule:render-safe-origin"
+      ],
+      "requiredByManifest": false,
+      "requiredByPolicy": false,
+      "resolution": "pass",
+      "statementDigest": {
+        "sha256": "44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3"
+      },
+      "subjectName": null,
+      "target": "predicate",
+      "validation": "pass"
+    }
+  ],
+  "quarantinedStatements": [],
+  "recipientStatus": "not_checked",
+  "reportTruncated": false,
+  "reportVersion": "0.2",
+  "roots": [
+    {
+      "sha256": "44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3"
+    }
+  ],
+  "statements": [
+    {
+      "authorization": "pass",
+      "authorizationPrerequisiteChecks": [],
+      "authorizingRuleIds": [
+        "urn:makoto:demo:rule:render-safe-origin"
+      ],
+      "candidateRuleIds": [
+        "urn:makoto:demo:rule:render-safe-origin"
+      ],
+      "coreSchema": "pass",
+      "coreSchemaPrerequisiteChecks": [],
+      "digest": {
+        "sha256": "44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3"
+      },
+      "eventId": "urn:uuid:06000001-0600-4600-8600-060000000001",
+      "graph": "pass",
+      "graphPrerequisiteChecks": [],
+      "predicateType": "https://usemakoto.dev/predicate/v0.2/origin",
+      "signatures": [
+        {
+          "cryptographic": "pass",
+          "keyKnown": true,
+          "keyid": "sha256:472887aa21e3c36ab999ea1661e03cf232fca7957f1e502698216a8bf1185a01"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "artifactsChecked": 1,
+    "artifactsDeclared": 1,
+    "heads": 1,
+    "historicalMaterialsChecked": 0,
+    "historicalMaterialsDeclared": 0,
+    "manifestSignaturesAuthorized": 1,
+    "manifestSignaturesRequired": 1,
+    "manifestSignaturesValid": 1,
+    "profilesDeclared": 1,
+    "profilesValidated": 1,
+    "quarantinedStatementsTotal": 0,
+    "roots": 1,
+    "signaturesChecked": 2,
+    "signaturesTotal": 2,
+    "signaturesValid": 2,
+    "statementsAuthorized": 1,
+    "statementsReachable": 1,
+    "statementsTotal": 1,
+    "statementsValid": 1
+  },
+  "tool": {
+    "name": "makoto",
+    "version": "0.2.0a0"
+  },
+  "unindexedEnvelopes": [],
+  "unreferencedFiles": [
+    {
+      "path": "schemas/resources/bd43c68df4621b055f6f2a5d4e5069331206f7fe78a1eda240064259b31ce508.schema.json",
+      "reason": "unreferenced",
+      "status": "not_checked"
+    }
+  ],
+  "warnings": [
+    {
+      "causedByCheck": "artifact-profiles",
+      "code": "W_ARTIFACT_UNPROFILED",
+      "context": {
+        "artifactDigest": {
+          "sha256": "d7dd00740f0860f7f01369cdd036674ddccabba65e702dfc8d40435240fcd46f"
+        },
+        "head": {
+          "sha256": "44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3"
+        },
+        "subjectName": "safe-visible.js"
+      },
+      "message": "final artifact has no applicable content profile",
+      "step": 13
+    }
+  ]
+}
