@@ -121,10 +121,13 @@ Where content describes a flow, chain, graph or handoff, draw it. A host with
 in an `aria-hidden` SVG layer beneath opaque nodes: `chain` joins consecutive
 `.dag-node`s, `spread` fans `.spread-source` out to every `.spread-node`
 (`data-copies="3"` draws three lines; stacked in one column the copies share
-one trunk down the gutter and branch off at their node), and `handoff` /
-`lifecycle` / `overwrite` use the edge lists in `flow.js` over
-`[data-flow-id]` nodes. The homepage hero is a `handoff`: the gate's frame to
-the run's frame. Geometry is measured and redrawn on resize, and under
+one trunk down the gutter and branch off at their node), `handoff` and
+`lifecycle` use the edge lists in `flow.js` over `[data-flow-id]` nodes (the
+homepage hero is a `handoff`: the gate's frame to the run's frame), and
+`inplace` joins numbered `cmd-N` / `st-N` nodes to one `db` node, timing its
+points to the `ip-*` keyframes in `v02.css` (5s per step). Geometry is
+measured and redrawn on resize, stacked layouts route lines down a gutter,
+and under
 reduced motion the lines stay and nothing moves. Load
 `<script defer src="/assets/flow.js"></script>` on those pages.
 

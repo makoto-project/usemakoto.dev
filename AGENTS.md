@@ -8,6 +8,7 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 - `schema/core-candidate.json` digests six HTML pages (`DOCUMENTATION` in `scripts/sync_core_release.py`). Editing any of them requires refreshing those digests, or `scripts/check_site.py` fails.
 - Tests expect a sibling `../core` checkout at the pinned commit; `scripts/check_site.py --candidate --core-repo <path>` accepts any location.
 - Learning URLs are versionless and permanent (`/demos/end-to-end/`, `/examples/`, `/integrations/`); never link `/demos/v0.2-end-to-end/`, `/examples/v0.2/` or `/integrations/v0.2/`. Those stay as forwarding pages, and `demos/v0.2-end-to-end/artifacts/` is a byte-identical mirror that `sync_core_release.py` writes and `check_site.py` enforces. Wire identifiers (`/spec/v0.2/`, `/schema/v0.2/`, `/predicate/v0.2/`, `/vocab/v0.2/`, `/release/v0.2/`) keep their version.
+- `examples/in-place/` states, statements and every digest on its page come from `uv run scripts/in_place_example.py` (`--check` fails on drift); edit the SQL there, rerun, and update the page.
 - `scripts/check_site.py` forbids visible `v0.1`/`v0.2` text on narrative pages; put identifiers inside `<code>`.
 - Every styled page carries the same `<head>` social block (canonical, Open Graph, Twitter) and the same footer structure; `DESIGN.md` ("Shell") says where each comes from. The card `assets/og-card.png` is rendered from `scripts/og_card.html` (instructions inside); re-render it when the identity changes.
 
