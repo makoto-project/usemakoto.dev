@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="One source file becomes ten copies. Data lineage keeps origin, transformations, attesters, and exact artifacts connected as data moves.">
   <title>Why data lineage matters — Makoto</title>
-  <link rel="stylesheet" href="/assets/v02.css">
+  <link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -55,7 +55,7 @@
           </div>
         </div>
 
-        <figure class="lineage-spread" aria-labelledby="spread-caption">
+        <figure class="lineage-spread" data-flow="spread" aria-labelledby="spread-caption">
           <figcaption id="spread-caption" class="visually-hidden">A source dataset spreads to storage, warehouse, marts, feature store, backup, regional replica, vendor software, and an analyst notebook, with additional shadow copies in CI and Slack.</figcaption>
           <div class="spread-source">
             <span class="spread-number">01</span>
@@ -65,7 +65,7 @@
           <ul class="spread-grid">
             <li class="spread-node"><span>02</span><strong>Object storage</strong><small>Landing copy</small></li>
             <li class="spread-node"><span>03</span><strong>Warehouse</strong><small>Loaded copy</small></li>
-            <li class="spread-node"><span>04–06</span><strong>Three marts</strong><small>Different grain</small></li>
+            <li class="spread-node" data-copies="3"><span>04–06</span><strong>Three marts</strong><small>Different grain</small></li>
             <li class="spread-node"><span>07</span><strong>Feature store</strong><small>Model input</small></li>
             <li class="spread-node"><span>08</span><strong>Nightly backup</strong><small>90-day retention</small></li>
             <li class="spread-node"><span>09</span><strong>Region two</strong><small>Durability replica</small></li>
@@ -139,5 +139,6 @@
   <footer class="footer"><div class="footer-inner">Makoto · Source-first, append-only data provenance · <a href="/community/">Built in public</a></div></footer>
     </div>
   </div>
+<script defer src="/assets/flow.js"></script>
 </body>
 </html>

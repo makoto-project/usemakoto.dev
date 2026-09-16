@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Runnable Makoto source-to-receiver walkthrough."><title>End-to-end handoff proof — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Runnable Makoto source-to-receiver walkthrough."><title>End-to-end handoff proof — Makoto</title><link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script></head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/" aria-current="page">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
@@ -23,7 +23,7 @@ uv run makoto verify bundle "$MAKOTO_RECEIVER_DIR/bundle" \
   <p class="editorial-note"><strong>Evidence boundary.</strong> This page presents checked-in evidence; it does not perform verification. Trust these bytes only when the website pin identifies the exact core revision and the receiver command below returns <code>allow</code>.</p>
 
   <h2>The complete story</h2>
-  <div class="dag" role="img" aria-label="Synthetic source data is signed by an ingestion key, normalized and signed by a normalization key, made public-safe and signed by a privacy key, placed in a handoff signed by a sender key, and checked by a receiver policy.">
+  <div class="dag" data-flow="chain" role="img" aria-label="Synthetic source data is signed by an ingestion key, normalized and signed by a normalization key, made public-safe and signed by a privacy key, placed in a handoff signed by a sender key, and checked by a receiver policy.">
 <div class="dag-node"><strong>Source</strong><small>Signer: ingestion</small><div class="hash">artifact 4e90181e…</div></div>
     <div class="dag-node"><strong>Normalize</strong><small>Signer: normalize</small><div class="hash">statement 1f28b72b…</div></div>
     <div class="dag-node"><strong>Public-safe</strong><small>Signer: privacy</small><div class="hash">head 962be717…</div></div>
@@ -83,5 +83,5 @@ artifact: 2f4fe11d…</code></pre></div></details>
 </main>
 <footer class="footer"><div class="footer-inner">Generated from the pinned Makoto core · browser presentation is not live verification · Apache-2.0 · <a href="/community/">Contribute on GitHub</a></div></footer>
 </div></div>
-<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+<script defer src="/assets/flow.js"></script><script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
 </body></html>

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Makoto is a source-first, signed provenance framework for data.">
   <title>Makoto — source-first data provenance</title>
-  <link rel="stylesheet" href="/assets/v02.css">
+  <link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -30,12 +30,15 @@
 
     <div class="site-main">
       <main id="main">
-        <section class="hero-v02" aria-labelledby="hero-title"><div class="hero-inner hero-docket">
+        <section class="hero-v02 hero-home" aria-labelledby="hero-title"><div class="hero-inner">
           <div class="hero-claim">
             <h1 id="hero-title">Know where data began, what changed, and who attested to it.</h1>
             <p>Makoto is a source-first, SLSA-like framework for data. It keeps a verifiable history beside the bytes as data moves between systems, teams, and organizations.</p>
             <div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Run the proof</a><a class="button secondary" href="/spec/">Read the specification</a><a class="button secondary" href="https://github.com/makoto-project/makoto">Build it with us on GitHub</a></div>
           </div>
+          <ol class="hero-proof" aria-label="A receiver's gate, then the run it produced">
+          <li class="proof-step">
+          <p class="proof-label"><span>1</span> The gate you add</p>
           <figure class="hero-file">
             <pre data-filename="makoto-gate.yml · lines 57–79"><code class="language-yaml">      - name: Verify the received bundle
         id: verify
@@ -62,6 +65,9 @@
           exit "$status"</code></pre>
             <figcaption class="hero-caption">The receiver's CI gate, quoted from <a href="/demos/01/makoto-gate.yml"><code>demos/01/makoto-gate.yml</code></a>. The load job declares <code>needs: gate</code>, so nothing loads until Makoto allows the exact bytes that arrived.</figcaption>
           </figure>
+          </li>
+          <li class="proof-step">
+          <p class="proof-label"><span>2</span> What it catches</p>
           <figure class="hero-run">
             <pre data-filename="receiver · poisoned handoff"><code class="language-bash">$ makoto verify bundle handoffs/mutated-final-data/bundle \
   --policy receiver/policy.json \
@@ -93,6 +99,8 @@ $ echo $?
 1</code></pre>
             <figcaption class="hero-caption">Captured output from <a href="/demos/01/">the poisoned-pipeline case</a>: one byte appended after signing. Every signature still verifies; <code>artifact-bytes</code> fails and the job exits 1.</figcaption>
           </figure>
+          </li>
+          </ol>
         </div></section>
 
         <div class="page wide">

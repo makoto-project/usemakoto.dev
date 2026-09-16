@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A single dataset attested, changed, re-attested, transformed, and re-attested again — with every digest computed from real checked-in bytes."><title>Dataset lifecycle walkthrough — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A single dataset attested, changed, re-attested, transformed, and re-attested again — with every digest computed from real checked-in bytes."><title>Dataset lifecycle walkthrough — Makoto</title><link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script></head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
@@ -13,12 +13,43 @@
   <p class="lead">A dataset is attested, then edited, then transformed again. Each change produces different bytes, so each change needs its own statement, and each new statement carries the identity of the one before it. This page follows a single set of customer records through all three states and shows the evidence each state produced.</p>
   <p class="editorial-note"><strong>Every value on this page is real.</strong> The records are the fixtures checked into <a href="/demos/v0.2-end-to-end/">the runnable proof</a>, and every digest was computed from those exact bytes. Nothing here is illustrative filler. This page presents evidence; it does not perform verification.</p>
 
-  <div class="dag" role="img" aria-label="Raw customer records are attested by an origin statement, normalized into a second dataset attested by a transformation statement, reduced to a public-safe dataset attested by a third statement, and then handed to a receiver that re-hashes the bytes it was given.">
-    <div class="dag-node"><strong>Raw</strong><small>Origin statement</small><div class="hash">4e90181e…</div></div>
-    <div class="dag-node"><strong>Normalized</strong><small>Transformation statement</small><div class="hash">421e19cf…</div></div>
-    <div class="dag-node"><strong>Public-safe</strong><small>Transformation statement</small><div class="hash">2f4fe11d…</div></div>
-    <div class="dag-node"><strong>Receiver</strong><small>Re-hashes what arrived</small><div class="hash">6c8f8061…</div></div>
-  </div>
+  <figure class="lifecycle-flow" data-flow="lifecycle" aria-labelledby="lifecycle-flow-caption">
+    <figcaption id="lifecycle-flow-caption">Raw customer records are attested by an origin statement, normalized into a second dataset attested by a transformation statement, reduced to a public-safe dataset attested by a third statement, and then handed to a receiver that re-hashes the bytes it was given. <span class="lf-note">Nothing is edited in place: each step writes a new file with a new digest, and every earlier file stays exactly as it was.</span></figcaption>
+    <ol class="lf-stages">
+      <li class="lf-stage">
+        <div class="lf-card" data-flow-id="raw"><span class="lf-kind">File</span><strong>Raw</strong><code>customers.raw.json</code><br><code class="hash" title="sha256:4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919" tabindex="0" aria-label="sha256 4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919">4e90181e…</code><small>Stays as it arrived.</small></div>
+        <div class="lf-statement" data-flow-id="st-origin"><strong>Origin statement</strong><code class="hash" title="sha256:014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11" tabindex="0" aria-label="sha256 014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11">014b4252…</code><small>Subject: the raw file. No predecessor; the graph starts here.</small></div>
+      </li>
+      <li class="lf-stage">
+        <p class="lf-verb" data-flow-label="raw&gt;normalized">normalize</p>
+        <div class="lf-card" data-flow-id="normalized"><span class="lf-kind">New file</span><strong>Normalized</strong><code>customers.normalized.json</code><br><code class="hash" title="sha256:421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8" tabindex="0" aria-label="sha256 421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8">421e19cf…</code><small>Written beside the raw file, which is untouched.</small></div>
+        <div class="lf-statement" data-flow-id="st-normalize"><strong>Transformation statement</strong><code class="hash" title="sha256:9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55" tabindex="0" aria-label="sha256 9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55">9ef9051c…</code><small>Input: the raw digest. Predecessor: the origin statement.</small></div>
+      </li>
+      <li class="lf-stage">
+        <p class="lf-verb" data-flow-label="normalized&gt;public">public-safe derivative</p>
+        <div class="lf-card" data-flow-id="public"><span class="lf-kind">New file</span><strong>Public-safe</strong><code>customers.public.json</code><br><code class="hash" title="sha256:2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4" tabindex="0" aria-label="sha256 2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4">2f4fe11d…</code><small>Both earlier files remain readable.</small></div>
+        <div class="lf-statement" data-flow-id="st-public"><strong>Transformation statement</strong><code class="hash" title="sha256:6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d" tabindex="0" aria-label="sha256 6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d">6c8f8061…</code><small>Input: the normalized digest. Predecessor: the normalize statement.</small></div>
+      </li>
+    </ol>
+    <div class="lf-receiver" data-flow-id="receiver"><strong>Receiver</strong><small>Re-hashes what arrived</small><div class="hash">6c8f8061…</div>
+      <ol class="lf-walk" aria-label="Receiver checks, from the head statement back to the root">
+        <li>6c8f8061… head</li><li>9ef9051c…</li><li>014b4252… root</li>
+      </ol>
+    </div>
+  </figure>
+
+  <aside class="overwrite-panel" aria-labelledby="overwrite-title">
+    <h2 id="overwrite-title">If your pipeline overwrites in place</h2>
+    <p><strong>Illustrative, not from the fixtures above.</strong> When a job rewrites one table in place, storage only ever holds the latest bytes. Each statement still names the bytes it saw as their own digest and points back to its predecessor, so the history survives even when the storage does not.</p>
+    <div class="ow-graph" data-flow="overwrite">
+      <div class="ow-store" data-flow-id="store"><strong>One table</strong><small>rewritten in place</small><div class="ow-versions" aria-hidden="true"><span>version 1 bytes</span><span>version 2 bytes</span><span>version 3 bytes</span></div></div>
+      <ol class="ow-chain">
+        <li data-flow-id="v1">Statement 1<small>subject: digest of version 1</small></li>
+        <li data-flow-id="v2">Statement 2<small>input: digest of version 1 · subject: digest of version 2</small></li>
+        <li data-flow-id="v3">Statement 3<small>input: digest of version 2 · subject: digest of version 3</small></li>
+      </ol>
+    </div>
+  </aside>
 
   <ol class="setup-sequence">
 
@@ -84,6 +115,7 @@
   </div></li>
 
   <li id="change"><div><h2>The dataset changes</h2>
+    <p class="lf-note">A new file with a new digest: <code>customers.normalized.json</code>. The original <code>customers.raw.json</code> is untouched.</p>
     <p>Now the records get normalized. Whitespace goes, email case is folded, consent becomes a real boolean, region codes are upper-cased.</p>
     <pre><code class="language-json">[{"age":34,"customer_id":"C-1001","email":"alice@example.com","marketing_consent":true,"region":"US"},{"age":67,"customer_id":"C-1002","email":"bob@example.com","marketing_consent":false,"region":"GB"},{"age":17,"customer_id":"C-1003","email":"carol@example.com","marketing_consent":true,"region":"CA"}]</code></pre>
     <table class="wide-table"><caption>Field-by-field, for the first record. Scroll sideways on a narrow screen.</caption>
@@ -162,6 +194,7 @@
   </div></li>
 
   <li id="transform-again"><div><h2>Transform it again</h2>
+    <p class="lf-note">Another new file: <code>customers.public.json</code>. The normalized and raw files stay as they were.</p>
     <p>The normalized data still carries direct identifiers, so it cannot leave. A second transformation produces a public-safe derivative: email dropped, customer id replaced by a pseudonym, exact age generalised into a band.</p>
     <pre><code class="language-json">[{"age_band":"0-17","customer_id":"2da7dbbb0e3f243b06cb","marketing_consent":true,"region":"CA"},{"age_band":"25-34","customer_id":"3fb57f8f4d704855a7aa","marketing_consent":true,"region":"US"},{"age_band":"65+","customer_id":"ce76ddf0a0df7f1d0add","marketing_consent":false,"region":"GB"}]</code></pre>
     <table class="wide-table"><caption>Before and after the public-safe step, for the one record in the <code>US</code> region. Region is what lines the two rows up — the identifier no longer can. Scroll sideways on a narrow screen.</caption>
@@ -275,5 +308,5 @@ EOF</code></pre>
   </section>
 </main>
 <footer class="footer"><div class="footer-inner">Makoto casebook · every digest on this page is computed from checked-in bytes · <a href="https://github.com/makoto-project/makoto">Open source on GitHub</a></div></footer></div></div>
-<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+<script defer src="/assets/flow.js"></script><script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
 </body></html>
