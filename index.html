@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Makoto is a source-first, signed provenance framework for data.">
   <title>Makoto — source-first data provenance</title>
+  <link rel="canonical" href="https://usemakoto.dev/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Makoto">
+  <meta property="og:title" content="Makoto — source-first data provenance">
+  <meta property="og:description" content="Makoto is a source-first, signed provenance framework for data.">
+  <meta property="og:url" content="https://usemakoto.dev/">
+  <meta property="og:image" content="https://usemakoto.dev/assets/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Makoto: know where data began, what changed, and who attested to it. A receiver&#x27;s verification run refuses a handoff whose final bytes changed after signing.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Makoto — source-first data provenance">
+  <meta name="twitter:description" content="Makoto is a source-first, signed provenance framework for data.">
+  <meta name="twitter:image" content="https://usemakoto.dev/assets/og-card.png">
   <link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script>
 </head>
 <body>
@@ -34,13 +48,14 @@
           <div class="hero-claim">
             <h1 id="hero-title">Know where data began, what changed, and who attested to it.</h1>
             <p>Makoto is a source-first, SLSA-like framework for data. It keeps a verifiable history beside the bytes as data moves between systems, teams, and organizations.</p>
-            <div class="actions"><a class="button" href="/demos/end-to-end/">Run the proof</a><a class="button secondary" href="/spec/">Read the specification</a><a class="button secondary" href="https://github.com/makoto-project/makoto">Build it with us on GitHub</a></div>
+            <div class="actions"><a class="button" href="/demos/end-to-end/">Run the proof</a><a class="button secondary" href="/spec/">Read the specification</a><a class="button quiet" href="https://github.com/makoto-project/makoto">Build it with us on GitHub</a></div>
           </div>
+          <div class="hero-proof-flow" data-flow="handoff">
           <ol class="hero-proof" aria-label="A receiver's gate, then the run it produced">
           <li class="proof-step">
           <p class="proof-label"><span>1</span> The gate you add</p>
           <figure class="hero-file">
-            <pre data-filename="makoto-gate.yml · lines 57–79"><code class="language-yaml">      - name: Verify the received bundle
+            <pre data-flow-id="gate" data-filename="makoto-gate.yml · lines 57–79"><code class="language-yaml">      - name: Verify the received bundle
         id: verify
         shell: bash
         env:
@@ -69,7 +84,7 @@
           <li class="proof-step">
           <p class="proof-label"><span>2</span> What it catches</p>
           <figure class="hero-run">
-            <pre data-filename="receiver · poisoned handoff"><code class="language-bash">$ makoto verify bundle handoffs/mutated-final-data/bundle \
+            <pre data-flow-id="run" data-filename="receiver · poisoned handoff"><code class="language-bash">$ makoto verify bundle handoffs/mutated-final-data/bundle \
   --policy receiver/policy.json \
   --schema-catalog receiver/catalog.json \
   --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
@@ -101,6 +116,7 @@ $ echo $?
           </figure>
           </li>
           </ol>
+          </div>
         </div></section>
 
         <div class="page wide">
@@ -152,9 +168,9 @@ $ echo $?
           <section class="community-band" aria-labelledby="commons"><span class="kicker">Apache-2.0 · built in public</span><h2 id="commons">A common language should be built by the people who need it.</h2><p>The protocol, schemas, verifier, conformance fixtures, demos, and site are open on GitHub. Bring a real handoff, challenge a claim, add a denial case, or send a tested patch.</p><div class="actions"><a class="button" href="/community/">Choose a contribution path</a><a class="button secondary" href="https://github.com/makoto-project/makoto/issues">Open an issue on GitHub</a></div></section>
         </div>
       </main>
-      <footer class="footer"><div class="footer-inner">Makoto · Source-first, append-only data provenance · <a href="https://github.com/makoto-project/makoto">Developed in public on GitHub</a></div></footer>
+      <footer class="footer"><div class="footer-inner"><p class="footer-line">Makoto · Source-first, append-only data provenance · <a href="https://github.com/makoto-project/makoto">Developed in public on GitHub</a></p><nav class="footer-nav" aria-label="Site"><a href="/spec/">Specification</a><a href="/spec/schemas/">Hosted schemas</a><a href="/demos/end-to-end/">Runnable proof</a><a href="/examples/">Examples</a><a href="/community/">Community</a><a href="/privacy/">Privacy</a></nav><p class="footer-meta">Apache-2.0 · <a href="https://github.com/makoto-project/usemakoto.dev">Site source on GitHub</a></p></div></footer>
     </div>
   </div>
-<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script><script defer src="/assets/flow.js"></script>
 </body>
 </html>

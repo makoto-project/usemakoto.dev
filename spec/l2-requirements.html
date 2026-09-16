@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Assurance level L2: authorized signers, a continuous graph, a matching signed handoff, and matching received bytes.">
   <title>L2: Provenance is authorized and complete — Makoto</title>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Makoto">
+  <meta property="og:title" content="L2: Provenance is authorized and complete — Makoto">
+  <meta property="og:description" content="Assurance level L2: authorized signers, a continuous graph, a matching signed handoff, and matching received bytes.">
+  <meta property="og:url" content="https://usemakoto.dev/spec/l2-requirements.html">
+  <meta property="og:image" content="https://usemakoto.dev/assets/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Makoto: know where data began, what changed, and who attested to it. A receiver&#x27;s verification run refuses a handoff whose final bytes changed after signing.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="L2: Provenance is authorized and complete — Makoto">
+  <meta name="twitter:description" content="Assurance level L2: authorized signers, a continuous graph, a matching signed handoff, and matching received bytes.">
+  <meta name="twitter:image" content="https://usemakoto.dev/assets/og-card.png">
   <link rel="canonical" href="https://usemakoto.dev/spec/l2-requirements.html">
   <link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script>
 </head>
@@ -54,7 +67,7 @@
     </tbody></table>
     <p>With <code>--json</code> the command writes one deterministic object with exactly <code>decision</code>, <code>level</code> (<code>"L1"</code>, <code>"L2"</code>, <code>"L3"</code>, or <code>null</code>), and <code>levels</code>: an array in L1, L2, L3 order whose entries have exactly <code>decisionRequired</code>, <code>level</code>, <code>satisfied</code>, <code>title</code>, and <code>unmetChecks</code>. Each <code>unmetChecks</code> entry is <code>{ "id", "status" }</code>, in canonical check order. When <code>--require</code> is supplied, the object also contains <code>required</code> and <code>meetsRequired</code>.</p>
   </section>
-</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</main><footer class="footer"><div class="footer-inner"><p class="footer-line">Makoto specification · Source first · Append only · Receiver verified</p><nav class="footer-nav" aria-label="Site"><a href="/spec/">Specification</a><a href="/spec/schemas/">Hosted schemas</a><a href="/demos/end-to-end/">Runnable proof</a><a href="/examples/">Examples</a><a href="/community/">Community</a><a href="/privacy/">Privacy</a></nav><p class="footer-meta">Apache-2.0 · <a href="https://github.com/makoto-project/usemakoto.dev">Site source on GitHub</a></p></div></footer></div>
 </div>
 <script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
 </body>
