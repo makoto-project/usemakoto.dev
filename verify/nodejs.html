@@ -1,14 +1,292 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Install, validate with AJV, attest, verify a bundle, handle a denial, and read the Makoto report from Node.js."><title>Node.js verification binding — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/">誠 Makoto</a><nav class="nav" aria-label="Primary"><a href="/verify/">Verification</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><a href="/">Overview</a><a href="/verify/">Verification</a><a href="/validate/">Schema validation</a><a href="/sdk/">Language interfaces</a><a href="/community/">Community</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Verification</p><a href="/verify/">Decision model</a><a href="/validate/">Schema validation</a><a href="/verify/bash.html">Bash</a><a href="/verify/python.html">Python</a><a href="/verify/nodejs.html" aria-current="page">JavaScript</a><a href="/verify/typescript.html">TypeScript</a><a href="/verify/go.html">Go</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a></div></nav></aside><div class="site-main"><main id="main" class="page"><span class="kicker">Node.js recipe</span><h1>Invoke the reference report contract.</h1><p class="lead">There is no maintained Node.js verifier package. A server-side process can invoke a pinned core checkout while a native implementation is built against the same fixtures.</p><pre><code>import { spawnSync } from "node:child_process";
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Validate with AJV 2020, sign an origin statement, verify a Makoto bundle with spawnSync, refuse a tampered copy, and read the report from Node.js."><title>JavaScript verification binding — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/">誠 Makoto</a><nav class="nav" aria-label="Primary"><a href="/verify/">Verification</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><a href="/">Overview</a><a href="/verify/">Verification</a><a href="/validate/">Schema validation</a><a href="/sdk/">Language interfaces</a><a href="/community/">Community</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Verification</p><a href="/verify/">Decision model</a><a href="/validate/">Schema validation</a><a href="/verify/bash.html">Bash</a><a href="/verify/python.html">Python</a><a href="/verify/nodejs.html" aria-current="page">JavaScript</a><a href="/verify/typescript.html">TypeScript</a><a href="/verify/go.html">Go</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a></div></nav></aside><div class="site-main"><main id="main" class="page">
+<span class="kicker">JavaScript binding</span>
+<h1>Gate a Node.js service on a Makoto verdict.</h1>
+<p class="lead">One complete ES module: compile the hosted trust-policy schema with AJV&rsquo;s Draft 2020-12 build, sign an origin statement, spawn the pinned verifier, refuse a tampered bundle, and surface the primary error to the caller. It was executed on Node.js 26 against the pinned core before publication.</p>
+<p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>0e41afbd0c3f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
+<ol class="setup-sequence">
+<li><div><h2 id="install">Install the verifier and one dependency</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
+cd makoto
+git checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+uv sync --locked --dev
 
-const result = spawnSync("uv", [
-  "run", "makoto", "verify", "bundle", bundle,
-  "--policy", policy,
-  "--schema-catalog", catalog,
-  "--expected-artifact", expectedArtifact,
-  "--evaluation-time", evaluationTime,
-  "--json",
-], { cwd: reviewedCoreCheckout, encoding: "utf8" });
+# Writes the deterministic fixture set: one allowed bundle, seven denials.
+./scripts/demo-v0.2.sh --acceptance
 
-if (!result.stdout) throw new Error(result.stderr);
-const report = JSON.parse(result.stdout);
-if (report.decision !== "allow") throw new Error(JSON.stringify(report));</code></pre><p>Do not send evidence to an undocumented remote service. Keep trust policy and expected artifacts under receiver control.</p><p><a href="/validate/">Use AJV for structure-only checks →</a></p></main><footer class="footer"><div class="footer-inner">Makoto verification · Node.js subprocess recipe · No package claim</div></footer></div></div></body></html>
+export MAKOTO_CORE="$PWD"</code></pre><p>The binding needs a single npm package for structural validation. The verifier itself has no JavaScript dependency.</p><pre><code class="language-bash">mkdir makoto-gate &amp;&amp; cd makoto-gate
+npm init -y &amp;&amp; npm pkg set type=module
+npm install ajv@8</code></pre></div></li>
+<li><div><h2 id="program">The complete module</h2><p>Save this as <code>makoto-gate.mjs</code>. The functions are exported so a service can import them; the bottom of the file runs the demonstration.</p><pre><code class="language-javascript">// Validate, attest, verify, and gate on a Makoto report from Node.js 20+.
+import { spawnSync } from "node:child_process";
+import { cpSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { basename, join, resolve } from "node:path";
+import Ajv2020 from "ajv/dist/2020.js";
+
+const CORE = resolve(process.env.MAKOTO_CORE ?? "");
+const DEMO = join(CORE, "demos/v0.2-end-to-end/generated");
+const SCHEMA_BASE = "https://usemakoto.dev/schema/v0.2/";
+
+// Independent expectations: obtained out of band, never read from the bundle.
+const EXPECTED_MANIFEST = "sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c";
+const EXPECTED_HEAD = "sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977";
+const EVALUATION_TIME = "2026-09-16T16:00:00Z";
+
+export class MakotoToolError extends Error {}
+
+export class MakotoDenied extends Error {
+  constructor(report) {
+    super(`${report.decision}: ${report.primaryError}`);
+    this.report = report;
+  }
+}
+
+function makoto(...args) {
+  const result = spawnSync("uv", ["run", "--quiet", "makoto", ...args], {
+    cwd: CORE,
+    encoding: "utf8",
+    maxBuffer: 64 * 1024 * 1024,
+  });
+  if (result.error) throw new MakotoToolError(`could not start uv: ${result.error.message}`);
+  return result;
+}
+
+export async function validateStructure(instancePath, schemaName) {
+  const response = await fetch(SCHEMA_BASE + schemaName);
+  if (!response.ok) throw new MakotoToolError(`schema fetch failed: ${response.status}`);
+  const ajv = new Ajv2020({ allErrors: true, strict: false });
+  const validate = ajv.compile(await response.json());
+  const instance = JSON.parse(readFileSync(instancePath, "utf8"));
+  return validate(instance)
+    ? []
+    : validate.errors.map((e) =&gt; `${e.instancePath || "(root)"} ${e.message}`);
+}
+
+export function attestOrigin(artifactPath, workDir) {
+  const privateKey = join(workDir, "producer.private.pem");
+  const out = join(workDir, "origin.dsse.json");
+  for (const args of [
+    ["key", "generate", "--private-out", privateKey, "--public-out", join(workDir, "producer.public.pem")],
+    [
+      "attest", "origin",
+      "--subject", `${basename(artifactPath)}=${artifactPath}`,
+      "--source-kind", "urn:example:source:nightly-export",
+      "--source-uri", "urn:example:orders:2026-09-16",
+      "--key", privateKey,
+      "--out", out,
+    ],
+  ]) {
+    const result = makoto(...args);
+    if (result.status !== 0) throw new MakotoToolError(result.stderr.trim());
+  }
+  return out;
+}
+
+export function verifyBundle(bundleDir) {
+  const result = makoto(
+    "verify", "bundle", bundleDir,
+    "--policy", join(DEMO, "receiver/policy.json"),
+    "--schema-catalog", join(DEMO, "receiver/catalog.json"),
+    "--expected-manifest", EXPECTED_MANIFEST,
+    "--expected-head", EXPECTED_HEAD,
+    "--expected-artifact", join(DEMO, "receiver/expected-artifact.json"),
+    "--evaluation-time", EVALUATION_TIME,
+    "--json",
+  );
+  // 0 = allow, 1 = deny or indeterminate, 2 = invalid input, 3 = internal error.
+  if (result.status !== 0 &amp;&amp; result.status !== 1) {
+    throw new MakotoToolError(result.stderr.trim() || `exit ${result.status ?? result.signal}`);
+  }
+  let report;
+  try {
+    report = JSON.parse(result.stdout);
+  } catch (error) {
+    throw new MakotoToolError(`malformed report: ${error.message}`);
+  }
+  if ((result.status === 0) !== (report.decision === "allow")) {
+    throw new MakotoToolError("exit status and report decision disagree");
+  }
+  if (report.decision !== "allow") throw new MakotoDenied(report);
+  return report;
+}
+
+export function explain(report) {
+  console.log(`decision=${report.decision} primaryError=${report.primaryError}`);
+  for (const check of report.checks.filter((c) =&gt; c.status !== "pass")) {
+    console.log(`  check ${check.id}: ${check.status}`, check.prerequisiteChecks);
+  }
+  for (const error of report.errors) {
+    console.log(`  step ${error.step} ${error.code}: ${error.message}`);
+  }
+  const s = report.summary;
+  console.log(`  signatures ${s.signaturesValid}/${s.signaturesTotal} valid, policy ${report.policyDigest.sha256.slice(0, 12)}`);
+}
+
+const problems = await validateStructure(join(DEMO, "receiver/policy.json"), "trust-policy.schema.json");
+console.log("policy structure:", problems.length ? problems : "valid");
+
+const work = mkdtempSync(join(tmpdir(), "makoto-"));
+const artifact = join(work, "orders.csv");
+writeFileSync(artifact, "order_id,total\n1001,42.00\n");
+const envelope = attestOrigin(artifact, work);
+console.log("signed", JSON.parse(makoto("envelope", "inspect", "--envelope", envelope, "--json").stdout));
+
+explain(verifyBundle(join(DEMO, "positive-bundle")));
+
+const tampered = join(work, "tampered-bundle");
+cpSync(join(DEMO, "positive-bundle"), tampered, { recursive: true });
+const finalDir = join(tampered, "artifacts/final");
+const finalFile = join(finalDir, readdirSync(finalDir).find((name) =&gt; name.endsWith(".bin")));
+writeFileSync(finalFile, readFileSync(finalFile, "utf8").replace("]", ",{}]"));
+try {
+  verifyBundle(tampered);
+  console.error("tampered bundle was accepted");
+  process.exitCode = 1;
+} catch (error) {
+  if (!(error instanceof MakotoDenied)) throw error;
+  explain(error.report);
+  process.exitCode = error.report.primaryError === "E_ARTIFACT_DIGEST" ? 0 : 1;
+}</code></pre><pre><code class="language-bash">MAKOTO_CORE=/path/to/makoto node makoto-gate.mjs</code></pre><p>One run&rsquo;s output, unedited. Key IDs, payload digests, and temporary paths differ on every run; the decisions, codes, and policy digest do not.</p><pre><code class="language-bash">policy structure: valid
+signed {
+  payloadDigest: {
+    sha256: 'd62472eee50d2816f5234f51ac7f3fb8aaafa1783c167138f92db8a4548d9eb7'
+  },
+  payloadType: 'application/vnd.in-toto+json',
+  signatureKeyIds: [
+    'sha256:32297b2f194c32d8782c367250245076e172646a8e9f7b7e21f5bc5816414584'
+  ]
+}
+decision=allow primaryError=null
+  signatures 4/4 valid, policy 614eb137303b
+decision=deny primaryError=E_ARTIFACT_DIGEST
+  check artifact-bytes: fail []
+  step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
+  signatures 4/4 valid, policy 614eb137303b</code></pre></div></li>
+<li><div><h2 id="validate">Validate structure with AJV</h2><p>Fetch the hosted schema, compile it once, and reuse the compiled validator. <code>allErrors</code> reports every problem in one pass, which is what a person fixing a policy file wants.</p><pre><code class="language-javascript">export async function validateStructure(instancePath, schemaName) {
+  const response = await fetch(SCHEMA_BASE + schemaName);
+  if (!response.ok) throw new MakotoToolError(`schema fetch failed: ${response.status}`);
+  const ajv = new Ajv2020({ allErrors: true, strict: false });
+  const validate = ajv.compile(await response.json());
+  const instance = JSON.parse(readFileSync(instancePath, "utf8"));
+  return validate(instance)
+    ? []
+    : validate.errors.map((e) =&gt; `${e.instancePath || "(root)"} ${e.message}`);
+}</code></pre><p>Structure is not verification. <a href="/validate/">The validator catalogue</a> shows the same schemas in other tools.</p></div></li>
+<li><div><h2 id="attest">Generate an attestation</h2><p>The producer side is two CLI calls: an Ed25519 key pair, then a signed origin statement over the exact bytes of the new file. Pass arguments as an array, never through a shell string, so a file name can never become a flag.</p><pre><code class="language-javascript">export function attestOrigin(artifactPath, workDir) {
+  const privateKey = join(workDir, "producer.private.pem");
+  const out = join(workDir, "origin.dsse.json");
+  for (const args of [
+    ["key", "generate", "--private-out", privateKey, "--public-out", join(workDir, "producer.public.pem")],
+    [
+      "attest", "origin",
+      "--subject", `${basename(artifactPath)}=${artifactPath}`,
+      "--source-kind", "urn:example:source:nightly-export",
+      "--source-uri", "urn:example:orders:2026-09-16",
+      "--key", privateKey,
+      "--out", out,
+    ],
+  ]) {
+    const result = makoto(...args);
+    if (result.status !== 0) throw new MakotoToolError(result.stderr.trim());
+  }
+  return out;
+}</code></pre></div></li>
+<li><div><h2 id="verify">Verify a bundle and handle a denial</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-javascript">export class MakotoToolError extends Error {}
+
+export class MakotoDenied extends Error {
+  constructor(report) {
+    super(`${report.decision}: ${report.primaryError}`);
+    this.report = report;
+  }
+}</code></pre><pre><code class="language-javascript">export function verifyBundle(bundleDir) {
+  const result = makoto(
+    "verify", "bundle", bundleDir,
+    "--policy", join(DEMO, "receiver/policy.json"),
+    "--schema-catalog", join(DEMO, "receiver/catalog.json"),
+    "--expected-manifest", EXPECTED_MANIFEST,
+    "--expected-head", EXPECTED_HEAD,
+    "--expected-artifact", join(DEMO, "receiver/expected-artifact.json"),
+    "--evaluation-time", EVALUATION_TIME,
+    "--json",
+  );
+  // 0 = allow, 1 = deny or indeterminate, 2 = invalid input, 3 = internal error.
+  if (result.status !== 0 &amp;&amp; result.status !== 1) {
+    throw new MakotoToolError(result.stderr.trim() || `exit ${result.status ?? result.signal}`);
+  }
+  let report;
+  try {
+    report = JSON.parse(result.stdout);
+  } catch (error) {
+    throw new MakotoToolError(`malformed report: ${error.message}`);
+  }
+  if ((result.status === 0) !== (report.decision === "allow")) {
+    throw new MakotoToolError("exit status and report decision disagree");
+  }
+  if (report.decision !== "allow") throw new MakotoDenied(report);
+  return report;
+}</code></pre><p><code>spawnSync</code> reports a launch failure in <code>result.error</code> and a signal in <code>result.signal</code> with a null status; both are tool errors. A denial is an ordinary return with status 1 and a full report, turned into a typed <code>MakotoDenied</code> the caller can catch:</p><pre><code class="language-javascript">const tampered = join(work, "tampered-bundle");
+cpSync(join(DEMO, "positive-bundle"), tampered, { recursive: true });
+const finalDir = join(tampered, "artifacts/final");
+const finalFile = join(finalDir, readdirSync(finalDir).find((name) =&gt; name.endsWith(".bin")));
+writeFileSync(finalFile, readFileSync(finalFile, "utf8").replace("]", ",{}]"));
+try {
+  verifyBundle(tampered);
+  console.error("tampered bundle was accepted");
+  process.exitCode = 1;
+} catch (error) {
+  if (!(error instanceof MakotoDenied)) throw error;
+  explain(error.report);
+  process.exitCode = error.report.primaryError === "E_ARTIFACT_DIGEST" ? 0 : 1;
+}</code></pre></div></li>
+<li><div><h2 id="report">Read the verification report</h2><p>Route on <code>primaryError</code>, show the checks that did not pass, and keep the policy digest with anything you store.</p><pre><code class="language-javascript">export function explain(report) {
+  console.log(`decision=${report.decision} primaryError=${report.primaryError}`);
+  for (const check of report.checks.filter((c) =&gt; c.status !== "pass")) {
+    console.log(`  check ${check.id}: ${check.status}`, check.prerequisiteChecks);
+  }
+  for (const error of report.errors) {
+    console.log(`  step ${error.step} ${error.code}: ${error.message}`);
+  }
+  const s = report.summary;
+  console.log(`  signatures ${s.signaturesValid}/${s.signaturesTotal} valid, policy ${report.policyDigest.sha256.slice(0, 12)}`);
+}</code></pre><p>For declared types over the same report, see <a href="/verify/typescript.html">the TypeScript binding</a>.</p></div></li>
+</ol>
+<section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><table class="stack-table module-table"><thead><tr><th>Exit status</th><th>Meaning and what your code must do</th></tr></thead><tbody>
+<tr><td><code>0</code></td><td><strong>allow.</strong> Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</td></tr>
+<tr><td><code>1</code></td><td><strong>deny</strong> or <strong>indeterminate.</strong> stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</td></tr>
+<tr><td><code>2</code></td><td><strong>Invalid input.</strong> A missing file, a malformed flag, an unreadable policy. No report is written; stderr carries one JSON object with <code>errorClass</code> and <code>message</code>.</td></tr>
+<tr><td><code>3</code></td><td><strong>Internal error.</strong> Same stderr shape with <code>errorClass: internal</code>. Treat it as an outage, never as a verdict.</td></tr>
+</tbody></table></section>
+<section aria-labelledby="service"><h2 id="service">Inside a request handler</h2><p><code>spawnSync</code> blocks the event loop for the length of a verification, a few hundred milliseconds for the fixture. In an HTTP service, run the same arguments through the promise form of <code>execFile</code> so other requests keep moving, and keep the exit-status rules identical:</p><pre><code class="language-javascript">import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
+
+export async function verifyBundleAsync(core, args) {
+  try {
+    const { stdout } = await execFileAsync("uv", ["run", "--quiet", "makoto", ...args], {
+      cwd: core,
+      maxBuffer: 64 * 1024 * 1024,
+    });
+    return JSON.parse(stdout); // exit 0: allow
+  } catch (error) {
+    if (error.code === 1 &amp;&amp; error.stdout) return JSON.parse(error.stdout); // deny, full report
+    throw new Error(`makoto could not run: ${error.stderr || error.message}`);
+  }
+}</code></pre></section>
+<section aria-labelledby="trouble"><h2 id="trouble">Troubleshooting</h2><dl class="troubleshooting">
+<dt><code>no schema with key or ref "https://json-schema.org/draft/2020-12/schema"</code></dt>
+<dd>The hosted schemas are Draft 2020-12, and the default <code>ajv</code> entry targets draft-07. Import <code>ajv/dist/2020.js</code> instead.</dd>
+<dt><code>can't resolve reference https://usemakoto.dev/schema/v0.2/...</code></dt>
+<dd>The trust-policy, envelope, and report schemas are self-contained, but the statement, origin, and transform schemas reference sibling schemas by URL. Pass a <code>loadSchema</code> function and use <code>compileAsync</code>, as shown in <a href="/validate/#ajv">the validator catalogue</a>.</dd>
+<dt><code>spawnSync uv ENOBUFS</code></dt>
+<dd>A large bundle can produce a report bigger than Node&rsquo;s 1 MB default output buffer. <code>execFile</code> reports the same condition as <code>ERR_CHILD_PROCESS_STDIO_MAXBUFFER</code>. The example raises <code>maxBuffer</code> to 64 MB; the report&rsquo;s own <code>reportTruncated</code> flag tells you when the verifier itself capped detail.</dd>
+<dt>Every run denies with <code>E_EXPECTED_MANIFEST</code>, <code>E_EXPECTED_HEAD</code>, and <code>E_EXPECTED_ARTIFACT</code> at step 11</dt>
+<dd>The expectation flags are missing or stale. The <code>freshness-anchors</code> check fails because the policy requires all three. Supply the digests the producer published for this handoff.</dd>
+<dt>Exit status 2 with <code>{"errorClass":"invalid-input",...}</code> on stderr</dt>
+<dd>An input path is wrong or unreadable, or a singleton flag was passed twice. Paths are resolved from the process working directory, so pass absolute paths when the verifier runs with <code>cwd</code> set to the core checkout.</dd>
+<dt>The report shows <code>skipped</code> for a check you care about</dt>
+<dd>An earlier check failed and did not establish its prerequisite. <code>prerequisiteChecks</code> names it. A skipped check was not tested; never read it as a pass.</dd>
+<dt><code>uv: command not found</code> inside a service or CI job</dt>
+<dd>The binding needs <code>uv</code> on <code>PATH</code> for the process that spawns the verifier. Install it in the image or call the checkout&rsquo;s <code>.venv/bin/makoto</code> directly after <code>uv sync --locked</code>.</dd>
+</dl></section>
+<section class="community-band"><h2>The same gate in every language.</h2><p>Each binding runs the same six steps against the same fixtures and produces the same decision. The report and exit status are the contract; the language is a wrapper.</p><div class="actions"><a class="button" href="/verify/">Read the decision model</a><a class="button secondary" href="/sdk/">Compare language interfaces</a><a class="button secondary" href="/validate/">Structure-only validators</a></div><p>Bindings: <a href="/verify/bash.html">Bash</a> · <a href="/verify/python.html">Python</a> · <a href="/verify/nodejs.html">JavaScript</a> · <a href="/verify/typescript.html">TypeScript</a> · <a href="/verify/go.html">Go</a></p></section>
+</main><footer class="footer"><div class="footer-inner">Makoto verification · Node.js subprocess recipe · No package claim</div></footer></div></div></body></html>
