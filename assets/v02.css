@@ -506,9 +506,9 @@ pre ::selection, pre::selection { color: inherit; background: color-mix(in srgb,
 .flow-layer .flow-head { fill: var(--flow-line); }
 .flow-layer .flow-spark { fill: var(--flow-spark); }
 .flow-layer .flow-spark.is-back { fill: var(--seal); }
-.flow > :not(.flow-layer) { position: relative; z-index: 1; }
+.flow > :not(.flow-layer):not(.visually-hidden) { position: relative; z-index: 1; }
 
-.dag { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: var(--space-7); margin: var(--space-7) 0; align-items: stretch; }
+.dag { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,9.5rem),1fr)); gap: var(--space-7); margin: var(--space-7) 0; align-items: stretch; }
 .dag-node { position: relative; padding: var(--space-4) var(--space-5); min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--sheet); }
 .dag-node strong { display: block; margin-bottom: var(--space-1); }
 .dag-node small { display: block; color: var(--muted); }

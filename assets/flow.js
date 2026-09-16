@@ -18,7 +18,7 @@
 
   var NS = "http://www.w3.org/2000/svg";
   var motion = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
-  var SPEED = 80;       // px per second for a travelling point
+  var SPEED = 45;       // px per second for a travelling point
   var uid = 0;
 
   function still() { return !!(motion && motion.matches); }
@@ -111,7 +111,8 @@
    */
   function route(a, b, others, side, offset) {
     offset = offset || 0;
-    if (b.l >= a.r - 2 || a.l >= b.r - 2) {
+    var sameRow = a.t < b.b - 2 && b.t < a.b - 2;
+    if (sameRow && (b.l >= a.r - 2 || a.l >= b.r - 2)) {
       var ltr = b.l >= a.r - 2;
       var x1 = ltr ? a.r : a.l, x2 = ltr ? b.l : b.r, y1 = a.cy, y2 = b.cy;
       if (Math.abs(y1 - y2) < 2) return [[x1, y1], [x2, y2]];
@@ -127,13 +128,14 @@
       var my = (sy + ey) / 2;
       return [[a.cx, sy], [a.cx, my], [b.cx, my], [b.cx, ey]];
     }
+    if (!sameRow && !(b.t >= a.b - 2 || a.t >= b.b - 2)) blocked = true;
     var gx = side === "right" ? Math.max(a.r, b.r) + 14 + offset : Math.min(a.l, b.l) - 14 - offset;
     var ax = side === "right" ? a.r : a.l, bx = side === "right" ? b.r : b.l;
     return [[ax, a.cy], [gx, a.cy], [gx, b.cy], [bx, b.cy]];
   }
 
   function drawChain(host) {
-    var nodes = Array.prototype.slice.call(host.children).filter(function (n) { return !n.classList.contains("flow-layer"); });
+    var nodes = Array.prototype.slice.call(host.querySelectorAll(":scope > .dag-node"));
     var layer = new Layer(host);
     var boxes = nodes.map(function (n) { return layer.box(n); });
     for (var i = 0; i < boxes.length - 1; i++) {
@@ -206,14 +208,14 @@
   // Explicit edge lists for authored figures. [from, to, options]
   var EDGES = {
     lifecycle: [
-      ["raw", "normalized", { side: "left", delay: 0, cycle: 6 }],
-      ["normalized", "public", { side: "left", delay: 1.6, cycle: 6, offset: 6 }],
+      ["raw", "normalized", { side: "left", delay: 0, cycle: 4.5 }],
+      ["normalized", "public", { side: "left", delay: 1.5, cycle: 4.5, offset: 6 }],
       ["st-origin", "raw", { spark: false }],
       ["st-normalize", "normalized", { spark: false }],
       ["st-public", "public", { spark: false }],
-      ["st-normalize", "st-origin", { back: true, side: "right", delay: 3.2, cycle: 6 }],
-      ["st-public", "st-normalize", { back: true, side: "right", delay: 2.6, cycle: 6, offset: 6 }],
-      ["receiver", "st-public", { back: true, side: "right", delay: 2, cycle: 6, offset: 12 }]
+      ["st-normalize", "st-origin", { back: true, side: "right", delay: 3, cycle: 4.5 }],
+      ["st-public", "st-normalize", { back: true, side: "right", delay: 2.2, cycle: 4.5, offset: 6 }],
+      ["receiver", "st-public", { back: true, side: "right", delay: 1.4, cycle: 4.5, offset: 12 }]
     ],
     overwrite: [
       ["store", "v1", { side: "left", delay: 0, cycle: 9 }],
