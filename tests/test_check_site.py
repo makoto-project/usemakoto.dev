@@ -239,12 +239,12 @@ def test_current_integrations_reject_obsolete_protocol_constructs() -> None:
         assert check_site.stale_integration_markers(content) == [], relative
 
 
-def test_assurance_model_does_not_publish_numbered_security_levels() -> None:
+def test_assurance_levels_page_defines_l1_l2_l3_sections() -> None:
     content = (check_site.ROOT / "levels/index.html").read_text(encoding="utf-8")
 
-    assert "Trust is a set of answers, not a level badge." in content
-    assert "Seven dimensions the receiver evaluates" in content
-    assert all(label not in content for label in ("Level 1", "Level 2", "Level 3"))
+    assert '<h2 id="l1">L1 · Provenance is authentic</h2>' in content
+    assert '<h2 id="l2">L2 · Provenance is authorized and complete</h2>' in content
+    assert '<h2 id="l3">L3 · Provenance is anchored</h2>' in content
 
 
 def test_canonical_presentation_pages_have_no_visible_version_taxonomy() -> None:

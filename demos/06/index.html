@@ -79,7 +79,408 @@
 <main id="main" class="page wide">
 <span class="kicker">Case 06 · invisible Unicode</span>
 <h1>Unchanged bytes can still violate policy.</h1>
-<p class="lead">A string contains a bidirectional control or zero-width character. The signature and digest both pass because the dangerous bytes were present when the producer signed them.</p>
+<p class="lead">A source file renders exactly like a safe one, but carries 128 invisible variation selectors that encode hidden content. Its digest is honest and its signature is valid, because the dangerous bytes were present when the producer signed them.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the fixtures checked in beside this page, with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the published <a href="/demos/06-invisible-unicode-guardrails/fixtures/report.safe.json">allow</a> and <a href="/demos/06-invisible-unicode-guardrails/fixtures/report.flagged.json">deny</a> fixtures. Hidden characters are shown escaped, never embedded in this page.</p>
+
+<section>
+<h2>The problem</h2>
+<p>Package-registry campaigns have shipped code whose rendered view and byte view disagree. Variation selectors, characters meant to be invisible, encode instructions that a runtime decoder reconstructs. The code looks normal in every editor and review tool.</p>
+<p>Those packages can be signed, their hashes valid, and their reviews passed. Provenance and integrity checks answer "are these the bytes that were vouched for?" and the answer is yes. The question nobody asked was whether the bytes a reviewer approved are the bytes a reviewer saw.</p>
+</section>
+
+<ol class="setup-sequence">
+<li><div>
+<h2>The raw example</h2>
+<p>The same line from the safe file and from the flagged file. With the hidden codepoints stripped, as a reviewer's editor effectively shows it, the flagged line is identical. Escaped, it is not.</p>
+<pre><code class="language-bash">$ sed -n 5p src/safe-visible.js
+  if (!record || typeof record !== "object") {
+$ sed -n 6p src/flagged-invisible.js | uv run --no-project python -c \
+  'import re, sys; print(re.sub("[\\ufe00-\\ufe0f\\U000e0100-\\U000e01ef]", "", sys.stdin.read()), end="")'
+  if (!record || typeof record !== "object") {
+$ sed -n 6p src/flagged-invisible.js | uv run --no-project python -c \
+  'import sys; print(ascii(sys.stdin.read().rstrip()))'
+'  if (!r\ufe04\U000e0105eco\ufe08\U000e0106rd || t\ufe09\U000e0106ype\ufe03\U000e0107of r\ufe00\U000e0102eco\ufe04\U000e0107rd !== "o\ufe05\U000e0106bje\ufe08\U000e0107ct") {'</code></pre>
+<p>Download <a href="/demos/06-invisible-unicode-guardrails/fixtures/safe-visible.js">safe-visible.js</a>, <a href="/demos/06-invisible-unicode-guardrails/fixtures/flagged-invisible.js">flagged-invisible.js</a>, and the annotated <a href="/demos/06-invisible-unicode-guardrails/fixtures/flagged-revealed.txt">revealed view</a>. The hidden content decodes only to an inert explanation string.</p>
+</div></li>
+
+<li><div>
+<h2>How it failed</h2>
+<p>The flagged file is 508 bytes longer than the safe one for the same visible text. The difference is 128 codepoints in two variation-selector ranges. A render-safety scan records exactly that, with verdict <code>fail</code>.</p>
+<pre><code class="language-bash">$ wc -c src/safe-visible.js src/flagged-invisible.js
+     710 src/safe-visible.js
+    1218 src/flagged-invisible.js
+    1928 total
+$ shasum -a 256 src/*.js
+0dba71c75cdeefbbe428436db262721ac91543266c460920d76c2fa55c27d85c  src/flagged-invisible.js
+d7dd00740f0860f7f01369cdd036674ddccabba65e702dfc8d40435240fcd46f  src/safe-visible.js
+$ uv run --no-project python - src/flagged-invisible.js &lt;&lt;'PY'
+import sys, unicodedata
+text = open(sys.argv[1], encoding='utf-8').read()
+hidden = [c for c in text if 0xFE00 &lt;= ord(c) &lt;= 0xFE0F or 0xE0100 &lt;= ord(c) &lt;= 0xE01EF]
+print('codepoints:', len(text), 'hidden variation selectors:', len(hidden))
+print('first five:', ' '.join(f'U+{ord(c):04X}' for c in hidden[:5]))
+PY
+codepoints: 896 hidden variation selectors: 128
+first five: U+FE04 U+E0105 U+FE08 U+E0106 U+FE09
+$ jq '.["urn:makoto:demo:render-safe"] | {verdict, contains_invisible_codepoints, counts, ranges}' scanner/flagged-invisible.scan.json
+{
+  "verdict": "fail",
+  "contains_invisible_codepoints": true,
+  "counts": {
+    "invisible_codepoints": 128,
+    "total_codepoints": 896
+  },
+  "ranges": [
+    "U+FE00-U+FE0F",
+    "U+E0100-U+E01EF"
+  ]
+}</code></pre>
+<p>Read the full scan output in <a href="/demos/06-invisible-unicode-guardrails/fixtures/analysis.flagged.json">analysis.flagged.json</a>.</p>
+</div></li>
+
+<li><div>
+<h2>Put Makoto in the path</h2>
+<p>A pull request that changes a source handoff runs the render-safety gate. The receiver's policy authorizes origin claims only when they carry a passing scan, so a scan result is not advisory: it decides whether the claim can be authorized at all.</p>
+<h3>The workflow</h3>
+<pre><code class="language-yaml"># Render-safety gate for source files. The receiver policy only
+# authorizes origin claims that carry a passing render-safety scan.
+#
+# Copy to .github/workflows/makoto-gate.yml in the repository that
+# receives handoffs. Layout it expects:
+#   handoffs/&lt;name&gt;/bundle/                  what the sender transferred
+#   receiver/policy.json                     receiver-owned trust policy
+#   receiver/catalog.json, receiver/resources/  pinned private schemas
+#   receiver/expected/&lt;name&gt;.artifact.json   expected final artifact
+name: Makoto render-safety gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "handoffs/**"
+
+permissions:
+  contents: read
+
+env:
+  # Pinned so these fixtures replay identically. Delete this line to
+  # evaluate against the runner clock.
+  EVALUATION_TIME: "2026-09-16T16:00:00Z"
+  # Minimum assurance level to accept. L3 (anchored) is the only level
+  # that implies an allow decision; a deny still fails at any level.
+  REQUIRED_LEVEL: L3
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The sender publishes manifest and head digests out of band.
+          # The receiver pins them here, never inside the bundle.
+          - handoff: safe-visible
+            manifest: sha256:a1020fcb3d691dbbad9d6567c1d33bea36b96a4b99c6282e8958d59472bdb1f6
+            head: sha256:44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3
+          - handoff: flagged-invisible
+            manifest: sha256:ad9c3c7abc51c1dee1fb3939e9ef23c4345203bd1c96a3f2c5ccdff74737e89e
+            head: sha256:6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274
+    steps:
+      - uses: actions/checkout@v4
+      # Pin the verifier to an exact core commit, like any dependency.
+      # Run it from a checkout: the CLI resolves its core schemas from
+      # the repository tree. This commit adds `makoto report level`
+      # (makoto-project/makoto#5); move the pin to the merged release.
+      - uses: actions/checkout@v4
+        with:
+          repository: makoto-project/makoto
+          ref: 731c5c9e3dc59161bd797de70d1d478115bb4c8c
+          path: .makoto-core
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Verify the received bundle
+        id: verify
+        shell: bash
+        env:
+          HANDOFF: ${{ matrix.handoff }}
+          EXPECTED_MANIFEST: ${{ matrix.manifest }}
+          EXPECTED_HEAD: ${{ matrix.head }}
+        run: |
+          verify() {
+            uv run --project .makoto-core makoto verify bundle "handoffs/$HANDOFF/bundle" \
+              --policy receiver/policy.json \
+              --schema-catalog receiver/catalog.json \
+              --expected-manifest "$EXPECTED_MANIFEST" \
+              --expected-head "$EXPECTED_HEAD" \
+              --expected-artifact "receiver/expected/$HANDOFF.artifact.json" \
+              --evaluation-time "$EVALUATION_TIME" "$@"
+          }
+          status=0
+          verify --json &gt; makoto-report.json || status=$?
+          verify || true
+          uv run --project .makoto-core makoto report level makoto-report.json \
+            --require "$REQUIRED_LEVEL" || status=1
+          exit "$status"
+      - name: Keep the verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: makoto-report-${{ matrix.handoff }}
+          path: makoto-report.json
+
+  merge-check:
+    # Runs only when every handoff in the matrix was allowed.
+    needs: gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Report the render-safety result
+        run: echo "replace with your existing step"</code></pre>
+<p><a href="makoto-gate.yml">Download makoto-gate.yml</a>. The matrix runs the safe and flagged handoffs through the same step.</p>
+<p>The gate also requires an assurance level. After writing the report it runs <code>makoto report level --require "$REQUIRED_LEVEL"</code>; this workflow requires <a href="/levels/">L3</a>, the only level that implies an allow decision.</p>
+<h3>The render-safety profile and the rule that requires it</h3>
+<pre><code class="language-bash">$ jq . receiver/resources/*.schema.json
+{
+  "$schema": "https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json",
+  "$id": "https://schemas.example.internal/makoto/render-safe-origin-v1.schema.json",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "event",
+    "source",
+    "extensions"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "0.2"
+    },
+    "extensions": {
+      "type": "object",
+      "required": [
+        "urn:makoto:demo:render-safe"
+      ],
+      "properties": {
+        "urn:makoto:demo:render-safe": {
+          "type": "object",
+          "required": [
+            "scanner",
+            "normalization",
+            "contains_invisible_codepoints",
+            "verdict"
+          ],
+          "properties": {
+            "normalization": {
+              "const": "NFC"
+            },
+            "contains_invisible_codepoints": {
+              "const": false
+            },
+            "verdict": {
+              "const": "pass"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+$ jq '.rules[] | {id, authorizedKeyIds, profileConstraints}' receiver/policy.json
+{
+  "id": "urn:makoto:demo:rule:render-safe-origin",
+  "authorizedKeyIds": [
+    "sha256:472887aa21e3c36ab999ea1661e03cf232fca7957f1e502698216a8bf1185a01"
+  ],
+  "profileConstraints": [
+    {
+      "closureDigest": {
+        "sha256": "14a57a9dbc837c5c904cb7aa4bc9d23e80b4696fa70e9cdd9d6e10add499457c"
+      },
+      "digest": {
+        "sha256": "bd43c68df4621b055f6f2a5d4e5069331206f7fe78a1eda240064259b31ce508"
+      },
+      "id": "https://schemas.example.internal/makoto/render-safe-origin-v1.schema.json",
+      "target": "predicate"
+    }
+  ]
+}</code></pre>
+<p>The schema is <a href="/demos/06-invisible-unicode-guardrails/fixtures/render-safe-origin-v1.schema.json">render-safe-origin-v1.schema.json</a>; the full policy is <a href="/demos/06-invisible-unicode-guardrails/fixtures/receiver-policy.json">receiver-policy.json</a>.</p>
+<h3>The producer cannot attach a profile it does not meet</h3>
+<p>Makoto enforces the profile at signing time too. Asking the scanner to sign the flagged file's origin claim with the render-safety profile attached is refused, with exit status 2, before any envelope is written.</p>
+<pre><code class="language-bash">$ makoto attest origin \
+  --subject flagged-invisible.js=src/flagged-invisible.js \
+  --source-kind urn:makoto:demo:source:repository-file \
+  --source-uri urn:makoto:demo:v0.2:source:flagged-invisible-js \
+  --extensions scanner/flagged-invisible.scan.json \
+  --event-id urn:uuid:06000002-0600-4600-8600-060000000002 \
+  --occurred-at 2026-09-16T16:00:00Z \
+  --key scanner/keys/scanner.private.pem \
+  --profile receiver/render-safe.profile.json \
+  --schema-catalog receiver/catalog.json \
+  --out scanner/origin.dsse.json
+{"errorClass":"invalid-input","message":"profile claim is false: False was expected; 'pass' was expected"}
+$ echo $?
+2</code></pre>
+</div></li>
+
+<li><div>
+<h2>The output that catches it</h2>
+<p>The only way to sign the flagged claim is without the profile. That envelope is published as <a href="/demos/06-invisible-unicode-guardrails/fixtures/attestation.flagged.json">attestation.flagged.json</a>. Its signature verifies, but the only origin rule requires the render-safety profile, so no rule authorizes the statement. The deny is <code>E_SIGNER_UNAUTHORIZED</code>, not a digest or signature error: the bytes were never tampered with, they were never acceptable.</p>
+<pre><code class="language-bash">$ makoto verify bundle handoffs/flagged-invisible/bundle \
+  --policy receiver/policy.json \
+  --schema-catalog receiver/catalog.json \
+  --expected-manifest sha256:ad9c3c7abc51c1dee1fb3939e9ef23c4345203bd1c96a3f2c5ccdff74737e89e \
+  --expected-head sha256:6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274 \
+  --expected-artifact receiver/expected/flagged-invisible.artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+FAIL        authorization-thresholds
+PASS        metadata-profiles
+FAIL        authorization
+PASS        graph-dependency-artifacts
+SKIPPED     graph
+SKIPPED     roots-and-heads
+FAIL        completeness-anchor
+PASS        freshness-anchors
+SKIPPED     artifact-bytes
+SKIPPED     artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:ad9c3c7abc51c1dee1fb3939e9ef23c4345203bd1c96a3f2c5ccdff74737e89e
+E_SIGNER_UNAUTHORIZED: no matching policy rule met its signature threshold
+E_MANIFEST_SET: final artifact is not an exact terminal subject of its declared head
+E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle index
+$ echo $?
+1</code></pre>
+<h3>The machine-readable report</h3>
+<p class="editorial-note">Output of <code>jq &#x27;{decision, primaryError, errors, notPassed: [.checks[] | select(.status != &quot;pass&quot;) | {id, status}]}&#x27; makoto-report.flagged-invisible.json</code> against the report the workflow step wrote.</p><pre><code class="language-json">{
+  "decision": "deny",
+  "primaryError": "E_SIGNER_UNAUTHORIZED",
+  "errors": [
+    {
+      "causedByCheck": "authorization-thresholds",
+      "code": "E_SIGNER_UNAUTHORIZED",
+      "context": {
+        "statementDigest": {
+          "sha256": "6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274"
+        }
+      },
+      "message": "no matching policy rule met its signature threshold",
+      "step": 6
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "artifactDigest": {
+          "sha256": "0dba71c75cdeefbbe428436db262721ac91543266c460920d76c2fa55c27d85c"
+        },
+        "bundleId": "urn:makoto:demo:06:flagged",
+        "head": {
+          "sha256": "6fdf6d7bcbdbf7ed7b1b22d9ccee5e9cb1a09bb16ffa884edf30f409310ec274"
+        },
+        "subjectName": "flagged-invisible.js"
+      },
+      "message": "final artifact is not an exact terminal subject of its declared head",
+      "step": 11
+    },
+    {
+      "causedByCheck": "completeness-anchor",
+      "code": "E_MANIFEST_SET",
+      "context": {
+        "bundleId": "urn:makoto:demo:06:flagged"
+      },
+      "message": "signed manifest sets do not equal the verified graph and bundle index",
+      "step": 11
+    }
+  ],
+  "notPassed": [
+    {
+      "id": "authorization-thresholds",
+      "status": "fail"
+    },
+    {
+      "id": "authorization",
+      "status": "fail"
+    },
+    {
+      "id": "graph",
+      "status": "skipped"
+    },
+    {
+      "id": "roots-and-heads",
+      "status": "skipped"
+    },
+    {
+      "id": "completeness-anchor",
+      "status": "fail"
+    },
+    {
+      "id": "artifact-bytes",
+      "status": "skipped"
+    },
+    {
+      "id": "artifact-profiles",
+      "status": "skipped"
+    }
+  ]
+}</code></pre>
+<h3>The assurance level it reaches</h3>
+<p>The signature is valid, so the flagged claim reaches <strong>L1</strong>. No rule authorizes it, so it cannot reach L2.</p>
+<pre><code class="language-bash">$ makoto report level makoto-report.flagged-invisible.json --require L3
+PASS        L1 Provenance is authentic
+FAIL        L2 Provenance is authorized and complete: authorization-thresholds fail, authorization fail, graph skipped, roots-and-heads skipped, completeness-anchor fail, artifact-bytes skipped, artifact-profiles skipped
+FAIL        L3 Provenance is anchored: decision deny
+LEVEL       L1
+REQUIRED    L3 not met
+$ echo $?
+1</code></pre>
+<p><a href="/demos/06-invisible-unicode-guardrails/fixtures/report.flagged.json">Open the complete flagged report</a>.</p>
+<details><summary>Control run: the safe file through the same gate</summary><div>
+<pre><code class="language-bash">$ makoto verify bundle handoffs/safe-visible/bundle \
+  --policy receiver/policy.json \
+  --schema-catalog receiver/catalog.json \
+  --expected-manifest sha256:a1020fcb3d691dbbad9d6567c1d33bea36b96a4b99c6282e8958d59472bdb1f6 \
+  --expected-head sha256:44ca1c22a2fd7f3b58f407509b5a9fd933b57d5749786e3256154f1e3d1b82a3 \
+  --expected-artifact receiver/expected/safe-visible.artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+PASS        graph
+PASS        roots-and-heads
+PASS        completeness-anchor
+PASS        freshness-anchors
+PASS        artifact-bytes
+PASS        artifact-profiles
+PASS        decision
+ALLOW       decision
+manifest sha256:a1020fcb3d691dbbad9d6567c1d33bea36b96a4b99c6282e8958d59472bdb1f6
+$ echo $?
+0</code></pre>
+<p>The same report reaches <strong>L3</strong>, so the level requirement is met and the job exits 0.</p>
+<pre><code class="language-bash">$ makoto report level makoto-report.safe-visible.json --require L3
+PASS        L1 Provenance is authentic
+PASS        L2 Provenance is authorized and complete
+PASS        L3 Provenance is anchored
+LEVEL       L3
+REQUIRED    L3 met
+$ echo $?
+0</code></pre>
+<p><a href="/demos/06-invisible-unicode-guardrails/fixtures/report.safe.json">Open the complete safe report</a>.</p>
+</div></details>
+</div></li>
+</ol>
+
 <section>
 <h2>The correct failure</h2>
 <ol class="provenance-spine">
@@ -97,7 +498,7 @@
 </li>
 <li>
 <strong>Deny on content policy</strong>
-<span>Report the exact field and rule that failed so the producer can normalize, reject, or explicitly justify the value.</span>
+<span>Report the exact rule that failed so the producer can normalize, reject, or explicitly justify the content.</span>
 </li>
 </ol>
 </section>
@@ -105,7 +506,20 @@
 <h2>Why this belongs in the provenance story</h2>
 <p>The profile and result travel with the evidence boundary, so a later recipient can tell the difference between “bytes changed” and “unchanged bytes were never acceptable.” That distinction matters for incident response and remediation.</p>
 </section>
-<section><h2>Concrete content-policy check</h2><table><tbody><tr><th>Input</th><td>A signed JSON artifact whose visible label contains a hidden bidirectional or control character.</td></tr><tr><th>Integrity result</th><td>The digest and signature can still pass because the bytes have not changed.</td></tr><tr><th>Profile result</th><td>A receiver-required bounded string rule rejects the exact field and reports the profile failure.</td></tr><tr><th>Remediation</th><td>The producer normalizes or rejects the field, creates new output bytes, and appends a new signed statement.</td></tr></tbody></table><p><a href="/examples/invisible-unicode/">Inspect the safe and flagged byte sequences side by side</a></p></section>
+<section><h2>Concrete content-policy check</h2><table><tbody><tr><th>Input</th><td>A JavaScript source file whose visible text matches a safe file but contains 128 invisible variation selectors.</td></tr><tr><th>Integrity result</th><td>The digest and signature pass because the bytes have not changed since signing.</td></tr><tr><th>Profile result</th><td>The producer cannot attach the receiver's render-safety profile, and the receiver's only origin rule requires it, so the claim is not authorized.</td></tr><tr><th>Remediation</th><td>The producer removes the hidden codepoints, re-scans, creates new output bytes, and signs a new origin claim that carries the passing scan.</td></tr></tbody></table><p><a href="/examples/invisible-unicode/">Inspect the safe and flagged byte sequences side by side</a></p></section>
+
+<section>
+<h2>What else this handles</h2>
+<ul>
+<li>Zero-width characters hiding content in configuration files and prompts.</li>
+<li>Bidirectional control abuse that makes code read differently from how it executes.</li>
+<li>Tag-character sequences embedding data invisible to standard rendering.</li>
+<li>Any Unicode family where the rendered view diverges from the byte content.</li>
+</ul>
+<p class="callout"><strong>Key insight.</strong> Provenance tells you where an artifact came from. Signatures tell you who vouched for it. Render-safety analysis tells you what is actually present in the bytes, even when a reviewer cannot see it. A receiver needs all three.</p>
+<p>See also the <a href="/threats/#d9">display-layer obfuscation threat</a>.</p>
+</section>
+
 <section class="community-band">
 <span class="kicker">Inspect the bytes</span>
 <h2>The detailed case includes a bounded string-profile example.</h2>
@@ -114,11 +528,16 @@
 <a class="button secondary" href="/verify/#render-safe">Read the verification boundary</a>
 </div>
 </section>
+
+<nav class="actions" aria-label="Casebook sequence">
+<a class="button secondary" href="/demos/05/">← Case 05: AI dataset gate</a>
+<a class="button secondary" href="/demos/">All demos →</a>
+</nav>
 </main>
 <footer class="footer">
 <div class="footer-inner">Makoto demo · Invisible Unicode · Integrity is not safety</div>
 </footer>
 </div>
 </div>
-</body>
+<script defer src="/assets/prism.js"></script></body>
 </html>
