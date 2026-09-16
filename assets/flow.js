@@ -256,13 +256,14 @@
 
   /*
    * In place: every step is one command (cmd-N) and one statement (st-N).
-   * Commands enter the table on one port, exports leave it on another, so
-   * the two directions never share a line. Side by side, both run through
-   * their own lane between the table and the steps; stacked, commands climb
-   * the left gutter and exports descend the right. Back edges between
-   * statements take the outer lane. One step lasts STEP seconds, matching
-   * the ip-* keyframes in v02.css, and the layer's clock is set to the
-   * document's so a redraw never restarts the cycle out of step with CSS.
+   * Wide, the table sits between them: commands enter its left edge and
+   * exports leave its right edge, each through a lane in its own gap.
+   * Stacked, commands climb the left gutter to the table's left edge and
+   * exports descend the right gutter. Back edges between statements run
+   * down the outer lane on the side the exports do not use. One step lasts
+   * STEP seconds, matching the ip-* keyframes in v02.css, and the layer's
+   * clock is set to the document's so a redraw never restarts the cycle out
+   * of step with CSS.
    */
   var STEP = 5;
   function drawInplace(host) {
@@ -279,30 +280,32 @@
     }
     if (!steps.length) return;
     var cycle = STEP * steps.length;
-    var fast = { cycle: cycle, speed: 150 };
-    function opts(extra) { var o = {}; for (var k in fast) o[k] = fast[k]; for (var e in extra) o[e] = extra[e]; return o; }
-    var first = steps[0], beside = first.S.l >= D.r - 2;
-    var inY = D.cy - 14, outY = D.cy + 14;
+    function opts(extra) {
+      var o = { cycle: cycle, speed: 150 };
+      for (var k in extra) o[k] = extra[k];
+      return o;
+    }
+    var beside = D.l >= steps[0].C.r - 2;
+    var laneIn = (Math.max.apply(null, steps.map(function (s) { return s.C.r; })) + D.l) / 2;
+    var laneOut = (D.r + Math.min.apply(null, steps.map(function (s) { return s.S.l; }))) / 2;
+    var left = Math.min.apply(null, [D.l].concat(steps.map(function (s) { return s.C.l; }))) - 14;
+    var right = Math.max.apply(null, [D.r].concat(steps.map(function (s) { return s.S.r; }))) + 14;
     steps.forEach(function (step, i) {
-      var C = step.C, S = step.S, t = i * STEP, pts;
+      var C = step.C, S = step.S, t = i * STEP;
       if (beside) {
-        var gap = first.C.l - D.r;
-        var laneOut = D.r + gap * 0.36, laneIn = D.r + gap * 0.64;
-        layer.edge([[C.l, C.cy], [laneIn, C.cy], [laneIn, inY], [D.r, inY]], opts({ delay: t + 0.2 }));
-        layer.edge([[D.r, outY], [laneOut, outY], [laneOut, S.cy], [S.l, S.cy]], opts({ delay: t + 1.9 }));
+        layer.edge([[C.r, C.cy], [laneIn, C.cy], [laneIn, D.cy], [D.l, D.cy]], opts({ delay: t + 0.2 }));
+        layer.edge([[D.r, D.cy], [laneOut, D.cy], [laneOut, S.cy], [S.l, S.cy]], opts({ delay: t + 1.9 }));
       } else {
-        var left = Math.min(D.l, C.l) - 12, right = Math.max(D.r, S.r) + 12;
-        layer.edge([[C.l, C.cy], [left, C.cy], [left, inY], [D.l, inY]], opts({ delay: t + 0.2 }));
-        layer.edge([[D.r, outY], [right, outY], [right, S.cy], [S.r, S.cy]], opts({ delay: t + 1.9 }));
+        layer.edge([[C.l, C.cy], [left, C.cy], [left, D.cy], [D.l, D.cy]], opts({ delay: t + 0.2 }));
+        layer.edge([[D.r, D.cy], [right, D.cy], [right, S.cy], [S.r, S.cy]], opts({ delay: t + 1.9 }));
       }
       if (i === 0) return;
-      var P = steps[i - 1].S;
+      var P = steps[i - 1].S, pts;
       if (beside) {
-        var gx = Math.max(S.r, P.r) + 14;
-        pts = [[S.r, S.cy], [gx, S.cy], [gx, P.cy], [P.r, P.cy]];
+        pts = [[S.r, S.cy], [right, S.cy], [right, P.cy], [P.r, P.cy]];
       } else {
-        var bx = Math.min(S.l, P.l) - 24;
-        pts = [[S.l, S.cy + 8], [bx, S.cy + 8], [bx, P.cy + 8], [P.l, P.cy + 8]];
+        var y1 = S.cy + 10, y2 = P.cy + 10;
+        pts = [[S.l, y1], [left - 12, y1], [left - 12, y2], [P.l, y2]];
       }
       layer.edge(pts, opts({ back: true, delay: t + 3.2 }));
     });
