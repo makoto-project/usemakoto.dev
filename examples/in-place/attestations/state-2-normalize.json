@@ -1,0 +1,58 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.db#customers",
+      "digest": {
+        "sha256": "1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/transform",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:5699b2a6-5282-5270-8f51-6e3b4972eda5",
+      "occurredAt": "2026-09-16T16:05:00Z"
+    },
+    "operation": {
+      "type": "urn:makoto:example:operation:normalize",
+      "name": "Normalize email, consent and region in place",
+      "tool": {
+        "name": "SQLite"
+      },
+      "parametersDigest": {
+        "sha256": "a9f53771a9db5a50f78ffffd600f43684ea8bec8b9b347627f4c14d410660b1b"
+      }
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:in-place-table": {
+        "database": "customers.db",
+        "table": "customers",
+        "tableDefinition": "sql/00-create.sql",
+        "command": "sql/02-normalize.sql",
+        "export": "sql/export.sql",
+        "exportDigest": {
+          "sha256": "8513ac471e80707fab7bc153743ecfab5777a3c73e651e813223c527cac89aa2"
+        },
+        "storageKeepsPreviousState": false,
+        "rowsChanged": 3
+      }
+    },
+    "inputs": [
+      {
+        "name": "previous-state",
+        "digest": {
+          "sha256": "4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919"
+        },
+        "provenance": {
+          "statementDigest": {
+            "sha256": "a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383"
+          },
+          "subjectName": "customers.db#customers"
+        }
+      }
+    ]
+  }
+}
