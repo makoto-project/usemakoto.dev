@@ -14,7 +14,7 @@
   <p class="editorial-note"><strong>Every value on this page is real.</strong> The records are the fixtures checked into <a href="/demos/v0.2-end-to-end/">the runnable proof</a>, and every digest was computed from those exact bytes. Nothing here is illustrative filler. This page presents evidence; it does not perform verification.</p>
 
   <figure class="lifecycle-flow" data-flow="lifecycle" aria-labelledby="lifecycle-flow-caption">
-    <figcaption id="lifecycle-flow-caption">Raw customer records are attested by an origin statement, normalized into a second dataset attested by a transformation statement, reduced to a public-safe dataset attested by a third statement, and then handed to a receiver that re-hashes the bytes it was given. <span class="lf-note">Nothing is edited in place: each step writes a new file with a new digest, and every earlier file stays exactly as it was.</span></figcaption>
+    <figcaption id="lifecycle-flow-caption">Raw customer records are attested by an origin statement, normalized into a second dataset attested by a transformation statement, reduced to a public-safe dataset attested by a third statement, and then handed to a receiver that re-hashes the bytes it was given. <span class="lf-note">Nothing is edited in place: each step writes a new file with a new digest, and every earlier file stays exactly as it was. For a table rewritten in place, see <a href="/examples/in-place/">the in-place walkthrough</a>.</span></figcaption>
     <ol class="lf-stages">
       <li class="lf-stage">
         <div class="lf-card" data-flow-id="raw"><span class="lf-kind">File</span><strong>Raw</strong><code>customers.raw.json</code><br><code class="hash" title="sha256:4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919" tabindex="0" aria-label="sha256 4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919">4e90181e…</code><small>Stays as it arrived.</small></div>
@@ -38,17 +38,9 @@
     </div>
   </figure>
 
-  <aside class="overwrite-panel" aria-labelledby="overwrite-title">
-    <h2 id="overwrite-title">If your pipeline overwrites in place</h2>
-    <p><strong>Illustrative, not from the fixtures above.</strong> When a job rewrites one table in place, storage only ever holds the latest bytes. Each statement still names the bytes it saw as their own digest and points back to its predecessor, so the history survives even when the storage does not.</p>
-    <div class="ow-graph" data-flow="overwrite">
-      <div class="ow-store" data-flow-id="store"><strong>One table</strong><small>rewritten in place</small><div class="ow-versions" aria-hidden="true"><span>version 1 bytes</span><span>version 2 bytes</span><span>version 3 bytes</span></div></div>
-      <ol class="ow-chain">
-        <li data-flow-id="v1">Statement 1<small>subject: digest of version 1</small></li>
-        <li data-flow-id="v2">Statement 2<small>input: digest of version 1 · subject: digest of version 2</small></li>
-        <li data-flow-id="v3">Statement 3<small>input: digest of version 2 · subject: digest of version 3</small></li>
-      </ol>
-    </div>
+  <aside class="sibling-walkthrough" aria-labelledby="in-place-title">
+    <h2 id="in-place-title">If your pipeline overwrites in place</h2>
+    <p>This page writes a new file at every step. When a job rewrites one table instead, storage only ever holds the latest bytes, yet every state still needs its own statement. <a href="/examples/in-place/"><strong>The in-place walkthrough</strong></a> runs real SQL against one SQLite table, twice, and attests each state it passes through: same table, new state each step.</p>
   </aside>
 
   <ol class="setup-sequence">
@@ -304,7 +296,7 @@ EOF</code></pre>
 
   <section class="community-band" aria-labelledby="next"><h2 id="next">This walkthrough stops short of signing. The runnable proof does not.</h2>
     <p>Same three statements, plus signatures, a receiver trust policy, a signed handoff, and seven tampering cases that each produce a denial with a named error code.</p>
-    <div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Run the producer-to-receiver proof</a><a class="button secondary" href="/examples/">Back to the casebook</a></div>
+    <div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Run the producer-to-receiver proof</a><a class="button secondary" href="/examples/in-place/">See the same rule on a table edited in place</a><a class="button secondary" href="/examples/">Back to the casebook</a></div>
   </section>
 </main>
 <footer class="footer"><div class="footer-inner">Makoto casebook · every digest on this page is computed from checked-in bytes · <a href="https://github.com/makoto-project/makoto">Open source on GitHub</a></div></footer></div></div>

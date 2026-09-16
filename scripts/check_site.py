@@ -235,6 +235,9 @@ JSON_EXAMPLE_SCHEMAS = {
     "demos/v0.2-end-to-end/artifacts/reports/rewired-step.json": "verification-report.schema.json",
     "demos/v0.2-end-to-end/artifacts/reports/statement-digest-mismatch.json": "verification-report.schema.json",
     "demos/v0.2-end-to-end/artifacts/reports/unauthorized-signer.json": "verification-report.schema.json",
+    "examples/in-place/attestations/state-1-origin.json": "statement.schema.json",
+    "examples/in-place/attestations/state-2-normalize.json": "statement.schema.json",
+    "examples/in-place/attestations/state-3-withdraw-minor-consent.json": "statement.schema.json",
 }
 FORBIDDEN_TRACKED_SEGMENTS = {
     ".codex-work",
