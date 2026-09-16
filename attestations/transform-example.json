@@ -27,6 +27,18 @@
         "sha256": "c463deba9e6da45408de8cc72cb352026f0f527d9fbd1f6d33f45266862002b2"
       }
     },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:execution": {
+        "invocationId": "transform-20260916-160000-4b0d2e",
+        "startedAt": "2026-09-16T16:00:00Z",
+        "finishedAt": "2026-09-16T16:00:01Z",
+        "recordsIn": 3,
+        "recordsOut": 3,
+        "recordsDropped": 0,
+        "deterministic": true
+      }
+    },
     "inputs": [
       {
         "name": "raw",
@@ -40,18 +52,6 @@
           "subjectName": "customers.raw.json"
         }
       }
-    ],
-    "profiles": [],
-    "extensions": {
-      "urn:makoto:example:execution": {
-        "invocationId": "transform-20260916-160000-4b0d2e",
-        "startedAt": "2026-09-16T16:00:00Z",
-        "finishedAt": "2026-09-16T16:00:01Z",
-        "recordsIn": 3,
-        "recordsOut": 3,
-        "recordsDropped": 0,
-        "deterministic": true
-      }
-    }
+    ]
   }
 }

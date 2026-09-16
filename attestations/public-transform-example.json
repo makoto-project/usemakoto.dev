@@ -19,20 +19,6 @@
       "type": "urn:makoto:example:operation:public-safe",
       "name": "Remove direct identifiers and bucket ages"
     },
-    "inputs": [
-      {
-        "name": "normalized",
-        "digest": {
-          "sha256": "421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8"
-        },
-        "provenance": {
-          "statementDigest": {
-            "sha256": "9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55"
-          },
-          "subjectName": "customers.normalized.json"
-        }
-      }
-    ],
     "profiles": [],
     "extensions": {
       "urn:makoto:example:privacy": {
@@ -47,6 +33,20 @@
         ],
         "reviewed": true
       }
-    }
+    },
+    "inputs": [
+      {
+        "name": "normalized",
+        "digest": {
+          "sha256": "421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8"
+        },
+        "provenance": {
+          "statementDigest": {
+            "sha256": "9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55"
+          },
+          "subjectName": "customers.normalized.json"
+        }
+      }
+    ]
   }
 }
