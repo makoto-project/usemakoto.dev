@@ -450,6 +450,14 @@ pre[class*="language-"]::selection, pre[class*="language-"] ::selection { color:
   .schema-table td:nth-child(2)::before { content: "Constrains"; }
   .part-table td:nth-child(1)::before { content: "Section"; }
   .part-table td:nth-child(2)::before { content: "Fixes"; }
+  .level-check-table td:nth-child(1)::before { content: "Check"; }
+  .level-check-table td:nth-child(2)::before { content: "Step"; }
+  .level-check-table td:nth-child(3)::before { content: "Status"; }
+  .level-table td:nth-child(1)::before { content: "Level"; }
+  .level-table td:nth-child(2)::before { content: "Means"; }
+  .level-table td:nth-child(3)::before { content: "Adds"; }
+  .exit-table td:nth-child(1)::before { content: "Exit"; }
+  .exit-table td:nth-child(2)::before { content: "Meaning"; }
 }
 
 /* A page-level dark theme deepens the code surface so it still separates from

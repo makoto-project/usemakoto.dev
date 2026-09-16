@@ -127,15 +127,14 @@
     <p>The <a href="/demos/v0.2-end-to-end/">runnable proof</a> exercises an allowed handoff and seven deterministic denials against the pinned reference implementation.</p>
   </section>
 
-  <section aria-labelledby="superseded"><h2 id="superseded">The format this one replaced</h2>
-    <p>An earlier, incompatible format described data assurance as a ladder of three levels with its own requirement pages and signing guide. Those pages stay published at their original URLs, unchanged in substance and marked as superseded, because the specification requires them to remain reachable: a URL that once carried a normative claim does not get to quietly stop answering.</p>
-    <ul class="schema-list">
-      <li><a href="/spec/l1-requirements.html">First tier — documented provenance</a></li>
-      <li><a href="/spec/l2-requirements.html">Second tier — authenticated provenance</a></li>
-      <li><a href="/spec/l3-requirements.html">Third tier — isolated provenance</a></li>
-      <li><a href="/spec/signature-guide.html">Signature and verification guide</a></li>
-    </ul>
-    <p>None of it is wire-compatible with the protocol described above, and none of it may be coerced into it. <a href="/levels/">The assurance model</a> explains what replaced the ladder and why a single level badge was the wrong shape for the answer.</p>
+  <section aria-labelledby="levels"><h2 id="levels">Assurance levels</h2>
+    <p>Like SLSA, Makoto names cumulative levels. Each level is a fixed set of verification-report checks, so a receiver can require “L2 or higher” and still read exactly which check fell short. A level is derived from a completed report; deriving it never changes a check, a diagnostic, or the <code>allow</code>/<code>deny</code> decision.</p>
+    <table class="stack-table level-table"><thead><tr><th scope="col">Level</th><th scope="col">Means</th><th scope="col">Adds</th></tr></thead><tbody>
+      <tr><td><a href="/spec/l1-requirements.html">L1</a></td><td>Provenance is authentic</td><td>Well-formed statements signed by configured keys.</td></tr>
+      <tr><td><a href="/spec/l2-requirements.html">L2</a></td><td>Provenance is authorized and complete</td><td>Authorized signers, a continuous graph, a matching signed handoff, and matching received bytes.</td></tr>
+      <tr><td><a href="/spec/l3-requirements.html">L3</a></td><td>Provenance is anchored</td><td>An independent freshness anchor and an <code>allow</code> decision.</td></tr>
+    </tbody></table>
+    <p>No level asserts that a signer told the truth, that a transformation executed as described, or that evidence is unforgeable.</p>
   </section>
 
   <section aria-labelledby="limits"><h2 id="limits">What Makoto does not claim</h2>

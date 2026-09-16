@@ -49,14 +49,15 @@ CANONICAL_PRESENTATION_PAGES = (
     "verify/index.html",
     "why-lineage/index.html",
 )
-# Superseded-format pages. The specification requires these URLs to stay
-# reachable and labelled (sections 17 and 21), so the retired version string is
-# expected here and its absence is the error, not its presence.
-SUPERSEDED_FORMAT_PAGES = (
+# Superseded-format pages. They stay reachable and labelled (sections 17 and 21),
+# so the retired version string is expected here and its absence is the error.
+# The L1-L3 pages are not in this set: they document the current Section 8.3
+# assurance levels.
+SUPERSEDED_FORMAT_PAGES = ("spec/signature-guide.html",)
+LEVEL_PAGES = (
     "spec/l1-requirements.html",
     "spec/l2-requirements.html",
     "spec/l3-requirements.html",
-    "spec/signature-guide.html",
 )
 # Section 21 also requires the superseded pages to state the incompatibility, so
 # the banner has to carry both markers, inside the banner element itself.
@@ -120,10 +121,21 @@ CURRENT_INTEGRATION_PAGES = tuple(
     )
 )
 CURRENT_SHELL_PAGES += CURRENT_INTEGRATION_PAGES
+# Retired numeric-level constructs. These must not match the current string
+# levels "L1"-"L3" defined by Section 8.3.
+STALE_LEVEL_PATTERNS = (
+    ("makoto.level", r"\bmakoto\.level\b"),
+    # Tags and quotes may sit between the name and the number in highlighted markup.
+    ("numeric level assignment", r"(?i)\blevel\s*=\s*(?:<[^>]*>|[\"'])*\s*[123]\b"),
+)
+STALE_JSON_PATTERNS = (
+    r"makoto\.dev/(?:origin|transform)/v1",
+    r'"makotoLevel"',
+    r'"level"\s*:\s*[123](?:\s*[,}])',
+)
 STALE_INTEGRATION_MARKERS = (
     "origin/v1",
     "transform/v1",
-    "makoto.level",
     "makoto_airflow",
     "makoto_dagster",
     "makoto_databricks",
@@ -740,6 +752,18 @@ def check_tracked_files(errors: list[str]) -> None:
         errors.append(f"forbidden tracked dependencies/caches: {forbidden[:10]!r}")
 
 
+def stale_integration_markers(content: str) -> list[str]:
+    """Return the retired constructs an integration page still uses.
+
+    The numeric-level guards target only the old forms: a ``makoto.level``
+    attribute and a ``level = 1..3`` assignment. The current string levels
+    (``"L1"``-``"L3"``, ``--require L2``) and the ``makoto.levels`` module pass.
+    """
+    found = [marker for marker in STALE_INTEGRATION_MARKERS if marker in content]
+    found += [label for label, pattern in STALE_LEVEL_PATTERNS if re.search(pattern, content)]
+    return found
+
+
 def retired_version_errors(relative: str, content: str) -> list[str]:
     """Apply the retired-version rule to one HTML page.
 
@@ -777,16 +801,11 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
                 errors.append(
                     f"visible version label remains in narrative page {relative}: {forbidden}"
                 )
-    stale_json_patterns = (
-        r"makoto\.dev/(?:origin|transform)/v1",
-        r'"makotoLevel"',
-        r'"level"\s*:\s*[123](?:\s*[,}])',
-    )
     for path in sorted(ROOT.rglob("*.json")):
         if ".codex-work" in path.parts:
             continue
         content = path.read_text(encoding="utf-8", errors="replace")
-        for pattern in stale_json_patterns:
+        for pattern in STALE_JSON_PATTERNS:
             if re.search(pattern, content):
                 errors.append(
                     "retired protocol construct remains in deployable JSON: "
@@ -802,11 +821,10 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
                 errors.append(f"presentation version label remains in {relative}: {forbidden}")
     for relative in CURRENT_INTEGRATION_PAGES:
         content = (ROOT / relative).read_text(encoding="utf-8", errors="replace")
-        for marker in STALE_INTEGRATION_MARKERS:
-            if marker in content:
-                errors.append(f"stale integration construct remains in {relative}: {marker}")
-        if re.search(r"\blevel\s*=", content, flags=re.IGNORECASE):
-            errors.append(f"stale level assignment remains in {relative}")
+        errors.extend(
+            f"stale integration construct remains in {relative}: {marker}"
+            for marker in stale_integration_markers(content)
+        )
     for relative in CURRENT_SHELL_PAGES:
         path = ROOT / relative
         if not path.is_file():
