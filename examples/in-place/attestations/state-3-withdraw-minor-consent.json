@@ -1,0 +1,58 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.db#customers",
+      "digest": {
+        "sha256": "86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/transform",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:e789d3ba-79d4-5362-b1a9-bf4fa6df3e84",
+      "occurredAt": "2026-09-16T16:10:00Z"
+    },
+    "operation": {
+      "type": "urn:makoto:example:operation:withdraw-minor-consent",
+      "name": "Withdraw consent held by minors",
+      "tool": {
+        "name": "SQLite"
+      },
+      "parametersDigest": {
+        "sha256": "181098ef88909bae3dc238a10be2cc630907584eed6fd57330dd65bcc25c5a79"
+      }
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:in-place-table": {
+        "database": "customers.db",
+        "table": "customers",
+        "tableDefinition": "sql/00-create.sql",
+        "command": "sql/03-withdraw-minor-consent.sql",
+        "export": "sql/export.sql",
+        "exportDigest": {
+          "sha256": "8513ac471e80707fab7bc153743ecfab5777a3c73e651e813223c527cac89aa2"
+        },
+        "storageKeepsPreviousState": false,
+        "rowsChanged": 1
+      }
+    },
+    "inputs": [
+      {
+        "name": "previous-state",
+        "digest": {
+          "sha256": "1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982"
+        },
+        "provenance": {
+          "statementDigest": {
+            "sha256": "8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63"
+          },
+          "subjectName": "customers.db#customers"
+        }
+      }
+    ]
+  }
+}

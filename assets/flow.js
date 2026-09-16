@@ -6,7 +6,10 @@
  *   chain      consecutive children (.dag-node) in order
  *   spread     one .spread-source fanning out to every .spread-node; a node
  *              carrying data-copies="3" receives three separate lines
- *   lifecycle  and overwrite: explicit edges between [data-flow-id] nodes
+ *   lifecycle  explicit edges between [data-flow-id] nodes
+ *   inplace    commands feeding one table (db), the table's exports flowing
+ *              to statements (st-N), and each statement pointing back to the
+ *              one before it; sparks keep time with the CSS cycle in v02.css
  *
  * Geometry is measured from the rendered boxes and recomputed whenever the
  * host resizes, so lines land on the boxes at every width and every stacking.
@@ -78,7 +81,7 @@
 
   Layer.prototype.box = function (node) { return box(node, this.origin); };
 
-  // opts: back (dashed, seal-coloured point), arrow, spark, delay, cycle, hidden
+  // opts: back (dashed, seal-coloured point), arrow, spark, delay, cycle, speed, hidden
   Layer.prototype.edge = function (points, opts) {
     opts = opts || {};
     var id = this.id + "-p" + (++this.count);
@@ -86,7 +89,7 @@
     if (opts.hidden) path.setAttribute("stroke", "none");
     if (opts.arrow !== false && !opts.hidden) path.setAttribute("marker-end", "url(#" + this.id + "-head)");
     if (opts.spark === false || still()) return path;
-    var travel = Math.max(1.2, length(points) / SPEED);
+    var travel = Math.max(1.2, length(points) / (opts.speed || SPEED));
     var cycle = Math.max(opts.cycle || 0, travel + 1.4);
     var f = (travel / cycle).toFixed(3);
     var dot = el("circle", { r: opts.back ? "3" : "2.6", "class": "flow-spark" + (opts.back ? " is-back" : ""), opacity: "0" }, this.svg);
@@ -216,13 +219,6 @@
       ["st-normalize", "st-origin", { back: true, side: "right", delay: 3, cycle: 4.5 }],
       ["st-public", "st-normalize", { back: true, side: "right", delay: 2.2, cycle: 4.5, offset: 6 }],
       ["receiver", "st-public", { back: true, side: "right", delay: 1.4, cycle: 4.5, offset: 12 }]
-    ],
-    overwrite: [
-      ["store", "v1", { side: "left", delay: 0, cycle: 9 }],
-      ["store", "v2", { side: "left", delay: 3, cycle: 9, offset: 6 }],
-      ["store", "v3", { side: "left", delay: 6, cycle: 9, offset: 12 }],
-      ["v2", "v1", { back: true, side: "right", spark: false }],
-      ["v3", "v2", { back: true, side: "right", spark: false, offset: 6 }]
     ]
   };
 
@@ -258,10 +254,72 @@
     }
   }
 
+  /*
+   * In place: every step is one command (cmd-N) and one statement (st-N).
+   * Wide, the table sits between them: commands enter its left edge and
+   * exports leave its right edge, each through a lane in its own gap.
+   * Stacked, commands climb the left gutter to the table's left edge and
+   * exports descend the right gutter. Back edges between statements run
+   * down the outer lane on the side the exports do not use. One step lasts
+   * STEP seconds, matching the ip-* keyframes in v02.css, and the layer's
+   * clock is set to the document's so a redraw never restarts the cycle out
+   * of step with CSS.
+   */
+  var STEP = 5;
+  function drawInplace(host) {
+    var layer = new Layer(host);
+    var db = host.querySelector('[data-flow-id="db"]');
+    if (!db) return;
+    var D = layer.box(db);
+    var steps = [];
+    for (var n = 1; ; n++) {
+      var cmd = host.querySelector('[data-flow-id="cmd-' + n + '"]');
+      var st = host.querySelector('[data-flow-id="st-' + n + '"]');
+      if (!cmd || !st) break;
+      steps.push({ C: layer.box(cmd), S: layer.box(st) });
+    }
+    if (!steps.length) return;
+    var cycle = STEP * steps.length;
+    function opts(extra) {
+      var o = { cycle: cycle, speed: 150 };
+      for (var k in extra) o[k] = extra[k];
+      return o;
+    }
+    var beside = D.l >= steps[0].C.r - 2;
+    var laneIn = (Math.max.apply(null, steps.map(function (s) { return s.C.r; })) + D.l) / 2;
+    var laneOut = (D.r + Math.min.apply(null, steps.map(function (s) { return s.S.l; }))) / 2;
+    var left = Math.min.apply(null, [D.l].concat(steps.map(function (s) { return s.C.l; }))) - 14;
+    var right = Math.max.apply(null, [D.r].concat(steps.map(function (s) { return s.S.r; }))) + 14;
+    steps.forEach(function (step, i) {
+      var C = step.C, S = step.S, t = i * STEP;
+      if (beside) {
+        layer.edge([[C.r, C.cy], [laneIn, C.cy], [laneIn, D.cy], [D.l, D.cy]], opts({ delay: t + 0.2 }));
+        layer.edge([[D.r, D.cy], [laneOut, D.cy], [laneOut, S.cy], [S.l, S.cy]], opts({ delay: t + 1.9 }));
+      } else {
+        layer.edge([[C.l, C.cy], [left, C.cy], [left, D.cy], [D.l, D.cy]], opts({ delay: t + 0.2 }));
+        layer.edge([[D.r, D.cy], [right, D.cy], [right, S.cy], [S.r, S.cy]], opts({ delay: t + 1.9 }));
+      }
+      if (i === 0) return;
+      var P = steps[i - 1].S, pts;
+      if (beside) {
+        pts = [[S.r, S.cy], [right, S.cy], [right, P.cy], [P.r, P.cy]];
+      } else {
+        var y1 = S.cy + 10, y2 = P.cy + 10;
+        pts = [[S.l, y1], [left - 12, y1], [left - 12, y2], [P.l, y2]];
+      }
+      layer.edge(pts, opts({ back: true, delay: t + 3.2 }));
+    });
+    var timeline = document.timeline;
+    if (layer.svg.setCurrentTime && timeline && timeline.currentTime != null) {
+      layer.svg.setCurrentTime((timeline.currentTime / 1000) % cycle);
+    }
+  }
+
   function draw(host) {
     var kind = host.getAttribute("data-flow");
     if (kind === "chain") drawChain(host);
     else if (kind === "spread") drawSpread(host);
+    else if (kind === "inplace") drawInplace(host);
     else drawEdges(host, kind);
   }
 

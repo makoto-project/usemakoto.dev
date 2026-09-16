@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="One SQLite table edited in place by real SQL commands, with a Makoto statement attesting every state it passes through, and every digest reproducible from the committed commands."><title>In-place table walkthrough — Makoto</title><link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/end-to-end/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/end-to-end/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main">
+<main id="main" class="page wide">
+  <span class="kicker">Worked walkthrough · one table, edited in place</span>
+  <h1>Same table. New state. New statement.</h1>
+  <p class="lead">Most tables are not copied at every step; they are updated where they sit. This page runs real SQL against one SQLite table, twice, and attests every state the table passes through. The database keeps only the latest rows. Makoto keeps every state as its own digest, each statement naming the one before it.</p>
+  <p class="editorial-note"><strong>Every value on this page is generated.</strong> The commands are committed files, <a href="https://github.com/makoto-project/usemakoto.dev/blob/main/scripts/in_place_example.py"><code>scripts/in_place_example.py</code></a> runs them against a fresh SQLite database, and every export, digest and statement below comes from that run and validates against the published schemas. If your pipeline writes a new file at every step instead, <a href="/examples/lifecycle/">the lifecycle walkthrough</a> follows that shape.</p>
+
+  <figure class="inplace-flow" data-flow="inplace" aria-labelledby="inplace-flow-caption">
+    <figcaption id="inplace-flow-caption">Three SQL commands write into one table. After each, the table is exported, the export is hashed, and a statement attests that digest; each later statement names the statement before it. <span class="lf-note">The database only ever holds one state. The earlier states survive as digests inside the statements.</span></figcaption>
+    <div class="ip-graph">
+      <div class="ip-store" data-flow-id="db">
+        <div class="ip-cylinder">
+          <p class="ip-store-name"><strong>customers.db</strong><small>table <code>customers</code>, rewritten in place</small></p>
+          <div class="ip-rows" aria-hidden="true"><div class="ip-row"><span class="ip-cell"><span>"C-1001"</span></span><span class="ip-cell"><span class="ip-v" data-s="1">" Alice@Example.COM "</span><span class="ip-v" data-s="23">"alice@example.com"</span></span><span class="ip-meta"><span class="ip-cell" data-col="consent"><span class="ip-v" data-s="1">" YES "</span><span class="ip-v" data-s="23">1</span></span><span class="ip-cell" data-col="region"><span class="ip-v" data-s="1">"us"</span><span class="ip-v" data-s="23">"US"</span></span><span class="ip-cell" data-col="age"><span>34</span></span></span></div><div class="ip-row"><span class="ip-cell"><span>"C-1002"</span></span><span class="ip-cell"><span class="ip-v" data-s="1">"BOB@EXAMPLE.COM"</span><span class="ip-v" data-s="23">"bob@example.com"</span></span><span class="ip-meta"><span class="ip-cell" data-col="consent"><span class="ip-v" data-s="1">"false"</span><span class="ip-v" data-s="23">0</span></span><span class="ip-cell" data-col="region"><span class="ip-v" data-s="1">"gb"</span><span class="ip-v" data-s="23">"GB"</span></span><span class="ip-cell" data-col="age"><span>67</span></span></span></div><div class="ip-row"><span class="ip-cell"><span>"C-1003"</span></span><span class="ip-cell"><span class="ip-v" data-s="1">" carol@example.com"</span><span class="ip-v" data-s="23">"carol@example.com"</span></span><span class="ip-meta"><span class="ip-cell" data-col="consent"><span class="ip-v" data-s="1">"1"</span><span class="ip-v" data-s="2">1</span><span class="ip-v" data-s="3">0</span></span><span class="ip-cell" data-col="region"><span class="ip-v" data-s="1">"ca"</span><span class="ip-v" data-s="23">"CA"</span></span><span class="ip-cell" data-col="age"><span>17</span></span></span></div></div>
+          <div class="ip-snaps" aria-hidden="true"><span class="ip-snap">export 4e90181e…</span><span class="ip-snap">export 1985f7b3…</span><span class="ip-snap">export 86c8be84…</span></div>
+        </div>
+        <p class="ip-store-note">Holds one state at a time.</p>
+      </div>
+      <ol class="ip-steps" role="list">
+      <li class="ip-step">
+        <div class="ip-command" data-flow-id="cmd-1"><pre data-filename="01-load.sql"><code class="language-sql">INSERT INTO customers (customer_id, email, marketing_consent, region, age) VALUES
+  ('C-1001', ' Alice@Example.COM ', ' YES ', 'us', 34),
+  ('C-1002', 'BOB@EXAMPLE.COM', 'false', 'gb', 67),
+  ('C-1003', ' carol@example.com', '1', 'ca', 17);</code></pre></div>
+        <div class="ip-statement" data-flow-id="st-1"><strong>Statement 1 · origin</strong><dl class="ip-digests"><dt>State 1</dt><dd><code class="hash" title="sha256:4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919" tabindex="0" aria-label="sha256 4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919">4e90181e…</code></dd><dt>Statement</dt><dd><code class="hash" title="sha256:a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383" tabindex="0" aria-label="sha256 a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383">a1584131…</code></dd></dl><small>No predecessor. The chain starts here.</small></div>
+      </li>
+      <li class="ip-step">
+        <div class="ip-command" data-flow-id="cmd-2"><pre data-filename="02-normalize.sql"><code class="language-sql">UPDATE customers
+SET email = lower(trim(email)),
+    marketing_consent = CASE lower(trim(marketing_consent))
+      WHEN 'yes' THEN 1 WHEN 'true' THEN 1 WHEN '1' THEN 1
+      WHEN 'no' THEN 0 WHEN 'false' THEN 0 WHEN '0' THEN 0
+    END,
+    region = upper(region);</code></pre></div>
+        <div class="ip-statement" data-flow-id="st-2"><strong>Statement 2 · transformation</strong><dl class="ip-digests"><dt>State 2</dt><dd><code class="hash" title="sha256:1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982" tabindex="0" aria-label="sha256 1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982">1985f7b3…</code></dd><dt>Statement</dt><dd><code class="hash" title="sha256:8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63" tabindex="0" aria-label="sha256 8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63">8444407e…</code></dd></dl><small>Input: the state 1 digest. Predecessor: statement 1.</small></div>
+      </li>
+      <li class="ip-step">
+        <div class="ip-command" data-flow-id="cmd-3"><pre data-filename="03-withdraw-minor-consent.sql"><code class="language-sql">UPDATE customers
+SET marketing_consent = 0
+WHERE age &lt; 18 AND marketing_consent = 1;</code></pre></div>
+        <div class="ip-statement" data-flow-id="st-3"><strong>Statement 3 · transformation</strong><dl class="ip-digests"><dt>State 3</dt><dd><code class="hash" title="sha256:86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0" tabindex="0" aria-label="sha256 86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0">86c8be84…</code></dd><dt>Statement</dt><dd><code class="hash" title="sha256:f57f35ea803045407dc5a12a15f250dd5ac31a420bddd48a89e9bafaa6841746" tabindex="0" aria-label="sha256 f57f35ea803045407dc5a12a15f250dd5ac31a420bddd48a89e9bafaa6841746">f57f35ea…</code></dd></dl><small>Input: the state 2 digest. Predecessor: statement 2.</small></div>
+      </li>
+      </ol>
+    </div>
+  </figure>
+
+  <ol class="setup-sequence">
+
+  <li id="table"><div><h2>The table and what gets hashed</h2>
+    <p>One table, created once. The consent column has no declared type, so SQLite stores whatever each command writes into it: text on the way in, integers once normalized.</p>
+    <pre data-filename="00-create.sql"><code class="language-sql">-- marketing_consent is declared without a type, so SQLite stores each value
+-- exactly as written: text when loaded, integers after normalization.
+CREATE TABLE customers (
+  customer_id TEXT PRIMARY KEY,
+  email TEXT,
+  marketing_consent,
+  region TEXT,
+  age INTEGER
+);</code></pre>
+    <p>A table is not a file, and the database file is the wrong thing to hash. Two SQLite files holding identical rows can differ byte for byte: page layout, free pages and journal state all vary. The specification hashes exact bytes and leaves it to the producer to make serialization and row order deterministic, so this walkthrough defines one export and attests its output:</p>
+    <pre data-filename="export.sql"><code class="language-sql">SELECT json_group_array(json_object(
+  'age', age,
+  'customer_id', customer_id,
+  'email', email,
+  'marketing_consent', marketing_consent,
+  'region', region
+))
+FROM (SELECT * FROM customers ORDER BY customer_id);</code></pre>
+    <p><strong>The attested bytes are exactly what that query prints:</strong> one JSON array, rows ordered by <code>customer_id</code>, keys in alphabetical order, no whitespace, followed by a single line feed. <code>sqlite3 customers.db &lt; export.sql</code> produces those bytes, so anyone with the sqlite3 shell can re-hash a state. The generator also serializes the rows independently and fails if the two ever disagree.</p>
+    <dl class="meta-list"><dt>Export query</dt><dd><a href="/examples/in-place/sql/export.sql">export.sql</a><br><code class="hash">8513ac471e80707fab7bc153743ecfab5777a3c73e651e813223c527cac89aa2</code></dd><dt>Subject name</dt><dd><code>customers.db#customers</code>, the same in every statement</dd></dl>
+  </div></li>
+
+  <li id="load"><div><h2>Load the table and attest it</h2>
+    <p>The first command loads three partner records with the usual intake defects: padded whitespace, mixed case, and three spellings of a consent answer.</p>
+    <pre data-filename="01-load.sql"><code class="language-sql">INSERT INTO customers (customer_id, email, marketing_consent, region, age) VALUES
+  ('C-1001', ' Alice@Example.COM ', ' YES ', 'us', 34),
+  ('C-1002', 'BOB@EXAMPLE.COM', 'false', 'gb', 67),
+  ('C-1003', ' carol@example.com', '1', 'ca', 17);</code></pre>
+    <p>Exported, the table is state 1:</p>
+    <pre data-filename="state-1.json"><code class="language-json">[{"age":34,"customer_id":"C-1001","email":" Alice@Example.COM ","marketing_consent":" YES ","region":"us"},{"age":67,"customer_id":"C-1002","email":"BOB@EXAMPLE.COM","marketing_consent":"false","region":"gb"},{"age":17,"customer_id":"C-1003","email":" carol@example.com","marketing_consent":"1","region":"ca"}]</code></pre>
+    <dl class="meta-list"><dt>State 1</dt><dd><a href="/examples/in-place/states/state-1.json">state-1.json</a>, 311 bytes<br><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></dd></dl>
+    <p>That digest is the same one <a href="/examples/lifecycle/#dataset">the lifecycle walkthrough</a> starts from: the export is byte-for-byte the raw customer file used there. The records are the same; only what happens to them next differs.</p>
+    <p>An <a href="/predicate/v0.2/origin/">origin</a> statement attests state 1. The extension block records which database, table, commands and export produced the subject, because none of that is visible in the digest itself.</p>
+    <pre><code class="language-json">{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.db#customers",
+      "digest": {
+        "sha256": "4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/origin",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:110c8a8a-aabf-5155-a37d-df55f64e0e29",
+      "occurredAt": "2026-09-16T16:00:00Z"
+    },
+    "source": {
+      "kind": "urn:makoto:example:source:sqlite-table",
+      "name": "customers table, initial load",
+      "mediaType": "application/json",
+      "retrievedAt": "2026-09-16T16:00:00Z"
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:in-place-table": {
+        "database": "customers.db",
+        "table": "customers",
+        "tableDefinition": "sql/00-create.sql",
+        "command": "sql/01-load.sql",
+        "export": "sql/export.sql",
+        "exportDigest": {
+          "sha256": "8513ac471e80707fab7bc153743ecfab5777a3c73e651e813223c527cac89aa2"
+        },
+        "storageKeepsPreviousState": false
+      }
+    }
+  }
+}</code></pre>
+    <dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></dd><dt>Statement digest</dt><dd><code class="hash">a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383</code></dd><dt>Document</dt><dd><a href="/examples/in-place/attestations/state-1-origin.json">state-1-origin.json</a></dd></dl>
+  </div></li>
+
+  <li id="normalize"><div><h2>Edit it in place</h2>
+    <p class="lf-note">Same table, same file. State 1 is gone from storage.</p>
+    <p>One <code>UPDATE</code> normalizes every row where it sits: whitespace trimmed, email folded to lower case, consent resolved to 1 or 0, region upper-cased.</p>
+    <pre data-filename="02-normalize.sql"><code class="language-sql">UPDATE customers
+SET email = lower(trim(email)),
+    marketing_consent = CASE lower(trim(marketing_consent))
+      WHEN 'yes' THEN 1 WHEN 'true' THEN 1 WHEN '1' THEN 1
+      WHEN 'no' THEN 0 WHEN 'false' THEN 0 WHEN '0' THEN 0
+    END,
+    region = upper(region);</code></pre>
+    <pre data-filename="state-2.json"><code class="language-json">[{"age":34,"customer_id":"C-1001","email":"alice@example.com","marketing_consent":1,"region":"US"},{"age":67,"customer_id":"C-1002","email":"bob@example.com","marketing_consent":0,"region":"GB"},{"age":17,"customer_id":"C-1003","email":"carol@example.com","marketing_consent":1,"region":"CA"}]</code></pre>
+    <table class="wide-table"><caption>Before and after the normalize command, for customer <code>C-1001</code>.</caption>
+      <thead><tr><th scope="col">Column</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">What happened</th></tr></thead>
+      <tbody><tr><td><code>email</code></td><td><code>" Alice@Example.COM "</code></td><td><code>"alice@example.com"</code></td><td>Whitespace trimmed, case folded.</td></tr><tr><td><code>marketing_consent</code></td><td><code>" YES "</code></td><td><code>1</code></td><td>Text answer resolved to an integer.</td></tr><tr><td><code>region</code></td><td><code>"us"</code></td><td><code>"US"</code></td><td>Upper-cased.</td></tr><tr><td><code>age</code></td><td><code>34</code></td><td><code>34</code></td><td>Unchanged.</td></tr><tr><td><code>customer_id</code></td><td><code>"C-1001"</code></td><td><code>"C-1001"</code></td><td>Unchanged.</td></tr></tbody>
+    </table>
+    <dl class="meta-list"><dt>State before</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></dd><dt>State after</dt><dd><a href="/examples/in-place/states/state-2.json">state-2.json</a>, 294 bytes<br><code class="hash">1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982</code></dd></dl>
+    <p><strong>Nothing in the database remembers state 1 now.</strong> Querying the table cannot recover those rows and cannot prove they existed. The only surviving record of state 1 is its digest, inside statement 1.</p>
+  </div></li>
+
+  <li id="attest-normalize"><div><h2>Attest the new state</h2>
+    <p>A <a href="/predicate/v0.2/transform/">transformation</a> statement attests state 2, and its <code>inputs</code> block ties it to the state it replaced.</p>
+    <pre><code class="language-json">{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.db#customers",
+      "digest": {
+        "sha256": "1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/transform",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:5699b2a6-5282-5270-8f51-6e3b4972eda5",
+      "occurredAt": "2026-09-16T16:05:00Z"
+    },
+    "operation": {
+      "type": "urn:makoto:example:operation:normalize",
+      "name": "Normalize email, consent and region in place",
+      "tool": {
+        "name": "SQLite"
+      },
+      "parametersDigest": {
+        "sha256": "a9f53771a9db5a50f78ffffd600f43684ea8bec8b9b347627f4c14d410660b1b"
+      }
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:in-place-table": {
+        "database": "customers.db",
+        "table": "customers",
+        "tableDefinition": "sql/00-create.sql",
+        "command": "sql/02-normalize.sql",
+        "export": "sql/export.sql",
+        "exportDigest": {
+          "sha256": "8513ac471e80707fab7bc153743ecfab5777a3c73e651e813223c527cac89aa2"
+        },
+        "storageKeepsPreviousState": false,
+        "rowsChanged": 3
+      }
+    },
+    "inputs": [
+      {
+        "name": "previous-state",
+        "digest": {
+          "sha256": "4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919"
+        },
+        "provenance": {
+          "statementDigest": {
+            "sha256": "a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383"
+          },
+          "subjectName": "customers.db#customers"
+        }
+      }
+    ]
+  }
+}</code></pre>
+    <dl class="meta-list"><dt>Input digest</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code><br><code>inputs[0].digest</code>: state 1, the rows the command rewrote.</dd><dt>Predecessor</dt><dd><code class="hash">a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383</code><br><code>inputs[0].<wbr>provenance.<wbr>statementDigest</code>: statement 1.</dd><dt>Parameters</dt><dd><code class="hash">a9f53771a9db5a50f78ffffd600f43684ea8bec8b9b347627f4c14d410660b1b</code><br><code>operation.parametersDigest</code>: the SHA-256 of <a href="/examples/in-place/sql/02-normalize.sql">02-normalize.sql</a>, so the statement names the exact command that edited the table.</dd></dl>
+    <p>The input and the subject share one name, <code>customers.db#customers</code>, and differ only in digest. That is the in-place pattern in one line: the name says which table, the digest says which state.</p>
+    <dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982</code></dd><dt>Statement digest</dt><dd><code class="hash">8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63</code></dd><dt>Document</dt><dd><a href="/examples/in-place/attestations/state-2-normalize.json">state-2-normalize.json</a></dd></dl>
+  </div></li>
+
+  <li id="withdraw"><div><h2>Edit it again</h2>
+    <p class="lf-note">Same table again. State 2 is gone from storage too.</p>
+    <p>A policy fix: a customer under 18 cannot give marketing consent. The command touches one row.</p>
+    <pre data-filename="03-withdraw-minor-consent.sql"><code class="language-sql">UPDATE customers
+SET marketing_consent = 0
+WHERE age &lt; 18 AND marketing_consent = 1;</code></pre>
+    <pre data-filename="state-3.json"><code class="language-json">[{"age":34,"customer_id":"C-1001","email":"alice@example.com","marketing_consent":1,"region":"US"},{"age":67,"customer_id":"C-1002","email":"bob@example.com","marketing_consent":0,"region":"GB"},{"age":17,"customer_id":"C-1003","email":"carol@example.com","marketing_consent":0,"region":"CA"}]</code></pre>
+    <table class="wide-table"><caption>Before and after the withdrawal, for customer <code>C-1003</code>, the only row it changed.</caption>
+      <thead><tr><th scope="col">Column</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">What happened</th></tr></thead>
+      <tbody><tr><td><code>email</code></td><td><code>"carol@example.com"</code></td><td><code>"carol@example.com"</code></td><td>Unchanged.</td></tr><tr><td><code>marketing_consent</code></td><td><code>1</code></td><td><code>0</code></td><td>Withdrawn: the customer is 17.</td></tr><tr><td><code>region</code></td><td><code>"CA"</code></td><td><code>"CA"</code></td><td>Unchanged.</td></tr><tr><td><code>age</code></td><td><code>17</code></td><td><code>17</code></td><td>Unchanged.</td></tr><tr><td><code>customer_id</code></td><td><code>"C-1003"</code></td><td><code>"C-1003"</code></td><td>Unchanged.</td></tr></tbody>
+    </table>
+    <dl class="meta-list"><dt>State before</dt><dd><code class="hash">1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982</code></dd><dt>State after</dt><dd><a href="/examples/in-place/states/state-3.json">state-3.json</a>, 294 bytes<br><code class="hash">86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0</code></dd></dl>
+  </div></li>
+
+  <li id="attest-withdraw"><div><h2>Attest it again</h2>
+    <p>The same pattern, one link further along: the input is state 2 and the predecessor is statement 2.</p>
+    <pre><code class="language-json">{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.db#customers",
+      "digest": {
+        "sha256": "86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/transform",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:e789d3ba-79d4-5362-b1a9-bf4fa6df3e84",
+      "occurredAt": "2026-09-16T16:10:00Z"
+    },
+    "operation": {
+      "type": "urn:makoto:example:operation:withdraw-minor-consent",
+      "name": "Withdraw consent held by minors",
+      "tool": {
+        "name": "SQLite"
+      },
+      "parametersDigest": {
+        "sha256": "181098ef88909bae3dc238a10be2cc630907584eed6fd57330dd65bcc25c5a79"
+      }
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:in-place-table": {
+        "database": "customers.db",
+        "table": "customers",
+        "tableDefinition": "sql/00-create.sql",
+        "command": "sql/03-withdraw-minor-consent.sql",
+        "export": "sql/export.sql",
+        "exportDigest": {
+          "sha256": "8513ac471e80707fab7bc153743ecfab5777a3c73e651e813223c527cac89aa2"
+        },
+        "storageKeepsPreviousState": false,
+        "rowsChanged": 1
+      }
+    },
+    "inputs": [
+      {
+        "name": "previous-state",
+        "digest": {
+          "sha256": "1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982"
+        },
+        "provenance": {
+          "statementDigest": {
+            "sha256": "8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63"
+          },
+          "subjectName": "customers.db#customers"
+        }
+      }
+    ]
+  }
+}</code></pre>
+    <dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0</code></dd><dt>Statement digest</dt><dd><code class="hash">f57f35ea803045407dc5a12a15f250dd5ac31a420bddd48a89e9bafaa6841746</code></dd><dt>Points back to</dt><dd><code class="hash">8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63</code></dd><dt>Parameters</dt><dd><code class="hash">181098ef88909bae3dc238a10be2cc630907584eed6fd57330dd65bcc25c5a79</code></dd><dt>Document</dt><dd><a href="/examples/in-place/attestations/state-3-withdraw-minor-consent.json">state-3-withdraw-minor-consent.json</a></dd></dl>
+  </div></li>
+
+  <li id="what-survives"><div><h2>What storage keeps, and what Makoto keeps</h2>
+    <table class="wide-table"><caption>After both edits. Only state 3 is still in the database; statements name all three.</caption>
+      <thead><tr><th scope="col">State</th><th scope="col">In the database</th><th scope="col">Export digest</th><th scope="col">Statement digest</th><th scope="col">Declares its predecessor as</th></tr></thead>
+      <tbody>
+        <tr><td>1 · loaded</td><td>No</td><td><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></td><td><code class="hash">a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383</code></td><td>None: the root of the chain</td></tr>
+        <tr><td>2 · normalized</td><td>No</td><td><code class="hash">1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982</code></td><td><code class="hash">8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63</code></td><td><code class="hash">a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383</code></td></tr>
+        <tr><td>3 · consent withdrawn</td><td>Yes</td><td><code class="hash">86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0</code></td><td><code class="hash">f57f35ea803045407dc5a12a15f250dd5ac31a420bddd48a89e9bafaa6841746</code></td><td><code class="hash">8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63</code></td></tr>
+      </tbody>
+    </table>
+    <p>A receiver holding the database and the three statements can re-run the export and compare it to statement 3's subject. It can hash each statement and follow the chain back to the origin. And for each step it can check that the input digest equals the previous statement's subject, which is what shows that nothing else wrote to the table between the two commands the statements describe.</p>
+    <p><strong>What it cannot do is re-hash state 1 or state 2 from the database.</strong> Makoto keeps the identity of every state, not its bytes. If the earlier rows must stay checkable, the exports have to be kept somewhere; this page publishes them alongside the statements for exactly that reason.</p>
+    <p>As on the lifecycle page, these statements are unsigned, so they carry no authenticity or authorization claim, and nothing here anchors freshness. <a href="/demos/end-to-end/">The runnable proof</a> adds signatures, a receiver trust policy, and a pinned handoff.</p>
+  </div></li>
+
+  </ol>
+
+  <h2 id="reproduce">Reproduce every digest on this page</h2>
+  <p>State digests need only the sqlite3 shell and <code>shasum</code>. Start in an empty directory; the create command fails if <code>customers.db</code> already exists.</p>
+  <pre><code class="language-bash">$ base=https://usemakoto.dev/examples/in-place/sql
+$ for f in 00-create 01-load 02-normalize 03-withdraw-minor-consent export; do curl -fsSO "$base/$f.sql"; done
+$ sqlite3 customers.db &lt; 00-create.sql
+$ sqlite3 customers.db &lt; 01-load.sql
+$ sqlite3 customers.db &lt; export.sql | shasum -a 256
+4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919  -
+$ sqlite3 customers.db &lt; 02-normalize.sql
+$ sqlite3 customers.db &lt; export.sql | shasum -a 256
+1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982  -
+$ sqlite3 customers.db &lt; 03-withdraw-minor-consent.sql
+$ sqlite3 customers.db &lt; export.sql | shasum -a 256
+86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0  -
+$ shasum -a 256 02-normalize.sql 03-withdraw-minor-consent.sql export.sql
+a9f53771a9db5a50f78ffffd600f43684ea8bec8b9b347627f4c14d410660b1b  02-normalize.sql
+181098ef88909bae3dc238a10be2cc630907584eed6fd57330dd65bcc25c5a79  03-withdraw-minor-consent.sql
+8513ac471e80707fab7bc153743ecfab5777a3c73e651e813223c527cac89aa2  export.sql</code></pre>
+  <p>Statement digests are taken over the canonical serialization, keys sorted with no insignificant whitespace, not over the pretty-printed files:</p>
+  <pre><code class="language-python">python3 - &lt;&lt;'EOF'
+import hashlib, json, urllib.request
+
+BASE = "https://usemakoto.dev/examples/in-place/attestations/"
+for name in ("state-1-origin", "state-2-normalize", "state-3-withdraw-minor-consent"):
+    raw = urllib.request.urlopen(BASE + name + ".json").read()
+    canonical = json.dumps(json.loads(raw), sort_keys=True, separators=(",", ":"))
+    print(hashlib.sha256(canonical.encode()).hexdigest(), name)
+EOF</code></pre>
+  <p>That prints the three statement digests above, in order. From a checkout of this site, one command regenerates every export and statement, validates each statement against the schemas, and fails if a committed file has drifted:</p>
+  <pre><code class="language-bash">$ uv run scripts/in_place_example.py --check</code></pre>
+
+  <section class="community-band" aria-labelledby="next"><h2 id="next">Two shapes, one rule: new bytes need a new statement.</h2>
+    <p>The lifecycle walkthrough writes a new file at every step. This one rewrites a single table. Either way, each state gets its own digest and each statement names the one before it.</p>
+    <div class="actions"><a class="button" href="/examples/lifecycle/">Follow the new-file lifecycle</a><a class="button secondary" href="/examples/">Back to the casebook</a></div>
+  </section>
+</main>
+<footer class="footer"><div class="footer-inner">Makoto casebook · every digest on this page is generated from committed SQL · <a href="https://github.com/makoto-project/makoto">Open source on GitHub</a></div></footer></div></div>
+<script defer src="/assets/flow.js"></script><script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body></html>
