@@ -40,7 +40,7 @@ set -euo pipefail
 
 : "${MAKOTO_CORE:?set MAKOTO_CORE to a reviewed, synced core checkout}"
 CORE="$(cd "$MAKOTO_CORE" &amp;&amp; pwd)"
-DEMO="$CORE/demos/v0.2-end-to-end/generated"
+DEMO="$CORE/demos/end-to-end/generated"
 WORK="$(mktemp -d)"
 
 makoto() { (cd "$CORE" &amp;&amp; uv run --quiet makoto "$@"); }
@@ -139,7 +139,7 @@ makoto attest origin \
   --source-uri urn:example:orders:2026-09-16 \
   --key "$WORK/producer.private.pem" \
   --out "$WORK/origin.dsse.json"
-makoto envelope inspect --envelope "$WORK/origin.dsse.json" --json | jq .</code></pre><p>For a derived output, <code>makoto attest transform</code> takes <code>--operation-type</code> and one <code>--input-binding</code> JSON file per input with <code>name</code>, <code>path</code>, <code>predecessor</code>, and <code>subjectName</code>. The <a href="/demos/v0.2-end-to-end/">runnable walkthrough</a> shows a three-step chain and its handoff.</p></section><section aria-labelledby="verify"><h2 id="verify">5. Verify and branch on the verdict</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-bash"># 3. Verify: exit 0 allow, 1 deny or indeterminate, 2 bad input, 3 internal.
+makoto envelope inspect --envelope "$WORK/origin.dsse.json" --json | jq .</code></pre><p>For a derived output, <code>makoto attest transform</code> takes <code>--operation-type</code> and one <code>--input-binding</code> JSON file per input with <code>name</code>, <code>path</code>, <code>predecessor</code>, and <code>subjectName</code>. The <a href="/demos/end-to-end/">runnable walkthrough</a> shows a three-step chain and its handoff.</p></section><section aria-labelledby="verify"><h2 id="verify">5. Verify and branch on the verdict</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-bash"># 3. Verify: exit 0 allow, 1 deny or indeterminate, 2 bad input, 3 internal.
 verify() {
   makoto verify bundle "$1" \
     --policy "$DEMO/receiver/policy.json" \

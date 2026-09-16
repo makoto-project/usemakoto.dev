@@ -16,7 +16,7 @@ test evidence can be discussed first. Small corrections can go directly to a pul
 
 ## High-value ways to help
 
-1. Run the [end-to-end proof](https://usemakoto.dev/demos/v0.2-end-to-end/) against the checked
+1. Run the [end-to-end proof](https://usemakoto.dev/demos/end-to-end/) against the checked
    core pin and report anything that is unclear or nondeterministic.
 2. Describe a real producer-to-consumer data handoff and identify the claims, private rules, and
    trust decisions Makoto would need to carry.

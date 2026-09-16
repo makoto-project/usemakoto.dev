@@ -13,7 +13,7 @@
     <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a>
     <nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav>
     <details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile">
-      <p class="mobile-section">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a>
+      <p class="mobile-section">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/end-to-end/">Runnable proof</a>
       <p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a>
       <p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a>
       <p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a>
@@ -22,7 +22,7 @@
 
   <div class="site-shell">
     <aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav">
-      <div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a></div>
+      <div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/end-to-end/">Runnable proof</a></div>
       <div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div>
       <div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a></div>
       <div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div>
@@ -34,7 +34,7 @@
           <div class="hero-claim">
             <h1 id="hero-title">Know where data began, what changed, and who attested to it.</h1>
             <p>Makoto is a source-first, SLSA-like framework for data. It keeps a verifiable history beside the bytes as data moves between systems, teams, and organizations.</p>
-            <div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Run the proof</a><a class="button secondary" href="/spec/">Read the specification</a><a class="button secondary" href="https://github.com/makoto-project/makoto">Build it with us on GitHub</a></div>
+            <div class="actions"><a class="button" href="/demos/end-to-end/">Run the proof</a><a class="button secondary" href="/spec/">Read the specification</a><a class="button secondary" href="https://github.com/makoto-project/makoto">Build it with us on GitHub</a></div>
           </div>
           <ol class="hero-proof" aria-label="A receiver's gate, then the run it produced">
           <li class="proof-step">
@@ -131,7 +131,7 @@ $ echo $?
 
           <section aria-labelledby="cases"><div class="section-intro"><div><span class="kicker">The casebook</span><h2 id="cases">Real failures, not toy metadata</h2></div><a class="text-link" href="/examples/">See every example →</a></div>
             <ol class="casebook">
-              <li class="casebook-item"><span class="case-number">01</span><h3>Independent data handoff</h3><p>A producer signs an origin and two transformations. A receiver applies its own trust policy and verifies the final bytes.</p><a href="/demos/v0.2-end-to-end/">Run it →</a></li>
+              <li class="casebook-item"><span class="case-number">01</span><h3>Independent data handoff</h3><p>A producer signs an origin and two transformations. A receiver applies its own trust policy and verifies the final bytes.</p><a href="/demos/end-to-end/">Run it →</a></li>
               <li class="casebook-item"><span class="case-number">02</span><h3>Poisoned pipeline</h3><p>Trace malicious or corrupted input through the transformations that spread it.</p><a href="/demos/01/">Read the case →</a></li>
               <li class="casebook-item"><span class="case-number">03</span><h3>Scientific reproducibility</h3><p>Preserve the source and processing evidence needed to reproduce a published result.</p><a href="/demos/02/">Read the case →</a></li>
               <li class="casebook-item"><span class="case-number">04</span><h3>Release provenance</h3><p>Bind a published dataset to its inputs, build history, signed handoff, and exact release bytes.</p><a href="/demos/03/">Read the case →</a></li>

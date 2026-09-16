@@ -74,7 +74,7 @@
 
 <section aria-labelledby="cli">
 <h2 id="cli">Check the level of any report</h2>
-<p><code>makoto report level</code> reads a report written by <code>makoto verify bundle --json</code>, prints each level with the checks that fell short, and exits 1 when a required level is not met. The two runs below are real output against the published <a href="/demos/v0.2-end-to-end/artifacts/reports/positive.json">allow</a> and <a href="/demos/v0.2-end-to-end/artifacts/reports/mutated-final-data.json">tampered-bytes</a> reports.</p>
+<p><code>makoto report level</code> reads a report written by <code>makoto verify bundle --json</code>, prints each level with the checks that fell short, and exits 1 when a required level is not met. The two runs below are real output against the published <a href="/demos/end-to-end/artifacts/reports/positive.json">allow</a> and <a href="/demos/end-to-end/artifacts/reports/mutated-final-data.json">tampered-bytes</a> reports.</p>
 <pre><code class="language-bash">$ makoto report level makoto-report.positive.json --require L3
 PASS        L1 Provenance is authentic
 PASS        L2 Provenance is authorized and complete
@@ -123,7 +123,7 @@ $ echo $?
     }
   ]
 }</code></pre>
-<p>Output of <code>jq -r .payload attestations/56b7be43….dsse.json | base64 -d | jq .</code> on the <a href="/demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json">published envelope</a>.</p>
+<p>Output of <code>jq -r .payload attestations/56b7be43….dsse.json | base64 -d | jq .</code> on the <a href="/demos/end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json">published envelope</a>.</p>
 <p>The receiver side of the same boundary: the rule that authorizes that origin claim (an L2 requirement) and the handoff expectations that make L3 possible.</p>
 <pre><code class="language-json">{
   "rules": [
@@ -157,7 +157,7 @@ $ echo $?
     "requireRecipient": false
   }
 }</code></pre>
-<p>Output of <code>jq '{rules: [.rules[] | select(.id == "urn:makoto:demo:rule:origin")], handoff}' policy.json</code> on the <a href="/demos/v0.2-end-to-end/artifacts/receiver/policy.json">published receiver policy</a>.</p>
+<p>Output of <code>jq '{rules: [.rules[] | select(.id == "urn:makoto:demo:rule:origin")], handoff}' policy.json</code> on the <a href="/demos/end-to-end/artifacts/receiver/policy.json">published receiver policy</a>.</p>
 </section>
 
 <section aria-labelledby="climb"><h2 id="climb">Climbing the levels</h2><ol class="provenance-spine"><li><strong>Start at one source (toward L1)</strong><span>Choose a real collection boundary and bind a signed origin claim to exact source bytes.</span></li><li><strong>Append one transform (toward L1)</strong><span>Make the next producer name its exact predecessor statement and input artifact instead of rewriting a shared history.</span></li><li><strong>Separate the receiver (L2)</strong><span>Move trust policy, authorization rules, and schema catalogs outside the producer's bundle.</span></li><li><strong>Sign the handoff (L2)</strong><span>Commit to the exact graph and artifacts intentionally transferred across the organizational boundary, and add private profiles for the rules that matter.</span></li><li><strong>Anchor it (L3)</strong><span>Pin the expected manifest, head, or artifact through an independent channel, or require a nonce or maximum age.</span></li></ol></section>
@@ -210,7 +210,7 @@ makoto verify bundle bundle \
 
 # 6. Require a level.
 makoto report level report.json --require L3</code></pre>
-<p>Run the whole path, including private profiles and seven denial cases, with the <a href="/demos/v0.2-end-to-end/">end-to-end proof</a>. Put steps 5 and 6 in CI with any casebook <a href="/demos/01/makoto-gate.yml">gate workflow</a>.</p>
+<p>Run the whole path, including private profiles and seven denial cases, with the <a href="/demos/end-to-end/">end-to-end proof</a>. Put steps 5 and 6 in CI with any casebook <a href="/demos/01/makoto-gate.yml">gate workflow</a>.</p>
 </section>
 
 <section aria-labelledby="choose">

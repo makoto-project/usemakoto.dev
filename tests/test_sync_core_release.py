@@ -312,6 +312,7 @@ def test_promote_rolls_back_every_replacement_on_failure(
     old_targets = {
         "schema/v0.2/old.json": b"old schema\n",
         "spec/v0.2/spec.md": b"old spec\n",
+        "demos/end-to-end/artifacts/old.json": b"old demo\n",
         "demos/v0.2-end-to-end/artifacts/old.json": b"old demo\n",
         "schema/core-candidate.json": b"old candidate\n",
         "schema/core-release.json": b"old release\n",
@@ -320,6 +321,7 @@ def test_promote_rolls_back_every_replacement_on_failure(
         write(root / relative, data)
     write(staging / "schema/v0.2/new.json", b"new schema\n")
     write(staging / "spec/v0.2/spec.md", b"new spec\n")
+    write(staging / "demos/end-to-end/artifacts/new.json", b"new demo\n")
     write(staging / "demos/v0.2-end-to-end/artifacts/new.json", b"new demo\n")
     write(staging / "schema/core-candidate.json", b"new candidate\n")
     original_replace = Path.replace
@@ -337,3 +339,50 @@ def test_promote_rolls_back_every_replacement_on_failure(
     for relative, data in old_targets.items():
         assert (root / relative).read_bytes() == data
     assert not (root / "schema/v0.2/new.json").exists()
+
+
+def test_copy_release_content_mirrors_demo_artifacts_at_the_retired_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    blobs: dict[str, bytes] = {}
+    checksum_digests: dict[str, str] = {}
+    for name in sync_core_release.SCHEMA_NAMES:
+        path = f"schemas/v0.2/{name}"
+        if name == "catalog.json":
+            data = sync_core_release.jcs({"resources": []})
+        else:
+            data = sync_core_release.jcs(
+                {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": f"https://usemakoto.dev/schema/v0.2/{name}",
+                    "type": "object",
+                }
+            )
+        blobs[path] = data
+        checksum_digests[path] = sha256(data)
+    demo_source = "demos/v0.2-end-to-end/generated/data/customers.raw.json"
+    blobs[demo_source] = b"[1]\n"
+
+    def fake_tree(core: Path, revision: str, prefix: str) -> tuple[str, ...]:
+        del core, revision
+        if prefix == "schemas/v0.2":
+            return tuple(f"schemas/v0.2/{name}" for name in sync_core_release.SCHEMA_NAMES)
+        if prefix == "demos/v0.2-end-to-end/generated":
+            return (demo_source,)
+        raise AssertionError(prefix)
+
+    monkeypatch.setattr(sync_core_release, "STATIC_RESOURCES", {})
+    monkeypatch.setattr(sync_core_release, "git_tree", fake_tree)
+    monkeypatch.setattr(sync_core_release, "git_blob", lambda core, rev, path: blobs[path])
+    staging = tmp_path / "staging"
+
+    _, resources = sync_core_release.copy_release_content(
+        tmp_path / "core", "a" * 40, staging, checksum_digests
+    )
+
+    canonical = staging / "demos/end-to-end/artifacts/data/customers.raw.json"
+    legacy = staging / "demos/v0.2-end-to-end/artifacts/data/customers.raw.json"
+    assert canonical.read_bytes() == legacy.read_bytes() == b"[1]\n"
+    assert [item["path"] for item in resources] == [
+        "/demos/end-to-end/artifacts/data/customers.raw.json"
+    ]
