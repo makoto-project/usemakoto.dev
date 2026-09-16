@@ -1,22 +1,442 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Go verification recipe — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/">誠 Makoto</a><nav class="nav" aria-label="Primary"><a href="/verify/">Verification</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><a href="/">Overview</a><a href="/verify/">Verification</a><a href="/validate/">Schema validation</a><a href="/sdk/">Language interfaces</a><a href="/community/">Community</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Verification</p><a href="/verify/">Decision model</a><a href="/validate/">Schema validation</a><a href="/verify/bash.html">Bash</a><a href="/verify/python.html">Python</a><a href="/verify/nodejs.html">Node.js</a><a href="/verify/go.html" aria-current="page">Go</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a></div></nav></aside><div class="site-main"><main id="main" class="page"><span class="kicker">Go recipe</span><h1>Keep the reference verifier behind an explicit process boundary.</h1><p class="lead">There is no maintained Go SDK. A service can invoke the pinned reference CLI today and replace it only when a native verifier passes the same conformance fixtures.</p><pre><code>cmd := exec.Command(
-    "uv", "run", "makoto", "verify", "bundle", bundle,
-    "--policy", policy,
-    "--schema-catalog", catalog,
-    "--expected-artifact", expectedArtifact,
-    "--evaluation-time", evaluationTime,
-    "--json",
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Validate with a Draft 2020-12 Go validator, sign an origin statement, verify a Makoto bundle with os/exec, decode the report, and fail closed."><title>Go verification binding — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/">誠 Makoto</a><nav class="nav" aria-label="Primary"><a href="/verify/">Verification</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><a href="/">Overview</a><a href="/verify/">Verification</a><a href="/validate/">Schema validation</a><a href="/sdk/">Language interfaces</a><a href="/community/">Community</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Verification</p><a href="/verify/">Decision model</a><a href="/validate/">Schema validation</a><a href="/verify/bash.html">Bash</a><a href="/verify/python.html">Python</a><a href="/verify/nodejs.html">JavaScript</a><a href="/verify/typescript.html">TypeScript</a><a href="/verify/go.html" aria-current="page">Go</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a></div></nav></aside><div class="site-main"><main id="main" class="page">
+<span class="kicker">Go binding</span>
+<h1>Keep the reference verifier behind an explicit process boundary.</h1>
+<p class="lead">A single <code>main.go</code>: validate the trust policy against the hosted schema, sign an origin statement, run the pinned verifier with <code>os/exec</code>, decode the report into structs, and fail closed on anything that is not a clean allow. It passes <code>go vet</code> and was run on Go 1.26 against the pinned core.</p>
+<p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>0e41afbd0c3f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
+<section aria-labelledby="install"><h2 id="install">1. Install the verifier and one module</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
+cd makoto
+git checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+uv sync --locked --dev
+
+# Writes the deterministic fixture set: one allowed bundle, seven denials.
+./scripts/demo-v0.2.sh --acceptance
+
+export MAKOTO_CORE="$PWD"</code></pre><pre><code class="language-bash">mkdir makoto-gate &amp;&amp; cd makoto-gate
+go mod init example.com/makotogate
+go get github.com/santhosh-tekuri/jsonschema/v6@v6.0.3</code></pre></section><section aria-labelledby="program"><h2 id="program">2. The complete program</h2><p>Save this as <code>main.go</code>.</p><pre><code class="language-go">// Command makotogate validates, attests, verifies, and gates on a Makoto report.
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/fs"
+	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
+
+	"github.com/santhosh-tekuri/jsonschema/v6"
 )
-cmd.Dir = reviewedCoreCheckout
-output, runErr := cmd.Output()
-if runErr != nil {
-    if _, ok := runErr.(*exec.ExitError); !ok {
-        return fmt.Errorf("start verifier: %w", runErr)
-    }
+
+const (
+	schemaBase       = "https://usemakoto.dev/schema/v0.2/"
+	expectedManifest = "sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c"
+	expectedHead     = "sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+	evaluationTime   = "2026-09-16T16:00:00Z"
+)
+
+type Check struct {
+	ID                 string   `json:"id"`
+	Status             string   `json:"status"`
+	PrerequisiteChecks []string `json:"prerequisiteChecks"`
 }
 
-var report VerificationReport
-if err := json.Unmarshal(output, &report); err != nil {
-    return fmt.Errorf("malformed verifier report: %w", err)
+type Diagnostic struct {
+	Code          string         `json:"code"`
+	Step          int            `json:"step"`
+	CausedByCheck string         `json:"causedByCheck"`
+	Message       string         `json:"message"`
+	Context       map[string]any `json:"context"`
 }
-if report.Decision != "allow" { return fmt.Errorf("denied: %+v", report) }
-if runErr != nil { return fmt.Errorf("verifier failed after ALLOW: %w", runErr) }</code></pre><p>Makoto returns a nonzero process status for a well-formed <code>deny</code> decision. Parse and retain that JSON report before handling the process status; a launch failure, malformed report, denial, and inconsistent ALLOW exit are different failures.</p><p><a href="/verify/">Read the complete decision model →</a></p></main><footer class="footer"><div class="footer-inner">Makoto verification · Go subprocess recipe · No SDK claim</div></footer></div></div></body></html>
+
+type Report struct {
+	ReportVersion string            `json:"reportVersion"`
+	Decision      string            `json:"decision"`
+	PrimaryError  *string           `json:"primaryError"`
+	PolicyDigest  map[string]string `json:"policyDigest"`
+	Checks        []Check           `json:"checks"`
+	Errors        []Diagnostic      `json:"errors"`
+	Warnings      []Diagnostic      `json:"warnings"`
+	Summary       map[string]int    `json:"summary"`
+}
+
+// ToolError means the verifier did not produce a verdict. Never treat it as one.
+type ToolError struct{ Detail string }
+
+func (e *ToolError) Error() string { return "makoto tool error: " + e.Detail }
+
+// DeniedError carries the full report for a deny or indeterminate decision.
+type DeniedError struct{ Report Report }
+
+func (e *DeniedError) Error() string {
+	return fmt.Sprintf("%s: %s", e.Report.Decision, deref(e.Report.PrimaryError))
+}
+
+func deref(s *string) string {
+	if s == nil {
+		return "&lt;none&gt;"
+	}
+	return *s
+}
+
+func makoto(core string, args ...string) (stdout []byte, stderr []byte, runErr error) {
+	cmd := exec.Command("uv", append([]string{"run", "--quiet", "makoto"}, args...)...)
+	cmd.Dir = core
+	var out, errOut bytes.Buffer
+	cmd.Stdout, cmd.Stderr = &amp;out, &amp;errOut
+	runErr = cmd.Run()
+	return out.Bytes(), errOut.Bytes(), runErr
+}
+
+func validateStructure(instancePath, schemaName string) error {
+	resp, err := http.Get(schemaBase + schemaName)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("schema fetch failed: %s", resp.Status)
+	}
+	schemaDoc, err := jsonschema.UnmarshalJSON(resp.Body)
+	if err != nil {
+		return err
+	}
+	compiler := jsonschema.NewCompiler()
+	if err := compiler.AddResource(schemaBase+schemaName, schemaDoc); err != nil {
+		return err
+	}
+	schema, err := compiler.Compile(schemaBase + schemaName)
+	if err != nil {
+		return err
+	}
+	file, err := os.Open(instancePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	instance, err := jsonschema.UnmarshalJSON(file)
+	if err != nil {
+		return err
+	}
+	return schema.Validate(instance)
+}
+
+func attestOrigin(core, artifact, workDir string) (string, error) {
+	privateKey := filepath.Join(workDir, "producer.private.pem")
+	out := filepath.Join(workDir, "origin.dsse.json")
+	steps := [][]string{
+		{"key", "generate", "--private-out", privateKey, "--public-out", filepath.Join(workDir, "producer.public.pem")},
+		{"attest", "origin",
+			"--subject", filepath.Base(artifact) + "=" + artifact,
+			"--source-kind", "urn:example:source:nightly-export",
+			"--source-uri", "urn:example:orders:2026-09-16",
+			"--key", privateKey,
+			"--out", out},
+	}
+	for _, args := range steps {
+		if _, stderr, err := makoto(core, args...); err != nil {
+			return "", &amp;ToolError{Detail: string(bytes.TrimSpace(stderr))}
+		}
+	}
+	return out, nil
+}
+
+func verifyBundle(core, demo, bundle string) (Report, error) {
+	output, stderr, runErr := makoto(core,
+		"verify", "bundle", bundle,
+		"--policy", filepath.Join(demo, "receiver/policy.json"),
+		"--schema-catalog", filepath.Join(demo, "receiver/catalog.json"),
+		"--expected-manifest", expectedManifest,
+		"--expected-head", expectedHead,
+		"--expected-artifact", filepath.Join(demo, "receiver/expected-artifact.json"),
+		"--evaluation-time", evaluationTime,
+		"--json",
+	)
+	// A deny exits 1, so a nonzero process status alone is not a tool failure.
+	// Only exit codes 0 and 1 carry a report; 2 and 3 mean no verdict exists.
+	exitCode := 0
+	if runErr != nil {
+		exitErr, ok := runErr.(*exec.ExitError)
+		if !ok {
+			return Report{}, &amp;ToolError{Detail: runErr.Error()}
+		}
+		exitCode = exitErr.ExitCode()
+	}
+	if exitCode != 0 &amp;&amp; exitCode != 1 {
+		return Report{}, &amp;ToolError{Detail: fmt.Sprintf("exit %d: %s", exitCode, bytes.TrimSpace(stderr))}
+	}
+	var report Report
+	if err := json.Unmarshal(output, &amp;report); err != nil {
+		return Report{}, &amp;ToolError{Detail: "malformed report: " + err.Error()}
+	}
+	if (exitCode == 0) != (report.Decision == "allow") {
+		return Report{}, &amp;ToolError{Detail: "exit status and report decision disagree"}
+	}
+	if report.Decision != "allow" {
+		return report, &amp;DeniedError{Report: report}
+	}
+	return report, nil
+}
+
+func explain(r Report) {
+	fmt.Printf("decision=%s primaryError=%s\n", r.Decision, deref(r.PrimaryError))
+	for _, c := range r.Checks {
+		if c.Status != "pass" {
+			fmt.Printf("  check %s: %s %v\n", c.ID, c.Status, c.PrerequisiteChecks)
+		}
+	}
+	for _, e := range r.Errors {
+		fmt.Printf("  step %d %s: %s\n", e.Step, e.Code, e.Message)
+	}
+	fmt.Printf("  signatures %d/%d valid, policy %.12s\n",
+		r.Summary["signaturesValid"], r.Summary["signaturesTotal"], r.PolicyDigest["sha256"])
+}
+
+func copyTree(src, dst string) error {
+	return filepath.WalkDir(src, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, _ := filepath.Rel(src, path)
+		target := filepath.Join(dst, rel)
+		if d.IsDir() {
+			return os.MkdirAll(target, 0o755)
+		}
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		return os.WriteFile(target, data, 0o644)
+	})
+}
+
+func run() error {
+	core, err := filepath.Abs(os.Getenv("MAKOTO_CORE"))
+	if err != nil {
+		return err
+	}
+	demo := filepath.Join(core, "demos/v0.2-end-to-end/generated")
+
+	if err := validateStructure(filepath.Join(demo, "receiver/policy.json"), "trust-policy.schema.json"); err != nil {
+		return fmt.Errorf("policy structure: %w", err)
+	}
+	fmt.Println("policy structure: valid")
+
+	work, err := os.MkdirTemp("", "makoto-")
+	if err != nil {
+		return err
+	}
+	artifact := filepath.Join(work, "orders.csv")
+	if err := os.WriteFile(artifact, []byte("order_id,total\n1001,42.00\n"), 0o644); err != nil {
+		return err
+	}
+	envelope, err := attestOrigin(core, artifact, work)
+	if err != nil {
+		return err
+	}
+	fmt.Println("signed", envelope)
+
+	report, err := verifyBundle(core, demo, filepath.Join(demo, "positive-bundle"))
+	if err != nil {
+		return err
+	}
+	explain(report)
+
+	tampered := filepath.Join(work, "tampered-bundle")
+	if err := copyTree(filepath.Join(demo, "positive-bundle"), tampered); err != nil {
+		return err
+	}
+	finals, _ := filepath.Glob(filepath.Join(tampered, "artifacts/final/*.bin"))
+	if len(finals) != 1 {
+		return errors.New("fixture should have exactly one final artifact")
+	}
+	data, _ := os.ReadFile(finals[0])
+	if err := os.WriteFile(finals[0], bytes.Replace(data, []byte("]"), []byte(",{}]"), 1), 0o644); err != nil {
+		return err
+	}
+
+	_, err = verifyBundle(core, demo, tampered)
+	var denied *DeniedError
+	if !errors.As(err, &amp;denied) {
+		return fmt.Errorf("expected a denial, got %v", err)
+	}
+	explain(denied.Report)
+	if deref(denied.Report.PrimaryError) != "E_ARTIFACT_DIGEST" {
+		return fmt.Errorf("unexpected primary error %s", deref(denied.Report.PrimaryError))
+	}
+	return nil
+}
+
+func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}</code></pre><pre><code class="language-bash">go vet .
+MAKOTO_CORE=/path/to/makoto go run .</code></pre><p>One run&rsquo;s output, unedited. Key IDs, payload digests, and temporary paths differ on every run; the decisions, codes, and policy digest do not.</p><pre><code class="language-bash">policy structure: valid
+signed /var/folders/22/0hyg7lbs2fb34hr0ryq3sl1m0000gn/T/makoto-1865024480/origin.dsse.json
+decision=allow primaryError=&lt;none&gt;
+  signatures 4/4 valid, policy 614eb137303b
+decision=deny primaryError=E_ARTIFACT_DIGEST
+  check artifact-bytes: fail []
+  step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
+  signatures 4/4 valid, policy 614eb137303b</code></pre></section><section aria-labelledby="validate"><h2 id="validate">3. Validate structure against the hosted schema</h2><p>Register the fetched schema under its own URL, compile once, and validate decoded JSON. The validator&rsquo;s error lists every failing location.</p><pre><code class="language-go">func validateStructure(instancePath, schemaName string) error {
+	resp, err := http.Get(schemaBase + schemaName)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("schema fetch failed: %s", resp.Status)
+	}
+	schemaDoc, err := jsonschema.UnmarshalJSON(resp.Body)
+	if err != nil {
+		return err
+	}
+	compiler := jsonschema.NewCompiler()
+	if err := compiler.AddResource(schemaBase+schemaName, schemaDoc); err != nil {
+		return err
+	}
+	schema, err := compiler.Compile(schemaBase + schemaName)
+	if err != nil {
+		return err
+	}
+	file, err := os.Open(instancePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	instance, err := jsonschema.UnmarshalJSON(file)
+	if err != nil {
+		return err
+	}
+	return schema.Validate(instance)
+}</code></pre></section><section aria-labelledby="attest"><h2 id="attest">4. Generate an attestation</h2><p><code>exec.Command</code> takes arguments as a slice and never involves a shell. The private key file is written with mode 0600 by the verifier itself.</p><pre><code class="language-go">func makoto(core string, args ...string) (stdout []byte, stderr []byte, runErr error) {
+	cmd := exec.Command("uv", append([]string{"run", "--quiet", "makoto"}, args...)...)
+	cmd.Dir = core
+	var out, errOut bytes.Buffer
+	cmd.Stdout, cmd.Stderr = &amp;out, &amp;errOut
+	runErr = cmd.Run()
+	return out.Bytes(), errOut.Bytes(), runErr
+}</code></pre><pre><code class="language-go">func attestOrigin(core, artifact, workDir string) (string, error) {
+	privateKey := filepath.Join(workDir, "producer.private.pem")
+	out := filepath.Join(workDir, "origin.dsse.json")
+	steps := [][]string{
+		{"key", "generate", "--private-out", privateKey, "--public-out", filepath.Join(workDir, "producer.public.pem")},
+		{"attest", "origin",
+			"--subject", filepath.Base(artifact) + "=" + artifact,
+			"--source-kind", "urn:example:source:nightly-export",
+			"--source-uri", "urn:example:orders:2026-09-16",
+			"--key", privateKey,
+			"--out", out},
+	}
+	for _, args := range steps {
+		if _, stderr, err := makoto(core, args...); err != nil {
+			return "", &amp;ToolError{Detail: string(bytes.TrimSpace(stderr))}
+		}
+	}
+	return out, nil
+}</code></pre></section><section aria-labelledby="verify"><h2 id="verify">5. Verify a bundle and handle a denial</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-go">func verifyBundle(core, demo, bundle string) (Report, error) {
+	output, stderr, runErr := makoto(core,
+		"verify", "bundle", bundle,
+		"--policy", filepath.Join(demo, "receiver/policy.json"),
+		"--schema-catalog", filepath.Join(demo, "receiver/catalog.json"),
+		"--expected-manifest", expectedManifest,
+		"--expected-head", expectedHead,
+		"--expected-artifact", filepath.Join(demo, "receiver/expected-artifact.json"),
+		"--evaluation-time", evaluationTime,
+		"--json",
+	)
+	// A deny exits 1, so a nonzero process status alone is not a tool failure.
+	// Only exit codes 0 and 1 carry a report; 2 and 3 mean no verdict exists.
+	exitCode := 0
+	if runErr != nil {
+		exitErr, ok := runErr.(*exec.ExitError)
+		if !ok {
+			return Report{}, &amp;ToolError{Detail: runErr.Error()}
+		}
+		exitCode = exitErr.ExitCode()
+	}
+	if exitCode != 0 &amp;&amp; exitCode != 1 {
+		return Report{}, &amp;ToolError{Detail: fmt.Sprintf("exit %d: %s", exitCode, bytes.TrimSpace(stderr))}
+	}
+	var report Report
+	if err := json.Unmarshal(output, &amp;report); err != nil {
+		return Report{}, &amp;ToolError{Detail: "malformed report: " + err.Error()}
+	}
+	if (exitCode == 0) != (report.Decision == "allow") {
+		return Report{}, &amp;ToolError{Detail: "exit status and report decision disagree"}
+	}
+	if report.Decision != "allow" {
+		return report, &amp;DeniedError{Report: report}
+	}
+	return report, nil
+}</code></pre><p>The report is decoded before the decision is read, and a report that does not decode is a <code>ToolError</code>. Denials come back as <code>*DeniedError</code> with the full report attached, so callers use <code>errors.As</code>:</p><pre><code class="language-go">	_, err = verifyBundle(core, demo, tampered)
+	var denied *DeniedError
+	if !errors.As(err, &amp;denied) {
+		return fmt.Errorf("expected a denial, got %v", err)
+	}
+	explain(denied.Report)
+	if deref(denied.Report.PrimaryError) != "E_ARTIFACT_DIGEST" {
+		return fmt.Errorf("unexpected primary error %s", deref(denied.Report.PrimaryError))
+	}</code></pre></section><section aria-labelledby="report"><h2 id="report">6. Read the verification report</h2><p>The structs decode the fields a gate needs. <code>PrimaryError</code> is a pointer because it is JSON <code>null</code> on an allow.</p><pre><code class="language-go">type Check struct {
+	ID                 string   `json:"id"`
+	Status             string   `json:"status"`
+	PrerequisiteChecks []string `json:"prerequisiteChecks"`
+}
+
+type Diagnostic struct {
+	Code          string         `json:"code"`
+	Step          int            `json:"step"`
+	CausedByCheck string         `json:"causedByCheck"`
+	Message       string         `json:"message"`
+	Context       map[string]any `json:"context"`
+}
+
+type Report struct {
+	ReportVersion string            `json:"reportVersion"`
+	Decision      string            `json:"decision"`
+	PrimaryError  *string           `json:"primaryError"`
+	PolicyDigest  map[string]string `json:"policyDigest"`
+	Checks        []Check           `json:"checks"`
+	Errors        []Diagnostic      `json:"errors"`
+	Warnings      []Diagnostic      `json:"warnings"`
+	Summary       map[string]int    `json:"summary"`
+}</code></pre><pre><code class="language-go">func explain(r Report) {
+	fmt.Printf("decision=%s primaryError=%s\n", r.Decision, deref(r.PrimaryError))
+	for _, c := range r.Checks {
+		if c.Status != "pass" {
+			fmt.Printf("  check %s: %s %v\n", c.ID, c.Status, c.PrerequisiteChecks)
+		}
+	}
+	for _, e := range r.Errors {
+		fmt.Printf("  step %d %s: %s\n", e.Step, e.Code, e.Message)
+	}
+	fmt.Printf("  signatures %d/%d valid, policy %.12s\n",
+		r.Summary["signaturesValid"], r.Summary["signaturesTotal"], r.PolicyDigest["sha256"])
+}</code></pre></section>
+<section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><dl class="troubleshooting">
+<dt><code>0</code> &middot; allow</dt><dd>Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</dd>
+<dt><code>1</code> &middot; deny or indeterminate</dt><dd>stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</dd>
+<dt><code>2</code> &middot; invalid input</dt><dd>A missing file, a malformed flag, an unreadable policy. No report is written; stderr carries one JSON object with <code>errorClass</code> and <code>message</code>.</dd>
+<dt><code>3</code> &middot; internal error</dt><dd>Same stderr shape with <code>errorClass</code> set to <code>internal</code>. Treat it as an outage, never as a verdict.</dd>
+</dl></section>
+<section aria-labelledby="native"><h2 id="native">Toward a native Go verifier</h2><p>No maintained Go SDK exists. A native implementation would need to reproduce DSSE pre-authentication encoding over exact payload bytes, JCS canonicalization, digest-pinned schema resolution, the receiver policy model, and the published check order with its diagnostic codes. Until one passes the same positive fixture and all seven denial cases, keep the process boundary: it is the only way to be certain Go and Python agree.</p></section>
+<section aria-labelledby="trouble"><h2 id="trouble">Troubleshooting</h2><dl class="troubleshooting">
+<dt>Treating every non-nil <code>cmd.Run()</code> error as a failure</dt>
+<dd>A denial exits 1, which <code>os/exec</code> reports as <code>*exec.ExitError</code>. Unwrap it and read <code>ExitCode()</code>; only 2, 3, a signal, or a launch failure mean no report exists.</dd>
+<dt>Validating statement, origin, or transform documents</dt>
+<dd>Those schemas reference sibling schemas by URL. <code>santhosh-tekuri/jsonschema/v6</code> fetches only what a loader allows; register each referenced schema with <code>AddResource</code> first, or configure an HTTP URL loader. The trust-policy, envelope, and report schemas are self-contained.</dd>
+<dt>Every run denies with <code>E_EXPECTED_MANIFEST</code>, <code>E_EXPECTED_HEAD</code>, and <code>E_EXPECTED_ARTIFACT</code> at step 11</dt>
+<dd>The expectation flags are missing or stale. The <code>freshness-anchors</code> check fails because the policy requires all three. Supply the digests the producer published for this handoff.</dd>
+<dt>Exit status 2 with <code>{"errorClass":"invalid-input",...}</code> on stderr</dt>
+<dd>An input path is wrong or unreadable, or a singleton flag was passed twice. Paths are resolved from the process working directory, so pass absolute paths when the verifier runs with <code>cwd</code> set to the core checkout.</dd>
+<dt>The report shows <code>skipped</code> for a check you care about</dt>
+<dd>An earlier check failed and did not establish its prerequisite. <code>prerequisiteChecks</code> names it. A skipped check was not tested; never read it as a pass.</dd>
+<dt><code>uv: command not found</code> inside a service or CI job</dt>
+<dd>The binding needs <code>uv</code> on <code>PATH</code> for the process that spawns the verifier. Install it in the image or call the checkout&rsquo;s <code>.venv/bin/makoto</code> directly after <code>uv sync --locked</code>.</dd>
+</dl></section>
+<section class="community-band"><h2>The same gate in every language.</h2><p>Each binding runs the same six steps against the same fixtures and produces the same decision. The report and exit status are the contract; the language is a wrapper.</p><div class="actions"><a class="button" href="/verify/">Read the decision model</a><a class="button secondary" href="/sdk/">Compare language interfaces</a><a class="button secondary" href="/validate/">Structure-only validators</a></div><p>Bindings: <a href="/verify/bash.html">Bash</a> · <a href="/verify/python.html">Python</a> · <a href="/verify/nodejs.html">JavaScript</a> · <a href="/verify/typescript.html">TypeScript</a> · <a href="/verify/go.html">Go</a></p></section>
+</main><footer class="footer"><div class="footer-inner">Makoto verification · Go subprocess recipe · No SDK claim</div></footer></div></div></body></html>

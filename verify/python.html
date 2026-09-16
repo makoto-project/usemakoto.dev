@@ -1,20 +1,308 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Python verification recipe — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/">誠 Makoto</a><nav class="nav" aria-label="Primary"><a href="/verify/">Verification</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><a href="/">Overview</a><a href="/verify/">Verification</a><a href="/validate/">Schema validation</a><a href="/sdk/">Language interfaces</a><a href="/community/">Community</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Verification</p><a href="/verify/">Decision model</a><a href="/validate/">Schema validation</a><a href="/verify/bash.html">Bash</a><a href="/verify/python.html" aria-current="page">Python</a><a href="/verify/nodejs.html">Node.js</a><a href="/verify/go.html">Go</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a></div></nav></aside><div class="site-main"><main id="main" class="page"><span class="kicker">Python recipe</span><h1>Embed the CLI boundary before depending on internals.</h1><p class="lead">The core repository is implemented in Python, but its internal modules are not yet a stable published SDK. A subprocess keeps your application on the tested command and report contract.</p><pre><code>import json
-import subprocess
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Validate with jsonschema, sign an origin statement, verify a Makoto bundle with subprocess.run, refuse a tampered copy, and read the report from Python."><title>Python verification binding — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/">誠 Makoto</a><nav class="nav" aria-label="Primary"><a href="/verify/">Verification</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><a href="/">Overview</a><a href="/verify/">Verification</a><a href="/validate/">Schema validation</a><a href="/sdk/">Language interfaces</a><a href="/community/">Community</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Verification</p><a href="/verify/">Decision model</a><a href="/validate/">Schema validation</a><a href="/verify/bash.html">Bash</a><a href="/verify/python.html" aria-current="page">Python</a><a href="/verify/nodejs.html">JavaScript</a><a href="/verify/typescript.html">TypeScript</a><a href="/verify/go.html">Go</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a></div></nav></aside><div class="site-main"><main id="main" class="page">
+<span class="kicker">Python binding</span>
+<h1>Gate a Python ingestion job on a Makoto verdict.</h1>
+<p class="lead">This page builds one complete, runnable program: validate a trust policy against the hosted schema with <code>jsonschema</code>, sign an origin statement for new data, verify a handoff bundle, refuse a tampered copy, and read the report that explains why. Every line below was executed against the pinned core before it was published.</p>
+<p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>0e41afbd0c3f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
+<section aria-labelledby="install"><h2 id="install">1. Install the verifier and the fixtures</h2><p>Clone the core repository at the documented revision, sync its locked environment, and generate the fixture set every example uses.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
+cd makoto
+git checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+uv sync --locked --dev
 
-completed = subprocess.run(
-    [
-        "uv", "run", "makoto", "verify", "bundle", bundle,
-        "--policy", policy,
-        "--schema-catalog", catalog,
-        "--expected-artifact", expected_artifact,
-        "--evaluation-time", evaluation_time,
+# Writes the deterministic fixture set: one allowed bundle, seven denials.
+./scripts/demo-v0.2.sh --acceptance
+
+export MAKOTO_CORE="$PWD"</code></pre><p>The program declares its own dependency, <code>jsonschema</code>, in inline script metadata, so <code>uv run</code> provisions it without a project file. With plain <code>pip</code>, install <code>jsonschema&gt;=4.25</code> first.</p></section><section aria-labelledby="program"><h2 id="program">2. The complete program</h2><p>Save this as <code>makoto_gate.py</code> anywhere outside the core checkout. The sections that follow walk through each part.</p><pre><code class="language-python"># /// script
+# requires-python = "&gt;=3.11"
+# dependencies = ["jsonschema&gt;=4.25,&lt;5"]
+# ///
+"""Validate, attest, verify, and gate on a Makoto report from Python."""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import urllib.request
+from pathlib import Path
+
+from jsonschema import Draft202012Validator
+
+CORE = Path(os.environ["MAKOTO_CORE"]).resolve()
+DEMO = CORE / "demos/v0.2-end-to-end/generated"
+SCHEMA_BASE = "https://usemakoto.dev/schema/v0.2/"
+
+# Independent expectations. In production these arrive out of band from the
+# producer (a ticket, a signed release note, a registry), never from the bundle.
+EXPECTED_MANIFEST = "sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c"
+EXPECTED_HEAD = "sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+EVALUATION_TIME = "2026-09-16T16:00:00Z"
+
+
+class MakotoToolError(RuntimeError):
+    """Exit 2 or 3: the verifier could not run. This is never a verdict."""
+
+
+class MakotoDenied(RuntimeError):
+    def __init__(self, report: dict) -&gt; None:
+        super().__init__(f"{report['decision']}: {report['primaryError']}")
+        self.report = report
+
+
+def makoto(*args: str) -&gt; subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["uv", "run", "--quiet", "makoto", *args],
+        cwd=CORE,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def validate_structure(instance_path: Path, schema_name: str) -&gt; list[str]:
+    # The schema host rejects urllib's default User-Agent with 403.
+    request = urllib.request.Request(SCHEMA_BASE + schema_name, headers={"User-Agent": "makoto-gate"})
+    with urllib.request.urlopen(request, timeout=10) as response:
+        schema = json.load(response)
+    instance = json.loads(instance_path.read_text(encoding="utf-8"))
+    validator = Draft202012Validator(schema)
+    return [
+        f"{'/'.join(map(str, error.absolute_path)) or '(root)'}: {error.message}"
+        for error in validator.iter_errors(instance)
+    ]
+
+
+def attest_origin(artifact: Path, work: Path) -&gt; Path:
+    private_key, public_key = work / "producer.private.pem", work / "producer.public.pem"
+    out = work / "origin.dsse.json"
+    for args in (
+        ("key", "generate", "--private-out", str(private_key), "--public-out", str(public_key)),
+        (
+            "attest", "origin",
+            "--subject", f"{artifact.name}={artifact}",
+            "--source-kind", "urn:example:source:nightly-export",
+            "--source-uri", "urn:example:orders:2026-09-16",
+            "--key", str(private_key),
+            "--out", str(out),
+        ),
+    ):
+        completed = makoto(*args)
+        if completed.returncode != 0:
+            raise MakotoToolError(completed.stderr.strip())
+    return out
+
+
+def verify_bundle(bundle: Path) -&gt; dict:
+    completed = makoto(
+        "verify", "bundle", str(bundle),
+        "--policy", str(DEMO / "receiver/policy.json"),
+        "--schema-catalog", str(DEMO / "receiver/catalog.json"),
+        "--expected-manifest", EXPECTED_MANIFEST,
+        "--expected-head", EXPECTED_HEAD,
+        "--expected-artifact", str(DEMO / "receiver/expected-artifact.json"),
+        "--evaluation-time", EVALUATION_TIME,
         "--json",
-    ],
-    cwd=reviewed_core_checkout,
-    check=False,
-    capture_output=True,
-    text=True,
+    )
+    if completed.returncode not in (0, 1):
+        # stderr carries one JSON object: {"errorClass": ..., "message": ...}
+        raise MakotoToolError(completed.stderr.strip())
+    try:
+        report = json.loads(completed.stdout)
+    except json.JSONDecodeError as error:
+        raise MakotoToolError(f"verifier emitted a malformed report: {error}") from error
+    # Exit status and decision must agree. If they do not, trust neither.
+    if (completed.returncode == 0) != (report.get("decision") == "allow"):
+        raise MakotoToolError("exit status and report decision disagree")
+    if report["decision"] != "allow":
+        raise MakotoDenied(report)
+    return report
+
+
+def explain(report: dict) -&gt; None:
+    print(f"decision={report['decision']} primaryError={report['primaryError']}")
+    for check in report["checks"]:
+        if check["status"] != "pass":
+            print(f"  check {check['id']}: {check['status']} {check['prerequisiteChecks']}")
+    for error in report["errors"]:
+        print(f"  step {error['step']} {error['code']}: {error['message']}")
+    summary = report["summary"]
+    print(
+        f"  statements {summary['statementsValid']}/{summary['statementsTotal']} valid, "
+        f"signatures {summary['signaturesValid']}/{summary['signaturesTotal']} valid, "
+        f"policy {report['policyDigest']['sha256'][:12]}"
+    )
+
+
+def main() -&gt; int:
+    problems = validate_structure(DEMO / "receiver/policy.json", "trust-policy.schema.json")
+    print("policy structure:", "valid" if not problems else problems)
+
+    with tempfile.TemporaryDirectory() as scratch:
+        work = Path(scratch)
+        artifact = work / "orders.csv"
+        artifact.write_text("order_id,total\n1001,42.00\n", encoding="utf-8")
+        envelope = attest_origin(artifact, work)
+        print("signed", json.loads(makoto("envelope", "inspect", "--envelope", str(envelope), "--json").stdout))
+
+        report = verify_bundle(DEMO / "positive-bundle")
+        explain(report)
+
+        tampered = work / "tampered-bundle"
+        shutil.copytree(DEMO / "positive-bundle", tampered)
+        final = next((tampered / "artifacts/final").glob("*.bin"))
+        final.write_bytes(final.read_bytes().replace(b"]", b",{}]", 1))
+        try:
+            verify_bundle(tampered)
+        except MakotoDenied as denied:
+            explain(denied.report)
+            if denied.report["primaryError"] != "E_ARTIFACT_DIGEST":
+                return 1
+            print("tampered bundle refused, as it should be")
+            return 0
+    print("tampered bundle was accepted", file=sys.stderr)
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())</code></pre><pre><code class="language-bash">MAKOTO_CORE=/path/to/makoto uv run makoto_gate.py</code></pre><p>One run&rsquo;s output, unedited. Key IDs, payload digests, and temporary paths differ on every run; the decisions, codes, and policy digest do not.</p><pre><code class="language-bash">policy structure: valid
+signed {'payloadDigest': {'sha256': '0411bf08b3fb75a8c723d3b8a4e93ae03e3150a163930785aeb9eb6ddbec77aa'}, 'payloadType': 'application/vnd.in-toto+json', 'signatureKeyIds': ['sha256:1090f3864e8d67bde4dcdf76e03adfc1815e6b2a59f7b2392afac448c31a64e2']}
+decision=allow primaryError=None
+  statements 3/3 valid, signatures 4/4 valid, policy 614eb137303b
+decision=deny primaryError=E_ARTIFACT_DIGEST
+  check artifact-bytes: fail []
+  step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
+  statements 3/3 valid, signatures 4/4 valid, policy 614eb137303b
+tampered bundle refused, as it should be</code></pre></section><section aria-labelledby="validate"><h2 id="validate">3. Validate structure against the hosted schema</h2><p>Structural validation is cheap, keyless, and belongs at the ingestion boundary, where it rejects a malformed policy or statement before anything is spent on cryptography. It answers whether a document is shaped correctly and nothing else: a schema-valid policy can still trust the wrong key.</p><pre><code class="language-python">def validate_structure(instance_path: Path, schema_name: str) -&gt; list[str]:
+    # The schema host rejects urllib's default User-Agent with 403.
+    request = urllib.request.Request(SCHEMA_BASE + schema_name, headers={"User-Agent": "makoto-gate"})
+    with urllib.request.urlopen(request, timeout=10) as response:
+        schema = json.load(response)
+    instance = json.loads(instance_path.read_text(encoding="utf-8"))
+    validator = Draft202012Validator(schema)
+    return [
+        f"{'/'.join(map(str, error.absolute_path)) or '(root)'}: {error.message}"
+        for error in validator.iter_errors(instance)
+    ]</code></pre><p>The same call works for any hosted schema: pass <code>envelope.schema.json</code> for a DSSE envelope or <code>verification-report.schema.json</code> for a stored report. <a href="/validate/">The validator catalogue</a> covers the other tools.</p></section><section aria-labelledby="attest"><h2 id="attest">4. Generate an attestation</h2><p>A producer signs an origin statement where data enters its system. <code>key generate</code> writes an Ed25519 key pair with the private half at mode 0600; <code>attest origin</code> hashes the exact subject bytes and writes a DSSE envelope. Keep the private key inside the job&rsquo;s secret boundary.</p><pre><code class="language-python">def attest_origin(artifact: Path, work: Path) -&gt; Path:
+    private_key, public_key = work / "producer.private.pem", work / "producer.public.pem"
+    out = work / "origin.dsse.json"
+    for args in (
+        ("key", "generate", "--private-out", str(private_key), "--public-out", str(public_key)),
+        (
+            "attest", "origin",
+            "--subject", f"{artifact.name}={artifact}",
+            "--source-kind", "urn:example:source:nightly-export",
+            "--source-uri", "urn:example:orders:2026-09-16",
+            "--key", str(private_key),
+            "--out", str(out),
+        ),
+    ):
+        completed = makoto(*args)
+        if completed.returncode != 0:
+            raise MakotoToolError(completed.stderr.strip())
+    return out</code></pre><p>A transformation step uses <code>attest transform</code> with one <code>--input-binding</code> file per input, naming the predecessor envelope and the exact subject it consumed. See the <a href="/predicate/v0.2/transform/">transform predicate</a> for the binding fields.</p></section><section aria-labelledby="verify"><h2 id="verify">5. Verify a bundle and handle a denial</h2><p class="editorial-note"><strong>Where the expected digests come from.</strong> The manifest digest, head digest, and expected-artifact file are the receiver&rsquo;s independent anchors. The fixture policy sets <code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, and <code>requireExpectedArtifacts</code>, so leaving them out is a denial, not a shortcut. In production they arrive through a channel the producer&rsquo;s bundle cannot rewrite: a change ticket, a signed release note, a registry entry. The values below are the fixture&rsquo;s published digests.</p><pre><code class="language-python">class MakotoToolError(RuntimeError):
+    """Exit 2 or 3: the verifier could not run. This is never a verdict."""
+
+
+class MakotoDenied(RuntimeError):
+    def __init__(self, report: dict) -&gt; None:
+        super().__init__(f"{report['decision']}: {report['primaryError']}")
+        self.report = report</code></pre><pre><code class="language-python">def verify_bundle(bundle: Path) -&gt; dict:
+    completed = makoto(
+        "verify", "bundle", str(bundle),
+        "--policy", str(DEMO / "receiver/policy.json"),
+        "--schema-catalog", str(DEMO / "receiver/catalog.json"),
+        "--expected-manifest", EXPECTED_MANIFEST,
+        "--expected-head", EXPECTED_HEAD,
+        "--expected-artifact", str(DEMO / "receiver/expected-artifact.json"),
+        "--evaluation-time", EVALUATION_TIME,
+        "--json",
+    )
+    if completed.returncode not in (0, 1):
+        # stderr carries one JSON object: {"errorClass": ..., "message": ...}
+        raise MakotoToolError(completed.stderr.strip())
+    try:
+        report = json.loads(completed.stdout)
+    except json.JSONDecodeError as error:
+        raise MakotoToolError(f"verifier emitted a malformed report: {error}") from error
+    # Exit status and decision must agree. If they do not, trust neither.
+    if (completed.returncode == 0) != (report.get("decision") == "allow"):
+        raise MakotoToolError("exit status and report decision disagree")
+    if report["decision"] != "allow":
+        raise MakotoDenied(report)
+    return report</code></pre><p>Three rules keep this fail-closed. Exit status 2 or 3 raises <code>MakotoToolError</code>, because no verdict exists. A report that does not parse is a tool failure, not a denial. And the exit status must agree with <code>decision</code>; if they ever disagree, trust neither.</p><p>The caller decides what a denial means for the job. Here the program copies the good bundle, appends bytes to the delivered artifact, and expects the verifier to refuse it with <code>E_ARTIFACT_DIGEST</code>:</p><pre><code class="language-python">        tampered = work / "tampered-bundle"
+        shutil.copytree(DEMO / "positive-bundle", tampered)
+        final = next((tampered / "artifacts/final").glob("*.bin"))
+        final.write_bytes(final.read_bytes().replace(b"]", b",{}]", 1))
+        try:
+            verify_bundle(tampered)
+        except MakotoDenied as denied:
+            explain(denied.report)
+            if denied.report["primaryError"] != "E_ARTIFACT_DIGEST":
+                return 1
+            print("tampered bundle refused, as it should be")
+            return 0</code></pre></section><section aria-labelledby="report"><h2 id="report">6. Read the verification report</h2><p>Read <code>decision</code> first, then <code>primaryError</code> for the boundary that failed, then <code>checks</code> for what was actually established. <code>errors</code> carries the step number and a typed <code>context</code>. Store <code>policyDigest</code> with the report: a verdict is only meaningful under the exact policy that produced it. The full shape is the <a href="/schema/v0.2/verification-report.schema.json">verification-report schema</a>.</p><pre><code class="language-python">def explain(report: dict) -&gt; None:
+    print(f"decision={report['decision']} primaryError={report['primaryError']}")
+    for check in report["checks"]:
+        if check["status"] != "pass":
+            print(f"  check {check['id']}: {check['status']} {check['prerequisiteChecks']}")
+    for error in report["errors"]:
+        print(f"  step {error['step']} {error['code']}: {error['message']}")
+    summary = report["summary"]
+    print(
+        f"  statements {summary['statementsValid']}/{summary['statementsTotal']} valid, "
+        f"signatures {summary['signaturesValid']}/{summary['signaturesTotal']} valid, "
+        f"policy {report['policyDigest']['sha256'][:12]}"
+    )</code></pre><p>The tampered run reports one failing check, <code>artifact-bytes</code>, at step 12. Signatures, authorization, and the graph all still pass, which is the point: the claims are intact and the data under them changed. <a href="/verify/#pipeline">The ordered checks</a> list every code by step.</p></section>
+<section aria-labelledby="library"><h2 id="library">In-process: the reference library</h2><p>The command-line boundary is the stable contract. If a long-running Python service cannot afford a subprocess per bundle, it can call the same verifier in-process from inside the synced checkout. <code>VerificationRequest</code> and <code>verify_bundle</code> are the functions the CLI itself calls, and they return the identical report dictionary.</p><pre><code class="language-python">"""Run the reference verifier in-process. Run from inside the core checkout:
+uv run python in_process.py
+"""
+
+from pathlib import Path
+
+import makoto
+from makoto.bundle import VerificationRequest, verify_bundle
+
+core = Path(makoto.__file__).resolve().parents[2]
+demo = core / "demos/v0.2-end-to-end/generated"
+expected_artifact = {
+    "head": {"sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"},
+    "subjectName": "customers.public.json",
+    "digest": {"sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"},
+}
+
+report = verify_bundle(
+    VerificationRequest(
+        bundle_root=demo / "positive-bundle",
+        policy_path=demo / "receiver/policy.json",
+        repository_root=core,
+        schema_catalogs=(demo / "receiver/catalog.json",),
+        expected_manifest={"sha256": "b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c"},
+        expected_heads=({"sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"},),
+        expected_artifacts=(expected_artifact,),
+        evaluation_time="2026-09-16T16:00:00Z",
+    )
 )
-report = json.loads(completed.stdout)
-if report["decision"] != "allow":
-    raise RuntimeError(report)</code></pre><p>Pin the core checkout, treat malformed output as failure, and preserve the report’s separate structure, signature, authorization, graph, handoff, freshness, and artifact results.</p><p><a href="/sdk/">Read the Python implementation boundary →</a></p></main><footer class="footer"><div class="footer-inner">Makoto verification · Python subprocess recipe · No published SDK claim</div></footer></div></div></body></html>
+print(report["decision"], report["primaryError"])</code></pre><pre><code class="language-bash">cd "$MAKOTO_CORE" &amp;&amp; uv run python /path/to/in_process.py
+# allow None</code></pre><p class="editorial-note"><strong>Pin before you import.</strong> <code>makoto.bundle</code> is an internal module of the reference implementation, not a published API. Its fields can change between revisions, so lock the core checkout to a reviewed commit and rerun this fixture when you move it. The CLI path above does not carry that coupling.</p></section>
+<section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><dl class="troubleshooting">
+<dt><code>0</code> &middot; allow</dt><dd>Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</dd>
+<dt><code>1</code> &middot; deny or indeterminate</dt><dd>stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</dd>
+<dt><code>2</code> &middot; invalid input</dt><dd>A missing file, a malformed flag, an unreadable policy. No report is written; stderr carries one JSON object with <code>errorClass</code> and <code>message</code>.</dd>
+<dt><code>3</code> &middot; internal error</dt><dd>Same stderr shape with <code>errorClass</code> set to <code>internal</code>. Treat it as an outage, never as a verdict.</dd>
+</dl></section>
+<section aria-labelledby="trouble"><h2 id="trouble">Troubleshooting</h2><dl class="troubleshooting">
+<dt><code>urllib.error.HTTPError: HTTP Error 403: Forbidden</code> when fetching a schema</dt>
+<dd>The schema host rejects the default <code>Python-urllib</code> User-Agent. Send any explicit User-Agent, as <code>validate_structure</code> does.</dd>
+<dt>Every run denies with <code>E_EXPECTED_MANIFEST</code>, <code>E_EXPECTED_HEAD</code>, and <code>E_EXPECTED_ARTIFACT</code> at step 11</dt>
+<dd>The expectation flags are missing or stale. The <code>freshness-anchors</code> check fails because the policy requires all three. Supply the digests the producer published for this handoff.</dd>
+<dt>Exit status 2 with <code>{"errorClass":"invalid-input",...}</code> on stderr</dt>
+<dd>An input path is wrong or unreadable, or a singleton flag was passed twice. Paths are resolved from the process working directory, so pass absolute paths when the verifier runs with <code>cwd</code> set to the core checkout.</dd>
+<dt>The report shows <code>skipped</code> for a check you care about</dt>
+<dd>An earlier check failed and did not establish its prerequisite. <code>prerequisiteChecks</code> names it. A skipped check was not tested; never read it as a pass.</dd>
+<dt><code>uv: command not found</code> inside a service or CI job</dt>
+<dd>The binding needs <code>uv</code> on <code>PATH</code> for the process that spawns the verifier. Install it in the image or call the checkout&rsquo;s <code>.venv/bin/makoto</code> directly after <code>uv sync --locked</code>.</dd>
+</dl></section>
+<section class="community-band"><h2>The same gate in every language.</h2><p>Each binding runs the same six steps against the same fixtures and produces the same decision. The report and exit status are the contract; the language is a wrapper.</p><div class="actions"><a class="button" href="/verify/">Read the decision model</a><a class="button secondary" href="/sdk/">Compare language interfaces</a><a class="button secondary" href="/validate/">Structure-only validators</a></div><p>Bindings: <a href="/verify/bash.html">Bash</a> · <a href="/verify/python.html">Python</a> · <a href="/verify/nodejs.html">JavaScript</a> · <a href="/verify/typescript.html">TypeScript</a> · <a href="/verify/go.html">Go</a></p></section>
+</main><footer class="footer"><div class="footer-inner">Makoto verification · Python subprocess recipe · No published SDK claim</div></footer></div></div></body></html>

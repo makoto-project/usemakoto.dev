@@ -1,12 +1,135 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A truthful Makoto attachment pattern for committed Databricks table versions and exported artifacts."><title>Databricks integration pattern — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A Databricks job that exports a pinned Delta version to a Volume, signs the exact file, and fails a gate task so publish never runs when Makoto denies."><title>Databricks integration — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
 <a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/spec/">Specification</a><p class="mobile-section">Build</p><a href="/verify/">Verification</a><a href="/integrations/databricks/" aria-current="page">Databricks field note</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a></nav></details></div></header>
 <div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/" aria-current="page">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Platforms</p><a href="/integrations/airflow/">Airflow</a><a href="/integrations/dbt/">dbt</a><a href="/integrations/spark/">Spark</a><a href="/integrations/kafka/">Kafka</a><a href="/integrations/snowflake/">Snowflake</a><a href="/integrations/databricks/" aria-current="page">Databricks</a><a href="/integrations/dagster/">Dagster</a><a href="/integrations/prefect/">Prefect</a><a href="/integrations/expanso/">Expanso</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
-<div class="site-main"><main id="main" class="page wide"><span class="kicker">Integration field note</span><h1>Databricks: bind a committed table version to exact handoff bytes.</h1><p class="lead">Unity Catalog and Delta history supply useful operational context. They do not, by themselves, create a signed Makoto graph or prove which bytes a recipient received.</p><p class="editorial-note"><strong>Implementation boundary.</strong> This is a candidate lifecycle boundary, not an automatic notebook hook, expectation, system-table mapping, or shipped adapter.</p>
-<h2>The attachment point</h2><table><tbody><tr><th>Delta commit</th><td>After a write commits, record table identity, version, job, cluster, and notebook context. Resolve the exact snapshot files or a deterministic manifest.</td></tr><tr><th>Feature or model export</th><td>Attest the stable exported artifact; reference the upstream table statement and exact input digest.</td></tr><tr><th>Unity Catalog</th><td>Store pointers or searchable metadata if useful. Statement and artifact digests remain the portable identities.</td></tr><tr><th>External handoff</th><td>Sign the exact roots, heads, profiles, and final artifacts given to the recipient; keep receiver policy outside the bundle.</td></tr></tbody></table>
-<h2>Control flow</h2><pre><code># The Databricks job commits a table version or export.
-# A post-commit task resolves exact input and output identities,
-# writes operation metadata, then calls the checked-out reference CLI.
-uv run makoto attest transform --help
-uv run makoto handoff create --help</code></pre><p>The integration must define what one artifact means: snapshot manifest, exported files, or another immutable representation. A table name and version are useful selectors, but they are not substitutes for the artifact digest a receiver verifies.</p>
-<h2>What the evidence can say</h2><p>It can bind a Databricks commit or export to exact predecessor and output evidence. It cannot prove that every notebook cell ran, that a quality expectation was correct, or that a model card automatically carries the data history.</p>
-<section class="community-band"><h2>Choose one Databricks boundary and make it exact.</h2><p>Contribute a tested Delta snapshot or export fixture, including the failure when a file set and claimed table version diverge.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Propose the Databricks fixture</a><a class="button secondary" href="/integrations/">Return to integrations</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto + Databricks · Lifecycle pattern, not a shipped adapter</div></footer></div></div></body></html>
+<div class="site-main"><main id="main" class="page wide">
+<span class="kicker">Databricks integration</span>
+<h1>Databricks: bind a committed table version to exact handoff bytes.</h1>
+<p class="lead">Unity Catalog and Delta history supply useful operational context. They do not, by themselves, create a signed Makoto graph or prove which bytes a recipient received. This job reads one Delta version, writes it to a Volume, signs the file, and gates publication on the verifier.</p>
+<p class="editorial-note"><strong>Implementation boundary.</strong> This is a pattern built from the platform&rsquo;s own APIs and the pinned reference CLI. It is not a shipped adapter, plugin, or package. Not executed on a Databricks workspace. The three task scripts were executed locally on PySpark with <code>databricks.sdk.runtime</code> replaced by a stub for <code>spark</code> and task values: the export, signing, handoff, allow, and the denied gate exiting non-zero all ran. The bundle file was checked to parse, not deployed.</p>
+<section aria-labelledby="placement"><h2 id="placement">Where Makoto sits</h2><p>The job has three tasks. Only the first signs; the second verifies; the third depends on the second, so the job&rsquo;s own dependency rules enforce the gate.</p><ol class="provenance-spine"><li><strong><code>export_and_attest</code></strong><span>Reads one Delta version, writes a single CSV to a Unity Catalog Volume, signs it with the version as source metadata, builds the handoff, and passes the run ID and anchors as task values.</span></li><li><strong><code>makoto_gate</code></strong><span>Verifies the bundle. <code>MakotoDenied</code> is not caught, so the task fails.</span></li><li><strong><code>publish</code></strong><span>Depends on <code>makoto_gate</code>; with the default <code>run_if</code> of all succeeded, it does not run after a denial.</span></li></ol></section>
+<section aria-labelledby="install"><h2 id="install">1. Put the verifier on the cluster</h2><p>Every platform on this site uses the same two files from <a href="/integrations/#helper">the integration index</a>: <code>makoto_boundary.py</code>, a standard-library helper that signs, hands off, and verifies through the pinned CLI, and <code>makoto_bootstrap.py</code>, which creates one key per claim role and the receiver&rsquo;s trust policy. Put <code>makoto_boundary.py</code> in <code>src/</code> beside the task scripts.</p><p>An init script installs <code>uv</code> and the pinned core on every node of the job cluster.</p><pre><code class="language-bash">#!/bin/bash
+# Cluster init script: the pinned reference verifier on every node.
+set -euo pipefail
+curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh
+git clone https://github.com/makoto-project/makoto.git /opt/makoto
+git -C /opt/makoto checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+cd /opt/makoto &amp;&amp; uv sync --locked --dev</code></pre><pre><code class="language-bash">uv run makoto_bootstrap.py /Volumes/main/finance/makoto \
+  --source-kind urn:example:source:delta-table-version \
+  --source-uri databricks://acme/main.sales.orders \
+  --operation-type urn:example:operation:none
+export MAKOTO_KEYS=/Volumes/main/finance/makoto/keys MAKOTO_POLICY=/Volumes/main/finance/makoto/policy.json</code></pre></section><section aria-labelledby="bundle"><h2 id="bundle">2. The job definition</h2><p>A Databricks Asset Bundle, <code>databricks.yml</code>:</p><pre><code class="language-yaml">bundle:
+  name: makoto-orders
+
+resources:
+  jobs:
+    makoto_orders:
+      name: makoto-orders
+      job_clusters:
+        - job_cluster_key: main
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            node_type_id: i3.xlarge
+            num_workers: 1
+            spark_env_vars:
+              MAKOTO_CORE: /opt/makoto
+              MAKOTO_KEYS: /Volumes/main/sales/makoto_keys
+              MAKOTO_POLICY: /Volumes/main/finance/makoto/policy.json
+            init_scripts:
+              # Clones the pinned core revision and runs uv sync on every node.
+              - workspace:
+                  destination: /Workspace/Shared/makoto/install-makoto.sh
+      tasks:
+        - task_key: export_and_attest
+          job_cluster_key: main
+          spark_python_task:
+            python_file: ./src/export_and_attest.py
+        - task_key: makoto_gate
+          depends_on:
+            - task_key: export_and_attest
+          job_cluster_key: main
+          spark_python_task:
+            python_file: ./src/makoto_gate.py
+        - task_key: publish
+          depends_on:
+            - task_key: makoto_gate
+          job_cluster_key: main
+          spark_python_task:
+            python_file: ./src/publish.py</code></pre></section><section aria-labelledby="code"><h2 id="code">3. The tasks</h2><pre><code class="language-python"># src/export_and_attest.py
+"""Task 1: export a pinned Delta version to a Volume and sign the exact file."""
+
+import json
+import os
+import uuid
+from pathlib import Path
+
+from databricks.sdk.runtime import dbutils, spark
+
+import makoto_boundary as mb
+
+TABLE = "main.sales.orders"
+HANDOFFS = Path(os.environ.get("MAKOTO_HANDOFFS", "/Volumes/main/sales/handoffs"))
+RECIPIENT = "example:finance-workspace"
+
+run = uuid.uuid4().hex
+event = lambda name: f"urn:uuid:{uuid.uuid5(uuid.NAMESPACE_URL, f'{run}/{name}')}"
+
+# Read one committed table version, never "latest" twice.
+version = spark.sql(f"DESCRIBE HISTORY {TABLE} LIMIT 1").first()["version"]
+orders = spark.read.option("versionAsOf", version).table(TABLE)
+
+out_dir = HANDOFFS / run / "orders"
+(orders.orderBy("order_id").coalesce(1)
+    .write.mode("overwrite").option("header", True).csv(str(out_dir)))
+if not (out_dir / "_SUCCESS").exists():
+    raise RuntimeError("export was not committed")
+(export,) = sorted(out_dir.glob("part-*.csv"))
+
+head = mb.sign_origin(
+    export, HANDOFFS / run / "attestations" / "01-export.dsse.json",
+    source_kind="urn:example:source:delta-table-version",
+    source_uri=f"databricks://acme/{TABLE}",
+    source_metadata={"version": str(version), "mediaType": "text/csv"},
+    event_id=event("export"),
+)
+anchors = mb.create_handoff(
+    head, export, HANDOFFS / run / "attestations", HANDOFFS / run / "bundle",
+    recipient=RECIPIENT, bundle_id=event("bundle"), media_type="text/csv",
+)
+# Task values carry small strings between tasks. Keys and bundles never travel here.
+dbutils.jobs.taskValues.set(key="run", value=run)
+dbutils.jobs.taskValues.set(key="anchors", value=json.dumps(anchors))</code></pre><pre><code class="language-python"># src/makoto_gate.py
+"""Task 2: verify the handoff. Raising fails this task, so publish never runs."""
+
+import json
+import os
+from pathlib import Path
+
+from databricks.sdk.runtime import dbutils
+
+import makoto_boundary as mb
+
+HANDOFFS = Path(os.environ.get("MAKOTO_HANDOFFS", "/Volumes/main/sales/handoffs"))
+RECIPIENT = "example:finance-workspace"
+
+run = dbutils.jobs.taskValues.get(taskKey="export_and_attest", key="run", debugValue="")
+anchors = json.loads(dbutils.jobs.taskValues.get(taskKey="export_and_attest", key="anchors", debugValue="{}"))
+
+report = mb.verify(
+    HANDOFFS / run / "bundle", anchors,
+    recipient=RECIPIENT, report_path=HANDOFFS / run / "verification.json",
+)
+print(f"Makoto {report['decision']} for {run}, policy {report['policyDigest']['sha256'][:12]}")</code></pre><pre><code class="language-python"># src/publish.py
+"""Task 3: runs only after makoto_gate succeeded."""
+
+from databricks.sdk.runtime import dbutils
+
+run = dbutils.jobs.taskValues.get(taskKey="export_and_attest", key="run", debugValue="")
+print(f"publishing handoff {run}")</code></pre></section><section aria-labelledby="run"><h2 id="run">4. Deploy and run</h2><pre><code class="language-bash">databricks bundle validate
+databricks bundle deploy
+databricks bundle run makoto_orders</code></pre></section><section aria-labelledby="failure"><h2 id="failure">5. What a gate failure looks like</h2><p>From the local run of the gate task after the delivered file was changed; the task exits 1, which marks it failed:</p><pre><code class="language-bash">makoto_boundary.MakotoDenied: Makoto deny (E_ARTIFACT_DIGEST): step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest</code></pre></section>
+<section aria-labelledby="notes"><h2 id="notes">Design notes</h2><dl class="troubleshooting"><dt>Why read by version</dt><dd>Two reads of <code>main.sales.orders</code> during one job can see different commits. <code>versionAsOf</code> pins the export to the version recorded in the statement.</dd><dt>Keys</dt><dd>Store signing keys in a Volume or secret scope readable only by the job&rsquo;s service principal, one key per role. Task values carry run IDs and digests, never keys.</dd><dt>Production-sized tables</dt><dd>Do not coalesce to one file. Sign a dataset manifest over the part files, as described on the <a href="/integrations/spark/">Spark page</a>.</dd></dl></section>
+<section aria-labelledby="attachment"><h2 id="attachment">Other attachment points on this platform</h2><dl class="troubleshooting"><dt>Delta commit</dt><dd>After a write commits, record table identity, version, job, cluster, and notebook context. Resolve the exact snapshot files or a deterministic manifest.</dd><dt>Feature or model export</dt><dd>Attest the stable exported artifact; reference the upstream table statement and exact input digest.</dd><dt>Unity Catalog</dt><dd>Store pointers or searchable metadata if useful. Statement and artifact digests remain the portable identities.</dd><dt>External handoff</dt><dd>Sign the exact roots, heads, profiles, and final artifacts given to the recipient; keep receiver policy outside the bundle.</dd></dl></section>
+<section aria-labelledby="evidence"><h2 id="evidence">What the evidence can say</h2><p>It can bind a Databricks commit or export to exact predecessor and output evidence. It cannot prove that every notebook cell ran, that a quality expectation was correct, or that a model card automatically carries the data history.</p></section>
+<section aria-labelledby="trouble"><h2 id="trouble">Troubleshooting</h2><dl class="troubleshooting"><dt><code>ModuleNotFoundError: No module named 'makoto_boundary'</code></dt><dd>Place the helper beside the task scripts in the bundle&rsquo;s <code>src/</code> directory; the script directory is on the import path of a Python script task.</dd><dt><code>uv: command not found</code> in a task</dt><dd>The init script did not run on that cluster, or ran on a different cluster than the task. Confirm the task uses the job cluster that declares it.</dd></dl></section>
+<section class="community-band"><h2>Help us run this on a workspace.</h2><p>The local run proves the Makoto path. Serverless compute, shared access mode, and Volume permissions still need a real deployment.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Report a Databricks run</a><a class="button secondary" href="/integrations/airflow/">Airflow exemplar</a><a class="button secondary" href="/integrations/">All integrations</a></div></section>
+</main><footer class="footer"><div class="footer-inner">Makoto + Databricks · Lifecycle pattern, not a shipped adapter</div></footer></div></div></body></html>
