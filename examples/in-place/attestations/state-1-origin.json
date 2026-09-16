@@ -1,0 +1,39 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.db#customers",
+      "digest": {
+        "sha256": "4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/origin",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:110c8a8a-aabf-5155-a37d-df55f64e0e29",
+      "occurredAt": "2026-09-16T16:00:00Z"
+    },
+    "source": {
+      "kind": "urn:makoto:example:source:sqlite-table",
+      "name": "customers table, initial load",
+      "mediaType": "application/json",
+      "retrievedAt": "2026-09-16T16:00:00Z"
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:in-place-table": {
+        "database": "customers.db",
+        "table": "customers",
+        "tableDefinition": "sql/00-create.sql",
+        "command": "sql/01-load.sql",
+        "export": "sql/export.sql",
+        "exportDigest": {
+          "sha256": "8513ac471e80707fab7bc153743ecfab5777a3c73e651e813223c527cac89aa2"
+        },
+        "storageKeepsPreviousState": false
+      }
+    }
+  }
+}
