@@ -162,12 +162,12 @@ jq -r '.errors[] | "\(.step)\t\(.code)\t\(.causedByCheck)"' report.json
 # Fail a job unless every check passed (stricter than the decision alone):
 jq -e 'all(.checks[]; .status == "pass")' report.json &gt; /dev/null</code></pre></div></li>
 </ol>
-<section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><table class="stack-table module-table"><thead><tr><th>Exit status</th><th>Meaning and what your code must do</th></tr></thead><tbody>
-<tr><td><code>0</code></td><td><strong>allow.</strong> Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</td></tr>
-<tr><td><code>1</code></td><td><strong>deny</strong> or <strong>indeterminate.</strong> stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</td></tr>
-<tr><td><code>2</code></td><td><strong>Invalid input.</strong> A missing file, a malformed flag, an unreadable policy. No report is written; stderr carries one JSON object with <code>errorClass</code> and <code>message</code>.</td></tr>
-<tr><td><code>3</code></td><td><strong>Internal error.</strong> Same stderr shape with <code>errorClass: internal</code>. Treat it as an outage, never as a verdict.</td></tr>
-</tbody></table></section>
+<section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><dl class="troubleshooting">
+<dt><code>0</code> &middot; allow</dt><dd>Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</dd>
+<dt><code>1</code> &middot; deny or indeterminate</dt><dd>stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</dd>
+<dt><code>2</code> &middot; invalid input</dt><dd>A missing file, a malformed flag, an unreadable policy. No report is written; stderr carries one JSON object with <code>errorClass</code> and <code>message</code>.</dd>
+<dt><code>3</code> &middot; internal error</dt><dd>Same stderr shape with <code>errorClass</code> set to <code>internal</code>. Treat it as an outage, never as a verdict.</dd>
+</dl></section>
 <section aria-labelledby="ci"><h2 id="ci">In a GitHub Actions job</h2><p>The job checks out the receiver&rsquo;s repository and the pinned verifier side by side. The policy, catalog, and expected digests live in the receiver&rsquo;s repository and variables, never in the incoming bundle. The report is uploaded even on a denial, because the report is the explanation. This workflow passes <code>actionlint</code>.</p><pre><code class="language-yaml">name: verify-incoming-handoff
 
 on:

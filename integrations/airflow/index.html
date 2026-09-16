@@ -1,19 +1,475 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A truthful Makoto attachment pattern for Airflow task outputs and dataset handoffs."><title>Apache Airflow integration pattern — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A runnable Airflow 3 TaskFlow DAG that signs every task boundary with Makoto, hands off a bundle, and fails the run when the reference verifier denies it."><title>Airflow integration — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
 <a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/spec/">Specification</a><p class="mobile-section">Build</p><a href="/verify/">Verification</a><a href="/integrations/airflow/" aria-current="page">Airflow field note</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a></nav></details></div></header>
 <div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/" aria-current="page">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Platforms</p><a href="/integrations/airflow/" aria-current="page">Airflow</a><a href="/integrations/dbt/">dbt</a><a href="/integrations/spark/">Spark</a><a href="/integrations/kafka/">Kafka</a><a href="/integrations/snowflake/">Snowflake</a><a href="/integrations/databricks/">Databricks</a><a href="/integrations/dagster/">Dagster</a><a href="/integrations/prefect/">Prefect</a><a href="/integrations/expanso/">Expanso</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
-<div class="site-main"><main id="main" class="page wide"><span class="kicker">Integration field note</span><h1>Airflow: attest after the task commits its output.</h1><p class="lead">Airflow knows task and DAG execution. Makoto needs the exact artifact that task produced, exact predecessor evidence, and a signer authorized for that transformation or handoff.</p><p class="editorial-note"><strong>Implementation boundary.</strong> This is a TaskFlow/operator pattern, not a shipped Airflow provider or custom operator.</p>
-<h2>The attachment point</h2><table><tbody><tr><th>Task output</th><td>After the operator commits a stable file set, table snapshot, or manifest, append a transformation statement.</td></tr><tr><th>Dataset event</th><td>Use the dataset URI and event as scheduler context; resolve exact artifact bytes separately.</td></tr><tr><th>XCom</th><td>Pass statement digests and artifact references, not large evidence bundles or signing keys.</td></tr><tr><th>DAG boundary</th><td>Create a handoff only when the exact final artifacts, heads, recipients, and profiles are known.</td></tr></tbody></table>
-<h2>Control flow</h2><pre><code>@task
-def transform(input_ref):
-    output_ref = write_and_commit(input_ref)
-    return output_ref
+<div class="site-main"><main id="main" class="page wide">
+<span class="kicker">Airflow integration</span>
+<h1>Airflow: attest after the task commits its output.</h1>
+<p class="lead">Airflow knows which task ran and in what order. It does not know which exact bytes a task produced, which statement those bytes descend from, or whether the data that reached the next team is the data that was signed. This page wires Makoto into a real TaskFlow DAG so every boundary produces signed evidence and the handoff is refused unless the reference verifier allows it. The DAG below was run end to end with <code>airflow dags test</code> on Airflow 3.3.1, once clean and once with the data corrupted in transit.</p>
+<p class="editorial-note"><strong>Implementation boundary.</strong> This is a pattern built from Airflow&rsquo;s own Task SDK and the pinned reference CLI. It is not a shipped adapter, provider package, or custom operator, and no Makoto package is installed into Airflow. Everything Makoto-specific is the <code>makoto</code> command called through <code>subprocess</code>.</p>
 
-@task
-def attest(output_ref, predecessor_ref):
-    # Resolve exact bytes and invoke the checked-out reference CLI.
-    # Keep key material in the task's secret boundary, never XCom.
-    ...
+<section aria-labelledby="placement"><h2 id="placement">Where Makoto sits in the DAG</h2><p>Each data-producing task is followed by a task that signs what it just committed. Signing is a separate task on purpose: the transformation can be retried or rewritten without ever touching key material, and a failed signature is visible in the graph as its own red box.</p>
+<ol class="provenance-spine">
+<li><strong><code>extract</code></strong><span>Commits the raw export for this run to a run-scoped directory.</span></li>
+<li><strong><code>attest_origin</code></strong><span>Signs an origin statement over the exact raw bytes with the <code>origin</code> key, naming the source kind and URI the receiver&rsquo;s policy trusts.</span></li>
+<li><strong><code>normalize</code></strong><span>Your transformation. It knows nothing about Makoto.</span></li>
+<li><strong><code>attest_normalize</code></strong><span>Signs a transformation statement that binds the output to the origin statement and the exact input digest, with the <code>normalize</code> key.</span></li>
+<li><strong><code>create_handoff</code></strong><span>Packages the statements and final artifact into a bundle signed by the <code>handoff</code> key, addressed to one recipient, and computes the three anchors the receiver will check.</span></li>
+<li><strong><code>deliver</code></strong><span>Moves the bundle to the receiver. In this demonstration a DAG parameter can corrupt it on the way.</span></li>
+<li><strong><code>makoto_gate</code></strong><span>Runs the verifier with the receiver&rsquo;s policy and independent anchors. A denial raises <code>AirflowFailException</code>, so nothing downstream runs and nothing is retried.</span></li>
+<li><strong><code>publish</code></strong><span>Runs only on an allow, and records the manifest and policy digests the decision was made under.</span></li>
+</ol></section>
 
-uv run makoto attest transform --help</code></pre><p>Retries must be deterministic: the integration should recover an existing statement for the same event and artifacts or fail, not emit conflicting signed histories. A successful Airflow task alone does not establish artifact integrity.</p>
-<h2>What the evidence can say</h2><p>It can bind one committed task output to exact inputs, predecessor statements, and selected Airflow run context. It cannot prove task code executed honestly or infer recipient authorization from DAG ownership.</p>
-<section class="community-band"><h2>Contribute one DAG with a verifiable handoff.</h2><p>The fixture should include stable artifacts, retry behavior, key isolation, and the denial produced when the output changes.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Propose the Airflow fixture</a><a class="button secondary" href="/integrations/">Return to integrations</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto + Airflow · Lifecycle pattern, not a shipped adapter</div></footer></div></div></body></html>
+<ol class="setup-sequence">
+<li><div><h2 id="install">Install the verifier beside Airflow</h2><p>The workers call the reference CLI, so the pinned core checkout and <code>uv</code> must exist on every machine that runs a Makoto task. Airflow and Makoto keep separate Python environments; nothing is imported across them.</p><pre><code class="language-bash"># The reference verifier, pinned and synced once per worker image.
+git clone https://github.com/makoto-project/makoto.git /opt/makoto
+git -C /opt/makoto checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+(cd /opt/makoto &amp;&amp; uv sync --locked --dev)
+
+# Airflow itself, installed with its published constraints.
+uv pip install "apache-airflow==3.3.1" \
+  --constraint https://raw.githubusercontent.com/apache/airflow/constraints-3.3.1/constraints-3.12.txt
+
+# Every scheduler, DAG processor, and worker needs both variables.
+export MAKOTO_CORE=/opt/makoto
+export MAKOTO_WORK=/srv/makoto</code></pre></div></li>
+<li><div><h2 id="bootstrap">Create role keys and the receiver policy</h2><p>Run this once per environment, outside Airflow. It creates one Ed25519 key pair per claim role and writes the receiver&rsquo;s trust policy: which key may sign origins for which source, which key may sign which operation, and what the handoff must prove. The last line runs <code>makoto policy check</code>, so a malformed policy fails here rather than inside a task.</p><pre><code class="language-python">"""One-time setup: signing keys per claim role and the receiver's trust policy.
+
+Run once per environment, outside Airflow:
+    MAKOTO_CORE=/path/to/makoto MAKOTO_WORK=/srv/makoto uv run bootstrap_makoto.py
+"""
+
+import base64
+import json
+import os
+import subprocess
+from pathlib import Path
+
+CORE = Path(os.environ["MAKOTO_CORE"]).resolve()
+WORK = Path(os.environ["MAKOTO_WORK"]).resolve()
+ROLES = ("origin", "normalize", "handoff")
+
+
+def makoto(*args: object) -&gt; str:
+    result = subprocess.run(
+        ["uv", "run", "--quiet", "makoto", *map(str, args)],
+        cwd=CORE, capture_output=True, text=True, check=False,
+    )
+    if result.returncode != 0:
+        raise SystemExit(result.stderr.strip())
+    return result.stdout
+
+
+def public_key_entry(role: str) -&gt; tuple[str, dict]:
+    public_pem = WORK / "keys" / f"{role}.public.pem"
+    keyid = json.loads(makoto("key", "inspect", "--public", public_pem, "--json"))["keyid"]
+    # The policy stores the DER SubjectPublicKeyInfo, base64-encoded: the PEM body.
+    der = base64.b64decode("".join(public_pem.read_text().strip().splitlines()[1:-1]))
+    return keyid, {"type": "ed25519", "publicKey": base64.b64encode(der).decode(), "label": f"orders pipeline {role} key"}
+
+
+(WORK / "keys").mkdir(parents=True, exist_ok=True)
+(WORK / "receiver").mkdir(parents=True, exist_ok=True)
+for role in ROLES:
+    if not (WORK / "keys" / f"{role}.private.pem").exists():
+        makoto(
+            "key", "generate",
+            "--private-out", WORK / "keys" / f"{role}.private.pem",
+            "--public-out", WORK / "keys" / f"{role}.public.pem",
+        )
+
+keys = dict(public_key_entry(role) for role in ROLES)
+keyid = {role: kid for role, kid in zip(ROLES, keys)}
+
+policy = {
+    "version": "0.2",
+    "keys": keys,
+    "rules": [
+        {
+            "id": "urn:example:rule:orders-origin",
+            "predicateTypes": ["https://usemakoto.dev/predicate/v0.2/origin"],
+            "authorizedKeyIds": [keyid["origin"]],
+            "minimumSignatures": 1,
+            "sourceKinds": ["urn:example:source:orders-export"],
+            "sourceUris": ["urn:example:orders:daily"],
+        },
+        {
+            "id": "urn:example:rule:orders-normalize",
+            "predicateTypes": ["https://usemakoto.dev/predicate/v0.2/transform"],
+            "authorizedKeyIds": [keyid["normalize"]],
+            "minimumSignatures": 1,
+            "operationTypes": ["urn:example:operation:normalize-orders"],
+        },
+    ],
+    "handoff": {
+        "authorizedKeyIds": [keyid["handoff"]],
+        "minimumSignatures": 1,
+        "requireExpectedManifest": True,
+        "requireExpectedHead": True,
+        "requireExpectedArtifacts": True,
+        "requireRecipient": True,
+        "requireNonce": False,
+        "allowReplayableHandoff": False,
+        "maxAgeSeconds": 86400,
+        "maxFutureSkewSeconds": 300,
+    },
+    "requiredProfiles": [],
+    "limits": {
+        "maxBundleFiles": 10000,
+        "maxMetadataBytes": 104857600,
+        "maxArtifactBytesPerFile": 10737418240,
+        "maxAggregateArtifactBytes": 53687091200,
+        "maxSnapshotBytes": 53687091200,
+        "maxArtifactValidationBytes": 104857600,
+        "maxJsonDepth": 128,
+        "maxJsonNumberChars": 1024,
+        "maxJsonExponentMagnitude": 10000,
+        "maxSchemaBytes": 2097152,
+        "maxSchemaResources": 256,
+        "maxSchemaEvaluationDepth": 256,
+        "maxSchemaOperations": 10000000,
+        "maxRegexLength": 4096,
+        "profileEvaluationTimeoutSeconds": 5,
+        "profileWorkerMemoryBytes": 536870912,
+        "maxNdjsonLineBytes": 1048576,
+        "maxSignaturesTotal": 10000,
+        "maxProfileEvaluations": 10000,
+        "maxDiagnostics": 10000,
+        "maxReportRecords": 20000,
+        "maxReportBytes": 67108864,
+    },
+}
+# The verifier requires canonical order: rules sorted by id, compared as bytes.
+policy["rules"].sort(key=lambda rule: rule["id"].encode())
+policy_path = WORK / "receiver" / "policy.json"
+policy_path.write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
+makoto("policy", "check", "--policy", policy_path)
+print(f"keys in {WORK / 'keys'}; policy checked at {policy_path}")</code></pre><pre><code class="language-bash">MAKOTO_CORE=/opt/makoto MAKOTO_WORK=/srv/makoto uv run bootstrap_makoto.py
+keys in /srv/makoto/keys; policy checked at /srv/makoto/receiver/policy.json</code></pre><p class="editorial-note"><strong>In a real deployment these are two parties.</strong> The producer holds the private keys. The receiver owns <code>policy.json</code> and needs only the public keys. The script creates both halves in one place so the example runs on one machine.</p></div></li>
+<li><div><h2 id="dag">The DAG</h2><p>Save this as <code>dags/makoto_orders.py</code>. It uses only the Airflow Task SDK and the standard library.</p><pre><code class="language-python">"""Attest every task boundary with Makoto, hand off a bundle, and gate on the verdict."""
+
+from __future__ import annotations
+
+import base64
+import hashlib
+import json
+import os
+import re
+import shutil
+import subprocess
+import uuid
+from pathlib import Path
+
+import pendulum
+from airflow.sdk import Param, dag, get_current_context, task
+from airflow.sdk.exceptions import AirflowFailException
+
+CORE = Path(os.environ["MAKOTO_CORE"])  # reviewed core checkout, synced with uv
+WORK = Path(os.environ["MAKOTO_WORK"])  # keys/ and receiver/ from bootstrap_makoto.py
+RECIPIENT = "example:analytics-team"
+NORMALIZE_OP = "urn:example:operation:normalize-orders"
+
+
+# --------------------------------------------------------------------------- helpers
+def makoto(*args: object) -&gt; subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["uv", "run", "--quiet", "makoto", *map(str, args)],
+        cwd=CORE, capture_output=True, text=True, check=False,
+    )
+
+
+def run_dir(*parts: str) -&gt; Path:
+    """One directory per DAG run, so retries and reruns never mix evidence."""
+    run_id = re.sub(r"[^A-Za-z0-9._-]", "_", get_current_context()["run_id"])
+    path = WORK.joinpath("runs", run_id, *parts)
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def event_id(name: str) -&gt; str:
+    """Stable across task retries, unique across runs."""
+    context = get_current_context()
+    return f"urn:uuid:{uuid.uuid5(uuid.NAMESPACE_URL, f'{context['ti'].dag_id}/{context['run_id']}/{name}')}"
+
+
+def sha256(path: Path) -&gt; str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def payload(envelope: Path) -&gt; bytes:
+    return base64.b64decode(json.loads(envelope.read_text())["payload"])
+
+
+def sign(kind: str, role: str, subject: Path, out: Path, *extra: object) -&gt; str:
+    """Sign once. A retry reuses the envelope only if it covers the same bytes."""
+    if out.exists():
+        signed = json.loads(payload(out))["subject"][0]["digest"]["sha256"]
+        if signed == sha256(subject):
+            return str(out)
+        raise AirflowFailException(f"{out.name} already attests different bytes; refusing a second history")
+    result = makoto(
+        "attest", kind,
+        "--subject", f"{subject.name}={subject}",
+        *extra,
+        "--event-id", event_id(out.name),
+        "--key", WORK / "keys" / f"{role}.private.pem",
+        "--out", out,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"makoto attest {kind} failed: {result.stderr.strip()}")  # retryable
+    return str(out)
+
+
+# --------------------------------------------------------------------------- DAG
+@dag(
+    dag_id="makoto_orders",
+    schedule=None,
+    start_date=pendulum.datetime(2026, 9, 1, tz="UTC"),
+    catchup=False,
+    default_args={"retries": 2},
+    params={"tamper_in_transit": Param(False, type="boolean")},
+    tags=["makoto"],
+)
+def makoto_orders():
+    @task
+    def extract() -&gt; str:
+        raw = run_dir("data") / "orders.raw.csv"
+        raw.write_text("order_id,region,total\n1001, us ,42.00\n1002,GB,17.50\n")
+        return str(raw)
+
+    @task
+    def attest_origin(raw: str) -&gt; str:
+        return sign(
+            "origin", "origin", Path(raw), run_dir("attestations") / "01-origin.dsse.json",
+            "--source-kind", "urn:example:source:orders-export",
+            "--source-uri", "urn:example:orders:daily",
+        )
+
+    @task
+    def normalize(raw: str) -&gt; str:
+        header, *rows = Path(raw).read_text().splitlines()
+        out = run_dir("data") / "orders.normalized.csv"
+        cleaned = [",".join(cell.strip().lower() for cell in row.split(",")) for row in rows]
+        out.write_text("\n".join([header, *cleaned]) + "\n")
+        return str(out)
+
+    @task
+    def attest_normalize(raw: str, origin: str, normalized: str) -&gt; str:
+        binding = run_dir("bindings") / "normalize-input.json"
+        binding.write_text(json.dumps({
+            "name": "raw",
+            "path": raw,
+            "predecessor": origin,
+            "subjectName": Path(raw).name,
+        }))
+        return sign(
+            "transform", "normalize", Path(normalized),
+            run_dir("attestations") / "02-normalize.dsse.json",
+            "--input-binding", binding,
+            "--operation-type", NORMALIZE_OP,
+            "--operation-name", "Normalize order regions",
+        )
+
+    @task
+    def create_handoff(head: str, normalized: str) -&gt; dict:
+        binding = run_dir("bindings") / "final-artifact.json"
+        binding.write_text(json.dumps({
+            "head": head,
+            "subjectName": Path(normalized).name,
+            "path": normalized,
+            "mediaType": "text/csv",
+        }))
+        bundle = run_dir() / "bundle"
+        result = makoto(
+            "handoff", "create",
+            "--head", head,
+            "--attestations", run_dir("attestations"),
+            "--artifact-binding", binding,
+            "--recipient", RECIPIENT,
+            "--bundle-id", event_id("bundle"),
+            "--key", WORK / "keys" / "handoff.private.pem",
+            "--out", bundle,
+            "--force",  # a retry rebuilds the same bundle from the same signed inputs
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"makoto handoff create failed: {result.stderr.strip()}")
+        index = json.loads((bundle / "bundle.json").read_text())
+        # These three anchors travel to the receiver out of band: a ticket, a
+        # release record, a catalog entry. Never inside the bundle they describe.
+        return {
+            "bundle": str(bundle),
+            "manifest": "sha256:" + hashlib.sha256(payload(bundle / index["manifest"])).hexdigest(),
+            "head": "sha256:" + hashlib.sha256(payload(Path(head))).hexdigest(),
+            "artifact": {
+                "head": {"sha256": hashlib.sha256(payload(Path(head))).hexdigest()},
+                "subjectName": Path(normalized).name,
+                "digest": {"sha256": sha256(Path(normalized))},
+            },
+        }
+
+    @task
+    def deliver(handoff: dict) -&gt; str:
+        inbox = run_dir("receiver-inbox") / "bundle"
+        shutil.copytree(handoff["bundle"], inbox, dirs_exist_ok=True)
+        if get_current_context()["params"]["tamper_in_transit"]:
+            final = next((inbox / "artifacts" / "final").glob("*.bin"))
+            final.write_bytes(final.read_bytes() + b"1003,us,0.01\n")
+        return str(inbox)
+
+    @task
+    def makoto_gate(delivered: str, handoff: dict) -&gt; dict:
+        expected_artifact = run_dir("receiver-inbox") / "expected-artifact.json"
+        expected_artifact.write_text(json.dumps(handoff["artifact"]))
+        result = makoto(
+            "verify", "bundle", delivered,
+            "--policy", WORK / "receiver" / "policy.json",
+            "--expected-manifest", handoff["manifest"],
+            "--expected-head", handoff["head"],
+            "--expected-artifact", expected_artifact,
+            "--expected-recipient", RECIPIENT,
+            "--json",
+        )
+        if result.returncode not in (0, 1):
+            raise RuntimeError(f"verifier could not run: {result.stderr.strip()}")  # retryable
+        report_path = run_dir("reports") / "verification.json"
+        report_path.write_text(result.stdout)
+        report = json.loads(result.stdout)
+        if report["decision"] != "allow":
+            failed = [f"step {e['step']} {e['code']}: {e['message']}" for e in report["errors"]]
+            # AirflowFailException skips retries: a denial will not change on retry.
+            raise AirflowFailException(
+                f"Makoto {report['decision']} ({report['primaryError']}); "
+                f"report at {report_path}; " + "; ".join(failed)
+            )
+        return {
+            "decision": report["decision"],
+            "manifest": report["manifestDigest"]["sha256"],
+            "policy": report["policyDigest"]["sha256"],
+            "report": str(report_path),
+        }
+
+    @task
+    def publish(verdict: dict, normalized: str) -&gt; None:
+        print(f"publishing {normalized} under Makoto {verdict['decision']} "
+              f"(manifest {verdict['manifest'][:12]}, policy {verdict['policy'][:12]})")
+
+    raw = extract()
+    origin = attest_origin(raw)
+    normalized = normalize(raw)
+    head = attest_normalize(raw, origin, normalized)
+    handoff = create_handoff(head, normalized)
+    verdict = makoto_gate(deliver(handoff), handoff)
+    publish(verdict, normalized)
+
+
+makoto_orders()</code></pre></div></li>
+<li><div><h2 id="run">Run it</h2><pre><code class="language-bash">airflow db migrate
+airflow dags test makoto_orders</code></pre><p>All eight tasks succeed. The <code>publish</code> task logs the decision and the digests it was made under:</p><pre><code class="language-bash">publishing /srv/makoto/runs/manual__2026-09-16T12_46_35.467633_00_00/data/orders.normalized.csv under Makoto allow (manifest 712954fd6b0d, policy b0b749267a9b)</code></pre></div></li>
+<li><div><h2 id="failure">What a gate failure looks like</h2><p>Trigger the same DAG with the data corrupted between handoff and verification. Everything upstream still succeeds, because every signature was honest when it was made. The gate is where the change is caught.</p><pre><code class="language-bash">airflow dags test makoto_orders -c '{"tamper_in_transit": true}'</code></pre><pre><code class="language-bash">airflow.sdk.exceptions.AirflowFailException: Makoto deny (E_ARTIFACT_DIGEST); report at /srv/makoto/runs/manual__2026-09-16T12_46_45.122670_00_00/reports/verification.json; step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest</code></pre><p>Task states for that run. <code>makoto_gate</code> fails once with no retries, and <code>publish</code> never starts:</p><pre><code class="language-bash">task_id state
+extract success
+attest_origin success
+normalize success
+attest_normalize success
+create_handoff success
+deliver success
+makoto_gate failed
+publish upstream_failed</code></pre><p>The report written by the gate says precisely what failed and what still held. Signatures, authorization, the graph, and the recipient all pass; only the delivered bytes do not match:</p><pre><code class="language-bash">jq '{decision, primaryError,
+    notPassed: [.checks[] | select(.status != "pass") | {id, status}],
+    errors: [.errors[] | {step, code, message}],
+    recipient: .actualRecipient, policy: .policyDigest.sha256}' \
+  /srv/makoto/runs/&lt;run&gt;/reports/verification.json
+{
+  "decision": "deny",
+  "primaryError": "E_ARTIFACT_DIGEST",
+  "notPassed": [
+    {
+      "id": "artifact-bytes",
+      "status": "fail"
+    }
+  ],
+  "errors": [
+    {
+      "step": 12,
+      "code": "E_ARTIFACT_DIGEST",
+      "message": "final artifact bytes differ from the signed digest"
+    }
+  ],
+  "recipient": "example:analytics-team",
+  "policy": "b0b749267a9b3bbfce5dc0a8a9fd570f49525af8a4332c43aa11d9ce1d529a69"
+}</code></pre></div></li>
+</ol>
+
+<section aria-labelledby="signing"><h2 id="signing">Signing that survives retries</h2><p>Airflow retries tasks. Signed evidence must not fork because of it. <code>sign</code> derives the event identifier from the DAG, run, and statement name, so a retry produces the same event. If the envelope already exists, it is reused only when it covers the same bytes; if the task output changed between attempts, the task fails permanently instead of emitting a second, conflicting history.</p><pre><code class="language-python">def sign(kind: str, role: str, subject: Path, out: Path, *extra: object) -&gt; str:
+    """Sign once. A retry reuses the envelope only if it covers the same bytes."""
+    if out.exists():
+        signed = json.loads(payload(out))["subject"][0]["digest"]["sha256"]
+        if signed == sha256(subject):
+            return str(out)
+        raise AirflowFailException(f"{out.name} already attests different bytes; refusing a second history")
+    result = makoto(
+        "attest", kind,
+        "--subject", f"{subject.name}={subject}",
+        *extra,
+        "--event-id", event_id(out.name),
+        "--key", WORK / "keys" / f"{role}.private.pem",
+        "--out", out,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"makoto attest {kind} failed: {result.stderr.strip()}")  # retryable
+    return str(out)</code></pre><p>Both behaviours were exercised against the run above: a retry over identical bytes returned the existing envelope unchanged, and a retry after the raw file changed raised <code>AirflowFailException: 01-origin.dsse.json already attests different bytes; refusing a second history</code>.</p></section>
+
+<section aria-labelledby="xcom"><h2 id="xcom">What travels through XCom, and what never does</h2><dl class="troubleshooting">
+<dt>Artifact and envelope paths</dt><dd>Passed through XCom. They are small strings pointing into the run-scoped directory.</dd>
+<dt>Manifest, head, and artifact digests</dt><dd>Returned by <code>create_handoff</code>. In production, publish them through a channel the bundle cannot rewrite and have the receiver read them from there.</dd>
+<dt>Private keys</dt><dd>Never. Tasks read them from the worker filesystem under <code>MAKOTO_WORK/keys</code>; mount them from your secrets backend, one key per role.</dd>
+<dt>Bundles and reports</dt><dd>Never. XCom rows live in the metadata database. The gate writes the report to disk and returns only its path and digests.</dd>
+</dl></section>
+
+<section aria-labelledby="gate"><h2 id="gate">The gate, and why its exceptions differ</h2><pre><code class="language-python">    def makoto_gate(delivered: str, handoff: dict) -&gt; dict:
+        expected_artifact = run_dir("receiver-inbox") / "expected-artifact.json"
+        expected_artifact.write_text(json.dumps(handoff["artifact"]))
+        result = makoto(
+            "verify", "bundle", delivered,
+            "--policy", WORK / "receiver" / "policy.json",
+            "--expected-manifest", handoff["manifest"],
+            "--expected-head", handoff["head"],
+            "--expected-artifact", expected_artifact,
+            "--expected-recipient", RECIPIENT,
+            "--json",
+        )
+        if result.returncode not in (0, 1):
+            raise RuntimeError(f"verifier could not run: {result.stderr.strip()}")  # retryable
+        report_path = run_dir("reports") / "verification.json"
+        report_path.write_text(result.stdout)
+        report = json.loads(result.stdout)
+        if report["decision"] != "allow":
+            failed = [f"step {e['step']} {e['code']}: {e['message']}" for e in report["errors"]]
+            # AirflowFailException skips retries: a denial will not change on retry.
+            raise AirflowFailException(
+                f"Makoto {report['decision']} ({report['primaryError']}); "
+                f"report at {report_path}; " + "; ".join(failed)
+            )
+        return {
+            "decision": report["decision"],
+            "manifest": report["manifestDigest"]["sha256"],
+            "policy": report["policyDigest"]["sha256"],
+            "report": str(report_path),
+        }</code></pre><p>Two exception types carry two meanings. <code>RuntimeError</code> means the verifier could not run, exit status 2 or 3, which may be transient, so the task&rsquo;s retries apply. <code>AirflowFailException</code> means the verifier ran and refused the data. Retrying cannot change a denial, and retrying would hide it in the UI, so it fails immediately.</p></section>
+
+<section aria-labelledby="production"><h2 id="production">Taking it to production</h2><dl class="troubleshooting">
+<dt>Split producer and receiver</dt><dd>Run <code>makoto_gate</code> and <code>publish</code> in the receiving team&rsquo;s own DAG and deployment, with its own policy file. A gate that shares a filesystem with the producer can be satisfied by the producer.</dd>
+<dt>Pin evaluation time for backfills</dt><dd>The gate uses the current time, which enforces the policy&rsquo;s 24-hour <code>maxAgeSeconds</code>. When re-verifying historical runs, pass <code>--evaluation-time</code> from the run&rsquo;s data interval and keep the policy snapshot that was in force.</dd>
+<dt>Keep the report</dt><dd>Ship <code>reports/verification.json</code> to durable storage with the policy digest, allowed or not. It is the record of why data was accepted.</dd>
+<dt>Keep the run directory immutable</dt><dd>Never rewrite a signed file in place to append a step. A new step is a new statement that names its predecessor.</dd>
+</dl></section>
+
+<section aria-labelledby="evidence"><h2 id="evidence">What the evidence can say</h2><p>It can bind one committed task output to exact inputs, predecessor statements, and the key that signed it, and prove that the bytes a receiver holds are the bytes that were signed. It cannot prove the task code executed honestly, that the source system told the truth, or that DAG ownership implies a recipient is authorized. Those remain controls around the pipeline, not properties of the evidence.</p></section>
+
+<section aria-labelledby="trouble"><h2 id="trouble">Troubleshooting</h2><dl class="troubleshooting">
+<dt><code>{"errorClass":"invalid-input","message":"$.rules: array is not in canonical order"}</code></dt><dd>Policy rules must be sorted by <code>id</code>, compared as bytes. The bootstrap script sorts them before writing.</dd>
+<dt><code>{"errorClass":"invalid-input","message":"output already exists: ..."}</code> on a retry</dt><dd>The CLI refuses to overwrite an existing envelope unless given <code>--force</code>, and exits 2. The <code>sign</code> helper handles this by reusing a matching envelope; do not add <code>--force</code> to attestation calls, or a retry can silently replace history.</dd>
+<dt><code>FileNotFoundError: [Errno 2] No such file or directory: 'uv'</code> in a task log</dt><dd>The worker&rsquo;s <code>PATH</code> does not include <code>uv</code>. Install it in the worker image, or call <code>$MAKOTO_CORE/.venv/bin/makoto</code> directly.</dd>
+<dt>The gate denies with <code>E_HANDOFF_STALE</code></dt><dd>The handoff is older than the policy&rsquo;s <code>maxAgeSeconds</code> at evaluation time. Verifying the clean run above two days later with <code>--evaluation-time</code> produces exactly this denial and no other error. Verify promptly after delivery, or pass an explicit <code>--evaluation-time</code> when re-verifying.</dd>
+</dl></section>
+
+<section class="community-band"><h2>Run it on your Airflow and tell us what broke.</h2><p>The most useful contribution is a real deployment detail this DAG gets wrong: a secrets backend, a Kubernetes executor, an object-store handoff, or a dataset-triggered receiver.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Report an Airflow finding</a><a class="button secondary" href="/verify/python.html">Python binding</a><a class="button secondary" href="/integrations/">All integrations</a></div></section>
+</main><footer class="footer"><div class="footer-inner">Makoto + Airflow · Lifecycle pattern, not a shipped adapter</div></footer></div></div></body></html>

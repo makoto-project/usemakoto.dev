@@ -424,12 +424,12 @@ type Report struct {
 		r.Summary["signaturesValid"], r.Summary["signaturesTotal"], r.PolicyDigest["sha256"])
 }</code></pre></div></li>
 </ol>
-<section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><table class="stack-table module-table"><thead><tr><th>Exit status</th><th>Meaning and what your code must do</th></tr></thead><tbody>
-<tr><td><code>0</code></td><td><strong>allow.</strong> Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</td></tr>
-<tr><td><code>1</code></td><td><strong>deny</strong> or <strong>indeterminate.</strong> stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</td></tr>
-<tr><td><code>2</code></td><td><strong>Invalid input.</strong> A missing file, a malformed flag, an unreadable policy. No report is written; stderr carries one JSON object with <code>errorClass</code> and <code>message</code>.</td></tr>
-<tr><td><code>3</code></td><td><strong>Internal error.</strong> Same stderr shape with <code>errorClass: internal</code>. Treat it as an outage, never as a verdict.</td></tr>
-</tbody></table></section>
+<section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><dl class="troubleshooting">
+<dt><code>0</code> &middot; allow</dt><dd>Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</dd>
+<dt><code>1</code> &middot; deny or indeterminate</dt><dd>stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</dd>
+<dt><code>2</code> &middot; invalid input</dt><dd>A missing file, a malformed flag, an unreadable policy. No report is written; stderr carries one JSON object with <code>errorClass</code> and <code>message</code>.</dd>
+<dt><code>3</code> &middot; internal error</dt><dd>Same stderr shape with <code>errorClass</code> set to <code>internal</code>. Treat it as an outage, never as a verdict.</dd>
+</dl></section>
 <section aria-labelledby="native"><h2 id="native">Toward a native Go verifier</h2><p>No maintained Go SDK exists. A native implementation would need to reproduce DSSE pre-authentication encoding over exact payload bytes, JCS canonicalization, digest-pinned schema resolution, the receiver policy model, and the published check order with its diagnostic codes. Until one passes the same positive fixture and all seven denial cases, keep the process boundary: it is the only way to be certain Go and Python agree.</p></section>
 <section aria-labelledby="trouble"><h2 id="trouble">Troubleshooting</h2><dl class="troubleshooting">
 <dt>Treating every non-nil <code>cmd.Run()</code> error as a failure</dt>

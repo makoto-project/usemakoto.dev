@@ -249,12 +249,12 @@ try {
   console.log(`  signatures ${s.signaturesValid}/${s.signaturesTotal} valid, policy ${report.policyDigest.sha256.slice(0, 12)}`);
 }</code></pre><p>For declared types over the same report, see <a href="/verify/typescript.html">the TypeScript binding</a>.</p></div></li>
 </ol>
-<section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><table class="stack-table module-table"><thead><tr><th>Exit status</th><th>Meaning and what your code must do</th></tr></thead><tbody>
-<tr><td><code>0</code></td><td><strong>allow.</strong> Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</td></tr>
-<tr><td><code>1</code></td><td><strong>deny</strong> or <strong>indeterminate.</strong> stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</td></tr>
-<tr><td><code>2</code></td><td><strong>Invalid input.</strong> A missing file, a malformed flag, an unreadable policy. No report is written; stderr carries one JSON object with <code>errorClass</code> and <code>message</code>.</td></tr>
-<tr><td><code>3</code></td><td><strong>Internal error.</strong> Same stderr shape with <code>errorClass: internal</code>. Treat it as an outage, never as a verdict.</td></tr>
-</tbody></table></section>
+<section aria-labelledby="exit"><h2 id="exit">Exit status contract</h2><dl class="troubleshooting">
+<dt><code>0</code> &middot; allow</dt><dd>Every required check passed under this exact policy and expectation set. stdout holds the report; keep it with the policy digest.</dd>
+<dt><code>1</code> &middot; deny or indeterminate</dt><dd>stdout still holds a complete report. Refuse the data and route on <code>primaryError</code>.</dd>
+<dt><code>2</code> &middot; invalid input</dt><dd>A missing file, a malformed flag, an unreadable policy. No report is written; stderr carries one JSON object with <code>errorClass</code> and <code>message</code>.</dd>
+<dt><code>3</code> &middot; internal error</dt><dd>Same stderr shape with <code>errorClass</code> set to <code>internal</code>. Treat it as an outage, never as a verdict.</dd>
+</dl></section>
 <section aria-labelledby="service"><h2 id="service">Inside a request handler</h2><p><code>spawnSync</code> blocks the event loop for the length of a verification, a few hundred milliseconds for the fixture. In an HTTP service, run the same arguments through the promise form of <code>execFile</code> so other requests keep moving, and keep the exit-status rules identical:</p><pre><code class="language-javascript">import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
