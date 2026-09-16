@@ -58,7 +58,10 @@ SUPERSEDED_FORMAT_PAGES = (
     "spec/l3-requirements.html",
     "spec/signature-guide.html",
 )
-SUPERSEDED_BANNER = "Historical v0.1 material."
+# Section 21 also requires the superseded pages to state the incompatibility, so
+# the banner has to carry both markers, inside the banner element itself.
+SUPERSEDED_BANNER_CLASS = 'class="superseded-banner"'
+SUPERSEDED_BANNER_TEXT = ("Historical v0.1 material.", "not wire-compatible")
 # Pages that reproduce canonical source text verbatim. The retired version is
 # discussed by the specification itself, so a faithful rendering has to contain
 # it; scripts/render_spec.py --check is what keeps these honest.
@@ -737,18 +740,33 @@ def check_tracked_files(errors: list[str]) -> None:
         errors.append(f"forbidden tracked dependencies/caches: {forbidden[:10]!r}")
 
 
+def retired_version_errors(relative: str, content: str) -> list[str]:
+    """Apply the retired-version rule to one HTML page.
+
+    The retired version may appear only where the specification requires it:
+    on the superseded pages, which must carry the labelled banner, and on the
+    verbatim rendering of the specification, which discusses it. Anywhere else
+    it is a regression.
+    """
+    names_retired = re.search(r"v0\.1", content, flags=re.IGNORECASE) is not None
+    if relative in SUPERSEDED_FORMAT_PAGES:
+        if not names_retired:
+            return [f"superseded-format page no longer names the retired version: {relative}"]
+        _, has_banner, after = content.partition(SUPERSEDED_BANNER_CLASS)
+        banner = after.split("</div>", 1)[0]
+        if not has_banner or not all(text in banner for text in SUPERSEDED_BANNER_TEXT):
+            return [f"superseded-format banner is missing or incomplete: {relative}"]
+        return []
+    if names_retired and relative not in VERBATIM_SOURCE_PAGES:
+        return [f"retired protocol version remains in HTML: {relative}"]
+    return []
+
+
 def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None:
     for path in sorted(ROOT.rglob("*.html")):
         relative = path.relative_to(ROOT).as_posix()
         content = path.read_text(encoding="utf-8", errors="replace")
-        if re.search(r"v0\.1", content, flags=re.IGNORECASE):
-            if relative in SUPERSEDED_FORMAT_PAGES:
-                if SUPERSEDED_BANNER not in content:
-                    errors.append(f"superseded-format banner is missing: {relative}")
-            elif relative not in VERBATIM_SOURCE_PAGES:
-                errors.append(f"retired protocol version remains in HTML: {relative}")
-        elif relative in SUPERSEDED_FORMAT_PAGES:
-            errors.append(f"superseded-format page no longer names the retired version: {relative}")
+        errors.extend(retired_version_errors(relative, content))
         if relative in TECHNICAL_VERSION_PAGES:
             continue
         parser = PageParser()

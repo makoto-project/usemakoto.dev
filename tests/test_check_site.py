@@ -204,8 +204,24 @@ def test_validation_and_language_recipes_are_substantive_and_truthful() -> None:
     assert "nonzero process status" in go
 
 
-def test_mutable_latest_schema_alias_is_not_deployed() -> None:
-    assert not (check_site.ROOT / "schema/latest.json").exists()
+def test_latest_schema_alias_is_a_labelled_pointer_not_an_identifier() -> None:
+    # Section 17: the alias MAY remain for humans, and documentation MUST warn it
+    # is not an immutable protocol identifier.
+    warning = "not an immutable protocol identifier"
+    latest = check_site.ROOT / "schema/latest.json"
+    pointer = json.loads(latest.read_text(encoding="utf-8"))
+    catalog = check_site.ROOT / "schema/v0.2/catalog.json"
+    pin = json.loads((check_site.ROOT / "schema/core-candidate.json").read_text(encoding="utf-8"))
+
+    assert "$id" not in pointer and "$schema" not in pointer
+    assert (
+        pointer["catalog"]["digest"]["sha256"] == hashlib.sha256(catalog.read_bytes()).hexdigest()
+    )
+    assert warning in pointer["note"]
+    assert all(entry["path"] != "/schema/latest.json" for entry in pin["schemas"])
+    for relative in ("spec/index.html", "spec/schemas/index.html"):
+        content = (check_site.ROOT / relative).read_text(encoding="utf-8")
+        assert 'href="/schema/latest.json"' in content and warning in content, relative
 
 
 def test_integration_field_notes_share_current_shell_and_status_boundary() -> None:
@@ -259,12 +275,67 @@ def test_narrative_pages_have_no_visible_version_labels() -> None:
         ), relative
 
 
-def test_html_does_not_reference_retired_protocol_version() -> None:
+def test_html_references_retired_protocol_version_only_where_required() -> None:
     for path in sorted(check_site.ROOT.rglob("*.html")):
+        relative = path.relative_to(check_site.ROOT).as_posix()
         content = path.read_text(encoding="utf-8", errors="replace")
-        assert re.search(r"v0\.1", content, flags=re.IGNORECASE) is None, path.relative_to(
-            check_site.ROOT
-        )
+        assert check_site.retired_version_errors(relative, content) == [], relative
+
+
+def test_superseded_pages_remain_published_and_labelled() -> None:
+    # Section 21: the L1/L2/L3 pages remain labelled as historical material.
+    for relative in check_site.SUPERSEDED_FORMAT_PAGES:
+        content = (check_site.ROOT / relative).read_text(encoding="utf-8")
+        assert 'http-equiv="refresh"' not in content, relative
+        assert len(content) > 20_000, relative
+
+
+BANNER = (
+    '<div class="superseded-banner"><p><strong>Historical v0.1 material.</strong> '
+    "It is not wire-compatible with the current protocol.</p></div>"
+)
+
+
+@pytest.mark.parametrize(
+    ("relative", "content", "expected"),
+    [
+        ("index.html", "<p>See v0.1.</p>", "retired protocol version remains in HTML"),
+        ("spec/index.html", "<a href='/schema/V0.1.json'>x</a>", "retired protocol version"),
+        ("spec/l1-requirements.html", "<p>Levels.</p>", "no longer names the retired version"),
+        ("spec/l1-requirements.html", "<p>v0.1 levels</p>", "banner is missing or incomplete"),
+        (
+            "spec/l2-requirements.html",
+            '<div class="superseded-banner"><p>Historical v0.1 material.</p></div>',
+            "banner is missing or incomplete",
+        ),
+        (
+            "spec/l3-requirements.html",
+            (
+                '<div class="superseded-banner"><p>Old.</p></div>'
+                "<p>Historical v0.1 material. not wire-compatible</p>"
+            ),
+            "banner is missing or incomplete",
+        ),
+    ],
+)
+def test_retired_version_rule_rejects_regressions(
+    relative: str, content: str, expected: str
+) -> None:
+    errors = check_site.retired_version_errors(relative, content)
+
+    assert len(errors) == 1 and expected in errors[0]
+
+
+@pytest.mark.parametrize(
+    ("relative", "content"),
+    [
+        ("index.html", "<p>Current protocol.</p>"),
+        ("spec/signature-guide.html", BANNER),
+        ("spec/text/index.html", "<p>v0.2 is not wire-compatible with v0.1.</p>"),
+    ],
+)
+def test_retired_version_rule_accepts_required_mentions(relative: str, content: str) -> None:
+    assert check_site.retired_version_errors(relative, content) == []
 
 
 def test_deployable_json_does_not_expose_retired_wire_constructs() -> None:

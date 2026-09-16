@@ -20,7 +20,7 @@
   <p class="spec-jump"><a href="/spec/text/">Normative text</a><a href="/spec/schemas/">Hosted schemas</a><a href="/spec/v0.2/spec.md">Raw specification</a><a href="/schema/v0.2/catalog.json">Schema catalog</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a></p>
 
   <section aria-labelledby="normative"><h2 id="normative">Read the normative text</h2>
-    <p>Everything below this section is orientation. The obligations themselves — encodings, digest and signature rules, the statement model, profile resolution limits, the handoff anchor, the trust-policy grammar, the ordered verification algorithm, and every diagnostic code — are fixed in one document, reproduced in full at <a href="/spec/text/">the normative text</a> and served raw at <a href="/spec/v0.2/spec.md">/spec/v0.2/spec.md</a>.</p>
+    <p>Everything below this section is orientation. The obligations themselves — encodings, digest and signature rules, the statement model, profile resolution limits, the handoff anchor, the trust-policy grammar, the ordered verification algorithm, and every diagnostic code — are fixed in one document, reproduced in full at <a href="/spec/text/">the normative text</a> and served raw at <a href="/spec/v0.2/spec.md"><code>/spec/v0.2/spec.md</code></a>.</p>
     <table class="stack-table part-table"><thead><tr><th scope="col">Section</th><th scope="col">What it fixes</th></tr></thead><tbody>
       <tr><td><a href="/spec/text/#7-terminology">Terminology</a></td><td>The exact words: subject, artifact, statement, predecessor, root, head, closure, handoff.</td></tr>
       <tr><td><a href="/spec/text/#8-guarantee-model">Guarantee model</a></td><td>What a conforming verifier may conclude, and the list of things it may never conclude.</td></tr>
@@ -108,7 +108,7 @@
   </section>
 
   <section aria-labelledby="resources"><h2 id="resources">Machine-readable resources</h2>
-    <p>Thirteen resources are served at stable URLs and pinned by digest in the catalog. <a href="/spec/schemas/">The schema index</a> reproduces every one of them in full, next to its identifier and its catalog digest, so a claim on a page can be checked against the bytes a resolver will actually fetch. <a href="/schema/latest.json">The release pointer</a> resolves the name “latest” to the current catalog.</p>
+    <p>Thirteen resources are served at stable URLs and pinned by digest in the catalog. <a href="/spec/schemas/">The schema index</a> reproduces every one of them in full, next to its identifier and its catalog digest, so a claim on a page can be checked against the bytes a resolver will actually fetch. <a href="/schema/latest.json">The release pointer</a> resolves the name “latest” to the current catalog, as a convenience for people. It is not an immutable protocol identifier: it moves when a new version is published, so never cite it as a schema <code>$id</code>, a <code>$schema</code>, or a pinned reference. Pin the versioned resource and its digest instead.</p>
     <table class="stack-table schema-table"><thead><tr><th scope="col">Resource</th><th scope="col">Constrains</th></tr></thead><tbody>
       <tr><td><a href="/spec/schemas/#statement-schema-json">statement.schema.json</a></td><td>The common wrapper every predicate is carried in.</td></tr>
       <tr><td><a href="/spec/schemas/#origin-schema-json">origin.schema.json</a></td><td>Source claims, event identity and time, first-observed subjects.</td></tr>
