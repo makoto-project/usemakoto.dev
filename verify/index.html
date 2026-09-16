@@ -37,25 +37,27 @@ uv sync --locked --dev
 ./scripts/demo-v0.2.sh --acceptance</code></pre><p>To inspect the receiver command directly:</p><pre><code class="language-bash">uv run makoto verify bundle demos/v0.2-end-to-end/generated/positive-bundle \
   --policy demos/v0.2-end-to-end/generated/receiver/policy.json \
   --schema-catalog demos/v0.2-end-to-end/generated/receiver/catalog.json \
+  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
+  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
   --expected-artifact demos/v0.2-end-to-end/generated/receiver/expected-artifact.json \
   --evaluation-time 2026-09-16T16:00:00Z \
-  --json</code></pre><p>The report keeps schema, signature, authorization, profile, graph, completeness, freshness, and artifact checks separate. A single boolean would hide which trust boundary failed.</p><p><a href="/demos/v0.2-end-to-end/"><strong>Open the complete walkthrough and exact denial reports &rarr;</strong></a></p></section>
+  --json</code></pre><p>Exit status 0 is an allow and 1 is a deny, each with a full JSON report on stdout; 2 and 3 mean the tool could not run and no verdict exists. The expected manifest, head, and artifact are the receiver&rsquo;s independent anchors, and this policy requires all three: drop them and the same bundle is denied at step 11. The report keeps schema, signature, authorization, profile, graph, completeness, freshness, and artifact checks separate. A single boolean would hide which trust boundary failed.</p><p><a href="/demos/v0.2-end-to-end/"><strong>Open the complete walkthrough and exact denial reports &rarr;</strong></a></p></section>
 
-<section aria-labelledby="pipeline"><h2 id="pipeline">The fourteen ordered checks</h2><p>Verification is a fixed sequence, and the order is part of the contract. A later check reports <code>skipped</code> when an earlier one did not establish its prerequisite, so a report never implies more was proven than actually was. Every entry in <code>checks[]</code> carries an <code>id</code>, a <code>status</code> of <code>pass</code>, <code>fail</code>, <code>indeterminate</code>, <code>not_checked</code>, or <code>skipped</code>, and the <code>prerequisiteChecks</code> that caused a skip.</p>
-<table class="wide-table"><caption>Scroll horizontally to see the diagnostic codes for each step.</caption><thead><tr><th>Step</th><th>Check <code>id</code></th><th>What it establishes</th><th>Diagnostic codes</th></tr></thead><tbody>
+<section aria-labelledby="pipeline"><h2 id="pipeline">The fourteen ordered steps</h2><p>Verification is a fixed sequence of fourteen steps carrying sixteen check identifiers, and the order is part of the contract. The codes below are the complete published diagnostic map for each step; <code>W_</code> codes are warnings that never deny on their own. A later check reports <code>skipped</code> when an earlier one did not establish its prerequisite, so a report never implies more was proven than actually was. Every entry in <code>checks[]</code> carries an <code>id</code>, a <code>status</code> of <code>pass</code>, <code>fail</code>, <code>indeterminate</code>, <code>not_checked</code>, or <code>skipped</code>, and the <code>prerequisiteChecks</code> that caused a skip.</p>
+<table class="wide-table"><caption>Scroll horizontally to see the diagnostic codes for each step.</caption><thead><tr><th>Step</th><th>Check <code>id</code></th><th>What it establishes</th><th>Diagnostic codes</th></tr></thead><tbody><tr><td>0</td><td>policy load</td><td>Before any bundle is read, the policy itself is checked for rules that shadow one another.</td><td><code>W_POLICY_RULE_OVERLAP</code></td></tr>
 <tr><td>1</td><td><code>load-safely</code></td><td>The bundle unpacks inside its own root, within resource limits.</td><td><code>E_BUNDLE_UNSAFE_PATH</code>, <code>E_HANDOFF_REQUIRED</code>, <code>E_RESOURCE_LIMIT</code></td></tr>
-<tr><td>2</td><td><code>parse-strictly</code></td><td>Every resource is well-formed JSON with no duplicate keys, and each envelope carries the expected payload type.</td><td><code>E_JSON_INVALID</code>, <code>E_JSON_DUPLICATE_KEY</code>, <code>E_ENVELOPE_MALFORMED</code>, <code>E_PAYLOAD_TYPE</code></td></tr>
-<tr><td>3</td><td><code>index-payloads</code></td><td>Each payload is addressed by its own digest, so later steps reference exact bytes.</td><td><code>E_STATEMENT_DIGEST</code>, <code>E_JSON_INVALID</code>, <code>E_JSON_DUPLICATE_KEY</code></td></tr>
-<tr><td>4</td><td><code>core-schemas</code></td><td>Statements, predicates, handoff, policy, and catalog match the pinned core schemas.</td><td><code>E_CORE_SCHEMA</code>, <code>E_CATALOG_INVALID</code>, <code>E_PREDICATE_SEMANTICS_UNSUPPORTED</code>, <code>E_PROFILE_TARGET_MISSING</code></td></tr>
-<tr><td>5</td><td><code>signatures</code></td><td>Each DSSE signature authenticates the exact payload bytes that were signed.</td><td><code>E_SIGNATURE_INVALID</code></td></tr>
-<tr><td>6</td><td><code>authorization-thresholds</code></td><td>Signer counts and thresholds satisfy receiver policy.</td><td><code>E_SIGNER_UNAUTHORIZED</code></td></tr>
-<tr><td>7</td><td><code>metadata-profiles</code>, <code>authorization</code></td><td>Declared profiles resolve to pinned digests, and each key is authorized for this source, operation, and profile.</td><td><code>E_PROFILE_UNRESOLVED</code>, <code>E_PROFILE_INVALID</code></td></tr>
-<tr><td>8</td><td><code>graph-dependency-artifacts</code></td><td>The artifacts a transformation claims as inputs match their declared digests and manifests.</td><td><code>E_ARTIFACT_DIGEST</code>, <code>E_DATASET_MANIFEST_INVALID</code>, <code>E_DATASET_MANIFEST_REQUIRED</code></td></tr>
-<tr><td>9</td><td><code>graph</code></td><td>Every step binds a real predecessor and its exact subject, with no cycles or duplicated event identifiers.</td><td><code>E_PREDECESSOR_MISSING</code>, <code>E_PREDECESSOR_SUBJECT</code>, <code>E_INPUT_DIGEST</code>, <code>E_GRAPH_CYCLE</code>, <code>E_EVENT_ID_DUPLICATE</code></td></tr>
-<tr><td>10</td><td><code>roots-and-heads</code></td><td>Each chain terminates at a valid origin.</td><td><code>E_ROOT_INVALID</code></td></tr>
-<tr><td>11</td><td><code>completeness-anchor</code>, <code>freshness-anchors</code></td><td>The signed manifest set is complete, and the receiver&rsquo;s independent expectations for manifest, heads, artifacts, recipient, nonce, and age hold.</td><td><code>E_MANIFEST_SET</code>, <code>E_EXPECTED_MANIFEST</code>, <code>E_EXPECTED_HEAD</code>, <code>E_EXPECTED_ARTIFACT</code>, <code>E_HANDOFF_RECIPIENT</code>, <code>E_HANDOFF_NONCE</code>, <code>E_HANDOFF_STALE</code>, <code>E_FRESHNESS_REQUIRED</code>, <code>E_REQUIRED_PROFILE_MISSING</code></td></tr>
-<tr><td>12</td><td><code>artifact-bytes</code></td><td>The bytes on disk hash to the signed artifact digest at the declared size.</td><td><code>E_ARTIFACT_MISSING</code>, <code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_SIZE</code></td></tr>
-<tr><td>13</td><td><code>artifact-profiles</code></td><td>The structured artifact satisfies the content rules its profile declares.</td><td><code>E_ARTIFACT_FORMAT</code>, <code>E_PROFILE_INVALID</code>, <code>E_REQUIRED_PROFILE_MISSING</code></td></tr>
+<tr><td>2</td><td><code>parse-strictly</code>, <code>core-schemas</code></td><td>Every resource is well-formed JSON with no duplicate keys, and each envelope carries the expected payload type.</td><td><code>E_BUNDLE_UNSAFE_PATH</code>, <code>E_CORE_SCHEMA</code>, <code>E_ENVELOPE_MALFORMED</code>, <code>E_HANDOFF_REQUIRED</code>, <code>E_JSON_DUPLICATE_KEY</code>, <code>E_JSON_INVALID</code>, <code>E_PAYLOAD_TYPE</code>, <code>E_RESOURCE_LIMIT</code></td></tr>
+<tr><td>3</td><td><code>index-payloads</code></td><td>Each payload is addressed by its own digest, so later steps reference exact bytes.</td><td><code>E_JSON_DUPLICATE_KEY</code>, <code>E_JSON_INVALID</code>, <code>E_RESOURCE_LIMIT</code>, <code>E_STATEMENT_DIGEST</code></td></tr>
+<tr><td>4</td><td><code>core-schemas</code></td><td>Statements, predicates, handoff, policy, and catalog match the pinned core schemas.</td><td><code>E_BUNDLE_UNSAFE_PATH</code>, <code>E_CATALOG_INVALID</code>, <code>E_CORE_SCHEMA</code>, <code>E_JSON_DUPLICATE_KEY</code>, <code>E_JSON_INVALID</code>, <code>E_PREDICATE_SEMANTICS_UNSUPPORTED</code>, <code>E_PROFILE_TARGET_MISSING</code>, <code>E_RESOURCE_LIMIT</code></td></tr>
+<tr><td>5</td><td><code>signatures</code></td><td>Each DSSE signature authenticates the exact payload bytes that were signed.</td><td><code>E_RESOURCE_LIMIT</code>, <code>E_SIGNATURE_INVALID</code>, <code>W_SIGNATURE_UNKNOWN</code></td></tr>
+<tr><td>6</td><td><code>authorization-thresholds</code></td><td>Signer counts and thresholds satisfy receiver policy.</td><td><code>E_RESOURCE_LIMIT</code>, <code>E_SIGNER_UNAUTHORIZED</code></td></tr>
+<tr><td>7</td><td><code>metadata-profiles</code>, <code>authorization</code></td><td>Declared profiles resolve to pinned digests, and each key is authorized for this source, operation, and profile.</td><td><code>E_PROFILE_INVALID</code>, <code>E_PROFILE_UNRESOLVED</code>, <code>E_RESOURCE_LIMIT</code>, <code>W_PROFILE_INDETERMINATE</code>, <code>W_PROFILE_RESOURCE_LIMIT</code></td></tr>
+<tr><td>8</td><td><code>graph-dependency-artifacts</code></td><td>The artifacts a transformation claims as inputs match their declared digests and manifests.</td><td><code>E_ARTIFACT_DIGEST</code>, <code>E_BUNDLE_UNSAFE_PATH</code>, <code>E_DATASET_MANIFEST_INVALID</code>, <code>E_DATASET_MANIFEST_REQUIRED</code>, <code>E_PROFILE_INVALID</code>, <code>E_PROFILE_UNRESOLVED</code>, <code>E_RESOURCE_LIMIT</code>, <code>W_ARTIFACT_VALIDATION_LIMIT</code>, <code>W_PROFILE_INDETERMINATE</code></td></tr>
+<tr><td>9</td><td><code>graph</code></td><td>Every step binds a real predecessor and its exact subject, with no cycles or duplicated event identifiers.</td><td><code>E_EVENT_ID_DUPLICATE</code>, <code>E_GRAPH_CYCLE</code>, <code>E_INPUT_DIGEST</code>, <code>E_PREDECESSOR_MISSING</code>, <code>E_PREDECESSOR_SUBJECT</code>, <code>E_RESOURCE_LIMIT</code></td></tr>
+<tr><td>10</td><td><code>roots-and-heads</code></td><td>Each chain terminates at a valid origin.</td><td><code>E_RESOURCE_LIMIT</code>, <code>E_ROOT_INVALID</code></td></tr>
+<tr><td>11</td><td><code>completeness-anchor</code>, <code>freshness-anchors</code></td><td>The signed manifest set is complete, and the receiver&rsquo;s independent expectations for manifest, heads, artifacts, recipient, nonce, and age hold.</td><td><code>E_EXPECTED_ARTIFACT</code>, <code>E_EXPECTED_HEAD</code>, <code>E_EXPECTED_MANIFEST</code>, <code>E_FRESHNESS_REQUIRED</code>, <code>E_HANDOFF_NONCE</code>, <code>E_HANDOFF_RECIPIENT</code>, <code>E_HANDOFF_STALE</code>, <code>E_MANIFEST_SET</code>, <code>E_REQUIRED_PROFILE_MISSING</code>, <code>E_RESOURCE_LIMIT</code>, <code>W_FRESHNESS_NOT_CHECKED</code></td></tr>
+<tr><td>12</td><td><code>artifact-bytes</code></td><td>The bytes on disk hash to the signed artifact digest at the declared size.</td><td><code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_MISSING</code>, <code>E_ARTIFACT_SIZE</code>, <code>E_BUNDLE_UNSAFE_PATH</code>, <code>E_DATASET_MANIFEST_INVALID</code>, <code>E_RESOURCE_LIMIT</code>, <code>W_HISTORICAL_ARTIFACT_NOT_CHECKED</code></td></tr>
+<tr><td>13</td><td><code>artifact-profiles</code></td><td>The structured artifact satisfies the content rules its profile declares.</td><td><code>E_ARTIFACT_FORMAT</code>, <code>E_PROFILE_INVALID</code>, <code>E_PROFILE_UNRESOLVED</code>, <code>E_REQUIRED_PROFILE_MISSING</code>, <code>E_RESOURCE_LIMIT</code>, <code>W_ARTIFACT_UNPROFILED</code>, <code>W_ARTIFACT_VALIDATION_LIMIT</code>, <code>W_PROFILE_INDETERMINATE</code></td></tr>
 <tr><td>14</td><td><code>decision</code></td><td>The single <code>allow</code>, <code>deny</code>, or <code>indeterminate</code> outcome derived from everything above.</td><td><code>E_RESOURCE_LIMIT</code></td></tr>
 </tbody></table>
 <p class="editorial-note"><strong>Why the order is published.</strong> A receiver that reruns these checks in a different order can reach a different answer from the same bundle. The sequence, the skip semantics, and the diagnostic codes are the interoperability surface, not an implementation detail.</p></section>
@@ -66,45 +68,83 @@ uv sync --locked --dev
   "decision": "deny",
   "reportTruncated": false,
   "primaryError": "E_ARTIFACT_DIGEST",
-  "bundleId": "handoff-2026-09-16",
+  "bundleId": "urn:uuid:55555555-5555-4555-8555-555555555555",
   "evaluationTime": "2026-09-16T16:00:00Z",
-  "policyDigest": { "sha256": "9f2c..." },
+  "policyDigest": {
+    "sha256": "614eb137303bcea78f25ded2e332a10649358484f9582984c1730ddc106ebfcd"
+  },
   "policyDigestEncoding": "exact-input-bytes",
-  "coreCatalogDigest": { "sha256": "30b4..." },
+  "coreCatalogDigest": {
+    "sha256": "298f55040022b6fe7c71e7a37d6ec4a75317d1c0b52a679dcca744cb4a3eaaf3"
+  },
+  "manifestDigest": {
+    "sha256": "b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c"
+  },
+  "expectedManifestDigest": {
+    "sha256": "b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c"
+  },
   "summary": {
-    "statementsTotal": 3,
-    "statementsReachable": 3,
-    "statementsValid": 3,
-    "statementsAuthorized": 3,
-    "signaturesTotal": 3,
-    "signaturesValid": 3,
+    "artifactsChecked": 0,
     "artifactsDeclared": 1,
-    "artifactsChecked": 1,
+    "heads": 1,
+    "historicalMaterialsChecked": 0,
+    "historicalMaterialsDeclared": 0,
+    "manifestSignaturesAuthorized": 1,
+    "manifestSignaturesRequired": 1,
+    "manifestSignaturesValid": 1,
+    "profilesDeclared": 1,
+    "profilesValidated": 1,
+    "quarantinedStatementsTotal": 0,
     "roots": 1,
-    "heads": 1
+    "signaturesChecked": 4,
+    "signaturesTotal": 4,
+    "signaturesValid": 4,
+    "statementsAuthorized": 3,
+    "statementsReachable": 3,
+    "statementsTotal": 3,
+    "statementsValid": 3
   },
   "checks": [
-    { "id": "load-safely",     "status": "pass",  "prerequisiteChecks": [] },
-    { "id": "parse-strictly",  "status": "pass",  "prerequisiteChecks": [] },
-    { "id": "signatures",      "status": "pass",  "prerequisiteChecks": [] },
-    { "id": "authorization",   "status": "pass",  "prerequisiteChecks": [] },
-    { "id": "graph",           "status": "pass",  "prerequisiteChecks": [] },
-    { "id": "artifact-bytes",  "status": "fail",  "prerequisiteChecks": [] },
-    { "id": "artifact-profiles", "status": "skipped",
-      "prerequisiteChecks": ["artifact-bytes"] }
+    { "id": "load-safely",                "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "parse-strictly",             "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "index-payloads",             "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "core-schemas",               "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "signatures",                 "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "authorization-thresholds",   "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "metadata-profiles",          "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "authorization",              "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "graph-dependency-artifacts", "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "graph",                      "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "roots-and-heads",            "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "completeness-anchor",        "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "freshness-anchors",          "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "artifact-bytes",             "status": "fail",    "prerequisiteChecks": [] },
+    { "id": "artifact-profiles",          "status": "pass",    "prerequisiteChecks": [] },
+    { "id": "decision",                   "status": "pass",    "prerequisiteChecks": [] }
   ],
   "errors": [
     {
-      "code": "E_ARTIFACT_DIGEST",
-      "step": 12,
       "causedByCheck": "artifact-bytes",
-      "message": "artifact bytes do not match the signed digest",
-      "context": { "artifact": "data/orders-2026-09-16.parquet" }
+      "code": "E_ARTIFACT_DIGEST",
+      "context": {
+        "artifactDigest": {
+          "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+        },
+        "head": {
+          "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+        },
+        "subjectName": "customers.public.json"
+      },
+      "message": "final artifact bytes differ from the signed digest",
+      "step": 12
     }
   ],
   "warnings": [],
-  "tool": { "name": "makoto", "version": "0.2.0" }
-}</code></pre>
+  "tool": {
+    "name": "makoto",
+    "version": "0.2.0a0"
+  }
+}</code></pre><p class="editorial-note"><strong>This is a real report.</strong> It is the reference verifier&rsquo;s output for the fixture bundle whose delivered data was changed after signing, trimmed only by omitting the per-statement, per-profile, and per-artifact arrays. Signatures, authorization, and the graph all pass; <code>artifact-bytes</code> alone fails, at step 12. The <a href="/demos/v0.2-end-to-end/artifacts/reports/mutated-final-data.json">complete report</a> is published with the walkthrough.</p>
 <ul class="evidence-trail">
 <li><span>decision</span><strong>allow, deny, or indeterminate</strong>Treat anything other than <code>allow</code> as a refusal. <code>indeterminate</code> means the verifier could not establish the answer, which is not the same as proving the evidence good.</li>
 <li><span>primaryError</span><strong>The one code that explains the outcome</strong>Route on this before reading the array. It is <code>null</code> on an allow.</li>
