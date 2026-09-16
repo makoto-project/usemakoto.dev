@@ -67,6 +67,7 @@ STYLE_HEAD = """  <meta charset="utf-8">
   <title>{title}</title>
   <link rel="canonical" href="https://usemakoto.dev{canonical}">
   <link rel="stylesheet" href="/assets/v02.css">
+  <script src="/assets/theme.js"></script>
 """
 
 

@@ -6,7 +6,7 @@
   <meta name="description" content="The superseded signature guide: DSSE envelope construction, key management, signing, verification, and timestamping.">
   <title>Signature and verification guide — Makoto</title>
   <link rel="canonical" href="https://usemakoto.dev/spec/signature-guide.html">
-  <link rel="stylesheet" href="/assets/v02.css">
+  <link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -209,7 +209,7 @@ openssl ec -in signing-key.pem -pubout -outform DER | \
 
                 <h4>Architecture Pattern</h4>
                 <div>
-                    <div class="dag">
+                    <div class="dag" data-flow="chain">
                         <div class="dag-node">
                             <div class="pipeline-stage-icon">⚙️</div>
                             <div>Processing</div>
@@ -338,7 +338,7 @@ def sign_attestation(statement: dict, private_key) -> dict:
 
             <h3>Verification Steps</h3>
             <div>
-                <div class="dag">
+                <div class="dag" data-flow="chain">
                     <div class="dag-node">
                         <div>1. Parse Envelope</div>
                     </div>
@@ -687,6 +687,6 @@ openssl ts -verify -data signature.bin -in response.tsr \
 
 </main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
 </div>
-<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+<script defer src="/assets/flow.js"></script><script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
 </body>
 </html>
