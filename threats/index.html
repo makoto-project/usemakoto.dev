@@ -3,5 +3,168 @@
 <div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/" aria-current="page">Threat model</a><a href="/privacy/">Privacy</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/verify/">Verification</a><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a></div></nav></aside>
 <div class="site-main"><main id="main" class="page wide"><span class="kicker">Threat model</span><h1>Signed history can still be false, incomplete, stale, or unsafe.</h1><p class="lead">Makoto makes exact claims attributable and tamper-evident. It does not turn every signed claim into truth. The receiver must evaluate distinct failure modes instead of treating “signature valid” as a universal pass.</p>
 <table class="wide-table"><caption>On narrow screens, scroll right to compare the control and residual risk.</caption><thead><tr><th>Threat</th><th>Attack</th><th>Makoto control</th><th>Residual risk</th></tr></thead><tbody><tr><td>False origin claim</td><td>An authorized collector signs the wrong source URI or misleading collection metadata.</td><td>Attribution, authorization policy, exact source-artifact digest, and optional organization profile.</td><td>The source claim may still be dishonest; external observation or audit is required.</td></tr><tr><td>Artifact mutation</td><td>Data changes after its statement or handoff is signed.</td><td>Receiver hashes the bytes it actually received and matches the signed subject digest.</td><td>A malicious producer can sign already-bad bytes.</td></tr><tr><td>Metadata mutation</td><td>An intermediary edits a transformation, profile binding, or subject digest.</td><td>DSSE authenticates the exact statement payload bytes.</td><td>Valid signatures do not establish signer authorization.</td></tr><tr><td>Graph rewiring</td><td>A transformation is pointed at a different predecessor or artifact.</td><td>Each input binds predecessor statement digest, predecessor subject, and input artifact digest.</td><td>A fully re-signed alternate graph may be internally valid under a compromised authorized key.</td></tr><tr><td>Branch omission</td><td>A producer removes an inconvenient but valid branch from the presented graph.</td><td>A signed handoff commits to exact roots, heads, statements, profiles, and final artifacts.</td><td>The receiver still needs an independent expectation to know which handoff should exist.</td></tr><tr><td>Replay or rollback</td><td>An older valid handoff is presented as current.</td><td>Expected head or manifest, nonce, age policy, artifact tuple, or external transparency anchor.</td><td>Without an independent anchor, old valid evidence can look complete.</td></tr><tr><td>Signer abuse</td><td>A known key signs a claim outside its role.</td><td>Receiver-owned policy authorizes keys per source, operation, profile, and handoff role.</td><td>Policy and key revocation must be maintained outside the bundle.</td></tr><tr><td>Profile substitution</td><td>A familiar schema URI resolves to weaker bytes or omits transitive references.</td><td>Signed profile references pin the root and closure digests; receivers resolve offline from an authenticated catalog.</td><td>Policy must require the right profile for the right subject.</td></tr><tr><td>Resource exhaustion</td><td>A bundle, graph, JSON document, regex, or schema closure is crafted to exhaust the verifier.</td><td>Strict resource bounds, closed path grammar, bounded pattern vocabulary, and fail-closed diagnostics.</td><td>Implementations must apply limits before expensive work and test adversarial inputs.</td></tr><tr><td>Content hazard</td><td>Invisible Unicode, malicious formulas, PII, or poison data remains byte-for-byte intact.</td><td>Organizational profiles can constrain structured artifact content and required analysis metadata.</td><td>Integrity does not equal safety, quality, privacy, or compliance.</td></tr></tbody></table>
+
+<section aria-labelledby="catalogue">
+<h2 id="catalogue">The data supply-chain threat catalogue</h2>
+<p>Data pipelines face threats that software build pipelines do not: readings that were never taken, rows that changed after sign-off, lineage that skips the step that mattered, and content that passes every integrity check because it was bad when it was signed. The catalogue below names nine of them. Each entry lists the attack, the verifier check and diagnostic codes that answer it, what remains outside Makoto, and the casebook demo that runs it against real fixtures when one exists.</p>
+
+<h3 id="d1">D1 · Source impersonation</h3>
+<p>An attacker claims data originates from a trusted source when it does not: fake sensor readings, forged API responses, spoofed device identifiers.</p>
+<table><tbody>
+<tr><th>Verifier control</th><td>Origin statements are signed over exact source bytes. Receiver policy authorizes origin claims per key and per <code>sourceKinds</code> (and optionally exact <code>sourceUris</code>), so a key trusted for one source cannot vouch for another.</td></tr>
+<tr><th>Diagnostics</th><td><code>E_SIGNATURE_INVALID</code>, <code>E_SIGNER_UNAUTHORIZED</code></td></tr>
+<tr><th>Residual risk</th><td>An authorized collector can still sign a false claim. Makoto cannot establish that a signer told the truth or that the source was correct.</td></tr>
+<tr><th>Runnable proof</th><td><a href="/demos/06/">Case 06</a> denies an origin claim that no origin rule authorizes.</td></tr>
+</tbody></table>
+
+<h3 id="d2">D2 · Data tampering</h3>
+<p>Unauthorized modification of data in transit or at rest: a man-in-the-middle rewrite, storage compromise, or an injected row after sign-off.</p>
+<table><tbody>
+<tr><th>Verifier control</th><td>The receiver hashes the exact bytes it received and compares them with the signed subject digest. Partitioned datasets commit each entry digest and optional size through a dataset manifest.</td></tr>
+<tr><th>Diagnostics</th><td><code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_SIZE</code>, <code>E_ARTIFACT_MISSING</code></td></tr>
+<tr><th>Residual risk</th><td>A producer can sign bytes that were already bad. A historical artifact that is no longer available is reported <code>not_checked</code>, not verified.</td></tr>
+<tr><th>Runnable proof</th><td><a href="/demos/01/">Case 01</a> appends one byte after signing and denies with <code>E_ARTIFACT_DIGEST</code>.</td></tr>
+</tbody></table>
+
+<h3 id="d3">D3 · Lineage falsification</h3>
+<p>False records of transformation history: a missing step, a transformation re-pointed at a different predecessor, a fabricated chain, or a cycle.</p>
+<table><tbody>
+<tr><th>Verifier control</th><td>Every transformation input binds the predecessor statement digest, predecessor subject name, and input artifact digest. The graph must reach declared origins without cycles, and the signed handoff commits to the exact statement, root, and head sets.</td></tr>
+<tr><th>Diagnostics</th><td><code>E_PREDECESSOR_MISSING</code>, <code>E_PREDECESSOR_SUBJECT</code>, <code>E_INPUT_DIGEST</code>, <code>E_GRAPH_CYCLE</code>, <code>E_ROOT_INVALID</code>, <code>E_MANIFEST_SET</code>; an edited binding without a new signature fails <code>E_SIGNATURE_INVALID</code></td></tr>
+<tr><th>Residual risk</th><td>A compromised authorized key can sign an alternate graph that is internally consistent. Makoto records claims about transformations; it does not prove a described transformation executed.</td></tr>
+<tr><th>Runnable proof</th><td><a href="/demos/02/">Case 02</a> removes the origin statement and rewires the final step.</td></tr>
+</tbody></table>
+
+<h3 id="d4">D4 · Timestamp manipulation and replay</h3>
+<p>Temporal metadata is altered to misrepresent when data was collected or handed off: backdated readings, reordered events, or an older valid handoff replayed as current.</p>
+<table><tbody>
+<tr><th>Verifier control</th><td><code>occurredAt</code> and <code>issuedAt</code> are signer-asserted claims, not trusted time. Freshness comes from receiver-held anchors: an expected manifest, head set, or final-artifact set; a consumer nonce; or a <code>maxAgeSeconds</code> bound at a consumer-controlled evaluation time. Key <code>validFrom</code> and <code>validUntil</code> are evaluated against that evaluation time, never the signed event time, so backdating cannot restore authorization.</td></tr>
+<tr><th>Diagnostics</th><td><code>E_EXPECTED_MANIFEST</code>, <code>E_EXPECTED_HEAD</code>, <code>E_EXPECTED_ARTIFACT</code>, <code>E_HANDOFF_NONCE</code>, <code>E_HANDOFF_STALE</code>, <code>E_FRESHNESS_REQUIRED</code></td></tr>
+<tr><th>Residual risk</th><td>No timestamp is proven to come from a trusted clock. Transparency logs are out of scope, so rollback resistance is only as strong as the channel that delivered the expected values.</td></tr>
+<tr><th>Runnable proof</th><td>No replay denial is checked in yet. Every casebook gate pins the expected manifest and head, which is the anchor this threat requires.</td></tr>
+</tbody></table>
+
+<h3 id="d5">D5 · Unauthorized attribution</h3>
+<p>Processing is attributed to a legitimate identity that did not perform it, or a known key signs outside its role: a stolen signing key, a compromised service account, a test key in production.</p>
+<table><tbody>
+<tr><th>Verifier control</th><td>Authenticity and authorization are separate checks. A statement must satisfy a receiver rule that lists its key for that predicate type, source, or operation, with a minimum signature threshold. Handoff signers are authorized separately.</td></tr>
+<tr><th>Diagnostics</th><td><code>E_SIGNER_UNAUTHORIZED</code></td></tr>
+<tr><th>Residual risk</th><td>A stolen key that the policy still authorizes passes. Revocation is a local policy edit; public revocation infrastructure is out of scope.</td></tr>
+<tr><th>Runnable proof</th><td><a href="/demos/03/">Case 03</a> denies a byte-identical claim signed by a known but unauthorized key.</td></tr>
+</tbody></table>
+
+<h3 id="d6">D6 · Attestation forgery</h3>
+<p>Attestation documents are edited or substituted so they appear valid: a rewritten operation record with its old signature, an envelope swapped under an unchanged index entry, or a payload crafted to confuse a parser.</p>
+<table><tbody>
+<tr><th>Verifier control</th><td>DSSE signatures cover the exact payload bytes. The verifier recomputes every statement digest from decoded payload bytes before trusting the bundle index, and parses JSON strictly.</td></tr>
+<tr><th>Diagnostics</th><td><code>E_SIGNATURE_INVALID</code>, <code>E_STATEMENT_DIGEST</code>, <code>E_ENVELOPE_MALFORMED</code>, <code>E_PAYLOAD_TYPE</code>, <code>E_JSON_DUPLICATE_KEY</code>, <code>E_JSON_INVALID</code></td></tr>
+<tr><th>Residual risk</th><td>Key custody is a deployment responsibility. A signer with the key can produce a new, valid forgery, which is why authorization and anchors still matter.</td></tr>
+<tr><th>Runnable proof</th><td><a href="/demos/04/">Case 04</a> edits a signed record two ways and denies both.</td></tr>
+</tbody></table>
+
+<h3 id="d7">D7 · Privacy violation</h3>
+<p>Sensitive information leaks through attestations, reports, or the data itself: source locators that reveal internal systems, extension fields with personal data, correlation across handoffs, or direct identifiers reintroduced into a public dataset.</p>
+<table><tbody>
+<tr><th>Verifier control</th><td>Source locators are optional and extension payloads are organization-controlled. Private profiles are exchanged separately and resolved from the receiver's local catalog with no network retrieval. A required artifact profile can reject identifiers in structured data.</td></tr>
+<tr><th>Diagnostics</th><td><code>E_PROFILE_INVALID</code> for content; metadata minimization has no diagnostic and is a producer obligation</td></tr>
+<tr><th>Residual risk</th><td>Provenance does not make data confidential. Reports can contain recipient and nonce values and must be handled as sensitive evidence.</td></tr>
+<tr><th>Runnable proof</th><td><a href="/demos/05/">Case 05</a> denies a validly signed dataset that reintroduced email addresses. See <a href="/privacy/">privacy techniques</a>.</td></tr>
+</tbody></table>
+
+<h3 id="d8">D8 · Stream injection</h3>
+<p>Malicious events are inserted into high-throughput streams: spoofed events, manipulated sequences, polluted windows.</p>
+<table><tbody>
+<tr><th>Verifier control</th><td>The reference implementation covers finite artifacts. A dataset manifest commits to an exact, sorted set of partition digests, and finite newline-delimited JSON can be validated against a profile under strict line and size bounds.</td></tr>
+<tr><th>Diagnostics</th><td><code>E_DATASET_MANIFEST_INVALID</code>, <code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_SIZE</code>, <code>E_RESOURCE_LIMIT</code></td></tr>
+<tr><th>Residual risk</th><td>A production streaming or windowing protocol is not part of the current release. A dataset manifest proves the producer's committed partition set, not that a storage prefix contains no other objects.</td></tr>
+<tr><th>Runnable proof</th><td>None yet. This is an open area for <a href="/community/">community fixtures</a>.</td></tr>
+</tbody></table>
+
+<h3 id="d9">D9 · Display-layer obfuscation</h3>
+<p>Content is materially present in artifact bytes but absent, misleading, or hard to notice in common rendered views: invisible variation selectors encoding hidden instructions, zero-width characters, bidirectional control abuse. This is not tampering or lineage falsification. It is a divergence between what humans review and what machines ingest.</p>
+<table><tbody>
+<tr><th>Verifier control</th><td>A render-safety scan travels as an extension of the signed claim, and a digest-pinned receiver profile requires a passing verdict. The reference producer refuses to attach a profile the claim does not satisfy, and a receiver rule with a profile constraint authorizes nothing without it.</td></tr>
+<tr><th>Diagnostics</th><td><code>E_SIGNER_UNAUTHORIZED</code> when no rule's profile constraint is met; <code>E_PROFILE_INVALID</code> when a present profile fails</td></tr>
+<tr><th>Residual risk</th><td>The guarantee is only as good as the scanner and the profile. Content validation is normative for JSON artifacts; other formats need adapters.</td></tr>
+<tr><th>Runnable proof</th><td><a href="/demos/06/">Case 06</a> denies a source file carrying 128 hidden variation selectors. See the <a href="/examples/invisible-unicode/">invisible Unicode example</a>.</td></tr>
+</tbody></table>
+</section>
+
+<section aria-labelledby="matrix">
+<h2 id="matrix">Threat matrix</h2>
+<p>Severity is editorial: how much damage a successful attack does before anyone notices. The check column is the report check that fails first.</p>
+<table class="wide-table"><caption>On narrow screens, scroll right to see the verifier check and proof.</caption><thead><tr><th>ID</th><th>Threat</th><th>Severity</th><th>Attack vector</th><th>Failing check</th><th>Proof</th></tr></thead><tbody>
+<tr><td>D1</td><td>Source impersonation</td><td>Critical</td><td>Spoofed source identifiers, unauthorized collector keys</td><td><code>authorization-thresholds</code></td><td><a href="/demos/06/">Case 06</a></td></tr>
+<tr><td>D2</td><td>Data tampering</td><td>Critical</td><td>Man-in-the-middle, storage compromise, injection</td><td><code>artifact-bytes</code></td><td><a href="/demos/01/">Case 01</a></td></tr>
+<tr><td>D3</td><td>Lineage falsification</td><td>High</td><td>Removed or rewired steps, fabricated chains</td><td><code>graph</code>, <code>signatures</code></td><td><a href="/demos/02/">Case 02</a></td></tr>
+<tr><td>D4</td><td>Timestamp manipulation and replay</td><td>High</td><td>Backdated claims, replayed handoffs</td><td><code>freshness-anchors</code></td><td>Not yet</td></tr>
+<tr><td>D5</td><td>Unauthorized attribution</td><td>High</td><td>Key theft, known key outside its role</td><td><code>authorization-thresholds</code></td><td><a href="/demos/03/">Case 03</a></td></tr>
+<tr><td>D6</td><td>Attestation forgery</td><td>Critical</td><td>Edited payloads, substituted envelopes</td><td><code>signatures</code>, <code>index-payloads</code></td><td><a href="/demos/04/">Case 04</a></td></tr>
+<tr><td>D7</td><td>Privacy violation</td><td>Medium</td><td>Metadata over-sharing, reintroduced identifiers</td><td><code>artifact-profiles</code></td><td><a href="/demos/05/">Case 05</a></td></tr>
+<tr><td>D8</td><td>Stream injection</td><td>High</td><td>Event spoofing, window manipulation</td><td><code>artifact-bytes</code> for committed partitions</td><td>Not yet</td></tr>
+<tr><td>D9</td><td>Display-layer obfuscation</td><td>High</td><td>Invisible Unicode, variation selectors, bidirectional controls</td><td><code>authorization-thresholds</code></td><td><a href="/demos/06/">Case 06</a></td></tr>
+</tbody></table>
+</section>
+
+<section aria-labelledby="surface">
+<h2 id="surface">Attack surface by pipeline stage</h2>
+<p>Every stage of a data pipeline is an attack surface. Makoto does not harden the stage; it gives the receiver a verification point that exposes what happened there.</p>
+<table class="wide-table"><caption>On narrow screens, scroll right to see where each threat is caught.</caption><thead><tr><th>Stage</th><th>Threats</th><th>Where the receiver catches it</th></tr></thead><tbody>
+<tr><td>Source</td><td><a href="#d1">D1</a> impersonation, <a href="#d9">D9</a> hidden content</td><td>Origin rule authorization and required origin profiles.</td></tr>
+<tr><td>Transport</td><td><a href="#d2">D2</a> tampering, <a href="#d4">D4</a> replay</td><td>Artifact digests over received bytes; expected manifest, head, nonce, or age bound.</td></tr>
+<tr><td>Processing</td><td><a href="#d3">D3</a> lineage falsification, <a href="#d5">D5</a> unauthorized attribution</td><td>Predecessor and input bindings; per-operation signer rules.</td></tr>
+<tr><td>Storage and archive</td><td><a href="#d6">D6</a> forgery, <a href="#d2">D2</a> tampering at rest</td><td>Signature and statement-digest recomputation on every re-verification.</td></tr>
+<tr><td>Consumer</td><td><a href="#d7">D7</a> privacy, <a href="#d8">D8</a> injected partitions</td><td>Required artifact profiles and dataset-manifest entry checks.</td></tr>
+</tbody></table>
+</section>
+
 <section aria-labelledby="trust"><h2 id="trust">Trust boundaries stay outside the bundle</h2><ol class="provenance-spine"><li><strong>Signing keys</strong><span>Private keys and production signing policy are deployment responsibilities. Demo keys are intentionally insecure fixtures.</span></li><li><strong>Authorization</strong><span>The receiver supplies policy; the producer does not get to declare itself trusted.</span></li><li><strong>Expected state</strong><span>Freshness requires an expected head, manifest, nonce, artifact, age, or transparency record learned independently.</span></li><li><strong>Schema catalog</strong><span>Private profiles remain private and are resolved from authenticated local bytes, never ambient network lookup during verification.</span></li></ol></section>
-<section class="community-band"><span class="kicker">Turn attacks into fixtures</span><h2>A threat becomes useful when it has one exact mutation and one expected denial.</h2><p>The reference demo already covers artifact mutation, signature failure, predecessor removal, rewiring, private-profile violation, and unauthorized signers. Add the case it missed.</p><div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Inspect the denial cases</a><a class="button secondary" href="https://github.com/makoto-project/makoto/issues/new">Propose a threat fixture</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto threat model · Exact claims · Explicit residual risk</div></footer></div></div></body></html>
+
+<section aria-labelledby="slsa">
+<h2 id="slsa">Software supply chain versus data supply chain</h2>
+<p>SLSA addresses software build integrity. Makoto addresses the threats specific to data moving between producers and receivers. They share principles and differ in focus.</p>
+<h3>SLSA threats (software)</h3>
+<ul>
+<li>Compromised source repository</li>
+<li>Modified source after checkout</li>
+<li>Compromised build platform</li>
+<li>Uploaded modified package</li>
+<li>Compromised package registry</li>
+<li>Dependency confusion</li>
+<li>Compromised build dependencies</li>
+</ul>
+<h3>Makoto threats (data)</h3>
+<ul>
+<li><a href="#d1">D1</a> Source impersonation</li>
+<li><a href="#d2">D2</a> Data tampering in transit or at rest</li>
+<li><a href="#d3">D3</a> Lineage falsification</li>
+<li><a href="#d4">D4</a> Timestamp manipulation and replay</li>
+<li><a href="#d5">D5</a> Unauthorized attribution</li>
+<li><a href="#d6">D6</a> Attestation forgery</li>
+<li><a href="#d7">D7</a> Privacy violation</li>
+<li><a href="#d8">D8</a> Stream injection</li>
+<li><a href="#d9">D9</a> Display-layer obfuscation</li>
+</ul>
+<h3>Shared principles and real differences</h3>
+<ul>
+<li><strong>Attestation-based.</strong> Both express provenance as verifiable claims about exact artifacts.</li>
+<li><strong>Same envelope.</strong> Makoto statements are in-toto Statements carried in DSSE envelopes.</li>
+<li><strong>Tamper-evident.</strong> Exact-byte SHA-256 digests make modification detectable.</li>
+<li><strong>Receiver-owned policy.</strong> Makoto's receiver decides which keys may make which claims; the bundle never declares itself trusted.</li>
+<li><strong>Separate checks, not levels.</strong> Makoto reports structure, authenticity, authorization, continuity, completeness, freshness, and artifact integrity as distinct results. See the <a href="/levels/">assurance model</a> and the <a href="/comparison/">comparisons</a>.</li>
+</ul>
+</section>
+
+<section aria-labelledby="depth">
+<h2 id="depth">Defense in depth</h2>
+<ol class="provenance-spine">
+<li><strong>Detection</strong><span>Exact-byte digests expose any change to artifacts or statement payloads.</span></li>
+<li><strong>Authentication</strong><span>DSSE signatures bind each statement and handoff to a key.</span></li>
+<li><strong>Authorization</strong><span>Receiver policy limits each key to the sources, operations, profiles, and handoffs it may sign.</span></li>
+<li><strong>Completeness and freshness</strong><span>A signed handoff plus an independent anchor defeats omission and replay.</span></li>
+<li><strong>Content policy</strong><span>Digest-pinned private profiles reject unchanged bytes that were never acceptable.</span></li>
+<li><strong>Privacy</strong><span>Minimized metadata and separately exchanged profiles limit what evidence discloses.</span></li>
+</ol>
+</section>
+
+<section class="community-band"><span class="kicker">Turn attacks into fixtures</span><h2>A threat becomes useful when it has one exact mutation and one expected denial.</h2><p>The reference demo already covers artifact mutation, signature failure, predecessor removal, rewiring, private-profile violation, and unauthorized signers, and the casebook runs each through a real gate. Replay and stream injection still need fixtures. Add the case it missed.</p><div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Inspect the denial cases</a><a class="button secondary" href="https://github.com/makoto-project/makoto/issues/new">Propose a threat fixture</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto threat model · Exact claims · Explicit residual risk</div></footer></div></div></body></html>
