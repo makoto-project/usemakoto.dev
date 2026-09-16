@@ -1,0 +1,7 @@
+{
+  "fieldsLowercased": ["email"],
+  "fieldsTrimmed": ["email", "marketing_consent"],
+  "regionCase": "upper",
+  "consentTruthyValues": ["yes", "true", "1"],
+  "consentFalsyValues": ["no", "false", "0"]
+}

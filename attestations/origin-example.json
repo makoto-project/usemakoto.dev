@@ -1,0 +1,46 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.raw.json",
+      "digest": {
+        "sha256": "4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/origin",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:9f1c6a02-5d74-4f0b-9a3e-1c6b4d8e77a1",
+      "occurredAt": "2026-09-16T16:00:00Z"
+    },
+    "source": {
+      "kind": "urn:makoto:example:source:partner-api",
+      "uri": "https://api.partner-bank.example/v2/customers",
+      "name": "Partner Bank customer extract",
+      "mediaType": "application/json",
+      "retrievedAt": "2026-09-16T15:58:12Z",
+      "version": "2026-09-16"
+    },
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:collection": {
+        "method": "scheduled-pull",
+        "collector": "urn:makoto:example:collector:prod-west-01",
+        "collectorVersion": "1.4.2",
+        "environment": "production",
+        "recordsCollected": 3,
+        "recordsDropped": 0
+      },
+      "urn:makoto:example:governance": {
+        "originGeography": "US-WEST-2",
+        "lawfulBasis": "contractual",
+        "agreementReference": "https://legal.example.com/dpa/partner-bank-2026",
+        "agreementEffective": "2026-01-15T00:00:00Z",
+        "confidentiality": "confidential",
+        "intendedUse": "fraud-detection model training"
+      }
+    }
+  }
+}

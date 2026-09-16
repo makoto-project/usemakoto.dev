@@ -1,0 +1,29 @@
+{
+  "version": "0.2",
+  "entries": [
+    {
+      "name": "data/customers.raw.json",
+      "digest": {
+        "sha256": "4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919"
+      },
+      "size": 311,
+      "mediaType": "application/json"
+    },
+    {
+      "name": "data/customers.normalized.json",
+      "digest": {
+        "sha256": "421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8"
+      },
+      "size": 304,
+      "mediaType": "application/json"
+    },
+    {
+      "name": "data/customers.public.json",
+      "digest": {
+        "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+      },
+      "size": 291,
+      "mediaType": "application/json"
+    }
+  ]
+}

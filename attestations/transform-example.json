@@ -1,0 +1,57 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "customers.normalized.json",
+      "digest": {
+        "sha256": "421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8"
+      }
+    }
+  ],
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/transform",
+  "predicate": {
+    "schemaVersion": "0.2",
+    "event": {
+      "id": "urn:uuid:4b0d2e11-8a37-4c62-b5d9-2f7e0a9c3b44",
+      "occurredAt": "2026-09-16T16:00:00Z"
+    },
+    "operation": {
+      "type": "urn:makoto:example:operation:normalize",
+      "name": "Normalize customer records",
+      "tool": {
+        "name": "makoto-example-normalizer",
+        "version": "1.2.0",
+        "uri": "git+https://github.com/makoto-project/makoto.git"
+      },
+      "parametersDigest": {
+        "sha256": "c463deba9e6da45408de8cc72cb352026f0f527d9fbd1f6d33f45266862002b2"
+      }
+    },
+    "inputs": [
+      {
+        "name": "raw",
+        "digest": {
+          "sha256": "4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919"
+        },
+        "provenance": {
+          "statementDigest": {
+            "sha256": "014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11"
+          },
+          "subjectName": "customers.raw.json"
+        }
+      }
+    ],
+    "profiles": [],
+    "extensions": {
+      "urn:makoto:example:execution": {
+        "invocationId": "transform-20260916-160000-4b0d2e",
+        "startedAt": "2026-09-16T16:00:00Z",
+        "finishedAt": "2026-09-16T16:00:01Z",
+        "recordsIn": 3,
+        "recordsOut": 3,
+        "recordsDropped": 0,
+        "deterministic": true
+      }
+    }
+  }
+}
