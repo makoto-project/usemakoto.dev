@@ -15,7 +15,7 @@
     <details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile">
       <p class="mobile-section">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a>
       <p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a>
-      <p class="mobile-section">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a>
+      <p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a>
       <p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a>
     </nav></details>
   </div></header>
@@ -24,16 +24,75 @@
     <aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav">
       <div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/" aria-current="page">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a></div>
       <div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div>
-      <div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a></div>
+      <div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a></div>
       <div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div>
     </nav></aside>
 
     <div class="site-main">
       <main id="main">
-        <section class="hero-v02"><div class="hero-inner">
-          <h1>Know where data began, what changed, and who attested to it.</h1>
-          <p>Makoto is a source-first, SLSA-like framework for data. It keeps a verifiable history beside the bytes as data moves between systems, teams, and organizations.</p>
-          <div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Run the proof</a><a class="button secondary" href="/spec/">Read the specification</a><a class="button secondary" href="https://github.com/makoto-project/makoto">Build it with us on GitHub</a></div>
+        <section class="hero-v02" aria-labelledby="hero-title"><div class="hero-inner hero-docket">
+          <div class="hero-claim">
+            <h1 id="hero-title">Know where data began, what changed, and who attested to it.</h1>
+            <p>Makoto is a source-first, SLSA-like framework for data. It keeps a verifiable history beside the bytes as data moves between systems, teams, and organizations.</p>
+            <div class="actions"><a class="button" href="/demos/v0.2-end-to-end/">Run the proof</a><a class="button secondary" href="/spec/">Read the specification</a><a class="button secondary" href="https://github.com/makoto-project/makoto">Build it with us on GitHub</a></div>
+          </div>
+          <figure class="hero-file">
+            <pre data-filename="makoto-gate.yml · lines 57–79"><code class="language-yaml">      - name: Verify the received bundle
+        id: verify
+        shell: bash
+        env:
+          HANDOFF: ${{ matrix.handoff }}
+          EXPECTED_MANIFEST: ${{ matrix.manifest }}
+          EXPECTED_HEAD: ${{ matrix.head }}
+        run: |
+          verify() {
+            uv run --project .makoto-core makoto verify bundle "handoffs/$HANDOFF/bundle" \
+              --policy receiver/policy.json \
+              --schema-catalog receiver/catalog.json \
+              --expected-manifest "$EXPECTED_MANIFEST" \
+              --expected-head "$EXPECTED_HEAD" \
+              --expected-artifact "receiver/expected/$HANDOFF.artifact.json" \
+              --evaluation-time "$EVALUATION_TIME" "$@"
+          }
+          status=0
+          verify --json &gt; makoto-report.json || status=$?
+          verify || true
+          uv run --project .makoto-core makoto report level makoto-report.json \
+            --require "$REQUIRED_LEVEL" || status=1
+          exit "$status"</code></pre>
+            <figcaption class="hero-caption">The receiver's CI gate, quoted from <a href="/demos/01/makoto-gate.yml"><code>demos/01/makoto-gate.yml</code></a>. The load job declares <code>needs: gate</code>, so nothing loads until Makoto allows the exact bytes that arrived.</figcaption>
+          </figure>
+          <figure class="hero-run">
+            <pre data-filename="receiver · poisoned handoff"><code class="language-bash">$ makoto verify bundle handoffs/mutated-final-data/bundle \
+  --policy receiver/policy.json \
+  --schema-catalog receiver/catalog.json \
+  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
+  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-artifact receiver/expected/mutated-final-data.artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+PASS        graph
+PASS        roots-and-heads
+PASS        completeness-anchor
+PASS        freshness-anchors
+FAIL        artifact-bytes
+PASS        artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
+$ echo $?
+1</code></pre>
+            <figcaption class="hero-caption">Captured output from <a href="/demos/01/">the poisoned-pipeline case</a>: one byte appended after signing. Every signature still verifies; <code>artifact-bytes</code> fails and the job exits 1.</figcaption>
+          </figure>
         </div></section>
 
         <div class="page wide">
@@ -77,7 +136,7 @@
           <section aria-labelledby="build"><div class="section-intro"><div><span class="kicker">Build and extend</span><h2 id="build">One protocol, many implementation paths</h2></div><a class="text-link" href="/tooling/">See tooling status →</a></div>
             <table><tbody>
               <tr><th>Reference implementation</th><td>Create, sign, bundle, and verify evidence locally from the open-source core repository.</td><td><a href="https://github.com/makoto-project/makoto">Open core repository ↗</a></td></tr>
-              <tr><th>Hosted JSON Schemas</th><td>Validate core statements and resolve exact digest-pinned private profiles.</td><td><a href="/schema/v0.2/catalog.json">Open schema catalog</a></td></tr>
+              <tr><th>Hosted JSON Schemas</th><td>Validate core statements and resolve exact digest-pinned private profiles.</td><td><a href="/spec/schemas/">Open schema catalog</a></td></tr>
               <tr><th>Integration patterns</th><td>Attach evidence at lifecycle hooks, materializations, writes, releases, and organizational handoffs.</td><td><a href="/integrations/">Explore integrations</a></td></tr>
             </tbody></table>
           </section>
@@ -88,5 +147,6 @@
       <footer class="footer"><div class="footer-inner">Makoto · Source-first, append-only data provenance · <a href="https://github.com/makoto-project/makoto">Developed in public on GitHub</a></div></footer>
     </div>
   </div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
 </body>
 </html>

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Field-by-field reference for the hosted Makoto resource statement.schema.json: types, requirements, constraints, rules, and real example values.">
+  <title>statement.schema.json reference — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/spec/schemas/statement/">
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+  <span class="kicker">Schema reference</span>
+  <h1><code>statement.schema.json</code></h1>
+  <p class="lead">The common in-toto statement wrapper every Makoto predicate is carried in.</p>
+  <dl class="schema-meta">
+    <dt>Title</dt><dd>Makoto v0.2 in-toto Statement</dd>
+    <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/statement.schema.json</dd>
+    <dt>Digest</dt><dd>sha256:dbe4487be9b44521e4fa9b63900992304b9fb4e4985b7899cb23af6916efe5e0</dd>
+    <dt>Raw</dt><dd><a href="/schema/v0.2/statement.schema.json">/schema/v0.2/statement.schema.json</a></dd>
+    <dt>Carried in</dt><dd class="prose">The decoded <code>payload</code> of each attestation envelope, payload type <code>application/vnd.in-toto+json</code>.</dd>
+    <dt>Responsibility</dt><dd class="prose">in-toto outer statement, SHA-256 subjects, predicate dispatch, and extension predicate allowance.</dd>
+  </dl>
+  <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#111-common-in-toto-statement">§11.1</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
+  <figure class="lead-exhibit"><figcaption><strong>A real instance.</strong> Read from <code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json → payload</code>, which validates against this schema.</figcaption><pre data-filename="1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json"><code class="language-json">{
+  &quot;_type&quot;: &quot;https://in-toto.io/Statement/v1&quot;,
+  &quot;predicate&quot;: {
+    &quot;event&quot;: {
+      &quot;id&quot;: &quot;urn:uuid:22222222-2222-4222-8222-222222222222&quot;,
+      &quot;occurredAt&quot;: &quot;2026-09-16T16:00:00Z&quot;
+    },
+    &quot;inputs&quot;: [
+      {
+        &quot;digest&quot;: {
+          &quot;sha256&quot;: &quot;4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919&quot;
+        },
+        &quot;name&quot;: &quot;raw&quot;,
+        &quot;provenance&quot;: {
+          &quot;statementDigest&quot;: {
+            &quot;sha256&quot;: &quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a&quot;
+          },
+          &quot;subjectName&quot;: &quot;customers.raw.json&quot;
+        }
+      }
+    ],
+    &quot;operation&quot;: {
+      &quot;name&quot;: &quot;Normalize customer records&quot;,
+      &quot;type&quot;: &quot;urn:makoto:demo:operation:normalize&quot;
+    },
+    &quot;profiles&quot;: [],
+    &quot;schemaVersion&quot;: &quot;0.2&quot;
+  },
+  &quot;predicateType&quot;: &quot;https://usemakoto.dev/predicate/v0.2/transform&quot;,
+  &quot;subject&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8&quot;
+      },
+      &quot;name&quot;: &quot;customers.normalized.json&quot;
+    }
+  ]
+}</code></pre></figure>
+  
+<section aria-labelledby="fields"><h2 id="fields">Fields</h2><p class="spec-jump"><a href="#def-root">Top level</a><a href="#def-digest">digest</a><a href="#def-subject">subject</a></p><section class="def-block" id="def-root" aria-labelledby="def-root-title"><h3 id="def-root-title">Top level<a class="anchor-link" href="#def-root" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-root-_type"><span class="field-name">_type</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;https://in-toto.io/Statement/v1&quot;</li></ul><div class="field-example"><code>&quot;https://in-toto.io/Statement/v1&quot;</code></div></td></tr><tr><td id="f-root-subject"><span class="field-name">subject</span><br><span class="field-req is-required">required</span></td><td class="field-type">array of <a href="#def-subject">subject</a></td><td><ul class="field-constraints"><li>min items 1</li></ul><div class="field-example"><code>[{&quot;digest&quot;: {&quot;sha256&quot;: &quot;421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8&quot;}, &quot;na…</code></div></td></tr><tr><td id="f-root-predicateType"><span class="field-name">predicateType</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div class="field-example"><code>&quot;https://usemakoto.dev/predicate/v0.2/transform&quot;</code></div></td></tr><tr><td id="f-root-predicate"><span class="field-name">predicate</span><br><span class="field-req is-required">required</span></td><td class="field-type">object</td><td><div class="field-example"><code>{&quot;event&quot;: {&quot;id&quot;: &quot;urn:uuid:22222222-2222-4222-8222-222222222222&quot;, &quot;occurredAt&quot;: &quot;2026-09-16T16:…</code></div></td></tr></tbody></table></div><h4>Conditional rules</h4><ul class="variant-list"><li>When <code>predicateType</code> = &quot;https://usemakoto.dev/predicate/v0.2/origin&quot;: then <code>predicate</code> <a href="/spec/schemas/origin/">origin.schema.json</a>.</li><li>When <code>predicateType</code> = &quot;https://usemakoto.dev/predicate/v0.2/transform&quot;: then <code>predicate</code> <a href="/spec/schemas/transform/">transform.schema.json</a>.</li></ul></section><section class="def-block" id="def-digest" aria-labelledby="def-digest-title"><h3 id="def-digest-title">digest<a class="anchor-link" href="#def-digest" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>subject[].digest</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-digest-sha256"><span class="field-name">sha256</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 64</li><li>max length 64</li></ul><div class="field-example"><code>&quot;421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-subject" aria-labelledby="def-subject-title"><h3 id="def-subject-title">subject<a class="anchor-link" href="#def-subject" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>subject[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-subject-name"><span class="field-name">name</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div class="field-example"><code>&quot;customers.normalized.json&quot;</code></div></td></tr><tr><td id="f-subject-digest"><span class="field-name">digest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8&quot;}</code></div></td></tr></tbody></table></div></section></section>
+  <section aria-labelledby="examples"><h2 id="examples">Real documents that validate</h2><ul class="schema-list"><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json → payload</code></li><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json → payload</code></li><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json → payload</code></li></ul></section>
+  <section aria-labelledby="raw"><h2 id="raw">Raw JSON</h2>
+    <details><summary>The published document (1,604 bytes)</summary><div>
+      <pre data-filename="statement.schema.json"><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;$id&quot;: &quot;https://usemakoto.dev/schema/v0.2/statement.schema.json&quot;,
+  &quot;title&quot;: &quot;Makoto v0.2 in-toto Statement&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [&quot;_type&quot;, &quot;subject&quot;, &quot;predicateType&quot;, &quot;predicate&quot;],
+  &quot;properties&quot;: {
+    &quot;_type&quot;: { &quot;const&quot;: &quot;https://in-toto.io/Statement/v1&quot; },
+    &quot;subject&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;minItems&quot;: 1,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/subject&quot; }
+    },
+    &quot;predicateType&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+    &quot;predicate&quot;: { &quot;type&quot;: &quot;object&quot; }
+  },
+  &quot;allOf&quot;: [
+    {
+      &quot;if&quot;: { &quot;properties&quot;: { &quot;predicateType&quot;: { &quot;const&quot;: &quot;https://usemakoto.dev/predicate/v0.2/origin&quot; } } },
+      &quot;then&quot;: { &quot;properties&quot;: { &quot;predicate&quot;: { &quot;$ref&quot;: &quot;https://usemakoto.dev/schema/v0.2/origin.schema.json&quot; } } }
+    },
+    {
+      &quot;if&quot;: { &quot;properties&quot;: { &quot;predicateType&quot;: { &quot;const&quot;: &quot;https://usemakoto.dev/predicate/v0.2/transform&quot; } } },
+      &quot;then&quot;: { &quot;properties&quot;: { &quot;predicate&quot;: { &quot;$ref&quot;: &quot;https://usemakoto.dev/schema/v0.2/transform.schema.json&quot; } } }
+    }
+  ],
+  &quot;$defs&quot;: {
+    &quot;digest&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;sha256&quot;],
+      &quot;properties&quot;: { &quot;sha256&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 64, &quot;maxLength&quot;: 64 } },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;subject&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;name&quot;, &quot;digest&quot;],
+      &quot;properties&quot;: {
+        &quot;name&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    }
+  },
+  &quot;additionalProperties&quot;: false
+}</code></pre>
+      <p class="code-note">The published bytes, unmodified.</p>
+    </div></details>
+  </section>
+</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body>
+</html>

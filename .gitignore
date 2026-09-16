@@ -23,3 +23,7 @@ node_modules/
 
 # Demo output (generated at runtime)
 demos/06-invisible-unicode-guardrails/output/
+
+# Impeccable design-tool working state (inferred, unconfirmed product notes)
+.impeccable/
+PRODUCT.md

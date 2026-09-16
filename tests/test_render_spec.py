@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import html
 import json
 import re
@@ -74,3 +75,50 @@ def test_prism_bundle_registers_every_required_language() -> None:
     languages = set(json.loads(result.stdout))
 
     assert set(REQUIRED_LANGUAGES) <= languages
+
+
+def test_schema_reference_pages_are_current() -> None:
+    pages = render_spec.reference_pages()
+    assert len(pages) == len([p for p in render_spec.SCHEMA_DIR.iterdir() if p.is_file()])
+    for path, expected in pages:
+        assert path.is_file(), f"missing reference page {path.relative_to(check_site.ROOT)}"
+        assert path.read_text(encoding="utf-8") == expected, (
+            f"{path.relative_to(check_site.ROOT)} drifted from its schema; "
+            "run scripts/render_spec.py"
+        )
+
+
+def test_schema_reference_pages_carry_the_published_bytes() -> None:
+    for schema in sorted(render_spec.SCHEMA_DIR.iterdir()):
+        page = (
+            render_spec.REFERENCE_ROOT / render_spec.reference_slug(schema.name) / "index.html"
+        ).read_text(encoding="utf-8")
+        raw = schema.read_bytes()
+        published, _ = render_spec._published_json(raw)
+        assert html.escape(published) in page, schema.name
+        assert f"sha256:{hashlib.sha256(raw).hexdigest()}" in page, schema.name
+
+
+def test_schema_reference_examples_are_real_and_valid() -> None:
+    from jsonschema import Draft202012Validator
+
+    for schema in sorted(render_spec.SCHEMA_DIR.glob("*.schema.json")):
+        document = json.loads(schema.read_text(encoding="utf-8"))
+        validator = Draft202012Validator(document, registry=render_spec._registry())
+        examples = render_spec.valid_examples(schema.name)
+        if schema.name != "dataset-manifest.schema.json":
+            assert examples, f"no real example validates against {schema.name}"
+        for label, value in examples:
+            source = label.split(" ")[0]
+            assert (check_site.ROOT / source).is_file(), label
+            assert validator.is_valid(value), label
+
+
+def test_schema_navigation_opens_the_reference() -> None:
+    for path in sorted(check_site.ROOT.rglob("*.html")):
+        content = path.read_text(encoding="utf-8", errors="replace")
+        assert '<a href="/schema/v0.2/catalog.json">Hosted schemas</a>' not in content, (
+            path.relative_to(check_site.ROOT)
+        )
+    index = render_spec.SCHEMA_PAGE.read_text(encoding="utf-8")
+    assert 'href="/schema/v0.2/catalog.json"' in index

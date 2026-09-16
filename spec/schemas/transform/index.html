@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Field-by-field reference for the hosted Makoto resource transform.schema.json: types, requirements, constraints, rules, and real example values.">
+  <title>transform.schema.json reference — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/spec/schemas/transform/">
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+  <span class="kicker">Schema reference</span>
+  <h1><code>transform.schema.json</code></h1>
+  <p class="lead">The transformation predicate. Operation metadata, exact predecessors, input artifacts, and output subjects.</p>
+  <dl class="schema-meta">
+    <dt>Title</dt><dd>Makoto v0.2 Transformation Predicate</dd>
+    <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/transform.schema.json</dd>
+    <dt>Digest</dt><dd>sha256:8b8dad3361327578c79a5b69912fe77e747d4ac6d1c6b234327f1a56621b1a23</dd>
+    <dt>Raw</dt><dd><a href="/schema/v0.2/transform.schema.json">/schema/v0.2/transform.schema.json</a></dd>
+    <dt>Carried in</dt><dd class="prose">The <code>predicate</code> of a statement whose <code>predicateType</code> is <code>https://usemakoto.dev/predicate/v0.2/transform</code>.</dd>
+    <dt>Responsibility</dt><dd class="prose">Operation, input artifacts, predecessor bindings, optional dataset entry membership, profiles, and extensions.</dd>
+  </dl>
+  <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#112-common-makoto-predicate-fields">§11.2</a><a href="/spec/text/#114-transformation-predicate">§11.4</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
+  <figure class="lead-exhibit"><figcaption><strong>A real instance.</strong> Read from <code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json → predicate</code>, which validates against this schema.</figcaption><pre data-filename="1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json"><code class="language-json">{
+  &quot;event&quot;: {
+    &quot;id&quot;: &quot;urn:uuid:22222222-2222-4222-8222-222222222222&quot;,
+    &quot;occurredAt&quot;: &quot;2026-09-16T16:00:00Z&quot;
+  },
+  &quot;inputs&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919&quot;
+      },
+      &quot;name&quot;: &quot;raw&quot;,
+      &quot;provenance&quot;: {
+        &quot;statementDigest&quot;: {
+          &quot;sha256&quot;: &quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a&quot;
+        },
+        &quot;subjectName&quot;: &quot;customers.raw.json&quot;
+      }
+    }
+  ],
+  &quot;operation&quot;: {
+    &quot;name&quot;: &quot;Normalize customer records&quot;,
+    &quot;type&quot;: &quot;urn:makoto:demo:operation:normalize&quot;
+  },
+  &quot;profiles&quot;: [],
+  &quot;schemaVersion&quot;: &quot;0.2&quot;
+}</code></pre></figure>
+  <section aria-labelledby="used-by"><h2 id="used-by">Referenced by</h2><ul class="used-by"><li><a href="/spec/schemas/statement/"><code>statement.schema.json</code> → predicate</a></li></ul></section>
+<section aria-labelledby="fields"><h2 id="fields">Fields</h2><p class="spec-jump"><a href="#def-root">Top level</a><a href="#def-digest">digest</a><a href="#def-timestamp">timestamp</a><a href="#def-event">event</a><a href="#def-tool">tool</a><a href="#def-operation">operation</a><a href="#def-provenance">provenance</a><a href="#def-input">input</a><a href="#def-extensions">extensions</a></p><section class="def-block" id="def-root" aria-labelledby="def-root-title"><h3 id="def-root-title">Top level<a class="anchor-link" href="#def-root" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-root-schemaVersion"><span class="field-name">schemaVersion</span><br><span class="field-req is-required">required</span></td><td class="field-type">string constant</td><td><ul class="field-constraints"><li>= &quot;0.2&quot;</li></ul><div>Makoto predicate version.</div><div class="field-example"><code>&quot;0.2&quot;</code></div></td></tr><tr><td id="f-root-event"><span class="field-name">event</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-event">event</a></td><td><div class="field-example"><code>{&quot;id&quot;: &quot;urn:uuid:22222222-2222-4222-8222-222222222222&quot;, &quot;occurredAt&quot;: &quot;2026-09-16T16:00:00Z&quot;}</code></div></td></tr><tr><td id="f-root-operation"><span class="field-name">operation</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-operation">operation</a></td><td><div class="field-example"><code>{&quot;name&quot;: &quot;Normalize customer records&quot;, &quot;type&quot;: &quot;urn:makoto:demo:operation:normalize&quot;}</code></div></td></tr><tr><td id="f-root-inputs"><span class="field-name">inputs</span><br><span class="field-req is-required">required</span></td><td class="field-type">array of <a href="#def-input">input</a></td><td><ul class="field-constraints"><li>min items 1</li></ul><div>One or more consumed artifacts and their provenance bindings.</div><div class="field-example"><code>[{&quot;digest&quot;: {&quot;sha256&quot;: &quot;4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919&quot;}, &quot;na…</code></div></td></tr><tr><td id="f-root-profiles"><span class="field-name">profiles</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">array of <a href="/spec/schemas/profile-reference/">profile-reference.schema.json</a></td><td><div>Additional schemas to apply.</div><div class="field-example"><code>[]</code></div></td></tr><tr><td id="f-root-extensions"><span class="field-name">extensions</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-extensions">extensions</a></td><td><div>URI-namespaced extension values.</div><div class="field-example"><code>{&quot;urn:makoto:demo:privacy-reviewed&quot;: true}</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-digest" aria-labelledby="def-digest-title"><h3 id="def-digest-title">digest<a class="anchor-link" href="#def-digest" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>inputs[].digest</code>, <code>inputs[].provenance.statementDigest</code>, <code>operation.parametersDigest</code>, <code>operation.tool.digest</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-digest-sha256"><span class="field-name">sha256</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 64</li><li>max length 64</li></ul><div class="field-example"><code>&quot;4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-timestamp" aria-labelledby="def-timestamp-title"><h3 id="def-timestamp-title">timestamp<a class="anchor-link" href="#def-timestamp" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">string</span><ul class="field-constraints"><li>min length 20</li><li>max length 30</li></ul><p class="text-muted">Appears at <code>event.occurredAt</code></p></div></section><section class="def-block" id="def-event" aria-labelledby="def-event-title"><h3 id="def-event-title">event<a class="anchor-link" href="#def-event" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>event</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-event-id"><span class="field-name">id</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Producer-selected event identifier; uniqueness is enforced across the verified graph.</div><div class="field-example"><code>&quot;urn:uuid:22222222-2222-4222-8222-222222222222&quot;</code></div></td></tr><tr><td id="f-event-occurredAt"><span class="field-name">occurredAt</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-timestamp">timestamp</a></td><td><div>Signer-asserted event time; not a trusted timestamp unless policy adds that guarantee.</div><div class="field-example"><code>&quot;2026-09-16T16:00:00Z&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-tool" aria-labelledby="def-tool-title"><h3 id="def-tool-title">tool<a class="anchor-link" href="#def-tool" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>operation.tool</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-tool-name"><span class="field-name">name</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>max length 4096</li></ul><div>Tool or service name.</div></td></tr><tr><td id="f-tool-version"><span class="field-name">version</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>max length 4096</li></ul><div>Tool version.</div></td></tr><tr><td id="f-tool-uri"><span class="field-name">uri</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Tool or recipe locator.</div></td></tr><tr><td id="f-tool-digest"><span class="field-name">digest</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div>Digest of executable, script, image, or recipe when available.</div></td></tr></tbody></table></div></section><section class="def-block" id="def-operation" aria-labelledby="def-operation-title"><h3 id="def-operation-title">operation<a class="anchor-link" href="#def-operation" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>operation</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-operation-type"><span class="field-name">type</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Stable transformation category.</div><div class="field-example"><code>&quot;urn:makoto:demo:operation:normalize&quot;</code></div></td></tr><tr><td id="f-operation-name"><span class="field-name">name</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>max length 4096</li></ul><div>Human-readable operation description.</div><div class="field-example"><code>&quot;Normalize customer records&quot;</code></div></td></tr><tr><td id="f-operation-tool"><span class="field-name">tool</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-tool">tool</a></td><td></td></tr><tr><td id="f-operation-parametersDigest"><span class="field-name">parametersDigest</span><br><span class="field-req is-optional">optional</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div>Digest of exact parameter/configuration bytes when available.</div></td></tr></tbody></table></div></section><section class="def-block" id="def-provenance" aria-labelledby="def-provenance-title"><h3 id="def-provenance-title">provenance<a class="anchor-link" href="#def-provenance" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>inputs[].provenance</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-provenance-statementDigest"><span class="field-name">statementDigest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div>Payload digest of the predecessor statement.</div><div class="field-example"><code>{&quot;sha256&quot;: &quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a&quot;}</code></div></td></tr><tr><td id="f-provenance-subjectName"><span class="field-name">subjectName</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Subject in that predecessor that supplied this input.</div><div class="field-example"><code>&quot;customers.raw.json&quot;</code></div></td></tr><tr><td id="f-provenance-entryName"><span class="field-name">entryName</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 1024</li></ul><div>Relative entry name when the input is one member of a predecessor dataset-manifest subject.</div></td></tr></tbody></table></div></section><section class="def-block" id="def-input" aria-labelledby="def-input-title"><h3 id="def-input-title">input<a class="anchor-link" href="#def-input" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>inputs[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-input-name"><span class="field-name">name</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Input artifact label.</div><div class="field-example"><code>&quot;raw&quot;</code></div></td></tr><tr><td id="f-input-digest"><span class="field-name">digest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div>Exact input artifact digest.</div><div class="field-example"><code>{&quot;sha256&quot;: &quot;4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919&quot;}</code></div></td></tr><tr><td id="f-input-provenance"><span class="field-name">provenance</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-provenance">provenance</a></td><td><div class="field-example"><code>{&quot;statementDigest&quot;: {&quot;sha256&quot;: &quot;56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27…</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-extensions" aria-labelledby="def-extensions-title"><h3 id="def-extensions-title">extensions<a class="anchor-link" href="#def-extensions" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><p class="text-muted">Appears at <code>extensions</code></p></div></section></section>
+  <section aria-labelledby="examples"><h2 id="examples">Real documents that validate</h2><ul class="schema-list"><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json → predicate</code></li><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json → predicate</code></li></ul></section>
+  <section aria-labelledby="raw"><h2 id="raw">Raw JSON</h2>
+    <details><summary>The published document (2,889 bytes)</summary><div>
+      <pre data-filename="transform.schema.json"><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;$id&quot;: &quot;https://usemakoto.dev/schema/v0.2/transform.schema.json&quot;,
+  &quot;title&quot;: &quot;Makoto v0.2 Transformation Predicate&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [&quot;schemaVersion&quot;, &quot;event&quot;, &quot;operation&quot;, &quot;inputs&quot;],
+  &quot;properties&quot;: {
+    &quot;schemaVersion&quot;: { &quot;const&quot;: &quot;0.2&quot; },
+    &quot;event&quot;: { &quot;$ref&quot;: &quot;#/$defs/event&quot; },
+    &quot;operation&quot;: { &quot;$ref&quot;: &quot;#/$defs/operation&quot; },
+    &quot;inputs&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;minItems&quot;: 1,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/input&quot; }
+    },
+    &quot;profiles&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;https://usemakoto.dev/schema/v0.2/profile-reference.schema.json&quot; }
+    },
+    &quot;extensions&quot;: { &quot;$ref&quot;: &quot;#/$defs/extensions&quot; }
+  },
+  &quot;$defs&quot;: {
+    &quot;digest&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;sha256&quot;],
+      &quot;properties&quot;: { &quot;sha256&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 64, &quot;maxLength&quot;: 64 } },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;timestamp&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 20,
+      &quot;maxLength&quot;: 30
+    },
+    &quot;event&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;id&quot;, &quot;occurredAt&quot;],
+      &quot;properties&quot;: {
+        &quot;id&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;occurredAt&quot;: { &quot;$ref&quot;: &quot;#/$defs/timestamp&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;tool&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;name&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;maxLength&quot;: 4096 },
+        &quot;version&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;maxLength&quot;: 4096 },
+        &quot;uri&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;operation&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;type&quot;],
+      &quot;properties&quot;: {
+        &quot;type&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;name&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;maxLength&quot;: 4096 },
+        &quot;tool&quot;: { &quot;$ref&quot;: &quot;#/$defs/tool&quot; },
+        &quot;parametersDigest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;provenance&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;statementDigest&quot;, &quot;subjectName&quot;],
+      &quot;properties&quot;: {
+        &quot;statementDigest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;subjectName&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;entryName&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 1024 }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;input&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;name&quot;, &quot;digest&quot;, &quot;provenance&quot;],
+      &quot;properties&quot;: {
+        &quot;name&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;provenance&quot;: { &quot;$ref&quot;: &quot;#/$defs/provenance&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;extensions&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;additionalProperties&quot;: true
+    }
+  },
+  &quot;additionalProperties&quot;: false
+}</code></pre>
+      <p class="code-note">The published bytes, unmodified.</p>
+    </div></details>
+  </section>
+</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body>
+</html>

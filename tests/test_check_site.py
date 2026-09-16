@@ -261,7 +261,7 @@ def test_canonical_presentation_pages_have_no_visible_version_taxonomy() -> None
 def test_narrative_pages_have_no_visible_version_labels() -> None:
     for path in sorted(check_site.ROOT.rglob("*.html")):
         relative = path.relative_to(check_site.ROOT).as_posix()
-        if relative in check_site.TECHNICAL_VERSION_PAGES:
+        if check_site.is_technical_version_page(relative):
             continue
         parser = check_site.PageParser()
         parser.feed(path.read_text(encoding="utf-8", errors="replace"))

@@ -9,13 +9,37 @@
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
 <div class="site-shell">
-<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
 <div class="site-main"><main id="main" class="page wide">
   <span class="kicker">Protocol specification</span>
   <h1>One signed claim per event. One verifiable history at handoff.</h1>
   <p class="lead">Makoto is a source-first protocol for data provenance. It records an origin, appends independently signed transformation statements, lets data teams attach private JSON Schema rules by digest, and gives the recipient enough evidence to verify the history and the bytes it actually received.</p>
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#shown">What one record actually looks like</a> below.</figcaption><pre class="language-json"><code class="language-json">{
+  &quot;_type&quot;: &quot;https://in-toto.io/Statement/v1&quot;,
+  &quot;predicate&quot;: {
+    &quot;event&quot;: {
+      &quot;id&quot;: &quot;urn:uuid:11111111-1111-4111-8111-111111111111&quot;,
+      &quot;occurredAt&quot;: &quot;2026-09-16T16:00:00Z&quot;
+    },
+    &quot;profiles&quot;: [],
+    &quot;schemaVersion&quot;: &quot;0.2&quot;,
+    &quot;source&quot;: {
+      &quot;kind&quot;: &quot;urn:makoto:demo:source:synthetic-file&quot;,
+      &quot;uri&quot;: &quot;urn:makoto:demo:v0.2:source:customers-raw&quot;
+    }
+  },
+  &quot;predicateType&quot;: &quot;https://usemakoto.dev/predicate/v0.2/origin&quot;,
+  &quot;subject&quot;: [
+    {
+      &quot;digest&quot;: {
+        &quot;sha256&quot;: &quot;4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919&quot;
+      },
+      &quot;name&quot;: &quot;customers.raw.json&quot;
+    }
+  ]
+}</code></pre></figure>
   <p class="editorial-note"><strong>Publication status.</strong> The normative text and implementation are available for public review. They are not yet an immutable tagged release.</p>
   <p class="spec-jump"><a href="/spec/text/">Normative text</a><a href="/spec/schemas/">Hosted schemas</a><a href="/spec/v0.2/spec.md">Raw specification</a><a href="/schema/v0.2/catalog.json">Schema catalog</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a></p>
 
@@ -144,6 +168,6 @@
   <section class="community-band" aria-labelledby="review"><span class="kicker">Public technical review</span><h2 id="review">Challenge the protocol with an actual handoff.</h2><p>Bring a source, two transformations, a private rule, a signer boundary, and a receiving decision. The useful contribution is the smallest case that exposes an ambiguity or produces a new conformance fixture.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto/issues/new">Open an issue on GitHub</a><a class="button secondary" href="/demos/setup/">Run the proof locally</a></div></section>
 </main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
 </div>
-<script defer src="/assets/prism.js"></script>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
 </body>
 </html>
