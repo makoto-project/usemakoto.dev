@@ -88,7 +88,7 @@ LEVEL       L1
 REQUIRED    L3 not met
 $ echo $?
 1</code></pre></figure>
-<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
 
 <section>
 <h2>The problem</h2>
@@ -110,7 +110,7 @@ done
 {"operation":"Normalize customer records","input":"customers.raw.json","output":"customers.normalized.json"}
 {"operation":"origin","input":null,"output":"customers.raw.json"}
 {"operation":"Remove direct identifiers and bucket ages","input":"customers.normalized.json","output":"customers.public.json"}</code></pre>
-<p>The <a href="/demos/v0.2-end-to-end/artifacts/data/customers.raw.json">source export</a> and <a href="/demos/v0.2-end-to-end/artifacts/data/customers.normalized.json">normalized intermediate</a> are published beside the <a href="/demos/v0.2-end-to-end/artifacts/data/customers.public.json">final file</a>, so every step's input and output bytes can be checked.</p>
+<p>The <a href="/demos/end-to-end/artifacts/data/customers.raw.json">source export</a> and <a href="/demos/end-to-end/artifacts/data/customers.normalized.json">normalized intermediate</a> are published beside the <a href="/demos/end-to-end/artifacts/data/customers.public.json">final file</a>, so every step's input and output bytes can be checked.</p>
 </div></li>
 
 <li><div>
@@ -354,7 +354,7 @@ LEVEL       L1
 REQUIRED    L3 not met
 $ echo $?
 1</code></pre>
-<p><a href="/demos/v0.2-end-to-end/artifacts/reports/removed-predecessor.json">Open the complete removed-predecessor report</a>.</p>
+<p><a href="/demos/end-to-end/artifacts/reports/removed-predecessor.json">Open the complete removed-predecessor report</a>.</p>
 <h3>Rewritten step</h3>
 <p>The copied signature no longer matches the edited payload, so <code>signatures</code> fails first. Without a valid signature no policy rule is satisfied, and the graph checks that depend on it are skipped rather than reported as passing.</p>
 <pre><code class="language-bash">$ makoto verify bundle handoffs/rewired-step/bundle \
@@ -486,7 +486,7 @@ LEVEL       none
 REQUIRED    L3 not met
 $ echo $?
 1</code></pre>
-<p><a href="/demos/v0.2-end-to-end/artifacts/reports/rewired-step.json">Open the complete rewired-step report</a>.</p>
+<p><a href="/demos/end-to-end/artifacts/reports/rewired-step.json">Open the complete rewired-step report</a>.</p>
 </div></li>
 </ol>
 
@@ -532,7 +532,7 @@ $ echo $?
 <span class="kicker">Make the next paper inspectable</span>
 <h2>Start the graph when data leaves the instrument, not when the PDF is submitted.</h2>
 <div class="actions">
-<a class="button" href="/demos/v0.2-end-to-end/">Run the source-to-handoff pattern</a>
+<a class="button" href="/demos/end-to-end/">Run the source-to-handoff pattern</a>
 <a class="button secondary" href="/examples/#reproducibility">Read the casebook entry</a>
 </div>
 </section>

@@ -1,7 +1,8 @@
 """Static guards for presentation rules that have regressed before.
 
-* Nothing scrolls sideways: no stylesheet a page loads may set overflow-x (or
-  the overflow shorthand) to auto or scroll.
+* Nothing scrolls sideways: no stylesheet in the repository, linked or not,
+  and no inline <style> block may set overflow-x (or the overflow shorthand)
+  to auto or scroll.
 * No coloured side stripes: no border-left / border-inline-start wider than
   1px with a visible colour, and no inset box-shadow drawn as a vertical rail.
 * JSON reads vertically: every JSON code block's default view, as laid out by
@@ -45,6 +46,20 @@ def linked_stylesheets() -> dict[str, str]:
     return sheets
 
 
+def all_stylesheets() -> dict[str, str]:
+    """Every .css file in the repository plus every inline <style> block.
+
+    Scanning unlinked files too means a stylesheet cannot slip past the guard
+    today and reintroduce sideways scroll the day someone links it.
+    """
+    sheets = linked_stylesheets()
+    for path in sorted(ROOT.rglob("*.css")):
+        if {".git", ".venv", "node_modules"}.intersection(path.relative_to(ROOT).parts):
+            continue
+        sheets[f"/{path.relative_to(ROOT).as_posix()}"] = path.read_text(encoding="utf-8")
+    return sheets
+
+
 def rules(css: str) -> list[tuple[str, str]]:
     """(selector, declarations) for every innermost rule, @media included."""
     css = re.sub(r"/\*.*?\*/", "", css, flags=re.DOTALL)
@@ -66,9 +81,19 @@ def test_pages_load_at_least_one_stylesheet() -> None:
     assert "/assets/v02.css" in linked_stylesheets()
 
 
+def test_sideways_scroll_guard_scans_unlinked_stylesheets() -> None:
+    names = all_stylesheets()
+    on_disk = {
+        f"/{path.relative_to(ROOT).as_posix()}"
+        for path in ROOT.rglob("*.css")
+        if not {".git", ".venv", "node_modules"}.intersection(path.relative_to(ROOT).parts)
+    }
+    assert on_disk and on_disk <= set(names)
+
+
 def test_no_stylesheet_scrolls_content_sideways() -> None:
     offenders = []
-    for name, css in linked_stylesheets().items():
+    for name, css in all_stylesheets().items():
         for selector, body in rules(css):
             for prop, value in declarations(body):
                 if prop == "overflow-x" and re.search(r"\b(auto|scroll)\b", value):

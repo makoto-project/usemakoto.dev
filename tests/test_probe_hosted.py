@@ -334,3 +334,29 @@ def test_load_expectations_rejects_slashless_documentation_path(tmp_path: Path) 
 
     with pytest.raises(probe_hosted.ProbeError, match="trailing slashes"):
         probe_hosted.load_expectations(tmp_path)
+
+
+def test_retired_demo_artifact_urls_are_probed_for_the_canonical_bytes(tmp_path: Path) -> None:
+    schema = b'{"type":"object"}\n'
+    write_candidate_pin(tmp_path, schema_body=schema, walkthrough=b"walkthrough\n")
+    pin_path = tmp_path / "schema/core-candidate.json"
+    pin = json.loads(pin_path.read_bytes())
+    digest = hashlib.sha256(b"[]\n").hexdigest()
+    pin["resources"] = [
+        {
+            "path": f"{probe_hosted.DEMO_ARTIFACTS_PATH}data/customers.raw.json",
+            "digest": {"sha256": digest},
+            "mediaType": "application/json",
+            "cors": True,
+        }
+    ]
+    pin_path.write_bytes(canonical(pin))
+
+    resources, _ = probe_hosted.load_expectations(tmp_path, candidate=True)
+    by_path = {resource.path: resource for resource in resources}
+
+    legacy = by_path["/demos/v0.2-end-to-end/artifacts/data/customers.raw.json"]
+    assert legacy.sha256 == digest and legacy.require_cors
+    assert legacy.media_types == ("application/json",)
+    for page in ("/demos/v0.2-end-to-end/", "/examples/v0.2/", "/integrations/v0.2/"):
+        assert by_path[page].media_types == ("text/html",)
