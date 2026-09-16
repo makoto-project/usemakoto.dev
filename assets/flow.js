@@ -168,6 +168,23 @@
         lines.push({ b: b, top: firstRow.indexOf(b) !== -1, spread: spread, order: i + c / 10 });
       }
     });
+    // Stacked in one column, the copies share one trunk down the gutter and
+    // each branches off at its own node: one line to read, many points of
+    // light peeling away along it. Side by side, every copy keeps its own
+    // lane so no drop crosses another node.
+    var bandTop = (label ? layer.box(label).b : S.b) + 12;
+    var bandBottom = gridTop - 14;
+    var single = boxes.every(function (b) { return Math.abs(b.l - boxes[0].l) < 2; });
+    if (single) {
+      var trunk = boxes[0].l - 14;
+      lines.forEach(function (line, i) {
+        var ey = line.b.cy + line.spread * 12;
+        layer.edge([[S.cx, S.b], [S.cx, bandTop], [trunk, bandTop], [trunk, ey], [line.b.l, ey]],
+          { delay: (i * 0.53) % 4.2, cycle: 5.2 });
+      });
+      return;
+    }
+
     // Gutter lanes: the shallowest line in a gutter runs closest to its nodes.
     var gutters = {};
     lines.forEach(function (line) {
@@ -187,8 +204,6 @@
       line.px = n === 1 ? S.cx : S.l + inset + (S.w - 2 * inset) * i / (n - 1);
     });
     // Bus levels: outermost lines turn first, so no drop crosses a run.
-    var bandTop = (label ? layer.box(label).b : S.b) + 12;
-    var bandBottom = gridTop - 14;
     var left = lines.filter(function (l) { return l.dx <= l.px; });
     var right = lines.filter(function (l) { return l.dx > l.px; }).reverse();
     [left, right].forEach(function (group) {
@@ -210,6 +225,10 @@
 
   // Explicit edge lists for authored figures. [from, to, options]
   var EDGES = {
+    // The homepage hero: the gate a receiver adds, then the run it produced.
+    handoff: [
+      ["gate", "run", { side: "left", delay: 0.9, cycle: 4.2 }]
+    ],
     lifecycle: [
       ["raw", "normalized", { side: "left", delay: 0, cycle: 4.5 }],
       ["normalized", "public", { side: "left", delay: 1.5, cycle: 4.5, offset: 6 }],

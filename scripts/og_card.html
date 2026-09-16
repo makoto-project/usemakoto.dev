@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1200">
+  <meta name="robots" content="noindex">
+  <title>Social card source — Makoto</title>
+  <!--
+    Source for /assets/og-card.png (1200 x 630). It uses the site's own
+    typefaces and tokens so the card is the site, not a poster of it.
+
+    To re-render: serve the repository root, open this file in Chrome with a
+    1200 x 630 viewport at device pixel ratio 1, and save a viewport
+    screenshot as assets/og-card.png. With chrome-devtools-axi:
+
+      chrome-devtools-axi open http://127.0.0.1:8790/scripts/og_card.html
+      chrome-devtools-axi emulate --viewport "1200x630x1"
+      chrome-devtools-axi screenshot assets/og-card.png
+  -->
+  <style>
+    @font-face { font-family: "Archivo"; src: url("/assets/fonts/archivo-latin-wdth-normal.woff2") format("woff2-variations"); font-weight: 100 900; font-stretch: 62% 125%; }
+    @font-face { font-family: "JetBrains Mono"; src: url("/assets/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2-variations"); font-weight: 100 800; }
+    :root {
+      --paper: #f4f6f6; --sheet: #ffffff; --ink: #16242b; --muted: #53646b; --line: #dbe2e4; --line-strong: #a3b2b7;
+      --seal: #b3321c; --term-bg: #1d282e; --term-head: #242f35; --term-edge: #33434a; --term-ink: #e3eaec; --term-muted: #a9b8be;
+      --term-prompt: #f0bb6c; --term-ok: #8fdcae; --term-fail: #ff9d93; --term-code: #ffbcaf; --flow-line: #b9c7cb;
+      --sans: "Archivo", sans-serif; --mono: "JetBrains Mono", monospace; --jp: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", serif;
+    }
+    html, body { margin: 0; background: var(--paper); }
+    .card { position: relative; width: 1200px; height: 630px; overflow: hidden; box-sizing: border-box; padding: 64px 72px; display: grid; grid-template-columns: 560px 1fr; column-gap: 48px; color: var(--ink); font-family: var(--sans); }
+    .brand { display: flex; align-items: center; gap: 16px; font: 800 30px/1 var(--sans); font-stretch: 112%; letter-spacing: -.01em; }
+    .brand-mark { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 6px; background: var(--seal); color: #fff7f2; font: 700 27px/1 var(--jp); }
+    .claim { display: flex; flex-direction: column; justify-content: space-between; }
+    h1 { margin: 40px 0 0; font: 800 58px/1 var(--sans); font-stretch: 108%; letter-spacing: -.03em; text-wrap: balance; }
+    .meta { margin: 0; display: flex; align-items: baseline; gap: 18px; color: var(--muted); font: 500 17px/1.4 var(--mono); white-space: nowrap; }
+    .meta strong { color: var(--ink); font-weight: 700; }
+    .meta span::before { content: ""; display: inline-block; width: 22px; height: 1px; margin: 0 14px 6px 0; background: var(--line-strong); }
+    /* The exhibit: the receiver's run, as it appears on the homepage. */
+    .exhibit { align-self: center; border: 1px solid var(--term-edge); border-radius: 6px; background: var(--term-bg); color: var(--term-ink); font: 500 15.5px/1.72 var(--mono); box-shadow: 0 18px 40px -28px rgba(22, 36, 43, .55); }
+    .exhibit-head { display: flex; gap: 12px; white-space: nowrap; padding: 12px 22px; border-bottom: 1px solid var(--term-edge); border-radius: 6px 6px 0 0; background: var(--term-head); color: var(--term-muted); font-size: 14px; }
+    .exhibit-head b { color: var(--term-ink); font-weight: 600; }
+    .exhibit-head i { color: var(--term-prompt); font-style: normal; }
+    .exhibit pre { margin: 0; padding: 20px 22px 22px; font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .prompt { color: var(--term-prompt); font-weight: 700; }
+    .ok { color: var(--term-ok); font-weight: 700; }
+    .fail { color: var(--term-fail); font-weight: 700; }
+    .deny { padding: 0 .35em; border-radius: 3px; background: rgba(255, 157, 147, .18); color: var(--term-fail); font-weight: 800; }
+    .code { color: var(--term-code); font-weight: 700; }
+    .digest { color: var(--term-muted); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="claim">
+      <div>
+        <p class="brand" style="margin:0"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</p>
+        <h1>Know where data began, what changed, and who attested to it.</h1>
+      </div>
+      <p class="meta"><strong>usemakoto.dev</strong><span>source-first, signed provenance for data</span></p>
+    </div>
+    <div class="exhibit">
+      <div class="exhibit-head"><b>receiver</b>·<span>poisoned handoff</span>·<i>terminal</i></div>
+<pre><span class="prompt">$</span> makoto verify bundle handoffs/mutated/bundle \
+  --expected-artifact receiver/expected/…
+<span class="ok">PASS</span>   signatures
+<span class="ok">PASS</span>   authorization
+<span class="ok">PASS</span>   graph
+<span class="ok">PASS</span>   roots-and-heads
+<span class="ok">PASS</span>   completeness-anchor
+<span class="fail">FAIL</span>   artifact-bytes
+<span class="deny">DENY</span>   decision
+<span class="code">E_ARTIFACT_DIGEST</span>: final artifact bytes
+  differ from the signed digest
+<span class="prompt">$</span> echo $?
+1</pre>
+    </div>
+  </div>
+</body>
+</html>
