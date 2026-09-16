@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Field-by-field reference for the hosted Makoto resource profile-reference.schema.json: types, requirements, constraints, rules, and real example values.">
+  <title>profile-reference.schema.json reference — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/spec/schemas/profile-reference/">
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+  <span class="kicker">Schema reference</span>
+  <h1><code>profile-reference.schema.json</code></h1>
+  <p class="lead">A profile reference: the schema root URI plus its complete digest-pinned closure.</p>
+  <dl class="schema-meta">
+    <dt>Title</dt><dd>Makoto v0.2 Profile Reference</dd>
+    <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/profile-reference.schema.json</dd>
+    <dt>Digest</dt><dd>sha256:abe12266ae10b57d95d8fd14489c6cdaedd4ed67ef8f7a44db7b18249832665c</dd>
+    <dt>Raw</dt><dd><a href="/schema/v0.2/profile-reference.schema.json">/schema/v0.2/profile-reference.schema.json</a></dd>
+    <dt>Carried in</dt><dd class="prose">Entries of <code>profiles</code> in origin and transformation predicates, and the receiver's profile references.</dd>
+    <dt>Responsibility</dt><dd class="prose">URI, root digest, closure digest, target, criticality, media type, subject, and sorted transitive resources.</dd>
+  </dl>
+  <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#121-profile-reference">§12.1</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
+  <figure class="lead-exhibit"><figcaption><strong>A real instance.</strong> Read from <code>demos/v0.2-end-to-end/artifacts/receiver/customer-public.profile.json</code>, which validates against this schema.</figcaption><pre data-filename="customer-public.profile.json"><code class="language-json">{
+  &quot;closureDigest&quot;: {
+    &quot;sha256&quot;: &quot;57eec614be9b2141ad536f486ff4400b514d79b8b1cc9642a839cf1a39b10794&quot;
+  },
+  &quot;critical&quot;: true,
+  &quot;digest&quot;: {
+    &quot;sha256&quot;: &quot;68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb&quot;
+  },
+  &quot;id&quot;: &quot;https://schemas.example.internal/makoto/customer-public-v1.schema.json&quot;,
+  &quot;mediaType&quot;: &quot;application/json&quot;,
+  &quot;resources&quot;: [],
+  &quot;subjectName&quot;: &quot;customers.public.json&quot;,
+  &quot;target&quot;: &quot;artifact&quot;
+}</code></pre></figure>
+  <section aria-labelledby="used-by"><h2 id="used-by">Referenced by</h2><ul class="used-by"><li><a href="/spec/schemas/origin/"><code>origin.schema.json</code> → profiles[]</a></li><li><a href="/spec/schemas/transform/"><code>transform.schema.json</code> → profiles[]</a></li></ul></section>
+<section aria-labelledby="fields"><h2 id="fields">Fields</h2><p class="spec-jump"><a href="#def-root">Top level</a><a href="#def-digest">digest</a><a href="#def-resource">resource</a><a href="#def-profileReference">profileReference</a></p><section class="def-block" id="def-root" aria-labelledby="def-root-title"><h3 id="def-root-title">Top level<a class="anchor-link" href="#def-root" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type"><a href="#def-profileReference">profileReference</a></span></div></section><section class="def-block" id="def-digest" aria-labelledby="def-digest-title"><h3 id="def-digest-title">digest<a class="anchor-link" href="#def-digest" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>closureDigest</code>, <code>digest</code>, <code>resources[].digest</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-digest-sha256"><span class="field-name">sha256</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 64</li><li>max length 64</li></ul><div>Digest of the exact root-plus-resource closure descriptor defined below.</div><div class="field-example"><code>&quot;68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb&quot;</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-resource" aria-labelledby="def-resource-title"><h3 id="def-resource-title">resource<a class="anchor-link" href="#def-resource" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>resources[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-resource-id"><span class="field-name">id</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Absolute schema URI. It is an identifier, not permission to fetch over the network.</div></td></tr><tr><td id="f-resource-digest"><span class="field-name">digest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td></td></tr></tbody></table></div></section><section class="def-block" id="def-profileReference" aria-labelledby="def-profileReference-title"><h3 id="def-profileReference-title">profileReference<a class="anchor-link" href="#def-profileReference" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-profileReference-id"><span class="field-name">id</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Absolute schema URI. It is an identifier, not permission to fetch over the network.</div><div class="field-example"><code>&quot;https://schemas.example.internal/makoto/customer-public-v1.schema.json&quot;</code></div></td></tr><tr><td id="f-profileReference-digest"><span class="field-name">digest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb&quot;}</code></div></td></tr><tr><td id="f-profileReference-closureDigest"><span class="field-name">closureDigest</span><br><span class="field-req is-required">required</span></td><td class="field-type"><a href="#def-digest">digest</a></td><td><div class="field-example"><code>{&quot;sha256&quot;: &quot;57eec614be9b2141ad536f486ff4400b514d79b8b1cc9642a839cf1a39b10794&quot;}</code></div></td></tr><tr><td id="f-profileReference-target"><span class="field-name">target</span><br><span class="field-req is-required">required</span></td><td class="field-type">enum</td><td><ul class="field-constraints"><li>one of: &quot;statement&quot;, &quot;predicate&quot;, &quot;artifact&quot;</li></ul><div>One of <code>statement</code>, <code>predicate</code>, or <code>artifact</code>.</div><div class="field-example"><code>&quot;artifact&quot;</code></div></td></tr><tr><td id="f-profileReference-subjectName"><span class="field-name">subjectName</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 1</li><li>max length 4096</li></ul><div>Identifies the statement subject whose actual bytes are validated.</div><div class="field-example"><code>&quot;customers.public.json&quot;</code></div></td></tr><tr><td id="f-profileReference-mediaType"><span class="field-name">mediaType</span><br><span class="field-req is-optional">optional</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>max length 255</li></ul><div>Signed declaration selecting the supported artifact parser, such as <code>application/json</code> or <code>application/x-ndjson</code>.</div><div class="field-example"><code>&quot;application/json&quot;</code></div></td></tr><tr><td id="f-profileReference-critical"><span class="field-name">critical</span><br><span class="field-req is-required">required</span></td><td class="field-type">boolean</td><td><div>If true, unresolved or unsupported validation MUST fail.</div><div class="field-example"><code>true</code></div></td></tr><tr><td id="f-profileReference-resources"><span class="field-name">resources</span><br><span class="field-req is-required">required</span></td><td class="field-type">array of <a href="#def-resource">resource</a></td><td><div>Sorted digest-pinned transitive schema resources; an empty array means the root has no non-core external resources.</div><div class="field-example"><code>[]</code></div></td></tr></tbody></table></div><h4>Conditional rules</h4><ul class="variant-list"><li>When <code>target</code> = &quot;artifact&quot;; requires <code>target</code>: then requires <code>subjectName</code>, <code>mediaType</code>.</li><li>When not <code>target</code> = &quot;artifact&quot;; requires <code>target</code>: <code>subjectName</code> is present; <code>mediaType</code> is present.</li></ul></section></section>
+  <section aria-labelledby="examples"><h2 id="examples">Real documents that validate</h2><ul class="schema-list"><li><code>demos/v0.2-end-to-end/artifacts/receiver/customer-public.profile.json</code></li><li><code>demos/v0.2-end-to-end/artifacts/receiver/public-transform-metadata.profile.json</code></li></ul></section>
+  <section aria-labelledby="raw"><h2 id="raw">Raw JSON</h2>
+    <details><summary>The published document (1,854 bytes)</summary><div>
+      <pre data-filename="profile-reference.schema.json"><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;$id&quot;: &quot;https://usemakoto.dev/schema/v0.2/profile-reference.schema.json&quot;,
+  &quot;title&quot;: &quot;Makoto v0.2 Profile Reference&quot;,
+  &quot;$ref&quot;: &quot;#/$defs/profileReference&quot;,
+  &quot;$defs&quot;: {
+    &quot;digest&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;sha256&quot;],
+      &quot;properties&quot;: {
+        &quot;sha256&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 64, &quot;maxLength&quot;: 64 }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;resource&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;id&quot;, &quot;digest&quot;],
+      &quot;properties&quot;: {
+        &quot;id&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;profileReference&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;id&quot;, &quot;digest&quot;, &quot;closureDigest&quot;, &quot;target&quot;, &quot;critical&quot;, &quot;resources&quot;],
+      &quot;properties&quot;: {
+        &quot;id&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;closureDigest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;target&quot;: { &quot;enum&quot;: [&quot;statement&quot;, &quot;predicate&quot;, &quot;artifact&quot;] },
+        &quot;subjectName&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;mediaType&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;maxLength&quot;: 255
+        },
+        &quot;critical&quot;: { &quot;type&quot;: &quot;boolean&quot; },
+        &quot;resources&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/resource&quot; }
+        }
+      },
+      &quot;allOf&quot;: [
+        {
+          &quot;if&quot;: { &quot;properties&quot;: { &quot;target&quot;: { &quot;const&quot;: &quot;artifact&quot; } }, &quot;required&quot;: [&quot;target&quot;] },
+          &quot;then&quot;: { &quot;required&quot;: [&quot;subjectName&quot;, &quot;mediaType&quot;] },
+          &quot;else&quot;: {
+            &quot;properties&quot;: {
+              &quot;subjectName&quot;: false,
+              &quot;mediaType&quot;: false
+            }
+          }
+        }
+      ],
+      &quot;additionalProperties&quot;: false
+    }
+  }
+}</code></pre>
+      <p class="code-note">The published bytes, unmodified.</p>
+    </div></details>
+  </section>
+</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Field-by-field reference for the hosted Makoto resource envelope.schema.json: types, requirements, constraints, rules, and real example values.">
+  <title>envelope.schema.json reference — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/spec/schemas/envelope/">
+  <link rel="stylesheet" href="/assets/v02.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+  <span class="kicker">Schema reference</span>
+  <h1><code>envelope.schema.json</code></h1>
+  <p class="lead">The DSSE envelope. Signatures authenticate exact payload bytes and nothing about authorization.</p>
+  <dl class="schema-meta">
+    <dt>Title</dt><dd>Makoto v0.2 DSSE Envelope</dd>
+    <dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/envelope.schema.json</dd>
+    <dt>Digest</dt><dd>sha256:49de7cf790e3a0c7bd3b83ee7322164d2a5a829648fe1407c79c07f4d74a0f66</dd>
+    <dt>Raw</dt><dd><a href="/schema/v0.2/envelope.schema.json">/schema/v0.2/envelope.schema.json</a></dd>
+    <dt>Carried in</dt><dd class="prose">Every signed file in a bundle: <code>attestations/&lt;digest&gt;.dsse.json</code> carries one statement, and <code>manifest.dsse.json</code> carries the handoff.</dd>
+    <dt>Responsibility</dt><dd class="prose">DSSE transport fields, payload type, base64 payload, and signature entries.</dd>
+  </dl>
+  <p class="spec-jump"><a href="/spec/schemas/">All schemas</a><a href="/spec/text/#101-json-and-dsse">§10.1</a><a href="#fields">Fields</a><a href="#raw">Raw JSON</a></p>
+  <figure class="lead-exhibit"><figcaption><strong>A real instance.</strong> Read from <code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json</code>, which validates against this schema.</figcaption><pre data-filename="1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json"><code class="language-json">{
+  &quot;payload&quot;: &quot;eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjEiLCJwcmVkaWNhdGUiOnsiZXZlbnQiOnsiaWQiOiJ1cm46dXVpZDoyMjIyMjIyMi0yMjIyLTQyMjItODIyMi0yMjIyMjIyMjIyMjIiLCJvY2N1cnJlZEF0IjoiMjAyNi0wOS0xNlQxNjowMDowMFoifSwiaW5wdXRzIjpbeyJkaWdlc3QiOnsic2hhMjU2IjoiNGU5MDE4MWU3Zjc1Y2NkZjBlNGQ4MWM4M2QyODFmNTM4MDZiZWQyNDE3ODdjZGM3NTFlMjJiMmQ0Y2QxOTkxOSJ9LCJuYW1lIjoicmF3IiwicHJvdmVuYW5jZSI6eyJzdGF0ZW1lbnREaWdlc3QiOnsic2hhMjU2IjoiNTZiN2JlNDM5NGZlMDljNjJlYzdhM2Q1NzYzY2VjYzI1MWU5Njk2ZjI2N2YzNWIyYWNjNzE3YjBkMTcwYTI3YSJ9LCJzdWJqZWN0TmFtZSI6ImN1c3RvbWVycy5yYXcuanNvbiJ9fV0sIm9wZXJhdGlvbiI6eyJuYW1lIjoiTm9ybWFsaXplIGN1c3RvbWVyIHJlY29yZHMiLCJ0eXBlIjoidXJuOm1ha290bzpkZW1vOm9wZXJhdGlvbjpub3JtYWxpemUifSwicHJvZmlsZXMiOltdLCJzY2hlbWFWZXJzaW9uIjoiMC4yIn0sInByZWRpY2F0ZVR5cGUiOiJodHRwczovL3VzZW1ha290by5kZXYvcHJlZGljYXRlL3YwLjIvdHJhbnNmb3JtIiwic3ViamVjdCI6W3siZGlnZXN0Ijp7InNoYTI1NiI6IjQyMWUxOWNmMDAyYWEyNWNmNmYyZjllZDc4OGUwNGM5YmFkZmQ5Y2JjNmIwMDAzMGIwYjA4OTgxMGIyYWU0ZjgifSwibmFtZSI6ImN1c3RvbWVycy5ub3JtYWxpemVkLmpzb24ifV19&quot;,
+  &quot;payloadType&quot;: &quot;application/vnd.in-toto+json&quot;,
+  &quot;signatures&quot;: [
+    {
+      &quot;keyid&quot;: &quot;sha256:47dea58ea00fae9417ee19d76755bfef690899021132effb04fe1f9e4f0c8059&quot;,
+      &quot;sig&quot;: &quot;WdgKRlEOVDNhGiDOeRy0UAHA9hpZQOTviOnW/sT+lOWBuHFid0EWdqF5VxB3PbFXlfEM/aPGbXppLRIdIRmGBA==&quot;
+    }
+  ]
+}</code></pre></figure>
+  
+<section aria-labelledby="fields"><h2 id="fields">Fields</h2><p class="spec-jump"><a href="#def-root">Top level</a><a href="#def-signature">signature</a></p><section class="def-block" id="def-root" aria-labelledby="def-root-title"><h3 id="def-root-title">Top level<a class="anchor-link" href="#def-root" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-root-payloadType"><span class="field-name">payloadType</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 3</li><li>max length 255</li></ul><div class="field-example"><code>&quot;application/vnd.in-toto+json&quot;</code></div></td></tr><tr><td id="f-root-payload"><span class="field-name">payload</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><div class="field-example"><code>&quot;eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjEiLCJwcmVkaWNhdGUiOnsiZXZlbnQiOnsiaWQiOi…</code></div></td></tr><tr><td id="f-root-signatures"><span class="field-name">signatures</span><br><span class="field-req is-required">required</span></td><td class="field-type">array of <a href="#def-signature">signature</a></td><td><ul class="field-constraints"><li>min items 1</li></ul><div class="field-example"><code>[{&quot;keyid&quot;: &quot;sha256:47dea58ea00fae9417ee19d76755bfef690899021132effb04fe1f9e4f0c8059&quot;, &quot;sig&quot;: &quot;W…</code></div></td></tr></tbody></table></div></section><section class="def-block" id="def-signature" aria-labelledby="def-signature-title"><h3 id="def-signature-title">signature<a class="anchor-link" href="#def-signature" aria-label="Permalink">#</a></h3><div class="def-summary"><strong>Shape</strong> <span class="field-type">object</span><ul class="field-constraints"><li>closed object</li></ul><p class="text-muted">Appears at <code>signatures[]</code></p></div><div class="table-scroll"><table class="doc-table field-table stack-table"><thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Constraints, rules, and a real value</th></tr></thead><tbody><tr><td id="f-signature-keyid"><span class="field-name">keyid</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 71</li><li>max length 71</li></ul><div class="field-example"><code>&quot;sha256:47dea58ea00fae9417ee19d76755bfef690899021132effb04fe1f9e4f0c8059&quot;</code></div></td></tr><tr><td id="f-signature-sig"><span class="field-name">sig</span><br><span class="field-req is-required">required</span></td><td class="field-type">string</td><td><ul class="field-constraints"><li>min length 88</li><li>max length 88</li></ul><div class="field-example"><code>&quot;WdgKRlEOVDNhGiDOeRy0UAHA9hpZQOTviOnW/sT+lOWBuHFid0EWdqF5VxB3PbFXlfEM/aPGbXppLRIdIRmGBA==&quot;</code></div></td></tr></tbody></table></div></section></section>
+  <section aria-labelledby="examples"><h2 id="examples">Real documents that validate</h2><ul class="schema-list"><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json</code></li><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json</code></li><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json</code></li><li><code>demos/v0.2-end-to-end/artifacts/positive-bundle/manifest.dsse.json</code></li></ul></section>
+  <section aria-labelledby="raw"><h2 id="raw">Raw JSON</h2>
+    <details><summary>The published document (943 bytes)</summary><div>
+      <pre data-filename="envelope.schema.json"><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
+  &quot;$id&quot;: &quot;https://usemakoto.dev/schema/v0.2/envelope.schema.json&quot;,
+  &quot;title&quot;: &quot;Makoto v0.2 DSSE Envelope&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [&quot;payloadType&quot;, &quot;payload&quot;, &quot;signatures&quot;],
+  &quot;properties&quot;: {
+    &quot;payloadType&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 3,
+      &quot;maxLength&quot;: 255
+    },
+    &quot;payload&quot;: { &quot;type&quot;: &quot;string&quot; },
+    &quot;signatures&quot;: {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;minItems&quot;: 1,
+      &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/signature&quot; }
+    }
+  },
+  &quot;$defs&quot;: {
+    &quot;signature&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;keyid&quot;, &quot;sig&quot;],
+      &quot;properties&quot;: {
+        &quot;keyid&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 71,
+          &quot;maxLength&quot;: 71
+        },
+        &quot;sig&quot;: {
+          &quot;type&quot;: &quot;string&quot;,
+          &quot;minLength&quot;: 88,
+          &quot;maxLength&quot;: 88
+        }
+      },
+      &quot;additionalProperties&quot;: false
+    }
+  },
+  &quot;additionalProperties&quot;: false
+}</code></pre>
+      <p class="code-note">The published bytes, unmodified.</p>
+    </div></details>
+  </section>
+</main><footer class="footer"><div class="footer-inner">Makoto specification · Source first · Append only · Receiver verified</div></footer></div>
+</div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body>
+</html>

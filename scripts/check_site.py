@@ -764,6 +764,16 @@ def stale_integration_markers(content: str) -> list[str]:
     return found
 
 
+def is_technical_version_page(relative: str) -> bool:
+    """Pages allowed to display a version label.
+
+    The generated schema field references under ``spec/schemas/`` quote schema
+    identifiers and titles that carry the version by definition, like the
+    schema index they hang off.
+    """
+    return relative in TECHNICAL_VERSION_PAGES or relative.startswith("spec/schemas/")
+
+
 def retired_version_errors(relative: str, content: str) -> list[str]:
     """Apply the retired-version rule to one HTML page.
 
@@ -791,7 +801,7 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
         relative = path.relative_to(ROOT).as_posix()
         content = path.read_text(encoding="utf-8", errors="replace")
         errors.extend(retired_version_errors(relative, content))
-        if relative in TECHNICAL_VERSION_PAGES:
+        if is_technical_version_page(relative):
             continue
         parser = PageParser()
         parser.feed(content)
