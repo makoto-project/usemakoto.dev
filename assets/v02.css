@@ -236,7 +236,9 @@ a:hover { color: var(--link-hover); text-decoration-color: currentColor; text-de
 a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--seal); outline-offset: 3px; border-radius: var(--radius-sm); }
 img, svg { max-width: 100%; height: auto; }
 p, li, dd, td { overflow-wrap: break-word; }
-h1, h2, h3, h4 { text-wrap: balance; }
+/* A heading word that cannot fit the line breaks rather than running past
+   the page edge; narrow screens hyphenate it (every page is lang="en"). */
+h1, h2, h3, h4 { text-wrap: balance; overflow-wrap: break-word; }
 p { text-wrap: pretty; }
 strong { font-weight: 700; }
 hr { border: 0; border-top: 1px solid var(--line); }
@@ -925,6 +927,9 @@ tbody th { font-weight: 650; }
   body { font-size: 15.5px; }
   :root { --frame-pad-y: 1rem; --frame-pad-x: 1rem; --card-pad: 1.15rem; --grid-gap: 1rem; }
   :root { --t-display: clamp(2.05rem, 1rem + 6.5vw, 2.8rem); --t-h2: 1.65rem; }
+  /* Only a word too long for the line hyphenates ("interchangeable."), not
+     every heading word that balancing could split. */
+  h1, h2, h3 { hyphens: auto; hyphenate-limit-chars: 14 5 5; }
   /* A mono title (a schema file name) is set to fit the width in one piece. */
   .page h1 > code { font-size: clamp(1.4rem, 7.6vw, 2.4rem); }
   pre, pre[class*="language-"] { font-size: .78rem; }
