@@ -99,7 +99,7 @@ def page(*, title: str, description: str, canonical: str, main: str) -> str:
         f"{main}\n"
         f"</main>{footer}</div>\n"
         "</div>\n"
-        '<script defer src="/assets/prism.js"></script>\n'
+        '<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>\n'
         "</body>\n</html>\n"
     )
 
