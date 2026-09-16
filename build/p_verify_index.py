@@ -1,12 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Verify Makoto schemas, signatures, signer authorization, provenance graphs, handoff completeness, and exact data bytes."><title>Verification — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head>
-<body>
-<a class="skip-link" href="#main">Skip to content</a>
-<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a><p class="mobile-section">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/" aria-current="page">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
-<div class="site-shell">
-<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/verify/" aria-current="page">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
-<div class="site-main"><main id="main" class="page wide">
+import sys; sys.path.insert(0, 'build')
+import shell
+
+BODY = r"""
 <span class="kicker">Receiver verification</span>
 <h1>A signature is one check, not the verdict.</h1>
 <p class="lead">A receiver should be able to verify the evidence without access to the producer&rsquo;s platform: parse the resources, authenticate each signed claim, decide whether each signer was authorized, reconstruct the source-to-handoff graph, resolve exact schemas, and hash the bytes that actually arrived.</p>
@@ -121,5 +116,7 @@ uv sync --locked --dev
 <section aria-labelledby="limits"><h2 id="limits">What verification still cannot prove</h2><p>Passing every check proves that exact bytes match authorized signed claims and the receiver&rsquo;s independent expectations. It does not prove that a source told the truth, that a claimed transformation actually ran, that the data is safe or high quality, or that signed metadata is confidential. Those are separate controls and evidence.</p></section>
 
 <section class="community-band" aria-labelledby="implement"><span class="kicker">Implement another verifier</span><h2 id="implement">Match the report contract, not just the JSON shape.</h2><p>A useful implementation must preserve the distinctions between authenticity and authorization, continuity and completeness, and completeness and freshness. Start from the public schemas, conformance fixtures, denial reports, and reference implementation.</p><div class="actions"><a class="button" href="https://github.com/makoto-project/makoto">Read the source on GitHub</a><a class="button secondary" href="https://github.com/makoto-project/makoto/issues/new">Propose a verifier</a></div></section>
-</main><footer class="footer"><div class="footer-inner">Makoto verification · Receiver-owned policy · Exact bytes · Open source on GitHub</div></footer></div></div>
-</body></html>
+"""
+
+shell.write('verify/index.html', BODY)
+print("verify/index.html written")

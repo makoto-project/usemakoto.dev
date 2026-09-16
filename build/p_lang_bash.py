@@ -1,4 +1,7 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Install, attest, verify, fail closed, and read the Makoto verification report from Bash and CI."><title>Bash verification binding — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/">誠 Makoto</a><nav class="nav" aria-label="Primary"><a href="/verify/">Verification</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><a href="/">Overview</a><a href="/verify/">Verification</a><a href="/validate/">Schema validation</a><a href="/sdk/">Language interfaces</a><a href="/community/">Community</a></nav></details></div></header><div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Verification</p><a href="/verify/">Decision model</a><a href="/validate/">Schema validation</a><a href="/verify/bash.html" aria-current="page">Bash</a><a href="/verify/python.html">Python</a><a href="/verify/nodejs.html">JavaScript</a><a href="/verify/typescript.html">TypeScript</a><a href="/verify/go.html">Go</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a></div></nav></aside><div class="site-main"><main id="main" class="page">
+import sys; sys.path.insert(0, 'build')
+import shell
+
+BODY = r"""
 <span class="kicker">Bash binding</span>
 <h1>Make the shell fail closed.</h1>
 <p class="lead">In a pipeline step there is no object model, only an exit status and a JSON document. This page covers the whole loop from an empty shell: install the verifier, validate structure against the hosted schemas, attest an origin and a transformation, verify a bundle, branch on the verdict, and read the report that comes back.</p>
@@ -153,4 +156,7 @@ SKIPPED artifact-profiles</code></pre>
 <p>The signatures passed. The authorization passed. The graph was continuous. The bytes that arrived were not the bytes that were signed &mdash; and because <code>artifact-bytes</code> failed, the profile check never ran and reports <code>skipped</code> rather than claiming a pass it did not earn. A single boolean would have hidden all of that. See <a href="/verify/#pipeline">the fourteen ordered checks</a> for every code and the step that raises it.</p></section>
 
 <section class="community-band"><h2>Contribute a shell fixture.</h2><p>The most useful contribution is a gate script paired with the exact denial report it must reject.</p><div class="actions"><a class="button" href="/verify/">Back to verification</a><a class="button secondary" href="/sdk/">All language interfaces</a></div></section>
-</main><footer class="footer"><div class="footer-inner">Makoto verification · Bash invokes the reference CLI</div></footer></div></div></body></html>
+"""
+
+shell.write('verify/bash.html', BODY)
+print("ok")
