@@ -1,16 +1,17 @@
 /*
- * Exhibit frames for every code block: a tab with the filename or language,
- * a copy control, and a terminal treatment for shell sessions.
+ * Exhibit frames for every code block: a tab with the filename and language,
+ * a copy control, a terminal treatment for shell sessions, wrapped lines that
+ * hang past their own indentation, and a reading layout for JSON.
  *
  * Load order matters. This script is deferred directly after /assets/prism.js,
  * so it runs after Prism registers its languages but before Prism's own
  * DOMContentLoaded highlightAll. That window is where the terminal grammars
- * are registered and shell blocks are re-classed, so Prism highlights them
- * with the right grammar on its single pass. Without Prism (pages with plain
- * <pre> only) the frames and copy controls still work.
+ * are registered, shell blocks are re-classed, and JSON is laid out, so Prism
+ * highlights each block once with the right grammar. Without Prism (pages
+ * with plain <pre> only) the frames, line wrapping and copy still work.
  *
- * The text inside each <pre> is never rewritten: what is displayed and what
- * is copied are the published bytes.
+ * The published bytes are never lost: copy always takes the original text,
+ * and a reformatted JSON block keeps its original bytes one click away.
  */
 (function () {
   "use strict";
@@ -20,6 +21,7 @@
     typescript: "typescript", go: "go", sql: "sql", bash: "shell",
     terminal: "terminal", "shell-plain": "shell", none: "text", markup: "html"
   };
+  var PRISM_SELECTOR = 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code';
 
   function registerGrammars(Prism) {
     if (!Prism || !Prism.languages || !Prism.languages.bash) return;
@@ -58,6 +60,11 @@
         "gha-expression": /\$\{\{[^}]*\}\}/
       });
     }
+    // Every highlight pass (the first, and each exact-bytes toggle) ends by
+    // splitting the result into lines.
+    Prism.hooks.add("complete", function (env) {
+      if (env.element) splitLines(env.element);
+    });
   }
 
   function languageOf(code) {
@@ -69,8 +76,95 @@
     return /^\$ /m.test(text);
   }
 
-  function copyText(pre, lang) {
-    var text = pre.textContent.replace(/\n$/, "");
+  /*
+   * Lay a JSON document out one member per line with two-space indentation.
+   * This is a lexical re-indent, not JSON.parse + stringify: every string and
+   * number literal is copied through verbatim and key order is kept, so the
+   * displayed document parses to exactly what the original parses to. The
+   * same algorithm is mirrored in tests/test_layout_guards.py. Returns null
+   * when the text is not a single valid JSON document.
+   */
+  function layoutJson(text) {
+    try { JSON.parse(text); } catch (e) { return null; }
+    var out = "", depth = 0, i = 0, n = text.length, pad = "  ";
+    function newline() { out += "\n"; for (var d = 0; d < depth; d++) out += pad; }
+    while (i < n) {
+      var ch = text.charAt(i);
+      if (ch === '"') {
+        var j = i + 1;
+        while (j < n) {
+          var c = text.charAt(j);
+          if (c === "\\") { j += 2; continue; }
+          if (c === '"') break;
+          j++;
+        }
+        out += text.slice(i, j + 1);
+        i = j + 1;
+      } else if (ch === "{" || ch === "[") {
+        var k = i + 1;
+        while (k < n && /\s/.test(text.charAt(k))) k++;
+        var close = ch === "{" ? "}" : "]";
+        if (text.charAt(k) === close) { out += ch + close; i = k + 1; continue; }
+        out += ch; depth++; newline(); i++;
+      } else if (ch === "}" || ch === "]") {
+        depth--; newline(); out += ch; i++;
+      } else if (ch === ",") {
+        out += ","; newline(); i++;
+      } else if (ch === ":") {
+        out += ": "; i++;
+      } else if (/\s/.test(ch)) {
+        i++;
+      } else {
+        out += ch; i++;
+      }
+    }
+    return out;
+  }
+
+  /*
+   * Wrap each source line of a rendered block in <span class="line"> so CSS
+   * can hang wrapped continuations past the line's own indentation. Works on
+   * the highlighted markup: token spans that cross a newline are closed at
+   * the end of the line and reopened on the next. textContent is unchanged.
+   */
+  function splitLines(code) {
+    if (code.querySelector(":scope > .line")) return;
+    var html = code.innerHTML;
+    var parts = html.split(/(<[^>]+>)/);
+    var stack = [], out = '<span class="line">';
+    for (var p = 0; p < parts.length; p++) {
+      var part = parts[p];
+      if (!part) continue;
+      if (part.charAt(0) === "<") {
+        if (part.charAt(1) === "/") { stack.pop(); }
+        else if (!/\/>$/.test(part)) { stack.push(part); }
+        out += part;
+        continue;
+      }
+      var pieces = part.split("\n");
+      for (var q = 0; q < pieces.length; q++) {
+        if (q > 0) {
+          var closes = "", opens = "";
+          for (var s = stack.length - 1; s >= 0; s--) {
+            closes += "</" + /^<([\w-]+)/.exec(stack[s])[1] + ">";
+          }
+          for (var o = 0; o < stack.length; o++) opens += stack[o];
+          out += "\n" + closes + '</span><span class="line">' + opens;
+        }
+        out += pieces[q];
+      }
+    }
+    out += "</span>";
+    code.innerHTML = out;
+    var lines = code.querySelectorAll(":scope > .line");
+    for (var l = 0; l < lines.length; l++) {
+      var lead = /^[ \t]*/.exec(lines[l].textContent)[0].replace(/\t/g, "  ").length;
+      if (lead) lines[l].style.setProperty("--indent", Math.min(lead, 12));
+    }
+  }
+
+  function copyText(original, lang) {
+    var text = original.replace(/\n$/, "");
     if (lang !== "terminal") return text;
     // Copy the commands, not the captured output, with continuations intact.
     var lines = text.split("\n"), out = [], inCommand = false;
@@ -103,15 +197,27 @@
     });
   }
 
+  function willHighlight(code) {
+    return !!(window.Prism && !window.Prism.manual && code.matches && code.matches(PRISM_SELECTOR));
+  }
+
+  function render(code) {
+    if (willHighlight(code) && window.Prism.highlightElement && document.readyState !== "loading") {
+      window.Prism.highlightElement(code);
+    } else if (!willHighlight(code)) {
+      splitLines(code);
+    }
+  }
+
   function frame(pre) {
     if (pre.closest(".exhibit") || pre.dataset.exhibit === "off") return;
     var code = pre.querySelector("code") || pre;
     var lang = languageOf(code);
     if (lang === "none") lang = languageOf(pre);
-    var text = pre.textContent;
+    var original = code.textContent;
 
     if (lang === "bash") {
-      lang = isTranscript(text) ? "terminal" : "shell-plain";
+      lang = isTranscript(original) ? "terminal" : "shell-plain";
       code.className = code.className.replace(/(^|\s)language-bash(?=\s|$)/, "$1language-" + lang);
       pre.className = pre.className.replace(/(^|\s)language-bash(?=\s|$)/, "$1language-" + lang);
     }
@@ -124,18 +230,11 @@
     var head = document.createElement("div");
     head.className = "exhibit-head";
 
-    var dots = document.createElement("span");
-    dots.className = "exhibit-dots";
-    dots.setAttribute("aria-hidden", "true");
-    dots.innerHTML = "<i></i><i></i><i></i>";
-    head.appendChild(dots);
-
     var filename = pre.dataset.filename || code.dataset.filename;
     if (filename) {
       var name = document.createElement("span");
       name.className = "exhibit-name";
       name.textContent = filename;
-      name.title = filename;
       head.appendChild(name);
     }
 
@@ -148,6 +247,32 @@
     spacer.className = "exhibit-spacer";
     head.appendChild(spacer);
 
+    // JSON is shown one member per line. The original bytes stay available.
+    var laidOut = lang === "json" && code !== pre ? layoutJson(original) : null;
+    var trailing = /\n$/.test(original) ? "\n" : "";
+    var note = null;
+    if (laidOut !== null && laidOut + trailing !== original) {
+      code.textContent = laidOut + trailing;
+      var toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "exhibit-toggle";
+      toggle.textContent = "Exact bytes";
+      toggle.setAttribute("aria-pressed", "false");
+      toggle.addEventListener("click", function () {
+        var exact = toggle.getAttribute("aria-pressed") !== "true";
+        toggle.setAttribute("aria-pressed", exact ? "true" : "false");
+        code.textContent = exact ? original : laidOut + trailing;
+        note.textContent = exact
+          ? "The exact published bytes, wrapped to fit the frame."
+          : "Formatted for reading. A digest covers the exact published bytes; Copy and Exact bytes give you those.";
+        render(code);
+      });
+      head.appendChild(toggle);
+      note = document.createElement("p");
+      note.className = "exhibit-note";
+      note.textContent = "Formatted for reading. A digest covers the exact published bytes; Copy and Exact bytes give you those.";
+    }
+
     var button = document.createElement("button");
     button.type = "button";
     button.className = "exhibit-copy";
@@ -159,7 +284,7 @@
     status.setAttribute("role", "status");
     button.addEventListener("click", function () {
       var labelNode = button.querySelector("span");
-      writeClipboard(copyText(pre, lang)).then(function () {
+      writeClipboard(copyText(original, lang)).then(function () {
         button.dataset.state = "copied";
         labelNode.textContent = "Copied";
         status.textContent = "Copied to clipboard";
@@ -178,12 +303,13 @@
     head.appendChild(button);
     head.appendChild(status);
 
-    // Long lines scroll inside the block; keyboard users need to reach it.
-    if (!pre.hasAttribute("tabindex")) pre.setAttribute("tabindex", "0");
-
     pre.parentNode.insertBefore(wrap, pre);
     wrap.appendChild(head);
+    if (note) wrap.appendChild(note);
     wrap.appendChild(pre);
+
+    // Blocks Prism will not touch are split now; the rest after highlighting.
+    if (!willHighlight(code)) splitLines(code);
   }
 
   registerGrammars(window.Prism);
