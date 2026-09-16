@@ -1,36 +1,501 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Validate Makoto JSON structures with hosted schemas, then use the reference verifier for signatures, policy, graph, handoff, and data bytes."><title>Schema validation — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Validate Makoto policies, envelopes, statements, and reports against the hosted Draft 2020-12 schemas with jq, check-jsonschema, jsonschema, pydantic, AJV, and Go."><title>Schema validation — Makoto</title><link rel="stylesheet" href="/assets/v02.css"></head><body>
 <a class="skip-link" href="#main">Skip to content</a><header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/spec/">Specification</a><p class="mobile-section">Build</p><a href="/validate/" aria-current="page">Schema validation</a><a href="/verify/">Full verification</a><a href="/sdk/">Language interfaces</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a></nav></details></div></header>
 <div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/schema/v0.2/catalog.json">Hosted schemas</a><a href="/validate/" aria-current="page">Schema validation</a><a href="/verify/">Full verification</a><a href="/sdk/">Language interfaces</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
-<div class="site-main"><main id="main" class="page wide"><span class="kicker">Structural validation</span><h1>JSON Schema answers “is this shaped correctly?” Nothing more.</h1><p class="lead">Makoto publishes ordinary Draft 2020-12 schemas with CORS enabled. Use them in editors, CI, and ingestion gates. Then use the reference verifier for signed payload bytes, signer authorization, profiles, graph continuity, handoff completeness, freshness, and the data bytes received.</p>
+<div class="site-main"><main id="main" class="page wide">
+<span class="kicker">Structural validation</span>
+<h1>JSON Schema answers &ldquo;is this shaped correctly?&rdquo; Nothing more.</h1>
+<p class="lead">Makoto publishes ordinary Draft 2020-12 schemas, served with CORS. Use them in editors, CI, and ingestion gates with the tools you already run: <code>jq</code>, <code>check-jsonschema</code>, Python <code>jsonschema</code>, pydantic, AJV, and Go. Every program on this page was run against the hosted schemas and the hosted fixture documents, and its real output is shown beneath it.</p>
 <table class="stack-table validation-table"><thead><tr><th>Layer</th><th>Checks</th><th>Does not check</th></tr></thead><tbody><tr><td>Core schema</td><td>Envelope, statement, predicate, profile reference, handoff, policy, bundle, and report shapes.</td><td>Signatures or cross-resource meaning.</td></tr><tr><td>Organizational profile</td><td>Declared metadata or supported structured-artifact constraints.</td><td>Whether the signer is authorized or the source is truthful.</td></tr><tr><td>Reference verifier</td><td>Structure plus cryptography, authorization, graph, handoff, freshness, and artifacts.</td><td>Data quality, confidentiality, compliance, or execution truth.</td></tr></tbody></table>
-<h2>Runnable command-line check</h2><pre><code>uvx --from check-jsonschema check-jsonschema \
-  --schemafile https://usemakoto.dev/schema/v0.2/trust-policy.schema.json \
-  policy.json</code></pre><p>Replace the schema URL with the resource type you are validating. The <a href="/schema/v0.2/catalog.json">hosted catalog</a> lists every core schema and SHA-256 digest.</p>
-<h2>Python with <code>jsonschema</code></h2><pre><code>import json
-from urllib.request import urlopen
+<p class="editorial-note"><strong>A valid document is not a verified one.</strong> A schema-valid policy can trust the wrong key. A schema-valid envelope can carry a signature over different bytes. Structure is one of sixteen checks the reference verifier runs, and it is the only one these tools perform. For the decision itself, see <a href="#receiver">Complete receiver decision</a>.</p>
+
+<section aria-labelledby="schemas"><h2 id="schemas">Which schema validates which document</h2><p>All schemas live under one directory and are listed with their SHA-256 digests in the <a href="/schema/v0.2/catalog.json">hosted catalog</a>. Two practical details matter when you wire a validator. Signed statements and handoff manifests travel base64-encoded inside DSSE envelopes, so decode the payload before validating it. And the statement schema references sibling schemas by URL, so your validator must be allowed to resolve them.</p>
+<dl class="troubleshooting"><dt>Trust policy &middot; <a href="/schema/v0.2/trust-policy.schema.json"><code>trust-policy.schema.json</code></a></dt><dd>The receiver&rsquo;s keys, rules, handoff requirements, and limits. Self-contained.</dd><dt>DSSE envelope &middot; <a href="/schema/v0.2/envelope.schema.json"><code>envelope.schema.json</code></a></dt><dd>Any <code>*.dsse.json</code> file: payload type, base64 payload, signatures. Self-contained.</dd><dt>Statement &middot; <a href="/schema/v0.2/statement.schema.json"><code>statement.schema.json</code></a></dt><dd>The decoded envelope payload, with its origin or transform predicate. References origin, transform, and profile-reference.</dd><dt>Bundle index &middot; <a href="/schema/v0.2/bundle.schema.json"><code>bundle.schema.json</code></a></dt><dd><code>bundle.json</code> at the root of a handoff bundle. Self-contained.</dd><dt>Handoff manifest &middot; <a href="/schema/v0.2/handoff.schema.json"><code>handoff.schema.json</code></a></dt><dd>The decoded payload of <code>manifest.dsse.json</code>. Self-contained.</dd><dt>Verification report &middot; <a href="/schema/v0.2/verification-report.schema.json"><code>verification-report.schema.json</code></a></dt><dd>The JSON the verifier writes with <code>--json</code>. Self-contained.</dd><dt>Schema catalog &middot; <a href="/schema/v0.2/catalog.schema.json"><code>catalog.schema.json</code></a></dt><dd>A receiver-owned, digest-pinned catalog of profile schemas. Self-contained.</dd><dt>Profile reference &middot; <a href="/schema/v0.2/profile-reference.schema.json"><code>profile-reference.schema.json</code></a></dt><dd>A profile a statement or policy points to by identity and digest. Self-contained.</dd><dt>Dataset manifest &middot; <a href="/schema/v0.2/dataset-manifest.schema.json"><code>dataset-manifest.schema.json</code></a></dt><dd>A canonical manifest listing partition members and digests. Self-contained.</dd></dl></section>
+
+<section aria-labelledby="samples"><h2 id="samples">Sample documents</h2><p>Every example below reads these files. They are the real outputs of the <a href="/demos/v0.2-end-to-end/">runnable fixture</a>: the receiver&rsquo;s policy, the final signed transformation, the verifier&rsquo;s report for a tampered bundle, and one policy broken on purpose so the failure output is real too.</p><pre><code class="language-bash"># Download real documents from the hosted runnable fixture.
+set -euo pipefail
+A=https://usemakoto.dev/demos/v0.2-end-to-end/artifacts
+curl -fsS -o policy.json "$A/receiver/policy.json"
+curl -fsS -o attestation.dsse.json \
+  "$A/positive-bundle/attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json"
+curl -fsS -o report.json "$A/reports/mutated-final-data.json"
+
+# The signed statement is the base64 payload inside the DSSE envelope.
+jq -r .payload attestation.dsse.json | base64 --decode &gt; statement.json
+
+# A deliberately broken policy for the failure examples.
+jq 'del(.limits) | .rules[0].minimumSignatures = 0' policy.json &gt; broken-policy.json
+ls -1 *.json</code></pre></section>
+
+<section aria-labelledby="jq"><h2 id="jq"><code>jq</code>: a pre-flight, not a validator</h2><p><code>jq</code> is already in most CI images and needs no network. It cannot evaluate JSON Schema: no <code>$ref</code>, no <code>additionalProperties</code>, no nested constraint language. Use it to reject obviously wrong input fast, then run a real validator. The field names and bounds below are taken from <code>trust-policy.schema.json</code>; the envelope&rsquo;s payload type is the one the verifier requires at its parse step.</p><pre><code class="language-bash"># Fast field-presence pre-flight with jq. Not JSON Schema: no types, patterns,
+# $ref resolution, or additionalProperties. Exit status 0 means "worth validating".
+set -euo pipefail
+
+policy_ok() {
+  jq --exit-status '
+    (keys - ["version","keys","rules","handoff","requiredProfiles","limits"] | length == 0)
+    and has("version") and has("keys") and has("rules") and has("handoff")
+    and has("requiredProfiles") and has("limits")
+    and .version == "0.2"
+    and (.keys | type == "object" and length &gt;= 1)
+    and (.keys | to_entries | all(.key | test("^sha256:[0-9a-f]{64}$")))
+    and (.rules | type == "array" and length &gt;= 1)
+    and (.rules | all(.minimumSignatures &gt;= 1 and (.authorizedKeyIds | length &gt;= 1)))
+  ' "$1" &gt; /dev/null
+}
+
+envelope_ok() {
+  jq --exit-status '
+    (.payloadType == "application/vnd.in-toto+json")
+    and (.payload | type == "string" and length &gt; 0)
+    and (.signatures | type == "array" and length &gt;= 1)
+    and (.signatures | all(has("keyid") and has("sig")))
+  ' "$1" &gt; /dev/null
+}
+
+for file in policy.json broken-policy.json; do
+  if policy_ok "$file"; then echo "ok      $file"; else echo "REJECT  $file"; fi
+done
+if envelope_ok attestation.dsse.json; then echo "ok      attestation.dsse.json"; fi</code></pre><pre><code class="language-bash">bash preflight.sh
+ok      policy.json
+REJECT  broken-policy.json
+ok      attestation.dsse.json</code></pre></section>
+
+<section aria-labelledby="cli"><h2 id="cli"><code>check-jsonschema</code>: the command line</h2><p>The <a href="https://github.com/python-jsonschema/check-jsonschema">check-jsonschema</a> CLI runs through <code>uvx</code> with nothing installed, fetches remote <code>$ref</code> targets, and accepts many instance files at once.</p><pre><code class="language-bash">uvx check-jsonschema --schemafile https://usemakoto.dev/schema/v0.2/trust-policy.schema.json policy.json
+uvx check-jsonschema --schemafile https://usemakoto.dev/schema/v0.2/envelope.schema.json attestation.dsse.json
+uvx check-jsonschema --schemafile https://usemakoto.dev/schema/v0.2/statement.schema.json statement.json
+uvx check-jsonschema --schemafile https://usemakoto.dev/schema/v0.2/verification-report.schema.json report.json
+# ok -- validation done   (printed once per command)</code></pre><p>A failure names every location and exits 1:</p><pre><code class="language-bash">uvx check-jsonschema --schemafile https://usemakoto.dev/schema/v0.2/trust-policy.schema.json broken-policy.json
+Schema validation errors were encountered.
+  broken-policy.json::$: 'limits' is a required property
+  broken-policy.json::$.rules[0].minimumSignatures: 0 is less than the minimum of 1</code></pre></section>
+
+<section aria-labelledby="python"><h2 id="python">Python: <code>jsonschema</code> with a reference registry</h2><p><code>Draft202012Validator</code> needs a <code>referencing.Registry</code> to follow the statement schema&rsquo;s URL references. The <code>retrieve</code> hook below fetches them on demand and refuses anything outside the Makoto schema directory, so a hostile document cannot steer your validator at an arbitrary URL.</p><pre><code class="language-python"># /// script
+# requires-python = "&gt;=3.11"
+# dependencies = ["jsonschema&gt;=4.25,&lt;5", "referencing&gt;=0.36"]
+# ///
+"""Validate Makoto documents against the hosted Draft 2020-12 schemas."""
+
+import json
+import sys
+import urllib.request
+from pathlib import Path
+
 from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
 
-with urlopen("https://usemakoto.dev/schema/v0.2/trust-policy.schema.json") as response:
-    schema = json.load(response)
-with open("policy.json", encoding="utf-8") as source:
-    instance = json.load(source)
+SCHEMA_BASE = "https://usemakoto.dev/schema/v0.2/"
 
-Draft202012Validator.check_schema(schema)
-Draft202012Validator(schema).validate(instance)</code></pre><p>This is structural validation. It deliberately does not reproduce strict JSON parsing, digest-pinned profile closure, or bundle-verification ordering from the reference implementation.</p>
-<h2>Node.js with AJV</h2><pre><code>import Ajv2020 from "ajv/dist/2020.js";
-import policy from "./policy.json" with { type: "json" };
 
-const schema = await fetch(
-  "https://usemakoto.dev/schema/v0.2/trust-policy.schema.json"
-).then((response) =&gt; response.json());
+def retrieve(uri: str) -&gt; Resource:
+    # Only follow references into the Makoto schema directory.
+    if not uri.startswith(SCHEMA_BASE):
+        raise ValueError(f"refusing to fetch {uri}")
+    # The host answers urllib's default User-Agent with 403.
+    request = urllib.request.Request(uri, headers={"User-Agent": "makoto-validate"})
+    with urllib.request.urlopen(request, timeout=10) as response:
+        return Resource.from_contents(json.load(response))
 
-const validate = new Ajv2020({ strict: true }).compile(schema);
-if (!validate(policy)) throw new Error(JSON.stringify(validate.errors));</code></pre><p>Pin the schema bytes or catalog digest in controlled builds rather than treating a mutable network response as a trust root.</p>
-<h2>CI boundary</h2><pre><code># Structure only
-uvx --from check-jsonschema check-jsonschema \
-  --schemafile https://usemakoto.dev/schema/v0.2/envelope.schema.json \
-  evidence.dsse.json
 
-# Complete receiver decision from a reviewed core checkout
-uv run makoto verify bundle --help</code></pre>
-<section class="community-band"><h2>Implement the check your runtime actually needs.</h2><p>Keep schema validation visibly separate from complete verification, and contribute cross-language fixtures when two implementations should agree.</p><div class="actions"><a class="button" href="/verify/">Read full verification</a><a class="button secondary" href="/sdk/">Review language interfaces</a></div></section></main><footer class="footer"><div class="footer-inner">Makoto schema validation · Hosted Draft 2020-12 resources · CORS enabled</div></footer></div></div></body></html>
+REGISTRY = Registry(retrieve=retrieve)
+
+
+def validator_for(schema_name: str) -&gt; Draft202012Validator:
+    schema = REGISTRY.get_or_retrieve(SCHEMA_BASE + schema_name).value.contents
+    Draft202012Validator.check_schema(schema)
+    return Draft202012Validator(schema, registry=REGISTRY)
+
+
+def validate(document: Path, schema_name: str) -&gt; bool:
+    instance = json.loads(document.read_text(encoding="utf-8"))
+    errors = sorted(validator_for(schema_name).iter_errors(instance), key=lambda e: e.json_path)
+    if not errors:
+        print(f"valid    {document} ({schema_name})")
+        return True
+    print(f"invalid  {document} ({schema_name})")
+    for error in errors:
+        print(f"  {error.json_path}: {error.message}")
+    return False
+
+
+if __name__ == "__main__":
+    checks = [
+        ("policy.json", "trust-policy.schema.json"),
+        ("attestation.dsse.json", "envelope.schema.json"),
+        ("statement.json", "statement.schema.json"),  # follows $ref into transform + profile-reference
+        ("report.json", "verification-report.schema.json"),
+    ]
+    results = [validate(Path(document), schema) for document, schema in checks]
+    sys.exit(0 if all(results) else 1)</code></pre><pre><code class="language-bash">uv run validate_schemas.py
+valid    policy.json (trust-policy.schema.json)
+valid    attestation.dsse.json (envelope.schema.json)
+valid    statement.json (statement.schema.json)
+valid    report.json (verification-report.schema.json)</code></pre><p>Against the broken documents, errors come back sorted by JSON path. The second case proves the <code>$ref</code> into the transform predicate is followed:</p><pre><code class="language-bash">invalid  broken-statement.json (statement.schema.json)
+  $.predicate: Additional properties are not allowed ('bogus' was unexpected)
+  $.predicate.inputs[0]: Additional properties are not allowed ('subject' was unexpected)
+invalid  broken-policy.json (trust-policy.schema.json)
+  $: 'limits' is a required property
+  $.rules[0].minimumSignatures: 0 is less than the minimum of 1</code></pre></section>
+
+<section aria-labelledby="pydantic"><h2 id="pydantic">Python: pydantic for typed report ingestion</h2><p>pydantic is not a JSON Schema validator, and hand-mirroring a schema this detailed would drift. Where it earns its place is the consumer side: turning stored verification reports into typed objects with the published vocabulary enforced, so downstream code cannot misspell a check identifier or treat a refusal without a <code>primaryError</code> as normal. Validate the full document against the schema as well when you persist it.</p><pre><code class="language-python"># /// script
+# requires-python = "&gt;=3.11"
+# dependencies = ["pydantic&gt;=2.8,&lt;3"]
+# ///
+"""Parse stored Makoto verification reports into typed objects.
+
+pydantic is not a JSON Schema validator. This model types the fields an
+ingestion job reads and rejects reports whose decision, statuses, or check
+identifiers fall outside the published vocabulary. Validate the full document
+against verification-report.schema.json as well when you persist reports.
+"""
+
+import sys
+from pathlib import Path
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+
+Decision = Literal["allow", "deny", "indeterminate"]
+Status = Literal["pass", "fail", "indeterminate", "not_checked", "skipped"]
+CheckId = Literal[
+    "load-safely", "parse-strictly", "index-payloads", "core-schemas",
+    "signatures", "authorization-thresholds", "metadata-profiles", "authorization",
+    "graph-dependency-artifacts", "graph", "roots-and-heads", "completeness-anchor",
+    "freshness-anchors", "artifact-bytes", "artifact-profiles", "decision",
+]
+
+
+class Digest(BaseModel):
+    sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class Check(BaseModel):
+    id: CheckId
+    status: Status
+    prerequisiteChecks: list[CheckId]
+
+    @model_validator(mode="after")
+    def skipped_names_its_cause(self) -&gt; "Check":
+        # Mirrors the schema: only a skipped check lists prerequisites.
+        if (self.status == "skipped") != bool(self.prerequisiteChecks):
+            raise ValueError("prerequisiteChecks must be non-empty exactly when status is skipped")
+        return self
+
+
+class Diagnostic(BaseModel):
+    code: str = Field(pattern=r"^[EW]_[A-Z_]+$")
+    step: int = Field(ge=0, le=14)
+    causedByCheck: CheckId
+    message: str
+    context: dict[str, object]
+
+
+class Summary(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    statementsTotal: int | None
+    statementsValid: int | None
+    signaturesTotal: int | None
+    signaturesValid: int | None
+
+
+class VerificationReport(BaseModel):
+    model_config = ConfigDict(extra="allow")  # the schema defines many more fields
+
+    reportVersion: Literal["0.2"]
+    decision: Decision
+    primaryError: str | None
+    evaluationTime: str
+    policyDigest: Digest
+    checks: list[Check] = Field(min_length=16, max_length=16)
+    errors: list[Diagnostic]
+    warnings: list[Diagnostic]
+    summary: Summary
+
+    @model_validator(mode="after")
+    def decision_is_consistent(self) -&gt; "VerificationReport":
+        if self.decision == "allow" and (self.primaryError is not None or self.errors):
+            raise ValueError("an allow cannot carry errors")
+        if self.decision != "allow" and self.primaryError is None:
+            raise ValueError("a refusal must name its primaryError")
+        return self
+
+    @property
+    def not_passed(self) -&gt; list[Check]:
+        return [check for check in self.checks if check.status != "pass"]
+
+
+if __name__ == "__main__":
+    failed = False
+    for path in sorted(Path(".").glob("reports/*.json")):
+        try:
+            report = VerificationReport.model_validate_json(path.read_bytes())
+        except ValidationError as error:
+            failed = True
+            print(f"rejected {path}: {error.error_count()} problem(s)")
+            print(error)
+            continue
+        print(f"{path.name}: {report.decision} {report.primaryError or ''}")
+        for check in report.not_passed:
+            print(f"  {check.id}: {check.status}")
+    sys.exit(1 if failed else 0)</code></pre><pre><code class="language-bash">mkdir -p reports
+for name in positive mutated-final-data statement-digest-mismatch edited-signed-metadata \
+    removed-predecessor rewired-step private-schema-violation unauthorized-signer; do
+  curl -fsS -o "reports/$name.json" \
+    "https://usemakoto.dev/demos/v0.2-end-to-end/artifacts/reports/$name.json"
+done
+uv run report_model.py
+edited-signed-metadata.json: deny E_SIGNATURE_INVALID
+  signatures: fail
+  authorization-thresholds: fail
+  authorization: fail
+  graph: skipped
+  roots-and-heads: skipped
+  completeness-anchor: fail
+  artifact-bytes: skipped
+  artifact-profiles: skipped
+mutated-final-data.json: deny E_ARTIFACT_DIGEST
+  artifact-bytes: fail
+positive.json: allow 
+private-schema-violation.json: deny E_PROFILE_INVALID
+  artifact-profiles: fail
+removed-predecessor.json: deny E_PREDECESSOR_MISSING
+  graph: fail
+  completeness-anchor: fail
+rewired-step.json: deny E_SIGNATURE_INVALID
+  signatures: fail
+  authorization-thresholds: fail
+  authorization: fail
+  graph: skipped
+  roots-and-heads: skipped
+  completeness-anchor: fail
+  artifact-bytes: skipped
+  artifact-profiles: skipped
+statement-digest-mismatch.json: deny E_STATEMENT_DIGEST
+  index-payloads: fail
+  graph: skipped
+  roots-and-heads: skipped
+  completeness-anchor: fail
+  artifact-bytes: skipped
+  artifact-profiles: fail
+unauthorized-signer.json: deny E_SIGNER_UNAUTHORIZED
+  authorization-thresholds: fail
+  authorization: fail
+  graph: skipped
+  roots-and-heads: skipped
+  completeness-anchor: fail
+  artifact-bytes: skipped
+  artifact-profiles: skipped</code></pre><p>That is all eight fixture reports, parsed and summarised. Note how far a signature failure reaches: authorization and completeness fail with it, and the graph, root, and artifact checks report <code>skipped</code> because nothing authenticated was left to test. A skipped check is never a pass.</p></section>
+
+<section aria-labelledby="ajv"><h2 id="ajv">Node.js and TypeScript: <code>Ajv2020</code></h2><p>Import AJV&rsquo;s Draft 2020-12 build, give it a <code>loadSchema</code> function, and compile with <code>compileAsync</code> so referenced schemas are fetched once and cached on the instance. In TypeScript, use the named import <code>import { Ajv2020 } from "ajv/dist/2020.js"</code>.</p><pre><code class="language-bash">npm init -y &amp;&amp; npm pkg set type=module
+npm install ajv@8</code></pre><pre><code class="language-javascript">// Validate Makoto documents against the hosted Draft 2020-12 schemas with AJV.
+import { readFile } from "node:fs/promises";
+import Ajv2020 from "ajv/dist/2020.js";
+
+const SCHEMA_BASE = "https://usemakoto.dev/schema/v0.2/";
+
+const ajv = new Ajv2020({
+  allErrors: true,
+  // The report schema narrows arrays inside if/then/else without repeating
+  // "type"; strictTypes would log a warning for each of those locations.
+  strictTypes: false,
+  // Statement, origin, and transform schemas $ref sibling schemas by URL.
+  loadSchema: async (uri) =&gt; {
+    if (!uri.startsWith(SCHEMA_BASE)) throw new Error(`refusing to fetch ${uri}`);
+    const response = await fetch(uri);
+    if (!response.ok) throw new Error(`${uri}: HTTP ${response.status}`);
+    return response.json();
+  },
+});
+
+const compiled = new Map();
+async function validatorFor(schemaName) {
+  const id = SCHEMA_BASE + schemaName;
+  if (!compiled.has(id)) {
+    const existing = ajv.getSchema(id); // may already be loaded as someone's $ref
+    compiled.set(id, existing ?? (await ajv.compileAsync(await ajv.opts.loadSchema(id))));
+  }
+  return compiled.get(id);
+}
+
+export async function validate(path, schemaName) {
+  const validateFn = await validatorFor(schemaName);
+  const instance = JSON.parse(await readFile(path, "utf8"));
+  if (validateFn(instance)) {
+    console.log(`valid    ${path} (${schemaName})`);
+    return true;
+  }
+  console.log(`invalid  ${path} (${schemaName})`);
+  for (const error of validateFn.errors) {
+    console.log(`  ${error.instancePath || "/"} ${error.message}`, error.params);
+  }
+  return false;
+}
+
+const results = [];
+for (const [path, schema] of [
+  ["policy.json", "trust-policy.schema.json"],
+  ["attestation.dsse.json", "envelope.schema.json"],
+  ["statement.json", "statement.schema.json"],
+  ["report.json", "verification-report.schema.json"],
+  ["broken-policy.json", "trust-policy.schema.json"],
+]) {
+  results.push(await validate(path, schema));
+}
+process.exitCode = results.slice(0, 4).every(Boolean) &amp;&amp; !results[4] ? 0 : 1;</code></pre><pre><code class="language-bash">node validate-schemas.mjs
+valid    policy.json (trust-policy.schema.json)
+valid    attestation.dsse.json (envelope.schema.json)
+valid    statement.json (statement.schema.json)
+valid    report.json (verification-report.schema.json)
+invalid  broken-policy.json (trust-policy.schema.json)
+  / must have required property 'limits' { missingProperty: 'limits' }
+  /rules/0/minimumSignatures must be &gt;= 1 { comparison: '&gt;=', limit: 1 }</code></pre><p class="editorial-note"><strong>Why <code>strictTypes: false</code>.</strong> AJV&rsquo;s strict mode wants <code>"type"</code> repeated beside every <code>minItems</code> and <code>properties</code>. The report schema narrows arrays inside <code>if</code>/<code>then</code>/<code>else</code> branches without repeating it, which is valid Draft 2020-12, so the default logs a warning for each location. Turning off only <code>strictTypes</code> keeps the rest of strict mode.</p></section>
+
+<section aria-labelledby="go"><h2 id="go">Go: <code>santhosh-tekuri/jsonschema</code></h2><p>Version 6 detects the draft from <code>$schema</code> and resolves references through a loader you control. This one fetches only from the Makoto schema directory.</p><pre><code class="language-bash">go mod init example.com/makotovalidate
+go get github.com/santhosh-tekuri/jsonschema/v6@v6.0.3</code></pre><pre><code class="language-go">// Command makotovalidate checks Makoto documents against the hosted schemas.
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/santhosh-tekuri/jsonschema/v6"
+)
+
+const schemaBase = "https://usemakoto.dev/schema/v0.2/"
+
+// makotoLoader resolves $ref URLs, but only inside the Makoto schema directory.
+type makotoLoader struct{ client *http.Client }
+
+func (l makotoLoader) Load(url string) (any, error) {
+	if !strings.HasPrefix(url, schemaBase) {
+		return nil, fmt.Errorf("refusing to fetch %s", url)
+	}
+	resp, err := l.client.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("%s: %s", url, resp.Status)
+	}
+	return jsonschema.UnmarshalJSON(resp.Body)
+}
+
+func main() {
+	compiler := jsonschema.NewCompiler()
+	compiler.UseLoader(makotoLoader{client: &amp;http.Client{Timeout: 10 * time.Second}})
+
+	checks := [][2]string{
+		{"policy.json", "trust-policy.schema.json"},
+		{"attestation.dsse.json", "envelope.schema.json"},
+		{"statement.json", "statement.schema.json"},
+		{"report.json", "verification-report.schema.json"},
+		{"broken-policy.json", "trust-policy.schema.json"},
+	}
+	invalid := 0
+	for _, check := range checks {
+		path, schemaName := check[0], check[1]
+		schema, err := compiler.Compile(schemaBase + schemaName)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "compile:", err)
+			os.Exit(2)
+		}
+		file, err := os.Open(path)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(2)
+		}
+		instance, err := jsonschema.UnmarshalJSON(file)
+		file.Close()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, path, err)
+			os.Exit(2)
+		}
+		if err := schema.Validate(instance); err != nil {
+			invalid++
+			fmt.Printf("invalid  %s (%s)\n%v\n", path, schemaName, err)
+			continue
+		}
+		fmt.Printf("valid    %s (%s)\n", path, schemaName)
+	}
+	if invalid &gt; 0 {
+		os.Exit(1)
+	}
+}</code></pre><pre><code class="language-bash">go run .   # exits 1: the broken policy is invalid
+valid    policy.json (trust-policy.schema.json)
+valid    attestation.dsse.json (envelope.schema.json)
+valid    statement.json (statement.schema.json)
+valid    report.json (verification-report.schema.json)
+invalid  broken-policy.json (trust-policy.schema.json)
+jsonschema validation failed with 'https://usemakoto.dev/schema/v0.2/trust-policy.schema.json#'
+- at '': missing property 'limits'
+- at '/rules/0/minimumSignatures': minimum: got 0, want 1</code></pre></section>
+
+<section aria-labelledby="compare"><h2 id="compare">Choosing a tool</h2><dl class="troubleshooting">
+<dt><code>jq</code></dt><dd>Shell pre-flight with no network. Field presence and simple bounds only; not JSON Schema.</dd>
+<dt><code>check-jsonschema</code></dt><dd>CI and pre-commit. Full Draft 2020-12, follows remote references, many files per call.</dd>
+<dt>Python <code>jsonschema</code></dt><dd>Ingestion services and scripts that need every error with its JSON path.</dd>
+<dt>pydantic</dt><dd>Typed consumption of stored reports. A subset by design; pair it with a schema validator.</dd>
+<dt><code>Ajv2020</code></dt><dd>Node.js, TypeScript, and browser code. Compile once, validate many documents quickly.</dd>
+<dt>Go <code>jsonschema/v6</code></dt><dd>Static binaries, sidecars, and admission hooks with an explicit reference loader.</dd>
+</dl><p class="editorial-note"><strong>Pin what you trust.</strong> A schema fetched over the network at validation time is a moving input. In controlled builds, vendor the schema bytes and compare their SHA-256 with the <a href="/schema/v0.2/catalog.json">catalog</a> digest, or validate with the reference implementation, which resolves schemas by digest.</p></section>
+
+<section aria-labelledby="ci"><h2 id="ci">In CI</h2><p>A pull-request job that checks every committed policy, envelope, and decoded statement. It is the cheap gate in front of the real one, and it passes <code>actionlint</code>.</p><pre><code class="language-yaml">name: makoto-structure
+
+on:
+  pull_request:
+    paths:
+      - "makoto/**.json"
+
+permissions:
+  contents: read
+
+jobs:
+  schemas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Trust policy
+        run: &gt;-
+          uvx check-jsonschema
+          --schemafile https://usemakoto.dev/schema/v0.2/trust-policy.schema.json
+          makoto/policy.json
+
+      - name: Signed envelopes
+        run: &gt;-
+          uvx check-jsonschema
+          --schemafile https://usemakoto.dev/schema/v0.2/envelope.schema.json
+          makoto/attestations/*.dsse.json
+
+      - name: Decoded statements
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/statements"
+          for envelope in makoto/attestations/*.dsse.json; do
+            jq -r .payload "$envelope" | base64 --decode \
+              &gt; "$RUNNER_TEMP/statements/$(basename "$envelope" .dsse.json).json"
+          done
+          uvx check-jsonschema \
+            --schemafile https://usemakoto.dev/schema/v0.2/statement.schema.json \
+            "$RUNNER_TEMP"/statements/*.json</code></pre></section>
+
+<section aria-labelledby="receiver"><h2 id="receiver">Complete receiver decision</h2><p>Schema validation never answers whether to accept data. The reference verifier does: it runs structure as one step of sixteen, then signatures over exact payload bytes, receiver authorization, profiles, graph continuity, handoff completeness, independent freshness anchors, and the bytes that actually arrived.</p><pre><code class="language-bash">cd makoto   # a reviewed checkout, synced with uv sync --locked --dev
+G=demos/v0.2-end-to-end/generated
+uv run makoto verify bundle "$G/positive-bundle" \
+  --policy "$G/receiver/policy.json" \
+  --schema-catalog "$G/receiver/catalog.json" \
+  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
+  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-artifact "$G/receiver/expected-artifact.json" \
+  --evaluation-time 2026-09-16T16:00:00Z \
+  --json</code></pre><p>Each language binding wraps this command with install steps, a tampered-bundle denial, and report handling: <a href="/verify/bash.html">Bash</a>, <a href="/verify/python.html">Python</a>, <a href="/verify/nodejs.html">JavaScript</a>, <a href="/verify/typescript.html">TypeScript</a>, and <a href="/verify/go.html">Go</a>.</p></section>
+
+<section class="community-band"><h2>Two validators should agree. Help prove it.</h2><p>If you run a validator not listed here, contribute its command and its output against the same fixture documents, including the broken ones.</p><div class="actions"><a class="button" href="/verify/">Read full verification</a><a class="button secondary" href="/sdk/">Review language interfaces</a><a class="button secondary" href="https://github.com/makoto-project/usemakoto.dev/issues/new">Propose a validator</a></div></section>
+</main><footer class="footer"><div class="footer-inner">Makoto schema validation · Hosted Draft 2020-12 resources · CORS enabled</div></footer></div></div></body></html>
