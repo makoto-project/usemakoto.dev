@@ -23,7 +23,7 @@
 
   <h2>Clone and run</h2>
   <p>These are the repository's canonical acceptance commands.</p>
-  <pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
+  <pre><code>git clone https://github.com/makoto-project/makoto.git
 cd makoto
 uv sync --locked --dev
 ./scripts/demo-v0.2.sh --acceptance</code></pre>
@@ -31,7 +31,7 @@ uv sync --locked --dev
 
   <h2>Send the bundle; verify as the receiver</h2>
   <p>The sender transfers only the signed bundle. The receiver keeps its trust policy, schema catalog, and expected artifact outside that bundle, then runs the verifier against the received bytes.</p>
-  <pre><code class="language-bash">MAKOTO_RECEIVER_DIR="$(mktemp -d)"
+  <pre><code>MAKOTO_RECEIVER_DIR="$(mktemp -d)"
 cp -R demos/v0.2-end-to-end/generated/positive-bundle "$MAKOTO_RECEIVER_DIR/bundle"
 
 uv run makoto verify bundle "$MAKOTO_RECEIVER_DIR/bundle" \
@@ -50,7 +50,7 @@ uv run makoto verify bundle "$MAKOTO_RECEIVER_DIR/bundle" \
   <details><summary>Private organizational profiles</summary><div><p>The final statement references one predicate profile and one structured-artifact profile by URI, root digest, and closure digest. The receiver resolves both from an external catalog; the producer bundle does not carry or control the private schema bytes.</p><ul><li><a href="artifacts/receiver/public-transform-metadata.profile.json">Predicate profile reference</a></li><li><a href="artifacts/receiver/customer-public.profile.json">Artifact profile reference</a></li><li><a href="artifacts/receiver/catalog.json">Receiver schema catalog</a></li></ul></div></details>
   <details><summary>Consumer trust policy</summary><div><p>The policy maps key IDs to public keys, selects allowed source/operation claims, sets signature thresholds, requires a freshness anchor, pins profile requirements, and carries resource ceilings.</p><p><a href="artifacts/receiver/policy.json">Open the exact policy</a></p></div></details>
   <details><summary>Signed handoff manifest and bundle index</summary><div><p>The handoff signs the exact statement, root, head, final-artifact, recipient, and profile-requirement sets. The unsigned bundle index only maps those logical identities to transport paths.</p><ul><li><a href="artifacts/positive-bundle/manifest.dsse.json">Signed handoff envelope</a></li><li><a href="artifacts/positive-bundle/bundle.json">Bundle index</a></li><li><a href="artifacts/manifest.json">Export digest manifest</a></li></ul></div></details>
-  <details><summary>Positive verification report</summary><div><p><a href="artifacts/reports/positive.json">Open the complete report</a>. It records separate checks for schemas, cryptography, authorization, profiles, graph, completeness/freshness, and artifact bytes.</p><pre><code class="language-yaml">decision: allow
+  <details><summary>Positive verification report</summary><div><p><a href="artifacts/reports/positive.json">Open the complete report</a>. It records separate checks for schemas, cryptography, authorization, profiles, graph, completeness/freshness, and artifact bytes.</p><pre><code>decision: allow
 manifestDigest: b83a5cd1…
 head: 962be717…
 artifact: 2f4fe11d…</code></pre></div></details>

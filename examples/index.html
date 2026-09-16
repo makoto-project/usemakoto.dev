@@ -33,7 +33,7 @@
   </tbody></table></section>
 
   <section aria-labelledby="documents"><h2 id="documents">The documents themselves</h2>
-  <p class="lead">Each pattern above is a real file. These are complete, unabridged, and valid against the <a href="/schema/v0.2/catalog.json">v0.2 schemas</a>; every digest in them was computed from bytes checked into this repository.</p>
+  <p class="lead">Each pattern above is a real file. These are complete, unabridged, and valid against the <a href="/schema/v0.2/catalog.json">published schemas</a>; every digest in them was computed from bytes checked into this repository.</p>
 
   <h3 id="doc-origin">Origin statement</h3>
   <p class="hash">predicate <code>https://usemakoto.dev/predicate/v0.2/origin</code></p>
@@ -84,7 +84,7 @@
     }
   }
 }</code></pre>
-  <dl class="troubleshooting"><dt><code>subject[].digest.sha256</code></dt><dd>The artifact this statement is about, identified by content rather than by name. Rename the file and the statement still applies; change one byte and it no longer does.</dd><dt><code>predicate.source.kind</code></dt><dd>What class of thing the data came from. A receiver policy matches on this, so it is a controlled value rather than free prose.</dd><dt><code>predicate.source.uri</code></dt><dd>The specific endpoint or location. Informative; a receiver cannot verify it from the statement.</dd><dt><code>predicate.source.retrievedAt</code></dt><dd>When the bytes were pulled, as distinct from when the statement was written.</dd><dt><code>predicate.event.id</code></dt><dd>A stable identifier for the collection run, so two statements about the same bytes can be told apart.</dd><dt><code>predicate.extensions</code></dt><dd>Open by design. Collector identity, origin geography, and lawful basis live here in v0.2 rather than as first-class fields. A receiver may read them; core verification does not check them.</dd></dl>
+  <dl class="troubleshooting"><dt><code>subject[].digest.sha256</code></dt><dd>The artifact this statement is about, identified by content rather than by name. Rename the file and the statement still applies; change one byte and it no longer does.</dd><dt><code>predicate.source.kind</code></dt><dd>What class of thing the data came from. A receiver policy matches on this, so it is a controlled value rather than free prose.</dd><dt><code>predicate.source.uri</code></dt><dd>The specific endpoint or location. Informative; a receiver cannot verify it from the statement.</dd><dt><code>predicate.source.retrievedAt</code></dt><dd>When the bytes were pulled, as distinct from when the statement was written.</dd><dt><code>predicate.event.id</code></dt><dd>A stable identifier for the collection run, so two statements about the same bytes can be told apart.</dd><dt><code>predicate.extensions</code></dt><dd>Open by design. Collector identity, origin geography, and lawful basis live here rather than as first-class fields. A receiver may read them; core verification does not check them.</dd></dl>
   <p><code class="hash">014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11</code> is this statement's own digest, taken over its canonical form. <a href="/attestations/origin-example.json">Download the document</a>.</p>
 
   <h3 id="doc-transform">Transformation statement</h3>
@@ -153,7 +153,7 @@
   <h3 id="doc-stream">Stream window</h3>
   <p class="hash">predicate <code>https://usemakoto.dev/predicate/v0.2/origin</code></p>
   <p>Streaming systems cannot attest to a stream, because a stream has no final bytes. They attest to bounded windows of it. Here one tumbling minute of sensor readings is serialized to newline-delimited JSON and treated as an artifact like any other.</p>
-  <div class="callout warning"><p><strong>Read this before reading the document.</strong> Makoto v0.2 defines exactly two predicate types, origin and transformation. <strong>There is no normative stream-window predicate.</strong> The window boundaries, the partition list, and the Merkle root below are producer claims carried in <code>extensions</code>. <strong>A receiver cannot verify any of them from this statement.</strong></p><p>What a v0.2 receiver does verify is the subject digest: <code class="hash">c4c2f3be19a1f816d5fe22a69b47a221ee84a29e6b3066d2b71241b8ddd14c64</code>, the SHA-256 of the serialized window file. The Merkle root is reproducible from that same file, because the document records the exact leaf, internal-node, and odd-node rules used to build it — but reproducing a value is not the same as a signature covering it.</p></div>
+  <div class="callout warning"><p><strong>Read this before reading the document.</strong> Makoto defines exactly two predicate types, origin and transformation. <strong>There is no normative stream-window predicate.</strong> The window boundaries, the partition list, and the Merkle root below are producer claims carried in <code>extensions</code>. <strong>A receiver cannot verify any of them from this statement.</strong></p><p>What a receiver does verify is the subject digest: <code class="hash">c4c2f3be19a1f816d5fe22a69b47a221ee84a29e6b3066d2b71241b8ddd14c64</code>, the SHA-256 of the serialized window file. The Merkle root is reproducible from that same file, because the document records the exact leaf, internal-node, and odd-node rules used to build it — but reproducing a value is not the same as a signature covering it.</p></div>
   <pre><code class="language-json">{
   "_type": "https://in-toto.io/Statement/v1",
   "subject": [
@@ -217,12 +217,12 @@
     }
   }
 }</code></pre>
-  <dl class="troubleshooting"><dt><code>subject[].digest.sha256</code></dt><dd>The serialized window, hashed whole. This is the binding a receiver checks, and the reason the window can be attested at all under v0.2.</dd><dt><code>predicate.source.kind</code></dt><dd>Marks the source as a stream rather than a file, so a policy can treat window statements differently.</dd><dt><code>extensions.…window</code></dt><dd>Boundaries, watermark, allowed lateness, and record count. Unverified producer claims.</dd><dt><code>extensions.…merkle</code></dt><dd>Algorithm, leaf rule, internal-node rule, odd-node rule, and root. Recomputable from the window file; not covered by v0.2 verification.</dd></dl>
+  <dl class="troubleshooting"><dt><code>subject[].digest.sha256</code></dt><dd>The serialized window, hashed whole. This is the binding a receiver checks, and the reason the window can be attested at all today.</dd><dt><code>predicate.source.kind</code></dt><dd>Marks the source as a stream rather than a file, so a policy can treat window statements differently.</dd><dt><code>extensions.…window</code></dt><dd>Boundaries, watermark, allowed lateness, and record count. Unverified producer claims.</dd><dt><code>extensions.…merkle</code></dt><dd>Algorithm, leaf rule, internal-node rule, odd-node rule, and root. Recomputable from the window file; not covered by core verification.</dd></dl>
   <p>The window itself: <a href="/attestations/stream-window-example.jsonl">stream-window-example.jsonl</a>, 12 records. Its Merkle root is <code class="hash">75a86974b9b00f412452a096bc6f77afcc32d13760f2e85ebb107aeb1c49cde4</code>, and the statement digest is <code class="hash">c4a818eeacbaa87e4a8d1c209487d6dfb930003c90e86d0aa7bdc44fccffc046</code>. <a href="/attestations/stream-window-example.json">Download the document</a>.</p>
 
   <h3 id="doc-bundle">Bundle index and dataset manifest</h3>
   <p class="hash">schemas <code>bundle.schema.json</code> · <code>dataset-manifest.schema.json</code></p>
-  <p>v0.1 collected a dataset's whole history into one aggregate document, a data bill of materials. v0.2 splits that job. The bundle index maps statement digests to transport paths and claims no authority of its own; a separately signed handoff is what commits to the graph.</p>
+  <p>The earlier format collected a dataset's whole history into one aggregate document, a data bill of materials. The current specification splits that job. The bundle index maps statement digests to transport paths and claims no authority of its own; a separately signed handoff is what commits to the graph.</p>
   <pre><code class="language-json">{
   "version": "0.2",
   "manifest": "manifest.dsse.json",
@@ -357,7 +357,7 @@
 }</code></pre>
   <p>The dataset authors never published a canonical artifact hash, so the signature block records a gap instead of a number. The <code>attestations</code> array is empty: no third party has certified this dataset for bias, quality, or regulatory compliance. <code>attestation_gaps</code> then names the three specific certifications that are missing and why each one would matter — an absence stated precisely is actionable, where an absence left implicit is invisible.</p>
   <p>In a world where those fields are populated — where an audit firm signs a bias finding against a specific digest, or a regulator attests to EU AI Act compliance — that signature travels with the data permanently, and a consumer can check it without contacting either party.</p>
-  <p class="editorial-note">This record is in the v0.1 DBOM shape, not the v0.2 statement shape, and is kept as a dataset study rather than as a format example. The v0.2 equivalents are <a href="#documents">the documents above</a>.</p>
+  <p class="editorial-note">This record is in the earlier aggregate DBOM shape, not the current statement shape, and is kept as a dataset study rather than as a format example. The current equivalents are <a href="#documents">the documents above</a>.</p>
   <p><a href="/examples/squad-dbom.json">Inspect the SQuAD record</a> · <a href="/prompts/dbom-generation-prompt.md">Use the dataset analysis prompt</a></p></section>
 
   <section aria-labelledby="tryit"><h2 id="tryit">Try it on a dataset you care about</h2>
