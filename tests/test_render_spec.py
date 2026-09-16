@@ -11,7 +11,7 @@ import pytest
 
 from scripts import check_site, render_spec
 
-REQUIRED_LANGUAGES = ("json", "yaml", "python", "javascript", "typescript", "go", "bash")
+REQUIRED_LANGUAGES = ("json", "yaml", "python", "javascript", "typescript", "go", "bash", "sql")
 
 
 def test_generated_specification_pages_are_current() -> None:

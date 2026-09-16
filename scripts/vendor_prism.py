@@ -39,6 +39,7 @@ COMPONENTS: tuple[tuple[str, str], ...] = (
     ("prism-typescript.min.js", "852f5513bb9ca9db247f86ecfce74acc91c541749d34929157240518fef8152a"),
     ("prism-go.min.js", "1225b4afb593126d4082da5fd2b131aede39831c2b2a62d6b07ea025acd2bf3f"),
     ("prism-bash.min.js", "6260814110e5182f2956e3bd257429548d9dbf2a9b66a63719b26cf9fac966a7"),
+    ("prism-sql.min.js", "3fc5f8ce69950ec73adc972f061df42aaea78faa4864709134ea2adc083f3a33"),
 )
 
 HEADER = f"""/*!
@@ -47,7 +48,7 @@ HEADER = f"""/*!
  *
  * Self-hosted bundle. Do not edit by hand: regenerate with
  *   uv run scripts/vendor_prism.py
- * Languages: markup, json, yaml, python, javascript, typescript, go, bash.
+ * Languages: markup, json, yaml, python, javascript, typescript, go, bash, sql.
  * Full licence text: assets/prism.LICENSE.txt
  */
 """
