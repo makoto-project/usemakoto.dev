@@ -41,7 +41,7 @@
   ]
 }</code></pre></figure>
   <p class="editorial-note"><strong>Publication status.</strong> The normative text and implementation are available for public review. They are not yet an immutable tagged release.</p>
-  <p class="spec-jump"><a href="/spec/text/">Normative text</a><a href="/spec/schemas/">Hosted schemas</a><a href="/spec/v0.2/spec.md">Raw specification</a><a href="/schema/v0.2/catalog.json">Schema catalog</a><a href="/demos/v0.2-end-to-end/">Runnable proof</a></p>
+  <p class="spec-jump"><a href="/spec/text/">Normative text</a><a href="/spec/schemas/">Hosted schemas</a><a href="/spec/v0.2/spec.md">Raw specification</a><a href="/schema/v0.2/catalog.json">Schema catalog</a><a href="/demos/end-to-end/">Runnable proof</a></p>
 
   <section aria-labelledby="normative"><h2 id="normative">Read the normative text</h2>
     <p>Everything below this section is orientation. The obligations themselves — encodings, digest and signature rules, the statement model, profile resolution limits, the handoff anchor, the trust-policy grammar, the ordered verification algorithm, and every diagnostic code — are fixed in one document, reproduced in full at <a href="/spec/text/">the normative text</a> and served raw at <a href="/spec/v0.2/spec.md"><code>/spec/v0.2/spec.md</code></a>.</p>
@@ -73,7 +73,7 @@
   <section aria-labelledby="shown"><h2 id="shown">What one record actually looks like</h2>
     <p>This is the origin statement from the runnable proof, decoded from the signed envelope that ships in the bundle. It is not an illustration written for this page: the digest below is the one the verifier recomputes, and the same bytes are what the transformation that follows names as its predecessor.</p>
     <figure class="codeblock">
-      <figcaption class="codeblock-head"><span class="codeblock-title">Origin statement, decoded from <a href="/demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json">the published envelope</a></span><span class="codeblock-lang">json</span></figcaption>
+      <figcaption class="codeblock-head"><span class="codeblock-title">Origin statement, decoded from <a href="/demos/end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json">the published envelope</a></span><span class="codeblock-lang">json</span></figcaption>
 <pre class="language-json"><code class="language-json">{
   &quot;_type&quot;: &quot;https://in-toto.io/Statement/v1&quot;,
   &quot;predicate&quot;: {
@@ -148,7 +148,7 @@
       <tr><td><a href="/spec/schemas/#catalog-schema-json">catalog.schema.json</a></td><td>The index itself, so a resolver can validate it before trusting it.</td></tr>
       <tr><td><a href="/spec/schemas/#catalog-json">catalog.json</a></td><td>The published index and the digests everything else is pinned by.</td></tr>
     </tbody></table>
-    <p>The <a href="/demos/v0.2-end-to-end/">runnable proof</a> exercises an allowed handoff and seven deterministic denials against the pinned reference implementation.</p>
+    <p>The <a href="/demos/end-to-end/">runnable proof</a> exercises an allowed handoff and seven deterministic denials against the pinned reference implementation.</p>
   </section>
 
   <section aria-labelledby="levels"><h2 id="levels">Assurance levels</h2>

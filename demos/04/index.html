@@ -88,7 +88,7 @@ LEVEL       none
 REQUIRED    L3 not met
 $ echo $?
 1</code></pre></figure>
-<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
 
 <section>
 <h2>The problem</h2>
@@ -397,7 +397,7 @@ LEVEL       none
 REQUIRED    L3 not met
 $ echo $?
 1</code></pre>
-<p><a href="/demos/v0.2-end-to-end/artifacts/reports/edited-signed-metadata.json">Open the complete edited-signed-metadata report</a>.</p>
+<p><a href="/demos/end-to-end/artifacts/reports/edited-signed-metadata.json">Open the complete edited-signed-metadata report</a>.</p>
 <h3>Edited payload under an old index entry</h3>
 <p>The verifier recomputes every statement digest from the decoded payload before trusting the index. <code>index-payloads</code> fails with <code>E_STATEMENT_DIGEST</code> as the primary error. Because the edited statement is no longer the head the manifest signed, the verifier also reports the required final-artifact profile as absent from that head.</p>
 <pre><code class="language-bash">$ makoto verify bundle handoffs/statement-digest-mismatch/bundle \
@@ -539,7 +539,7 @@ LEVEL       none
 REQUIRED    L3 not met
 $ echo $?
 1</code></pre>
-<p><a href="/demos/v0.2-end-to-end/artifacts/reports/statement-digest-mismatch.json">Open the complete statement-digest-mismatch report</a>.</p>
+<p><a href="/demos/end-to-end/artifacts/reports/statement-digest-mismatch.json">Open the complete statement-digest-mismatch report</a>.</p>
 </div></li>
 </ol>
 
@@ -585,7 +585,7 @@ $ echo $?
 <span class="kicker">Make the postmortem reproducible</span>
 <h2>Attach the exact configuration and output bytes to the transformation claim.</h2>
 <div class="actions">
-<a class="button" href="/demos/v0.2-end-to-end/">Run the append-only pattern</a>
+<a class="button" href="/demos/end-to-end/">Run the append-only pattern</a>
 <a class="button secondary" href="/examples/#postmortem">Read the casebook entry</a>
 </div>
 </section>

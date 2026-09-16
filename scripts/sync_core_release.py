@@ -33,8 +33,13 @@ SCHEMA_NAMES = (
     "trust-policy.schema.json",
     "verification-report.schema.json",
 )
+# The walkthrough's permanent home. Its artifacts are also mirrored, byte for
+# byte, at the retired versioned path so curl + shasum commands published before
+# the move keep verifying forever.
+DEMO_ARTIFACTS = "demos/end-to-end/artifacts"
+LEGACY_DEMO_ARTIFACTS = "demos/v0.2-end-to-end/artifacts"
 DOCUMENTATION = {
-    "/demos/v0.2-end-to-end/": "demos/v0.2-end-to-end/index.html",
+    "/demos/end-to-end/": "demos/end-to-end/index.html",
     "/predicate/v0.2/origin/": "predicate/v0.2/origin/index.html",
     "/predicate/v0.2/transform/": "predicate/v0.2/transform/index.html",
     "/source/file/": "source/file/index.html",
@@ -69,9 +74,7 @@ PUBLIC_TEXT_REWRITES = {
         ),
         ("(../spec/v0.2.md)", "(../spec/v0.2/spec.md)"),
     ),
-    "docs/v0.2-migration.md": (
-        ("(../demos/v0.2-end-to-end/README.md)", "(../demos/v0.2-end-to-end/)"),
-    ),
+    "docs/v0.2-migration.md": (("(../demos/v0.2-end-to-end/README.md)", "(../demos/end-to-end/)"),),
 }
 CHECKSUM_PREFIXES = (
     "demos/v0.2-end-to-end",
@@ -330,17 +333,17 @@ def copy_release_content(
     demo_paths = source_tree(core, revision, "demos/v0.2-end-to-end/generated")
     if not demo_paths:
         raise SyncError("core candidate has no generated v0.2 demo artifacts")
-    demo_target = staging / "demos/v0.2-end-to-end/artifacts"
     for source_path in demo_paths:
         relative = Path(source_path).relative_to("demos/v0.2-end-to-end/generated")
-        target = demo_target / relative
-        target.parent.mkdir(parents=True, exist_ok=True)
         data = source_blob(core, revision, source_path)
-        target.write_bytes(data)
+        for artifacts in (DEMO_ARTIFACTS, LEGACY_DEMO_ARTIFACTS):
+            target = staging / artifacts / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
         media_type = "application/octet-stream" if target.suffix == ".bin" else "application/json"
         resource_entries.append(
             {
-                "path": f"/demos/v0.2-end-to-end/artifacts/{relative.as_posix()}",
+                "path": f"/{DEMO_ARTIFACTS}/{relative.as_posix()}",
                 "digest": digest(data),
                 "mediaType": media_type,
                 "cors": True,
@@ -366,10 +369,8 @@ def promote(staging: Path, pin_name: str | None, remove_name: str | None) -> Non
     replacements = [
         (staging / "schema/v0.2", ROOT / "schema/v0.2"),
         (staging / "spec/v0.2/spec.md", ROOT / "spec/v0.2/spec.md"),
-        (
-            staging / "demos/v0.2-end-to-end/artifacts",
-            ROOT / "demos/v0.2-end-to-end/artifacts",
-        ),
+        (staging / DEMO_ARTIFACTS, ROOT / DEMO_ARTIFACTS),
+        (staging / LEGACY_DEMO_ARTIFACTS, ROOT / LEGACY_DEMO_ARTIFACTS),
     ]
     if pin_name is not None:
         replacements.append((staging / pin_name, ROOT / pin_name))

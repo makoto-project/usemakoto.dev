@@ -85,6 +85,7 @@ def make_parity_trees(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[
         checksum_paths.append(f"schemas/v0.2/{name}")
     write(site / "spec/v0.2/spec.md", b"spec\n")
     write(core / "spec/v0.2.md", b"spec\n")
+    write(site / "demos/end-to-end/artifacts/.keep", b"")
     write(site / "demos/v0.2-end-to-end/artifacts/.keep", b"")
     write(core / "demos/v0.2-end-to-end/generated/.keep", b"")
     schema_bytes = canonical(checksum_schema())
@@ -466,7 +467,7 @@ def test_release_resources_cover_diagnostic_contract_and_receiver_handoff() -> N
     resources = check_site.expected_resource_files()
 
     assert resources["/spec/v0.2/diagnostic-map.json"][1:] == ("application/json", True)
-    assert resources["/demos/v0.2-end-to-end/artifacts/receiver/expected-artifact.json"][1:] == (
+    assert resources["/demos/end-to-end/artifacts/receiver/expected-artifact.json"][1:] == (
         "application/json",
         True,
     )
@@ -675,3 +676,57 @@ def test_validate_pin_rejects_noncanonical_candidate_bytes(
     check_site.validate_pin("candidate", core, errors)
 
     assert "candidate pin is not canonical JSON plus one LF" in errors
+
+
+def test_legacy_demo_mirror_must_match_canonical_artifacts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(check_site, "ROOT", tmp_path)
+    write(tmp_path / "demos/end-to-end/artifacts/data/raw.json", b"[1]\n")
+    errors: list[str] = []
+    check_site.check_legacy_demo_mirror(errors)
+    assert errors == ["legacy demo artifact mirror is missing: demos/v0.2-end-to-end/artifacts"]
+
+    write(tmp_path / "demos/v0.2-end-to-end/artifacts/data/raw.json", b"[2]\n")
+    errors = []
+    check_site.check_legacy_demo_mirror(errors)
+    assert errors == ["legacy demo artifact mirror bytes differ: data/raw.json"]
+
+
+def test_current_legacy_mirror_serves_the_canonical_artifact_bytes() -> None:
+    errors: list[str] = []
+    check_site.check_legacy_demo_mirror(errors)
+    assert errors == []
+    assert (check_site.ROOT / "demos/v0.2-end-to-end/artifacts/data/customers.raw.json").is_file()
+
+
+def test_retired_learning_urls_forward_and_are_no_longer_linked() -> None:
+    errors: list[str] = []
+    check_site.check_legacy_redirects(errors)
+    assert errors == []
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        '<a href="/demos/v0.2-end-to-end/">proof</a>',
+        "curl -sO https://usemakoto.dev/demos/v0.2-end-to-end/artifacts/data/customers.raw.json",
+        '<a href="/examples/v0.2/">examples</a>',
+        "[proof](../demos/v0.2-end-to-end/)",
+    ],
+)
+def test_versioned_learning_url_guard_rejects_new_links(content: str) -> None:
+    assert check_site.VERSIONED_LEARNING_URL.search(content)
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "https://github.com/makoto-project/makoto/tree/main/demos/v0.2-end-to-end",
+        'DEMO="$CORE/demos/v0.2-end-to-end/generated"',
+        '<a href="/spec/v0.2/">spec</a>',
+        '<a href="/schema/v0.2/bundle.schema.json">schema</a>',
+    ],
+)
+def test_versioned_learning_url_guard_keeps_core_paths_and_wire_identifiers(content: str) -> None:
+    assert not check_site.VERSIONED_LEARNING_URL.search(content)

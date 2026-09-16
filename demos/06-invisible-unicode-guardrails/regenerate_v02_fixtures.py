@@ -119,7 +119,7 @@ policy = {
         "allowReplayableHandoff": False,
     },
     "requiredProfiles": [],
-    "limits": json.loads((SITE / "demos/v0.2-end-to-end/artifacts/receiver/policy.json")
+    "limits": json.loads((SITE / "demos/end-to-end/artifacts/receiver/policy.json")
                          .read_text())["limits"],
 }
 policy_path = write(WORK / "receiver/policy.json", policy)

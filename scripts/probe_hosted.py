@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BASE_URL = "https://usemakoto.dev"
 HOME_PATH = "/"
 LINEAGE_PATH = "/why-lineage/"
-WALKTHROUGH_PATH = "/demos/v0.2-end-to-end/"
+WALKTHROUGH_PATH = "/demos/end-to-end/"
 STATUS_PATH = "/spec/"
 SITE_REVIEW_SURFACES = {
     HOME_PATH: "index.html",
@@ -32,7 +32,15 @@ SITE_REVIEW_SURFACES = {
     "/demos/": "demos/index.html",
     STATUS_PATH: "spec/index.html",
     "/tooling/": "tooling/index.html",
+    # Retired versioned learning URLs stay live forever as forwarding pages.
+    "/demos/v0.2-end-to-end/": "demos/v0.2-end-to-end/index.html",
+    "/examples/v0.2/": "examples/v0.2/index.html",
+    "/integrations/v0.2/": "integrations/v0.2/index.html",
 }
+DEMO_ARTIFACTS_PATH = "/demos/end-to-end/artifacts/"
+# Published curl + shasum commands used this prefix; it must keep serving the
+# exact canonical artifact bytes.
+LEGACY_DEMO_ARTIFACTS_PATH = "/demos/v0.2-end-to-end/artifacts/"
 CANDIDATE_DISCLOSURE = b"not yet an immutable tagged release"
 
 
@@ -185,6 +193,16 @@ def load_expectations(
             require_cors=item["cors"],
         )
         for item in pin["resources"]
+    )
+    resources.extend(
+        ExpectedResource(
+            path=LEGACY_DEMO_ARTIFACTS_PATH + item["path"].removeprefix(DEMO_ARTIFACTS_PATH),
+            sha256=item["digest"]["sha256"],
+            media_types=(item["mediaType"],),
+            require_cors=item["cors"],
+        )
+        for item in pin["resources"]
+        if item["path"].startswith(DEMO_ARTIFACTS_PATH)
     )
     paths = [resource.path for resource in resources]
     if len(paths) != len(set(paths)):
