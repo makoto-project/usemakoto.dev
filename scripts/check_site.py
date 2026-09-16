@@ -36,7 +36,23 @@ CORE_SCHEMA_NAMES = (
     "verification-report.schema.json",
 )
 LINEAGE_PAGE = "why-lineage/index.html"
-WALKTHROUGH_PAGE = "demos/v0.2-end-to-end/index.html"
+WALKTHROUGH_PAGE = "demos/end-to-end/index.html"
+# Learning content lives at permanent versionless URLs. The retired versioned
+# addresses keep resolving forever: each one is a canonical-linked forwarding
+# page, and the walkthrough artifacts stay byte-identical at the old path so
+# published curl + shasum commands still verify. Protocol identifiers such as
+# /spec/v0.2/ and /schema/v0.2/ are wire identifiers and deliberately keep
+# their version.
+DEMO_ARTIFACTS = "demos/end-to-end/artifacts"
+LEGACY_DEMO_ARTIFACTS = "demos/v0.2-end-to-end/artifacts"
+LEGACY_REDIRECTS = {
+    "demos/v0.2-end-to-end/index.html": "/demos/end-to-end/",
+    "examples/v0.2/index.html": "/examples/",
+    "integrations/v0.2/index.html": "/integrations/",
+}
+VERSIONED_LEARNING_URL = re.compile(
+    r"(?:usemakoto\.dev|href=\"|src=\"|\]\()/?(?:\.\./)*(?:demos/v0\.2-end-to-end|examples/v0\.2|integrations/v0\.2)/"
+)
 SOURCE_REVISION_PREFIX = "https://github.com/makoto-project/makoto/tree/"
 CANONICAL_PRESENTATION_PAGES = (
     "community/index.html",
@@ -80,7 +96,7 @@ TECHNICAL_VERSION_PAGES = {
 CURRENT_SHELL_PAGES = (
     "community/index.html",
     "demos/index.html",
-    "demos/v0.2-end-to-end/index.html",
+    "demos/end-to-end/index.html",
     "examples/index.html",
     "index.html",
     "integrations/index.html",
@@ -163,7 +179,7 @@ LINEAGE_REQUIRED_TEXT = (
     ),
     "A checksum is necessary. It is not lineage.",
     "Makoto does not discover an unrecorded notebook export or Slack screenshot.",
-    "/demos/v0.2-end-to-end/",
+    "/demos/end-to-end/",
     "/spec/",
 )
 CANDIDATE_STATUS_TEXT = {
@@ -172,10 +188,10 @@ CANDIDATE_STATUS_TEXT = {
         "files are public review artifacts",
     ),
     "spec/index.html": ("not yet an immutable tagged release",),
-    "demos/v0.2-end-to-end/index.html": ("Runnable reference proof",),
+    "demos/end-to-end/index.html": ("Runnable reference proof",),
 }
 DOCUMENTATION_FILES = {
-    "/demos/v0.2-end-to-end/": "demos/v0.2-end-to-end/index.html",
+    "/demos/end-to-end/": "demos/end-to-end/index.html",
     "/predicate/v0.2/origin/": "predicate/v0.2/origin/index.html",
     "/predicate/v0.2/transform/": "predicate/v0.2/transform/index.html",
     "/source/file/": "source/file/index.html",
@@ -210,31 +226,29 @@ PUBLIC_TEXT_REWRITES = {
         ),
         ("(../spec/v0.2.md)", "(../spec/v0.2/spec.md)"),
     ),
-    "docs/v0.2-migration.md": (
-        ("(../demos/v0.2-end-to-end/README.md)", "(../demos/v0.2-end-to-end/)"),
-    ),
+    "docs/v0.2-migration.md": (("(../demos/v0.2-end-to-end/README.md)", "(../demos/end-to-end/)"),),
 }
 JSON_EXAMPLE_SCHEMAS = {
-    "demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json": "envelope.schema.json",
-    "demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json": "envelope.schema.json",
-    "demos/v0.2-end-to-end/artifacts/positive-bundle/attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json": "envelope.schema.json",
-    "demos/v0.2-end-to-end/artifacts/positive-bundle/bundle.json": "bundle.schema.json",
-    "demos/v0.2-end-to-end/artifacts/positive-bundle/manifest.dsse.json": "envelope.schema.json",
-    "demos/v0.2-end-to-end/artifacts/receiver/attacker-known-policy.json": "trust-policy.schema.json",
-    "demos/v0.2-end-to-end/artifacts/receiver/catalog.json": "catalog.schema.json",
-    "demos/v0.2-end-to-end/artifacts/receiver/customer-public.profile.json": "profile-reference.schema.json",
-    "demos/v0.2-end-to-end/artifacts/receiver/policy.json": "trust-policy.schema.json",
-    "demos/v0.2-end-to-end/artifacts/receiver/public-transform-metadata.profile.json": "profile-reference.schema.json",
-    "demos/v0.2-end-to-end/artifacts/receiver/resources/31934d2cf8fa7b5af2f8e4cf591d96278c4f59ddb6bb190afccb93701244f9eb.schema.json": "profile-dialect.schema.json",
-    "demos/v0.2-end-to-end/artifacts/receiver/resources/68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb.schema.json": "profile-dialect.schema.json",
-    "demos/v0.2-end-to-end/artifacts/reports/edited-signed-metadata.json": "verification-report.schema.json",
-    "demos/v0.2-end-to-end/artifacts/reports/mutated-final-data.json": "verification-report.schema.json",
-    "demos/v0.2-end-to-end/artifacts/reports/positive.json": "verification-report.schema.json",
-    "demos/v0.2-end-to-end/artifacts/reports/private-schema-violation.json": "verification-report.schema.json",
-    "demos/v0.2-end-to-end/artifacts/reports/removed-predecessor.json": "verification-report.schema.json",
-    "demos/v0.2-end-to-end/artifacts/reports/rewired-step.json": "verification-report.schema.json",
-    "demos/v0.2-end-to-end/artifacts/reports/statement-digest-mismatch.json": "verification-report.schema.json",
-    "demos/v0.2-end-to-end/artifacts/reports/unauthorized-signer.json": "verification-report.schema.json",
+    "demos/end-to-end/artifacts/positive-bundle/attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json": "envelope.schema.json",
+    "demos/end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json": "envelope.schema.json",
+    "demos/end-to-end/artifacts/positive-bundle/attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json": "envelope.schema.json",
+    "demos/end-to-end/artifacts/positive-bundle/bundle.json": "bundle.schema.json",
+    "demos/end-to-end/artifacts/positive-bundle/manifest.dsse.json": "envelope.schema.json",
+    "demos/end-to-end/artifacts/receiver/attacker-known-policy.json": "trust-policy.schema.json",
+    "demos/end-to-end/artifacts/receiver/catalog.json": "catalog.schema.json",
+    "demos/end-to-end/artifacts/receiver/customer-public.profile.json": "profile-reference.schema.json",
+    "demos/end-to-end/artifacts/receiver/policy.json": "trust-policy.schema.json",
+    "demos/end-to-end/artifacts/receiver/public-transform-metadata.profile.json": "profile-reference.schema.json",
+    "demos/end-to-end/artifacts/receiver/resources/31934d2cf8fa7b5af2f8e4cf591d96278c4f59ddb6bb190afccb93701244f9eb.schema.json": "profile-dialect.schema.json",
+    "demos/end-to-end/artifacts/receiver/resources/68169d043c628fda5435cbd7845b02ea3e0d850b7a509c0b35fd304463fffacb.schema.json": "profile-dialect.schema.json",
+    "demos/end-to-end/artifacts/reports/edited-signed-metadata.json": "verification-report.schema.json",
+    "demos/end-to-end/artifacts/reports/mutated-final-data.json": "verification-report.schema.json",
+    "demos/end-to-end/artifacts/reports/positive.json": "verification-report.schema.json",
+    "demos/end-to-end/artifacts/reports/private-schema-violation.json": "verification-report.schema.json",
+    "demos/end-to-end/artifacts/reports/removed-predecessor.json": "verification-report.schema.json",
+    "demos/end-to-end/artifacts/reports/rewired-step.json": "verification-report.schema.json",
+    "demos/end-to-end/artifacts/reports/statement-digest-mismatch.json": "verification-report.schema.json",
+    "demos/end-to-end/artifacts/reports/unauthorized-signer.json": "verification-report.schema.json",
 }
 FORBIDDEN_TRACKED_SEGMENTS = {
     ".codex-work",
@@ -390,10 +404,10 @@ def expected_resource_files() -> dict[str, tuple[Path, str, bool]]:
         f"/{relative}": (ROOT / relative, media_type, True)
         for _, (relative, media_type) in STATIC_RESOURCES.items()
     }
-    demo_root = ROOT / "demos/v0.2-end-to-end/artifacts"
+    demo_root = ROOT / DEMO_ARTIFACTS
     for relative, path in exact_files(demo_root).items():
         media_type = "application/octet-stream" if path.suffix == ".bin" else "application/json"
-        resources[f"/demos/v0.2-end-to-end/artifacts/{relative}"] = (
+        resources[f"/{DEMO_ARTIFACTS}/{relative}"] = (
             path,
             media_type,
             True,
@@ -612,16 +626,56 @@ def check_core_parity(core: Path, errors: list[str]) -> None:
         ):
             errors.append(f"core resource differs from checksum manifest: {core_relative}")
     compare_trees(
-        ROOT / "demos/v0.2-end-to-end/artifacts",
+        ROOT / DEMO_ARTIFACTS,
         core / "demos/v0.2-end-to-end/generated",
         "v0.2 demo artifacts",
         errors,
     )
+    check_legacy_demo_mirror(errors)
     check_demo_manifest(errors)
 
 
+def check_legacy_demo_mirror(errors: list[str]) -> None:
+    """The retired artifact path must serve exactly the canonical bytes."""
+    if not (ROOT / LEGACY_DEMO_ARTIFACTS).is_dir():
+        errors.append(f"legacy demo artifact mirror is missing: {LEGACY_DEMO_ARTIFACTS}")
+        return
+    compare_trees(
+        ROOT / LEGACY_DEMO_ARTIFACTS,
+        ROOT / DEMO_ARTIFACTS,
+        "legacy demo artifact mirror",
+        errors,
+    )
+
+
+def check_legacy_redirects(errors: list[str]) -> None:
+    """Retired learning URLs forward to their permanent home, and nothing links them."""
+    for relative, target in sorted(LEGACY_REDIRECTS.items()):
+        path = ROOT / relative
+        if not path.is_file():
+            errors.append(f"legacy forwarding page is missing: {relative}")
+            continue
+        content = path.read_text(encoding="utf-8")
+        for marker in (
+            f'<meta http-equiv="refresh" content="0;url={target}">',
+            f'<link rel="canonical" href="https://usemakoto.dev{target}">',
+            f'<a href="{target}">',
+        ):
+            if marker not in content:
+                errors.append(f"legacy forwarding page is incomplete in {relative}: {marker}")
+    for path in sorted(ROOT.rglob("*")):
+        if not path.is_file() or path.suffix not in {".html", ".md"}:
+            continue
+        relative = path.relative_to(ROOT).as_posix()
+        if relative in LEGACY_REDIRECTS or FORBIDDEN_TRACKED_SEGMENTS.intersection(path.parts):
+            continue
+        content = path.read_text(encoding="utf-8", errors="replace")
+        for match in VERSIONED_LEARNING_URL.finditer(content):
+            errors.append(f"versioned learning URL remains in {relative}: {match.group(0)}")
+
+
 def check_demo_manifest(errors: list[str]) -> None:
-    root = ROOT / "demos/v0.2-end-to-end/artifacts"
+    root = ROOT / DEMO_ARTIFACTS
     manifest_path = root / "manifest.json"
     try:
         manifest = strict_json(manifest_path)
@@ -908,7 +962,7 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
     for page in sorted(ROOT.rglob("*.html")):
         if 'href="https://github.com"' in page.read_text(encoding="utf-8", errors="replace"):
             errors.append(f"bare GitHub link remains: {page.relative_to(ROOT)}")
-    demo = (ROOT / "demos/v0.2-end-to-end/index.html").read_text(encoding="utf-8")
+    demo = (ROOT / "demos/end-to-end/index.html").read_text(encoding="utf-8")
     if "artifact 4e90181e…" not in demo:
         errors.append("v0.2 demo does not display the verified source digest prefix")
     for required_demo_text in (
@@ -957,6 +1011,7 @@ def main() -> int:
     else:
         check_core_parity(core, errors)
     check_links(errors)
+    check_legacy_redirects(errors)
     check_json_examples(errors)
     check_tracked_files(errors)
     check_truthfulness(errors, mode=validation_mode)

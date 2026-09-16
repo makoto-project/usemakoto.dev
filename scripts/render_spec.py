@@ -260,7 +260,7 @@ def schema_page() -> str:
 # ---------------------------------------------------------------------------
 
 REFERENCE_ROOT = ROOT / "spec/schemas"
-DEMO_ARTIFACTS = ROOT / "demos/v0.2-end-to-end/artifacts"
+DEMO_ARTIFACTS = ROOT / "demos/end-to-end/artifacts"
 SCHEMA_BASE_URI = "https://usemakoto.dev/schema/v0.2/"
 
 

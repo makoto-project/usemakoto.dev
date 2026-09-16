@@ -19,7 +19,7 @@ contract. The checked core pin identifies the exact commit used for the hosted s
 The normative specification is [`spec/v0.2/spec.md`](spec/v0.2/spec.md), and the
 [adversarial review record](docs/v0.2-adversarial-review.md) preserves completed findings and
 excluded timeouts without claiming convergence. The runnable narrative is
-[`demos/v0.2-end-to-end/`](demos/v0.2-end-to-end/), and the hosted schemas are in
+[`demos/end-to-end/`](demos/end-to-end/), and the hosted schemas are in
 [`schema/v0.2/`](schema/v0.2/).
 
 Earlier SDK, verifier, example, integration, and assurance concepts have been rewritten onto the
@@ -49,7 +49,8 @@ reviewing a schema, improving documentation, or submitting a tested implementati
 | `schema/v0.2/` | byte-for-byte copies of the core v0.2 schemas and catalog |
 | `predicate/v0.2/` | origin and transformation predicate documentation |
 | `vocab/v0.2/` | bounded extension-vocabulary documentation |
-| `demos/v0.2-end-to-end/` | public producer-to-receiver proof and generated artifacts |
+| `demos/end-to-end/` | public producer-to-receiver proof and generated artifacts, at a permanent versionless URL |
+| `demos/v0.2-end-to-end/` | forwarding page plus a byte-identical artifact mirror, so previously published commands keep verifying |
 | `examples/` | current proof and real-world scenario library |
 | `tooling/` | truthful status of the reference CLI, hosted schemas, and SDK experiments |
 | `integrations/` | current integration contract and platform-specific field notes |

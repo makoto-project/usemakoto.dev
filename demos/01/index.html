@@ -88,7 +88,7 @@ LEVEL       L1
 REQUIRED    L3 not met
 $ echo $?
 1</code></pre></figure>
-<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/v0.2-end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
 
 <section>
 <h2>The problem</h2>
@@ -133,7 +133,7 @@ $ statement positive | jq .subject
     "name": "customers.public.json"
   }
 ]</code></pre>
-<p>Inspect the <a href="/demos/v0.2-end-to-end/artifacts/data/customers.raw.json">source export</a>, the <a href="/demos/v0.2-end-to-end/artifacts/data/customers.normalized.json">normalized intermediate</a>, and the <a href="/demos/v0.2-end-to-end/artifacts/data/customers.public.json">final public-safe file</a>.</p>
+<p>Inspect the <a href="/demos/end-to-end/artifacts/data/customers.raw.json">source export</a>, the <a href="/demos/end-to-end/artifacts/data/customers.normalized.json">normalized intermediate</a>, and the <a href="/demos/end-to-end/artifacts/data/customers.public.json">final public-safe file</a>.</p>
 </div></li>
 
 <li><div>
@@ -268,7 +268,7 @@ jobs:
   },
   "subjectName": "customers.public.json"
 }</code></pre>
-<p>The trust policy and private schema catalog are the published <a href="/demos/v0.2-end-to-end/artifacts/receiver/policy.json">receiver policy</a> and <a href="/demos/v0.2-end-to-end/artifacts/receiver/catalog.json">catalog</a>.</p>
+<p>The trust policy and private schema catalog are the published <a href="/demos/end-to-end/artifacts/receiver/policy.json">receiver policy</a> and <a href="/demos/end-to-end/artifacts/receiver/catalog.json">catalog</a>.</p>
 </div></li>
 
 <li><div>
@@ -340,7 +340,7 @@ LEVEL       L1
 REQUIRED    L3 not met
 $ echo $?
 1</code></pre>
-<p><a href="/demos/v0.2-end-to-end/artifacts/reports/mutated-final-data.json">Open the complete denial report</a>. It records sixteen checks, the evaluation time, the expected and actual heads, and the catalog digest the receiver used.</p>
+<p><a href="/demos/end-to-end/artifacts/reports/mutated-final-data.json">Open the complete denial report</a>. It records sixteen checks, the evaluation time, the expected and actual heads, and the catalog digest the receiver used.</p>
 <details><summary>Control run: the untampered handoff through the same gate</summary><div>
 <pre><code class="language-bash">$ makoto verify bundle handoffs/positive/bundle \
   --policy receiver/policy.json \
@@ -378,7 +378,7 @@ LEVEL       L3
 REQUIRED    L3 met
 $ echo $?
 0</code></pre>
-<p><a href="/demos/v0.2-end-to-end/artifacts/reports/positive.json">Open the complete allow report</a>.</p>
+<p><a href="/demos/end-to-end/artifacts/reports/positive.json">Open the complete allow report</a>.</p>
 </div></details>
 </div></li>
 </ol>
@@ -440,7 +440,7 @@ $ echo $?
 <span class="kicker">Reproduce the denial</span>
 <h2>The complete fixture mutates final data and expects an artifact-digest failure.</h2>
 <div class="actions">
-<a class="button" href="/demos/v0.2-end-to-end/">Run the complete proof</a>
+<a class="button" href="/demos/end-to-end/">Run the complete proof</a>
 <a class="button secondary" href="/examples/#poisoned-pipeline">Read the casebook entry</a>
 </div>
 </section>
