@@ -28,26 +28,26 @@
   <p class="editorial-note"><strong>Every value on this page is real.</strong> The records are the fixtures checked into <a href="/demos/end-to-end/">the runnable proof</a>, and every digest was computed from those exact bytes. Nothing here is illustrative filler. This page presents evidence; it does not perform verification.</p>
 
   <figure class="lifecycle-flow" data-flow="lifecycle" aria-labelledby="lifecycle-flow-caption">
-    <figcaption id="lifecycle-flow-caption">Raw customer records are attested by an origin statement, normalized into a second dataset attested by a transformation statement, reduced to a public-safe dataset attested by a third statement, and then handed to a receiver that re-hashes the bytes it was given. <span class="lf-note">Nothing is edited in place: each step writes a new file with a new digest, and every earlier file stays exactly as it was. For a table rewritten in place, see <a href="/examples/in-place/">the in-place walkthrough</a>.</span></figcaption>
+    <figcaption id="lifecycle-flow-caption">Raw customer records are attested by an origin statement, normalized into a second dataset attested by a transformation statement, reduced to a public-safe dataset attested by a third statement, and then handed to a receiver that re-hashes the bytes it was given. <span class="lf-note">Every arrow points forward. Each step writes a file; under each file is the signed statement for it, and each statement names the one before it as its predecessor. The receiver comes last.</span> <span class="lf-note">Nothing is edited in place: each step writes a new file with a new digest, and every earlier file stays exactly as it was. For a table rewritten in place, see <a href="/examples/in-place/">the in-place walkthrough</a>.</span></figcaption>
     <ol class="lf-stages">
       <li class="lf-stage">
         <div class="lf-card" data-flow-id="raw"><span class="lf-kind">File</span><strong>Raw</strong><code>customers.raw.json</code><br><code class="hash" title="sha256:4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919" tabindex="0" aria-label="sha256 4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919">4e90181e…</code><small>Stays as it arrived.</small></div>
-        <div class="lf-statement" data-flow-id="st-origin"><strong>Origin statement</strong><code class="hash" title="sha256:014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11" tabindex="0" aria-label="sha256 014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11">014b4252…</code><small>Subject: the raw file. No predecessor; the graph starts here.</small></div>
+        <div class="lf-statement" data-flow-id="st-origin"><span class="lf-kind">Signs the file above</span><strong>Origin statement</strong><code class="hash" title="sha256:014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11" tabindex="0" aria-label="sha256 014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11">014b4252…</code><small>Subject: the raw file. No predecessor; the graph starts here.</small></div>
       </li>
       <li class="lf-stage">
         <p class="lf-verb" data-flow-label="raw&gt;normalized">normalize</p>
         <div class="lf-card" data-flow-id="normalized"><span class="lf-kind">New file</span><strong>Normalized</strong><code>customers.normalized.json</code><br><code class="hash" title="sha256:421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8" tabindex="0" aria-label="sha256 421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8">421e19cf…</code><small>Written beside the raw file, which is untouched.</small></div>
-        <div class="lf-statement" data-flow-id="st-normalize"><strong>Transformation statement</strong><code class="hash" title="sha256:9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55" tabindex="0" aria-label="sha256 9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55">9ef9051c…</code><small>Input: the raw digest. Predecessor: the origin statement.</small></div>
+        <div class="lf-statement" data-flow-id="st-normalize"><span class="lf-kind">Signs the file above</span><strong>Transformation statement</strong><code class="hash" title="sha256:9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55" tabindex="0" aria-label="sha256 9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55">9ef9051c…</code><small>Input: the raw digest. Predecessor: the origin statement.</small></div>
       </li>
       <li class="lf-stage">
         <p class="lf-verb" data-flow-label="normalized&gt;public">public-safe derivative</p>
         <div class="lf-card" data-flow-id="public"><span class="lf-kind">New file</span><strong>Public-safe</strong><code>customers.public.json</code><br><code class="hash" title="sha256:2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4" tabindex="0" aria-label="sha256 2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4">2f4fe11d…</code><small>Both earlier files remain readable.</small></div>
-        <div class="lf-statement" data-flow-id="st-public"><strong>Transformation statement</strong><code class="hash" title="sha256:6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d" tabindex="0" aria-label="sha256 6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d">6c8f8061…</code><small>Input: the normalized digest. Predecessor: the normalize statement.</small></div>
+        <div class="lf-statement" data-flow-id="st-public"><span class="lf-kind">Signs the file above</span><strong>Transformation statement</strong><code class="hash" title="sha256:6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d" tabindex="0" aria-label="sha256 6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d">6c8f8061…</code><small>Input: the normalized digest. Predecessor: the normalize statement.</small></div>
       </li>
     </ol>
-    <div class="lf-receiver" data-flow-id="receiver"><strong>Receiver</strong><small>Re-hashes what arrived</small><div class="hash">6c8f8061…</div>
-      <ol class="lf-walk" aria-label="Receiver checks, from the head statement back to the root">
-        <li>6c8f8061… head</li><li>9ef9051c…</li><li>014b4252… root</li>
+    <div class="lf-receiver" data-flow-id="receiver"><strong>Receiver</strong><small>Receives the public-safe file and its three statements, re-hashes the bytes, and checks the chain from the root statement to the head.</small><div class="hash">6c8f8061…</div>
+      <ol class="lf-walk" aria-label="The statement chain the receiver checks, from the root statement to the head">
+        <li>014b4252… root</li><li>9ef9051c…</li><li>6c8f8061… head</li>
       </ol>
     </div>
   </figure>

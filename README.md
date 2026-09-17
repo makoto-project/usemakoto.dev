@@ -56,7 +56,7 @@ reviewing a schema, improving documentation, or submitting a tested implementati
 | `integrations/` | current integration contract and platform-specific field notes |
 | `community/`, `CONTRIBUTING.md` | public participation and contribution paths |
 | `sdk/`, `verify/`, `validate/` | truthful implementation status and language recipes |
-| `levels/` | assurance dimensions; no numbered security badge |
+| `levels/` | Origin and Transform assurance tracks and verified properties |
 
 ## Local review
 
