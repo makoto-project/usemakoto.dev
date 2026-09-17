@@ -442,6 +442,8 @@ pre { position: relative; max-width: 100%; margin: var(--block-gap) 0; overflow:
 pre code { padding: 0; background: none; box-shadow: none; font-size: inherit; color: inherit; border-radius: 0; }
 pre .line { display: block; --hang: calc((var(--indent, 0) + 2) * 1ch); padding-left: var(--hang); text-indent: calc(var(--hang) * -1); }
 pre .line * { text-indent: 0; }
+/* Diagnostic messages stay on one line; code.js puts the full text in the title. */
+pre .line.is-diagnostic { padding-left: 0; text-indent: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hash { font-family: var(--mono); font-size: .8rem; overflow-wrap: anywhere; color: var(--muted); }
 
 /* The exhibit frame code.js builds around every <pre>: a tab carrying the
@@ -642,7 +644,7 @@ tbody th { font-weight: 650; }
 .shadow-copies p { margin: var(--space-1) 0 0; color: var(--muted); }
 .shadow-copies .kicker { display: block; }
 .consequence-index { margin: var(--space-6) 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line-strong); }
-.consequence-index li { display: grid; grid-template-columns: minmax(200px,.75fr) minmax(0,1.25fr); gap: var(--space-6); max-width: none; padding: var(--space-5) 0; border-bottom: 1px solid var(--line); }
+.consequence-index li { display: grid; grid-template-columns: minmax(200px,.75fr) minmax(0,1.25fr); gap: var(--space-6); align-items: center; max-width: none; padding: var(--space-5) 0; border-bottom: 1px solid var(--line); }
 .page .consequence-index h3 { margin: 0; font-size: var(--t-h3); }
 .consequence-index p { margin: 0; color: var(--muted); }
 .consequence-index .kicker { display: inline; color: var(--ink-soft); }

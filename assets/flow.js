@@ -81,6 +81,12 @@
 
   Layer.prototype.box = function (node) { return box(node, this.origin); };
 
+  // Seconds a point takes to cross one edge.
+  function travelTime(points, opts) {
+    var seconds = Math.max(1.2, length(points) / ((opts && opts.speed) || SPEED));
+    return opts && opts.maxTravel ? Math.min(seconds, opts.maxTravel) : seconds;
+  }
+
   // opts: back (dashed, seal-coloured point), arrow, spark, delay, cycle, speed, hidden
   Layer.prototype.edge = function (points, opts) {
     opts = opts || {};
@@ -89,7 +95,7 @@
     if (opts.hidden) path.setAttribute("stroke", "none");
     if (opts.arrow !== false && !opts.hidden) path.setAttribute("marker-end", "url(#" + this.id + "-head)");
     if (opts.spark === false || still()) return path;
-    var travel = Math.max(1.2, length(points) / (opts.speed || SPEED));
+    var travel = travelTime(points, opts);
     var cycle = Math.max(opts.cycle || 0, travel + 1.4);
     var f = (travel / cycle).toFixed(3);
     var dot = el("circle", { r: opts.back ? "3" : "2.6", "class": "flow-spark" + (opts.back ? " is-back" : ""), opacity: "0" }, this.svg);
@@ -141,9 +147,20 @@
     var nodes = Array.prototype.slice.call(host.querySelectorAll(":scope > .dag-node"));
     var layer = new Layer(host);
     var boxes = nodes.map(function (n) { return layer.box(n); });
+    // One point walks the chain: each edge's point leaves only when the point
+    // before it has landed, and every edge shares one cycle so the relay
+    // stays in step on every repeat.
+    var routes = [], starts = [], total = 0;
     for (var i = 0; i < boxes.length - 1; i++) {
       var others = boxes.filter(function (_, k) { return k !== i && k !== i + 1; });
-      layer.edge(route(boxes[i], boxes[i + 1], others, "left"), { delay: i * 0.7, cycle: 3.6 });
+      routes.push(route(boxes[i], boxes[i + 1], others, "left"));
+      starts.push(total);
+      // A wrapped row's return line is long; cap it so the relay keeps pace.
+      total += travelTime(routes[i], { maxTravel: 2.4 });
+    }
+    var cycle = Math.max(3.6, total + 1.4);
+    for (var j = 0; j < routes.length; j++) {
+      layer.edge(routes[j], { delay: starts[j], cycle: cycle, maxTravel: 2.4 });
     }
   }
 
@@ -231,7 +248,7 @@
     ],
     lifecycle: [
       ["raw", "normalized", { side: "left", delay: 0, cycle: 4.5 }],
-      ["normalized", "public", { side: "left", delay: 1.5, cycle: 4.5, offset: 6 }],
+      ["normalized", "public", { side: "left", after: "raw>normalized", cycle: 4.5, offset: 6 }],
       ["st-origin", "raw", { spark: false }],
       ["st-normalize", "normalized", { spark: false }],
       ["st-public", "public", { spark: false }],
@@ -250,11 +267,18 @@
       nodes[found[i].getAttribute("data-flow-id")] = b;
       all.push(b);
     }
+    // An edge with `after` leaves when the named edge's point lands.
+    var landed = {};
     (EDGES[kind] || []).forEach(function (edge) {
       var a = nodes[edge[0]], b = nodes[edge[1]], opts = edge[2] || {};
       if (!a || !b) return;
       var others = all.filter(function (o) { return o !== a && o !== b; });
-      layer.edge(route(a, b, others, opts.side, opts.offset), opts);
+      var points = route(a, b, others, opts.side, opts.offset);
+      if (opts.after && landed[opts.after] != null) {
+        opts = Object.assign({}, opts, { delay: landed[opts.after] });
+      }
+      landed[edge[0] + ">" + edge[1]] = (opts.delay || 0) + travelTime(points, opts);
+      layer.edge(points, opts);
     });
     // Place step labels at the middle of the edge they name.
     var labels = host.querySelectorAll("[data-flow-label]");

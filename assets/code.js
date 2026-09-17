@@ -63,8 +63,46 @@
     // Every highlight pass (the first, and each exact-bytes toggle) ends by
     // splitting the result into lines.
     Prism.hooks.add("complete", function (env) {
-      if (env.element) splitLines(env.element);
+      if (!env.element) return;
+      if (env.language === "terminal" || env.language === "shell-plain") {
+        abbreviateDigests(env.element);
+      }
+      splitLines(env.element);
+      if (env.language === "terminal" || env.language === "shell-plain") {
+        markDiagnostics(env.element);
+      }
     });
+  }
+
+  /*
+   * Shell sessions show digests the way GitHub shows a commit: algorithm plus
+   * the first seven hex digits. Display only. The full value stays in the
+   * title, and Copy always takes the original text.
+   */
+  function abbreviateDigests(code) {
+    var tokens = code.querySelectorAll(".token.digest");
+    for (var i = 0; i < tokens.length; i++) {
+      var full = tokens[i].textContent;
+      var match = /^(sha256:)([0-9a-f]{7})[0-9a-f]+$/.exec(full);
+      if (!match) continue;
+      tokens[i].title = full;
+      tokens[i].textContent = match[1] + match[2];
+    }
+  }
+
+  /*
+   * A diagnostic message (a line that begins with an E_ or W_ code) stays on
+   * one line and is cut with an ellipsis when the frame is too narrow. The
+   * full message is in the title and in Copy.
+   */
+  function markDiagnostics(code) {
+    var lines = code.querySelectorAll(":scope > .line");
+    for (var i = 0; i < lines.length; i++) {
+      var text = lines[i].textContent;
+      if (!/^[EW]_[A-Z0-9_]{3,}\b/.test(text)) continue;
+      lines[i].classList.add("is-diagnostic");
+      lines[i].title = text.replace(/\n$/, "");
+    }
   }
 
   function languageOf(code) {
