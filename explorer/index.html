@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Step one customer dataset through Makoto: see how the data changes at each stage, what signed evidence each step adds, and how a receiver catches seven kinds of tampering."><title>Explorer — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/explorer/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Makoto">
+  <meta property="og:title" content="Explorer — Makoto">
+  <meta property="og:description" content="Step one customer dataset through Makoto: see how the data changes at each stage, what signed evidence each step adds, and how a receiver catches seven kinds of tampering.">
+  <meta property="og:url" content="https://usemakoto.dev/explorer/">
+  <meta property="og:image" content="https://usemakoto.dev/assets/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Makoto: know where data began, what changed, and who attested to it. A receiver&#x27;s verification run refuses a handoff whose final bytes changed after signing.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Explorer — Makoto">
+  <meta name="twitter:description" content="Step one customer dataset through Makoto: see how the data changes at each stage, what signed evidence each step adds, and how a receiver catches seven kinds of tampering.">
+  <meta name="twitter:image" content="https://usemakoto.dev/assets/og-card.png"><link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main"><main id="main" class="page wide">
+<span class="kicker">Explorer</span><h1>Follow one dataset through Makoto, one stage at a time.</h1>
+<p class="lead">Three customer records are captured, normalized, made public-safe, and handed to another team. At each stage, see how the data changed, what signed evidence Makoto added, and what the receiver can establish. Then tamper with it and watch the same receiver say no.</p>
+
+<div class="explorer" data-explorer>
+  <nav class="explorer-stages" aria-label="Stages" data-stage-nav></nav>
+
+  <section class="explorer-head" aria-live="polite">
+    <p class="explorer-count" data-stage-count>Stage 1 of 5</p>
+    <h2 data-stage-title>Capture the source</h2>
+    <p data-stage-what>A collector receives three customer records and signs an origin statement over their exact bytes.</p>
+    <p class="explorer-level"><span>What this stage gives a consumer:</span> <strong data-stage-level></strong></p>
+    <div class="actions explorer-step"><button type="button" class="button secondary" data-prev>Previous stage</button><button type="button" class="button" data-next>Next stage</button></div>
+  </section>
+
+  <section class="explorer-verify" aria-labelledby="explorer-tamper-label">
+    <div class="explorer-tamper">
+      <label id="explorer-tamper-label" for="explorer-tamper">Tamper with it</label>
+      <select id="explorer-tamper" data-tamper></select>
+      <p data-tamper-story></p>
+    </div>
+    <div class="explorer-receiver" data-receiver aria-live="polite"></div>
+  </section>
+
+  <div class="explorer-panes">
+    <section class="explorer-pane" data-data aria-label="The data">
+      <p class="explorer-pane-title">The data</p>
+      <div class="exhibit">
+        <div class="exhibit-head"><span class="exhibit-name" data-data-name>customers.raw.json</span><span class="exhibit-lang">json</span><span class="exhibit-spacer"></span><button type="button" class="exhibit-toggle" aria-pressed="false" data-changes-only hidden>Changes only</button></div>
+        <p class="exhibit-note" data-data-note></p>
+        <pre><code></code></pre>
+      </div>
+    </section>
+    <section class="explorer-pane" data-evidence aria-label="What Makoto adds">
+      <p class="explorer-pane-title">What Makoto adds</p>
+      <div class="exhibit">
+        <div class="exhibit-head"><span class="exhibit-name" data-evidence-name>Origin statement</span><span class="exhibit-lang">json</span></div>
+        <p class="exhibit-note" data-evidence-note></p>
+        <pre><code></code></pre>
+      </div>
+    </section>
+  </div>
+
+
+  <div class="explorer-chain-wrap"><p class="explorer-pane-title">The chain so far</p><ol class="lf-walk explorer-chain" data-chain></ol></div>
+
+  <noscript><p class="callout">The explorer needs JavaScript. Every file it shows is published with the <a href="/demos/end-to-end/">end-to-end proof</a>: the <a href="/demos/end-to-end/artifacts/data/customers.raw.json">raw</a>, <a href="/demos/end-to-end/artifacts/data/customers.normalized.json">normalized</a>, and <a href="/demos/end-to-end/artifacts/data/customers.public.json">public-safe</a> data, the signed statements, and every verification report.</p></noscript>
+</div>
+
+<section aria-labelledby="where-from">
+<h2 id="where-from">Where every value comes from</h2>
+<p>Nothing on this page is typed in. The data files, the signed statements, the handoff manifest, and the verification reports are loaded from the <a href="/demos/end-to-end/">end-to-end proof</a>'s published artifacts, and the digest of each data file is computed in your browser from the bytes it loaded. The verified properties are computed from each report with core's own rules. The attacks are the proof's seven denial cases, each explained in the <a href="/demos/">casebook</a>.</p>
+<p>To see the track levels and properties behind each stage in full, read the <a href="/levels/">assurance model</a>. To run the same proof yourself, follow the <a href="/demos/end-to-end/">end-to-end walkthrough</a>.</p>
+</section>
+</main><footer class="footer"><div class="footer-inner"><p class="footer-line">Makoto explorer · Real proof artifacts · One stage at a time</p><nav class="footer-nav" aria-label="Site"><a href="/spec/">Specification</a><a href="/spec/schemas/">Hosted schemas</a><a href="/demos/end-to-end/">Runnable proof</a><a href="/examples/">Examples</a><a href="/community/">Community</a><a href="/privacy/">Privacy</a></nav><p class="footer-meta">Apache-2.0 · <a href="https://github.com/makoto-project/usemakoto.dev">Site source on GitHub</a></p></div></footer></div></div>
+<script defer src="/assets/explorer.js"></script></body></html>
