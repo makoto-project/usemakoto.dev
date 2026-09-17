@@ -247,14 +247,18 @@
       ["gate", "run", { side: "left", delay: 0.9, cycle: 4.2 }]
     ],
     lifecycle: [
-      ["raw", "normalized", { side: "left", delay: 0, cycle: 4.5 }],
-      ["normalized", "public", { side: "left", after: "raw>normalized", cycle: 4.5, offset: 6 }],
-      ["st-origin", "raw", { spark: false }],
-      ["st-normalize", "normalized", { spark: false }],
-      ["st-public", "public", { spark: false }],
-      ["st-normalize", "st-origin", { back: true, side: "right", delay: 3, cycle: 4.5 }],
-      ["st-public", "st-normalize", { back: true, side: "right", delay: 2.2, cycle: 4.5, offset: 6 }],
-      ["receiver", "st-public", { back: true, side: "right", delay: 1.4, cycle: 4.5, offset: 12 }]
+      // Everything reads left to right or top to bottom: files along the top,
+      // each file down to the statement that signs it, each statement on to
+      // the statement that names it as predecessor, and the head down to the
+      // receiver.
+      ["raw", "normalized", { side: "left", delay: 0, cycle: 6 }],
+      ["normalized", "public", { side: "left", after: "raw>normalized", cycle: 6, offset: 6 }],
+      ["raw", "st-origin", { spark: false }],
+      ["normalized", "st-normalize", { spark: false }],
+      ["public", "st-public", { spark: false }],
+      ["st-origin", "st-normalize", { back: true, spark: false, side: "right" }],
+      ["st-normalize", "st-public", { back: true, spark: false, side: "right", offset: 6 }],
+      ["st-public", "receiver", { side: "right", after: "normalized>public", cycle: 6, offset: 12 }]
     ]
   };
 
