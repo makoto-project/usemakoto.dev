@@ -954,3 +954,50 @@ tbody th { font-weight: 650; }
   .meta-list { grid-template-columns: minmax(0,1fr); gap: 0; }
   .meta-list dd { margin-bottom: var(--space-2); }
 }
+
+/* ---------------------------------------------------------------------------
+   Explorer: one dataset stepped through the proof. Stage tabs read as a
+   ruled index, panes are ordinary exhibits, and changed lines use the same
+   washes as the rest of the site.
+   --------------------------------------------------------------------------- */
+.explorer { margin-top: var(--space-6); }
+.explorer-stages { display: flex; flex-wrap: wrap; gap: 0 var(--space-5); margin: 0 0 var(--space-5); padding: 0 0 var(--space-2); border-bottom: 1px solid var(--line-strong); }
+.explorer-stage { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--muted); font: 600 .95rem/1.3 var(--sans); cursor: pointer; text-align: left; }
+.explorer-stage:hover { color: var(--ink); }
+.explorer-stage[aria-current="step"] { color: var(--ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .35rem; }
+.explorer-stage-n { font-variant-numeric: tabular-nums; }
+.explorer-stage.is-tampered::after { content: "tampered"; color: var(--deny); font-weight: 600; font-size: .8rem; }
+.explorer-head { max-width: var(--measure); }
+.page .explorer-head h2 { margin: var(--space-1) 0 var(--space-2); }
+.explorer-count { margin: 0; color: var(--muted); font: 600 .9rem/1.4 var(--sans); }
+.explorer-level { color: var(--ink-soft); }
+.explorer-level span { color: var(--muted); }
+.explorer-step { margin-top: var(--space-4); }
+.explorer-step .button:disabled { opacity: .45; cursor: default; }
+.explorer-panes { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--grid-gap); margin-top: var(--space-6); }
+.explorer-pane { min-width: 0; }
+.explorer-pane-title { margin: 0 0 var(--space-2); color: var(--ink); font: 700 1rem/1.4 var(--sans); }
+.explorer-pane .exhibit { margin: 0; }
+.explorer .exhibit-note:empty { display: none; }
+.explorer pre .line.is-added { background: var(--allow-wash); }
+.explorer pre .line.is-changed { background: var(--change-wash); }
+.explorer pre .line.is-link { background: color-mix(in srgb, var(--form) 16%, transparent); }
+.explorer pre .line.is-removed { background: var(--deny-wash); text-decoration: line-through; }
+.explorer pre .line.is-fail { background: var(--deny-wash); }
+.explorer pre .line.is-pass { background: var(--allow-wash); }
+.explorer-verify { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: var(--space-4) var(--grid-gap); margin-top: var(--space-6); padding: var(--space-5) 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.explorer-tamper label { display: block; margin-bottom: var(--space-2); color: var(--ink); font: 700 1rem/1.4 var(--sans); }
+.explorer-tamper select { width: 100%; max-width: 100%; min-height: 44px; padding: 0 var(--space-3); border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--sheet); color: var(--ink); font: 500 .95rem/1.3 var(--sans); }
+.explorer-tamper p { color: var(--ink-soft); }
+.explorer-receiver { min-width: 0; }
+.explorer-receiver:empty { display: none; }
+.page .explorer-receiver-title { margin: 0 0 var(--space-2); }
+.explorer-receiver .is-allow { color: var(--allow); }
+.explorer-receiver .is-deny { color: var(--deny); }
+.explorer-receiver table { margin: var(--space-3) 0; }
+.explorer-small { color: var(--muted); font-size: .9rem; }
+.explorer-chain-wrap { margin-top: var(--space-6); }
+.explorer-chain li span { color: var(--ink); font-family: var(--sans); font-weight: 650; }
+@media (max-width: 1100px) {
+  .explorer-panes, .explorer-verify { grid-template-columns: minmax(0,1fr); }
+}
