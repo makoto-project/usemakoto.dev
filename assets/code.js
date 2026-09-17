@@ -372,8 +372,8 @@
   document.addEventListener("copy", function (event) {
     var selection = window.getSelection && window.getSelection();
     if (!selection || selection.isCollapsed || !event.clipboardData) return;
-    var start = selection.anchorNode && selection.anchorNode.parentElement;
-    var end = selection.focusNode && selection.focusNode.parentElement;
+    function element(node) { return node && (node.nodeType === 1 ? node : node.parentElement); }
+    var start = element(selection.anchorNode), end = element(selection.focusNode);
     var hash = start && start.closest("[data-full]");
     if (!hash || !end || end.closest("[data-full]") !== hash) return;
     event.clipboardData.setData("text/plain", hash.dataset.full);

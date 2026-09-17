@@ -92,6 +92,21 @@
   measure();
   observe();
 
+  // A deep link to a step jumps before code frames and fonts finish growing
+  // the page above it. Land it again once they have, unless the reader has
+  // already started moving.
+  var linked = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  if (linked && track.contains(linked) && document.readyState !== "complete") {
+    var moved = false;
+    var stop = function () { moved = true; };
+    ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (type) {
+      window.addEventListener(type, stop, { once: true, passive: true });
+    });
+    window.addEventListener("load", function () {
+      if (!moved) linked.scrollIntoView({ block: "start", behavior: "instant" });
+    });
+  }
+
   var pending = 0;
   window.addEventListener("resize", function () {
     window.clearTimeout(pending);
