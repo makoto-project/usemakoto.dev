@@ -112,7 +112,7 @@
     }
   },
   &quot;additionalProperties&quot;: false
-}</code></pre><p class="code-note">The published bytes, unmodified.</p></div></details></article><article class="schema-entry" id="catalog-json"><h3>catalog.json<a class="anchor-link" href="#catalog-json" aria-label="Permalink">#</a></h3><p>The index of hosted resources and their digests. Not a schema itself; the document a resolver pins against.</p><dl class="schema-meta"><dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/catalog.json</dd><dt>Digest</dt><dd>sha256:298f55040022b6fe7c71e7a37d6ec4a75317d1c0b52a679dcca744cb4a3eaaf3</dd><dt>Raw</dt><dd><a href="/schema/v0.2/catalog.json">/schema/v0.2/catalog.json</a></dd><dt>Reference</dt><dd><a href="/spec/schemas/catalog/">Every field, with types, rules, and real values</a></dd></dl><details><summary>Read the document (2,274 bytes)</summary><div><pre class="language-json"><code class="language-json">{
+}</code></pre><p class="code-note">The published bytes, unmodified.</p></div></details></article><article class="schema-entry" id="catalog-json"><h3>catalog.json<a class="anchor-link" href="#catalog-json" aria-label="Permalink">#</a></h3><p>The index of hosted resources and their digests. Not a schema itself; the document a resolver pins against.</p><dl class="schema-meta"><dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/catalog.json</dd><dt>Digest</dt><dd>sha256:b68cb2cae64cfcd2a5021a725505ccbaa80dfaa053322ce276af9c6650860304</dd><dt>Raw</dt><dd><a href="/schema/v0.2/catalog.json">/schema/v0.2/catalog.json</a></dd><dt>Reference</dt><dd><a href="/spec/schemas/catalog/">Every field, with types, rules, and real values</a></dd></dl><details><summary>Read the document (2,274 bytes)</summary><div><pre class="language-json"><code class="language-json">{
   &quot;resources&quot;: [
     {
       &quot;digest&quot;: {
@@ -186,7 +186,7 @@
     },
     {
       &quot;digest&quot;: {
-        &quot;sha256&quot;: &quot;1a056bc1605174d1eb90c8491d74dc5db7398c4aa15f9bc6033eae55e8664aca&quot;
+        &quot;sha256&quot;: &quot;5f18360abc901e175a16ec3a0ed1a4fa47626b34af08d64f6adb33c78fe9d6ac&quot;
       },
       &quot;id&quot;: &quot;https://usemakoto.dev/schema/v0.2/trust-policy.schema.json&quot;,
       &quot;path&quot;: &quot;trust-policy.schema.json&quot;
@@ -778,7 +778,7 @@
     }
   },
   &quot;additionalProperties&quot;: false
-}</code></pre><p class="code-note">The published bytes, unmodified.</p></div></details></article><article class="schema-entry" id="trust-policy-schema-json"><h3>trust-policy.schema.json<a class="anchor-link" href="#trust-policy-schema-json" aria-label="Permalink">#</a></h3><p>The receiver-owned policy: which keys may make which claims, under which thresholds and resource limits.</p><dl class="schema-meta"><dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/trust-policy.schema.json</dd><dt>Digest</dt><dd>sha256:1a056bc1605174d1eb90c8491d74dc5db7398c4aa15f9bc6033eae55e8664aca</dd><dt>Raw</dt><dd><a href="/schema/v0.2/trust-policy.schema.json">/schema/v0.2/trust-policy.schema.json</a></dd><dt>Reference</dt><dd><a href="/spec/schemas/trust-policy/">Every field, with types, rules, and real values</a></dd></dl><details><summary>Read the document (7,905 bytes)</summary><div><pre class="language-json"><code class="language-json">{
+}</code></pre><p class="code-note">The published bytes, unmodified.</p></div></details></article><article class="schema-entry" id="trust-policy-schema-json"><h3>trust-policy.schema.json<a class="anchor-link" href="#trust-policy-schema-json" aria-label="Permalink">#</a></h3><p>The receiver-owned policy: which keys may make which claims, under which thresholds and resource limits.</p><dl class="schema-meta"><dt>Identifier</dt><dd>https://usemakoto.dev/schema/v0.2/trust-policy.schema.json</dd><dt>Digest</dt><dd>sha256:5f18360abc901e175a16ec3a0ed1a4fa47626b34af08d64f6adb33c78fe9d6ac</dd><dt>Raw</dt><dd><a href="/schema/v0.2/trust-policy.schema.json">/schema/v0.2/trust-policy.schema.json</a></dd><dt>Reference</dt><dd><a href="/spec/schemas/trust-policy/">Every field, with types, rules, and real values</a></dd></dl><details><summary>Read the document (11,253 bytes)</summary><div><pre class="language-json"><code class="language-json">{
   &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,
   &quot;$id&quot;: &quot;https://usemakoto.dev/schema/v0.2/trust-policy.schema.json&quot;,
   &quot;title&quot;: &quot;Makoto v0.2 Consumer Trust Policy&quot;,
@@ -801,6 +801,7 @@
       &quot;type&quot;: &quot;array&quot;,
       &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/requiredProfile&quot; }
     },
+    &quot;verificationSummary&quot;: { &quot;$ref&quot;: &quot;#/$defs/verificationSummary&quot; },
     &quot;limits&quot;: { &quot;$ref&quot;: &quot;#/$defs/limits&quot; }
   },
   &quot;$defs&quot;: {
@@ -926,6 +927,99 @@
         &quot;subjectName&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
         &quot;mediaType&quot;: { &quot;$ref&quot;: &quot;#/$defs/mediaType&quot; },
         &quot;scope&quot;: { &quot;const&quot;: &quot;eachMatchingFinalArtifact&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;resourceDescriptor&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;uri&quot;, &quot;digest&quot;],
+      &quot;properties&quot;: {
+        &quot;uri&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;assessmentProfile&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [&quot;id&quot;, &quot;digest&quot;, &quot;closureDigest&quot;, &quot;target&quot;],
+      &quot;properties&quot;: {
+        &quot;id&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;digest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;closureDigest&quot;: { &quot;$ref&quot;: &quot;#/$defs/digest&quot; },
+        &quot;target&quot;: { &quot;enum&quot;: [&quot;statement&quot;, &quot;predicate&quot;] }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;vsaVerifier&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [
+        &quot;id&quot;, &quot;verifierId&quot;, &quot;authorizedKeyIds&quot;, &quot;minimumSignatures&quot;, &quot;policy&quot;, &quot;resourceUri&quot;,
+        &quot;allowedVerifiedLevels&quot;, &quot;independenceGroup&quot;
+      ],
+      &quot;properties&quot;: {
+        &quot;id&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;verifierId&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;authorizedKeyIds&quot;: { &quot;$ref&quot;: &quot;#/$defs/keyIds&quot; },
+        &quot;minimumSignatures&quot;: { &quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1 },
+        &quot;policy&quot;: { &quot;$ref&quot;: &quot;#/$defs/resourceDescriptor&quot; },
+        &quot;resourceUri&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;allowedVerifiedLevels&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;minItems&quot;: 1,
+          &quot;items&quot;: {
+            &quot;enum&quot;: [
+              &quot;MAKOTO_ORIGIN_LEVEL_2&quot;, &quot;MAKOTO_ORIGIN_LEVEL_3&quot;,
+              &quot;MAKOTO_TRANSFORM_LEVEL_2&quot;, &quot;MAKOTO_TRANSFORM_LEVEL_3&quot;
+            ]
+          }
+        },
+        &quot;independenceGroup&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;requiredProfiles&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;minItems&quot;: 1,
+          &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/assessmentProfile&quot; }
+        },
+        &quot;requiredControlEvidence&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;minItems&quot;: 1,
+          &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/resourceDescriptor&quot; }
+        }
+      },
+      &quot;additionalProperties&quot;: false
+    },
+    &quot;verificationSummary&quot;: {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;required&quot;: [
+        &quot;resourceUri&quot;, &quot;summaryPolicy&quot;, &quot;requiredVerifiedLevels&quot;,
+        &quot;requiredProperties&quot;, &quot;verifiers&quot;
+      ],
+      &quot;properties&quot;: {
+        &quot;resourceUri&quot;: { &quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 1, &quot;maxLength&quot;: 4096 },
+        &quot;summaryPolicy&quot;: { &quot;$ref&quot;: &quot;#/$defs/resourceDescriptor&quot; },
+        &quot;requiredVerifiedLevels&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;enum&quot;: [
+              &quot;MAKOTO_ORIGIN_LEVEL_1&quot;, &quot;MAKOTO_ORIGIN_LEVEL_2&quot;,
+              &quot;MAKOTO_ORIGIN_LEVEL_3&quot;, &quot;MAKOTO_TRANSFORM_LEVEL_1&quot;,
+              &quot;MAKOTO_TRANSFORM_LEVEL_2&quot;, &quot;MAKOTO_TRANSFORM_LEVEL_3&quot;
+            ]
+          }
+        },
+        &quot;requiredProperties&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: {
+            &quot;enum&quot;: [
+              &quot;MAKOTO_AUTHORIZED&quot;, &quot;MAKOTO_GRAPH_COMPLETE&quot;,
+              &quot;MAKOTO_FRESHNESS_ANCHORED&quot;, &quot;MAKOTO_SCHEMA_CONFORMANT&quot;,
+              &quot;MAKOTO_REPRODUCED&quot;
+            ]
+          }
+        },
+        &quot;verifiers&quot;: {
+          &quot;type&quot;: &quot;array&quot;,
+          &quot;items&quot;: { &quot;$ref&quot;: &quot;#/$defs/vsaVerifier&quot; }
+        }
       },
       &quot;additionalProperties&quot;: false
     },
