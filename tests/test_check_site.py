@@ -240,12 +240,23 @@ def test_current_integrations_reject_obsolete_protocol_constructs() -> None:
         assert check_site.stale_integration_markers(content) == [], relative
 
 
-def test_assurance_levels_page_defines_l1_l2_l3_sections() -> None:
+def test_assurance_model_page_defines_both_tracks_and_every_property() -> None:
     content = (check_site.ROOT / "levels/index.html").read_text(encoding="utf-8")
 
-    assert '<h2 id="l1">L1 · Provenance is authentic</h2>' in content
-    assert '<h2 id="l2">L2 · Provenance is authorized and complete</h2>' in content
-    assert '<h2 id="l3">L3 · Provenance is anchored</h2>' in content
+    for track in ("origin", "transform"):
+        for level in (1, 2, 3):
+            assert f'id="{track}-l{level}"' in content
+    for anchor in (
+        "authorized",
+        "graph-complete",
+        "freshness-anchored",
+        "schema-conformant",
+        "reproduced",
+    ):
+        assert f'id="property-{anchor}"' in content
+    for section in ("not-covered", "correctness", "reference-profile", "summary"):
+        assert f'id="{section}"' in content
+    assert "report level" not in content
 
 
 def test_canonical_presentation_pages_have_no_visible_version_taxonomy() -> None:
@@ -287,44 +298,43 @@ def test_superseded_pages_remain_published_and_labelled() -> None:
         assert len(content) > 20_000, relative
 
 
-# Section 8.3: each level is a fixed, cumulative set of report checks.
-LEVEL_CHECKS = {
-    "spec/l1-requirements.html": (
-        "load-safely",
-        "parse-strictly",
-        "index-payloads",
-        "core-schemas",
-        "signatures",
-    ),
+# Section 8.3: L1-L3 are defined per track. The old URLs keep resolving and
+# explain each level in both tracks, linking to the track sections.
+LEVEL_NAMES = {
+    "spec/l1-requirements.html": ("Traceable capture", "Traceable execution"),
     "spec/l2-requirements.html": (
-        "authorization-thresholds",
-        "authorization",
-        "graph",
-        "roots-and-heads",
-        "completeness-anchor",
-        "artifact-bytes",
-        "metadata-profiles",
-        "graph-dependency-artifacts",
-        "artifact-profiles",
+        "Platform-authenticated capture",
+        "Platform-authenticated execution",
     ),
-    "spec/l3-requirements.html": ("freshness-anchors",),
+    "spec/l3-requirements.html": ("Policy-controlled capture", "Hardened execution"),
 }
 
 
-def test_level_pages_document_current_levels_not_superseded_history() -> None:
-    assert set(LEVEL_CHECKS) == set(check_site.LEVEL_PAGES)
+def test_level_pages_explain_each_level_per_track_not_superseded_history() -> None:
+    assert set(LEVEL_NAMES) == set(check_site.LEVEL_PAGES)
     hub = (check_site.ROOT / "spec/index.html").read_text(encoding="utf-8")
     assert 'id="levels"' in hub and "superseded" not in hub.casefold()
-    for relative, checks in LEVEL_CHECKS.items():
+    for relative, (origin, transform) in LEVEL_NAMES.items():
+        level = relative[len("spec/l")]
         content = (check_site.ROOT / relative).read_text(encoding="utf-8")
         assert relative not in check_site.TECHNICAL_VERSION_PAGES
         assert "superseded" not in content.casefold(), relative
         assert "historical" not in content.casefold(), relative
         assert f'href="/{relative}"' in hub, relative
-        for check in checks:
-            assert f"<code>{check}</code>" in content, (relative, check)
-    l3 = (check_site.ROOT / "spec/l3-requirements.html").read_text(encoding="utf-8")
-    assert "<code>allow</code>" in l3 and "allowReplayableHandoff" in l3
+        assert origin in content and transform in content, relative
+        assert f'href="/levels/#origin-l{level}"' in content, relative
+        assert f'href="/levels/#transform-l{level}"' in content, relative
+        assert f"MAKOTO_ORIGIN_LEVEL_{level}" in content, relative
+        assert f"MAKOTO_TRANSFORM_LEVEL_{level}" in content, relative
+
+
+def test_no_page_uses_the_unmerged_level_command() -> None:
+    for path in sorted(check_site.ROOT.rglob("*")):
+        if path.suffix not in {".html", ".yml"} or ".codex-work" in path.parts:
+            continue
+        content = path.read_text(encoding="utf-8", errors="replace")
+        assert "makoto report level" not in content, path
+        assert "REQUIRED_LEVEL" not in content, path
 
 
 @pytest.mark.parametrize(

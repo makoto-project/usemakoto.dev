@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Assurance level L2: authorized signers, a continuous graph, a matching signed handoff, and matching received bytes.">
-  <title>L2: Provenance is authorized and complete — Makoto</title>
+  <meta name="description" content="L2 is defined per assurance track: Origin L2 is platform-authenticated capture and Transform L2 is platform-authenticated execution.">
+  <title>L2 in each assurance track — Makoto</title>
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Makoto">
-  <meta property="og:title" content="L2: Provenance is authorized and complete — Makoto">
-  <meta property="og:description" content="Assurance level L2: authorized signers, a continuous graph, a matching signed handoff, and matching received bytes.">
+  <meta property="og:title" content="L2 in each assurance track — Makoto">
+  <meta property="og:description" content="L2 is defined per assurance track: Origin L2 is platform-authenticated capture and Transform L2 is platform-authenticated execution.">
   <meta property="og:url" content="https://usemakoto.dev/spec/l2-requirements.html">
   <meta property="og:image" content="https://usemakoto.dev/assets/og-card.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Makoto: know where data began, what changed, and who attested to it. A receiver&#x27;s verification run refuses a handoff whose final bytes changed after signing.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="L2: Provenance is authorized and complete — Makoto">
-  <meta name="twitter:description" content="Assurance level L2: authorized signers, a continuous graph, a matching signed handoff, and matching received bytes.">
+  <meta name="twitter:title" content="L2 in each assurance track — Makoto">
+  <meta name="twitter:description" content="L2 is defined per assurance track: Origin L2 is platform-authenticated capture and Transform L2 is platform-authenticated execution.">
   <meta name="twitter:image" content="https://usemakoto.dev/assets/og-card.png">
   <link rel="canonical" href="https://usemakoto.dev/spec/l2-requirements.html">
   <link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script>
@@ -28,44 +28,39 @@
 <aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/" aria-current="page">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
 <div class="site-main"><main id="main" class="page wide">
   <span class="kicker">Assurance level</span>
-  <h1>L2: Provenance is authorized and complete.</h1>
-  <p class="lead">L2 adds receiver authorization of every signer, a continuous graph from each head to its origins, an authorized handoff whose exact sets match, and received final-artifact bytes that match the signed digests.</p>
-<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#require">Require this level</a> below.</figcaption><pre><code class="language-bash">makoto report level report.json --require L2</code></pre></figure>
-  <p class="editorial-note"><strong>Derived, not declared.</strong> A level is a named set of verification-report checks (<a href="/spec/text/#8-guarantee-model">Section 8.3</a>). It is derived only from a completed report that validates against the core verification-report schema, and deriving it never changes a check status, a diagnostic, an exit code, or the <code>allow</code>/<code>deny</code> decision. A level is always relative to the receiver policy, catalog, and expectations that produced the report.</p>
-  <p class="spec-jump"><a href="/spec/l1-requirements.html">L1 · Provenance is authentic</a><a href="/spec/l2-requirements.html" aria-current="page">L2 · Provenance is authorized and complete</a><a href="/spec/l3-requirements.html">L3 · Provenance is anchored</a><a href="/spec/">Specification overview</a></p>
+  <h1>L2 is defined per track.</h1>
+  <p class="lead">Makoto has two producer tracks, Origin and Transform, and each defines its own L2. L2 moves evidence generation from a person to a hosted platform, which signs and assesses it in a standard SLSA Verification Summary Attestation.</p>
+<figure class="lead-exhibit"><figcaption><strong>The identifiers this page is about.</strong> Repeated from <a href="#identifiers">Identifiers</a> below.</figcaption><pre><code>MAKOTO_ORIGIN_LEVEL_2
+MAKOTO_TRANSFORM_LEVEL_2</code></pre></figure>
+  <p class="editorial-note"><strong>How to read a level.</strong> A track level says how origin or transformation evidence was produced (<a href="/spec/text/#83-assurance-model-at-a-glance">Section 8.3</a>). Levels are cumulative within a track, and the level for a final artifact is the minimum qualified level among all reachable statements in that track. What a receiver established about one handoff is a separate <a href="/levels/#properties">verified property</a>.</p>
+  <p class="spec-jump"><a href="/spec/l1-requirements.html">L1 in each track</a><a href="/spec/l2-requirements.html" aria-current="page">L2 in each track</a><a href="/spec/l3-requirements.html">L3 in each track</a><a href="/levels/">Assurance model</a><a href="/spec/">Specification overview</a></p>
 
-  <section aria-labelledby="checks"><h2 id="checks">Checks this level requires</h2>
-    <p>Levels are cumulative: every requirement of <a href="/spec/l1-requirements.html">L1</a> must also hold. This page lists only what L2 adds.</p>
-    <p>Each identifier is a top-level check in the verification report. The step is where <a href="/spec/text/#15-verification-algorithm">Section 15</a> runs it.</p>
-    <table class="stack-table level-check-table"><thead><tr><th scope="col">Check</th><th scope="col">Verification step</th><th scope="col">Required status</th></tr></thead><tbody><tr><td><code>authorization-thresholds</code></td><td>Step 6 — Check authorization thresholds</td><td><code>pass</code></td></tr><tr><td><code>authorization</code></td><td>Step 7 — Finalize statement authorization</td><td><code>pass</code></td></tr><tr><td><code>graph</code></td><td>Step 9 — Build the graph</td><td><code>pass</code></td></tr><tr><td><code>roots-and-heads</code></td><td>Step 10 — Discover roots and heads</td><td><code>pass</code></td></tr><tr><td><code>completeness-anchor</code></td><td>Step 11 — Check the handoff anchor</td><td><code>pass</code></td></tr><tr><td><code>artifact-bytes</code></td><td>Step 12 — Verify artifact bytes</td><td><code>pass</code></td></tr><tr><td><code>metadata-profiles</code></td><td>Step 7 — Resolve metadata profiles</td><td><code>pass</code> or <code>not_checked</code></td></tr><tr><td><code>graph-dependency-artifacts</code></td><td>Step 8 — Prevalidate dataset-manifest artifacts</td><td><code>pass</code> or <code>not_checked</code></td></tr><tr><td><code>artifact-profiles</code></td><td>Step 13 — Validate artifact profiles</td><td><code>pass</code> or <code>not_checked</code></td></tr></tbody></table>
-  </section>
-
-  <section aria-labelledby="permitted"><h2 id="permitted">Also permitted or required</h2>
-    <p>These three checks MAY be <code>not_checked</code> instead of <code>pass</code>. That exception exists because <a href="/spec/text/#151-decision-and-check-status-rules">Section 15.1</a> limits <code>not_checked</code> to optional, waived, or empty populations. Any other status fails the level.</p>
-  </section>
-
-  <section aria-labelledby="status"><h2 id="status">How statuses count</h2>
-    <ul>
-      <li>Levels are cumulative. A report that does not satisfy L1 has no level, even if later checks passed.</li>
-      <li><code>not_checked</code> is accepted only where a level explicitly allows it.</li>
-      <li><code>skipped</code>, <code>fail</code>, and <code>indeterminate</code> never satisfy a level.</li>
-    </ul>
-  </section>
-
-  <section aria-labelledby="limits"><h2 id="limits">What L2 does not establish</h2>
-    <p>L2 does not include an independent freshness anchor, so it is not the level a receiver needs before treating a handoff as current. That is the addition L3 makes.</p>
-    <p>No level asserts that a signer told the truth, that a transformation executed as described, or that evidence is unforgeable (<a href="/spec/text/#82-guarantees-makoto-does-not-establish-by-itself">Section 8.2</a>).</p>
-  </section>
-
-  <section aria-labelledby="require"><h2 id="require">Require this level</h2>
-    <p>The reference CLI reads a report written by <code>makoto verify bundle --json</code> and prints the level reached.</p>
-    <pre><code class="language-bash">makoto report level report.json --require L2</code></pre>
-    <table class="stack-table exit-table"><thead><tr><th scope="col">Exit code</th><th scope="col">Meaning</th></tr></thead><tbody>
-      <tr><td><code>0</code></td><td>No level was required, or the achieved level meets the requirement.</td></tr>
-      <tr><td><code>1</code></td><td>The achieved level does not meet the requirement.</td></tr>
-      <tr><td><code>2</code></td><td>The input is not a schema-valid verification report.</td></tr>
+  <section aria-labelledby="origin-l2"><h2 id="origin-l2">Origin L2 · Platform-authenticated capture</h2>
+    <table><tbody>
+      <tr><th>User benefit</th><td>A consumer can detect evidence added or changed after capture and can attribute the observation to a hosted capture platform rather than a person's workstation.</td></tr>
+      <tr><th>Producer evidence</th><td>Origin L1 evidence plus a SLSA VSA issued by the capture platform. Its <code>inputAttestations</code> include the exact origin envelope; its assessment policy requires automatic, contemporaneous provenance generation and a platform signing identity.</td></tr>
+      <tr><th>Receiver verification</th><td>Verify the VSA signature with a consumer-configured key; require the configured <code>verifier.id</code> and assessment-policy URI and digest; require <code>verificationResult: PASSED</code>, a subject matching the captured artifact, the exact origin-envelope digest in <code>inputAttestations</code>, and <code>MAKOTO_ORIGIN_LEVEL_2</code> or higher in <code>verifiedLevels</code>.</td></tr>
     </tbody></table>
-    <p>With <code>--json</code> the command writes one deterministic object with exactly <code>decision</code>, <code>level</code> (<code>"L1"</code>, <code>"L2"</code>, <code>"L3"</code>, or <code>null</code>), and <code>levels</code>: an array in L1, L2, L3 order whose entries have exactly <code>decisionRequired</code>, <code>level</code>, <code>satisfied</code>, <code>title</code>, and <code>unmetChecks</code>. Each <code>unmetChecks</code> entry is <code>{ "id", "status" }</code>, in canonical check order. When <code>--require</code> is supplied, the object also contains <code>required</code> and <code>meetsRequired</code>.</p>
+    <p><a href="/levels/#origin-l2">Origin L2 in the assurance model</a> · <a href="/spec/text/#84-origin-track">Specification section 8.4</a></p>
+  </section>
+
+  <section aria-labelledby="transform-l2"><h2 id="transform-l2">Transform L2 · Platform-authenticated execution</h2>
+    <table><tbody>
+      <tr><th>User benefit</th><td>A consumer can detect tampering after the run and attribute the provenance to a hosted pipeline rather than user-authored metadata.</td></tr>
+      <tr><th>Producer evidence</th><td>Transform L1 evidence plus a platform-issued SLSA VSA. Its assessment policy requires all steps to run on hosted infrastructure and the platform, not user-defined steps, to generate and sign provenance.</td></tr>
+      <tr><th>Receiver verification</th><td>Verify the VSA signature, configured verifier identity, assessment-policy digest, subjects, and every referenced transformation envelope; require <code>verificationResult: PASSED</code> and <code>MAKOTO_TRANSFORM_LEVEL_2</code> or higher. The receiver's trust input explicitly lists the platform or assessor key allowed to make this claim.</td></tr>
+    </tbody></table>
+    <p><a href="/levels/#transform-l2">Transform L2 in the assurance model</a> · <a href="/spec/text/#85-transform-track">Specification section 8.5</a></p>
+  </section>
+
+  <section aria-labelledby="identifiers"><h2 id="identifiers">Identifiers</h2>
+    <p>A verification summary names a track level with a stable identifier in <code>verifiedLevels</code>. A graph with no transformation has no Transform level and reports <code>MAKOTO_TRANSFORM_LEVEL_UNEVALUATED</code>, never a silent L1.</p>
+    <pre><code>MAKOTO_ORIGIN_LEVEL_2
+MAKOTO_TRANSFORM_LEVEL_2</code></pre>
+  </section>
+
+  <section aria-labelledby="limits"><h2 id="limits">What a level does not establish</h2>
+    <p>No track level is an allow or deny decision, and none establishes data-content correctness. Makoto cannot establish that a signer told the truth or that a source was correct (<a href="/spec/text/#82-what-makoto-does-not-cover">Section 8.2</a>). See <a href="/levels/#not-covered">what Makoto does not cover</a> and <a href="/levels/#correctness">the correctness handoff</a>.</p>
   </section>
 </main><footer class="footer"><div class="footer-inner"><p class="footer-line">Makoto specification · Source first · Append only · Receiver verified</p><nav class="footer-nav" aria-label="Site"><a href="/spec/">Specification</a><a href="/spec/schemas/">Hosted schemas</a><a href="/demos/end-to-end/">Runnable proof</a><a href="/examples/">Examples</a><a href="/community/">Community</a><a href="/privacy/">Privacy</a></nav><p class="footer-meta">Apache-2.0 · <a href="https://github.com/makoto-project/usemakoto.dev">Site source on GitHub</a></p></div></footer></div>
 </div>

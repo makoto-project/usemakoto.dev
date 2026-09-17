@@ -20,15 +20,15 @@
 
 <section aria-labelledby="catalogue">
 <h2 id="catalogue">The data supply-chain threat catalogue</h2>
-<p>Data pipelines face threats that software build pipelines do not: readings that were never taken, rows that changed after sign-off, lineage that skips the step that mattered, and content that passes every integrity check because it was bad when it was signed. The catalogue below names nine of them. Each entry lists the attack, the verifier check and diagnostic codes that answer it, the <a href="/levels/">assurance level</a> that stops it, what remains outside Makoto, and the casebook demo that runs it against real fixtures when one exists.</p>
+<p>Data pipelines face threats that software build pipelines do not: readings that were never taken, rows that changed after sign-off, lineage that skips the step that mattered, and content that passes every integrity check because it was bad when it was signed. The catalogue below names nine of them. Each entry lists the attack, the verifier check and diagnostic codes that answer it, the <a href="/levels/">track level or verified property</a> that addresses it (following the core <a href="https://github.com/makoto-project/makoto/blob/7044f803dc300cd3b7f8b24f40a0bb9d7151113f/spec/failure-mode-coverage.md">failure-mode coverage matrix</a>), what remains outside Makoto, and the casebook demo that runs it against real fixtures when one exists.</p>
 
 <h3 id="d1">D1 · Source impersonation</h3>
 <p>An attacker claims data originates from a trusted source when it does not: fake sensor readings, forged API responses, spoofed device identifiers.</p>
 <table><tbody>
 <tr><th>Verifier control</th><td>Origin statements are signed over exact source bytes. Receiver policy authorizes origin claims per key and per <code>sourceKinds</code> (and optionally exact <code>sourceUris</code>), so a key trusted for one source cannot vouch for another.</td></tr>
-<tr><th>Diagnostics</th><td><code>E_SIGNATURE_INVALID</code>, <code>E_SIGNER_UNAUTHORIZED</code></td></tr>
-<tr><th>Residual risk</th><td>An authorized collector can still sign a false claim. Makoto cannot establish that a signer told the truth or that the source was correct.</td></tr>
-<tr><th>Stopped at</th><td><a href="/levels/#l2">L2</a>. <code>authorization</code> requires an origin rule for the key and source.</td></tr>
+<tr><th>Diagnostics</th><td><code>E_SIGNATURE_INVALID</code>, <code>E_SIGNER_UNAUTHORIZED</code>, <code>E_ARTIFACT_DIGEST</code></td></tr>
+<tr><th>Residual risk</th><td>An authorized collector or platform can still lie. Makoto cannot establish physical truth, that a signer told the truth, or that the source was correct.</td></tr>
+<tr><th>Level / property</th><td><a href="/levels/#origin-l1">Origin L1</a> supplies the attributable claim; <a href="/levels/#origin-l2">Origin L2</a> authenticates the capture platform; <a href="/levels/#property-authorized"><code>MAKOTO_AUTHORIZED</code></a> evaluates receiver authority, which requires an origin rule for the key and source.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/06/">Case 06</a> denies an origin claim that no origin rule authorizes.</td></tr>
 </tbody></table>
 
@@ -36,9 +36,9 @@
 <p>Unauthorized modification of data in transit or at rest: a man-in-the-middle rewrite, storage compromise, or an injected row after sign-off.</p>
 <table><tbody>
 <tr><th>Verifier control</th><td>The receiver hashes the exact bytes it received and compares them with the signed subject digest. Partitioned datasets commit each entry digest and optional size through a dataset manifest.</td></tr>
-<tr><th>Diagnostics</th><td><code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_SIZE</code>, <code>E_ARTIFACT_MISSING</code></td></tr>
+<tr><th>Diagnostics</th><td><code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_SIZE</code>, <code>E_ARTIFACT_MISSING</code>, <code>E_INPUT_DIGEST</code></td></tr>
 <tr><th>Residual risk</th><td>A producer can sign bytes that were already bad. A historical artifact that is no longer available is reported <code>not_checked</code>, not verified.</td></tr>
-<tr><th>Stopped at</th><td><a href="/levels/#l2">L2</a>. <code>artifact-bytes</code> must pass.</td></tr>
+<tr><th>Level / property</th><td><a href="/levels/#origin-l1">Origin L1</a> or <a href="/levels/#transform-l1">Transform L1</a> plus base verification: <code>artifact-bytes</code> must pass. <a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a> supports descendant impact analysis.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/01/">Case 01</a> appends one byte after signing and denies with <code>E_ARTIFACT_DIGEST</code>.</td></tr>
 </tbody></table>
 
@@ -47,8 +47,8 @@
 <table><tbody>
 <tr><th>Verifier control</th><td>Every transformation input binds the predecessor statement digest, predecessor subject name, and input artifact digest. The graph must reach declared origins without cycles, and the signed handoff commits to the exact statement, root, and head sets.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_PREDECESSOR_MISSING</code>, <code>E_PREDECESSOR_SUBJECT</code>, <code>E_INPUT_DIGEST</code>, <code>E_GRAPH_CYCLE</code>, <code>E_ROOT_INVALID</code>, <code>E_MANIFEST_SET</code>; an edited binding without a new signature fails <code>E_SIGNATURE_INVALID</code></td></tr>
-<tr><th>Residual risk</th><td>A compromised authorized key can sign an alternate graph that is internally consistent. Makoto records claims about transformations; it does not prove a described transformation executed.</td></tr>
-<tr><th>Stopped at</th><td><a href="/levels/#l2">L2 for a missing or re-pointed step; L1 when the edit breaks a signature</a>. <code>graph</code> and <code>completeness-anchor</code> must pass.</td></tr>
+<tr><th>Residual risk</th><td>A compromised authorized producer can sign a different, internally consistent graph. Transform L2 and L3 reduce but cannot eliminate that risk. Without a trusted Transform-track assessment, Makoto does not prove a described transformation executed.</td></tr>
+<tr><th>Level / property</th><td><a href="/levels/#transform-l1">Transform L1</a>; <a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a>. <code>graph</code>, <code>roots-and-heads</code>, and <code>completeness-anchor</code> must pass; an edit that breaks a signature already fails <code>signatures</code>.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/02/">Case 02</a> removes the origin statement and rewires the final step.</td></tr>
 </tbody></table>
 
@@ -58,7 +58,7 @@
 <tr><th>Verifier control</th><td><code>occurredAt</code> and <code>issuedAt</code> are signer-asserted claims, not trusted time. Freshness comes from receiver-held anchors: an expected manifest, head set, or final-artifact set; a consumer nonce; or a <code>maxAgeSeconds</code> bound at a consumer-controlled evaluation time. Key <code>validFrom</code> and <code>validUntil</code> are evaluated against that evaluation time, never the signed event time, so backdating cannot restore authorization.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_EXPECTED_MANIFEST</code>, <code>E_EXPECTED_HEAD</code>, <code>E_EXPECTED_ARTIFACT</code>, <code>E_HANDOFF_NONCE</code>, <code>E_HANDOFF_STALE</code>, <code>E_FRESHNESS_REQUIRED</code></td></tr>
 <tr><th>Residual risk</th><td>No timestamp is proven to come from a trusted clock. Transparency logs are out of scope, so rollback resistance is only as strong as the channel that delivered the expected values.</td></tr>
-<tr><th>Stopped at</th><td><a href="/levels/#l3">L3</a>. <code>freshness-anchors</code> must pass and the decision must be <code>allow</code>.</td></tr>
+<tr><th>Level / property</th><td>Base verification; <a href="/levels/#property-freshness-anchored"><code>MAKOTO_FRESHNESS_ANCHORED</code></a>. <code>freshness-anchors</code> must pass with at least one anchor method passing. The same anchors reject 800-day-old records and enforce a three-hour expiry SLO.</td></tr>
 <tr><th>Runnable proof</th><td>No replay denial is checked in yet. Every casebook gate pins the expected manifest and head, which is the anchor this threat requires.</td></tr>
 </tbody></table>
 
@@ -67,8 +67,8 @@
 <table><tbody>
 <tr><th>Verifier control</th><td>Authenticity and authorization are separate checks. A statement must satisfy a receiver rule that lists its key for that predicate type, source, or operation, with a minimum signature threshold. Handoff signers are authorized separately.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_SIGNER_UNAUTHORIZED</code></td></tr>
-<tr><th>Residual risk</th><td>A stolen key that the policy still authorizes passes. Revocation is a local policy edit; public revocation infrastructure is out of scope.</td></tr>
-<tr><th>Stopped at</th><td><a href="/levels/#l2">L2</a>. <code>authorization-thresholds</code> and <code>authorization</code> must pass.</td></tr>
+<tr><th>Residual risk</th><td>A stolen key that the policy still authorizes passes. Revocation and identity lifecycle remain external: revocation is a local policy edit, and public revocation infrastructure is out of scope.</td></tr>
+<tr><th>Level / property</th><td><a href="/levels/#origin-l2">Origin L2</a> or <a href="/levels/#transform-l2">Transform L2</a> identifies the platform; <a href="/levels/#property-authorized"><code>MAKOTO_AUTHORIZED</code></a> decides authority: <code>authorization-thresholds</code> and <code>authorization</code> must pass.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/03/">Case 03</a> denies a byte-identical claim signed by a known but unauthorized key.</td></tr>
 </tbody></table>
 
@@ -78,7 +78,7 @@
 <tr><th>Verifier control</th><td>DSSE signatures cover the exact payload bytes. The verifier recomputes every statement digest from decoded payload bytes before trusting the bundle index, and parses JSON strictly.</td></tr>
 <tr><th>Diagnostics</th><td><code>E_SIGNATURE_INVALID</code>, <code>E_STATEMENT_DIGEST</code>, <code>E_ENVELOPE_MALFORMED</code>, <code>E_PAYLOAD_TYPE</code>, <code>E_JSON_DUPLICATE_KEY</code>, <code>E_JSON_INVALID</code></td></tr>
 <tr><th>Residual risk</th><td>Key custody is a deployment responsibility. A signer with the key can produce a new, valid forgery, which is why authorization and anchors still matter.</td></tr>
-<tr><th>Stopped at</th><td><a href="/levels/#l1">L1</a>. <code>signatures</code> and <code>index-payloads</code> must pass.</td></tr>
+<tr><th>Level / property</th><td><a href="/levels/#origin-l2">Origin L2</a> or <a href="/levels/#transform-l2">Transform L2</a>; base verification: <code>signatures</code> and <code>index-payloads</code> must pass.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/04/">Case 04</a> edits a signed record two ways and denies both.</td></tr>
 </tbody></table>
 
@@ -86,9 +86,9 @@
 <p>Sensitive information leaks through attestations, reports, or the data itself: source locators that reveal internal systems, extension fields with personal data, correlation across handoffs, or direct identifiers reintroduced into a public dataset.</p>
 <table><tbody>
 <tr><th>Verifier control</th><td>Source locators are optional and extension payloads are organization-controlled. Private profiles are exchanged separately and resolved from the receiver's local catalog with no network retrieval. A required artifact profile can reject identifiers in structured data.</td></tr>
-<tr><th>Diagnostics</th><td><code>E_PROFILE_INVALID</code> for content; metadata minimization has no diagnostic and is a producer obligation</td></tr>
-<tr><th>Residual risk</th><td>Provenance does not make data confidential. Reports can contain recipient and nonce values and must be handled as sensitive evidence.</td></tr>
-<tr><th>Stopped at</th><td><a href="/levels/#l2">L2 for content rules</a>. Required <code>artifact-profiles</code> must pass; metadata minimization sits outside every level.</td></tr>
+<tr><th>Diagnostics</th><td><code>E_PROFILE_INVALID</code>, <code>E_REQUIRED_PROFILE_MISSING</code>, <code>E_ARTIFACT_FORMAT</code> for content; metadata minimization has no diagnostic and is a producer obligation</td></tr>
+<tr><th>Residual risk</th><td>Provenance is not encryption and does not make data confidential. Metadata minimization, retention, legal basis, and report handling remain producer and consumer duties; reports can contain recipient and nonce values and must be handled as sensitive evidence.</td></tr>
+<tr><th>Level / property</th><td><a href="/levels/#origin-l3">Origin L3</a> may enforce collection minimization; <a href="/levels/#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a> requires the digest-pinned artifact profile, so required <code>artifact-profiles</code> must pass.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/05/">Case 05</a> denies a validly signed dataset that reintroduced email addresses. See <a href="/privacy/">privacy techniques</a>.</td></tr>
 </tbody></table>
 
@@ -96,9 +96,9 @@
 <p>Malicious events are inserted into high-throughput streams: spoofed events, manipulated sequences, polluted windows.</p>
 <table><tbody>
 <tr><th>Verifier control</th><td>The reference implementation covers finite artifacts. A dataset manifest commits to an exact, sorted set of partition digests, and finite newline-delimited JSON can be validated against a profile under strict line and size bounds.</td></tr>
-<tr><th>Diagnostics</th><td><code>E_DATASET_MANIFEST_INVALID</code>, <code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_SIZE</code>, <code>E_RESOURCE_LIMIT</code></td></tr>
+<tr><th>Diagnostics</th><td><code>E_DATASET_MANIFEST_INVALID</code>, <code>E_DATASET_MANIFEST_REQUIRED</code>, <code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_SIZE</code>, <code>E_RESOURCE_LIMIT</code></td></tr>
 <tr><th>Residual risk</th><td>A production streaming or windowing protocol is not part of the current release. A dataset manifest proves the producer's committed partition set, not that a storage prefix contains no other objects.</td></tr>
-<tr><th>Stopped at</th><td><a href="/levels/#l2">L2 for committed partitions</a>. <code>artifact-bytes</code> covers supplied partition bytes; no level covers live streams.</td></tr>
+<tr><th>Level / property</th><td>No live-stream level exists. <a href="/levels/#transform-l1">Transform L1</a> applies only after a finite partition is committed; base verification checks committed partitions, and <code>artifact-bytes</code> covers supplied partition bytes.</td></tr>
 <tr><th>Runnable proof</th><td>None yet. This is an open area for <a href="/community/">community fixtures</a>.</td></tr>
 </tbody></table>
 
@@ -106,27 +106,51 @@
 <p>Content is materially present in artifact bytes but absent, misleading, or hard to notice in common rendered views: invisible variation selectors encoding hidden instructions, zero-width characters, bidirectional control abuse. This is not tampering or lineage falsification. It is a divergence between what humans review and what machines ingest.</p>
 <table><tbody>
 <tr><th>Verifier control</th><td>A render-safety scan travels as an extension of the signed claim, and a digest-pinned receiver profile requires a passing verdict. The reference producer refuses to attach a profile the claim does not satisfy, and a receiver rule with a profile constraint authorizes nothing without it.</td></tr>
-<tr><th>Diagnostics</th><td><code>E_SIGNER_UNAUTHORIZED</code> when no rule's profile constraint is met; <code>E_PROFILE_INVALID</code> when a present profile fails</td></tr>
+<tr><th>Diagnostics</th><td><code>E_SIGNER_UNAUTHORIZED</code> when no rule's profile constraint is met; <code>E_PROFILE_INVALID</code> when a present profile fails; <code>E_REQUIRED_PROFILE_MISSING</code> when a required profile is absent</td></tr>
 <tr><th>Residual risk</th><td>The guarantee is only as good as the scanner and the profile. Content validation is normative for JSON artifacts; other formats need adapters.</td></tr>
-<tr><th>Stopped at</th><td><a href="/levels/#l2">L2</a>. A rule with a render-safety profile constraint must authorize the claim.</td></tr>
+<tr><th>Level / property</th><td><a href="/levels/#origin-l3">Origin L3</a> can enforce a render-safety control; <a href="/levels/#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a> and <a href="/levels/#property-authorized"><code>MAKOTO_AUTHORIZED</code></a>. A rule with a render-safety profile constraint must authorize the claim.</td></tr>
 <tr><th>Runnable proof</th><td><a href="/demos/06/">Case 06</a> denies a source file carrying 128 hidden variation selectors. See the <a href="/examples/invisible-unicode/">invisible Unicode example</a>.</td></tr>
 </tbody></table>
 </section>
 
 <section aria-labelledby="matrix">
 <h2 id="matrix">Threat matrix</h2>
-<p>Severity is editorial: how much damage a successful attack does before anyone notices. The check column is the report check that fails first, and the level column is the lowest <a href="/levels/">assurance level</a> a receiver must require to stop it.</p>
-<table class="wide-table"><caption>On narrow screens, scroll right to see the verifier check and proof.</caption><thead><tr><th>ID</th><th>Threat</th><th>Severity</th><th>Attack vector</th><th>Failing check</th><th>Stopped at</th><th>Proof</th></tr></thead><tbody>
-<tr><td>D1</td><td>Source impersonation</td><td>Critical</td><td>Spoofed source identifiers, unauthorized collector keys</td><td><code>authorization-thresholds</code></td><td>L2</td><td><a href="/demos/06/">Case 06</a></td></tr>
-<tr><td>D2</td><td>Data tampering</td><td>Critical</td><td>Man-in-the-middle, storage compromise, injection</td><td><code>artifact-bytes</code></td><td>L2</td><td><a href="/demos/01/">Case 01</a></td></tr>
-<tr><td>D3</td><td>Lineage falsification</td><td>High</td><td>Removed or rewired steps, fabricated chains</td><td><code>graph</code>, <code>signatures</code></td><td>L2 (L1 if re-signing fails)</td><td><a href="/demos/02/">Case 02</a></td></tr>
-<tr><td>D4</td><td>Timestamp manipulation and replay</td><td>High</td><td>Backdated claims, replayed handoffs</td><td><code>freshness-anchors</code></td><td>L3</td><td>Not yet</td></tr>
-<tr><td>D5</td><td>Unauthorized attribution</td><td>High</td><td>Key theft, known key outside its role</td><td><code>authorization-thresholds</code></td><td>L2</td><td><a href="/demos/03/">Case 03</a></td></tr>
-<tr><td>D6</td><td>Attestation forgery</td><td>Critical</td><td>Edited payloads, substituted envelopes</td><td><code>signatures</code>, <code>index-payloads</code></td><td>L1</td><td><a href="/demos/04/">Case 04</a></td></tr>
-<tr><td>D7</td><td>Privacy violation</td><td>Medium</td><td>Metadata over-sharing, reintroduced identifiers</td><td><code>artifact-profiles</code></td><td>L2</td><td><a href="/demos/05/">Case 05</a></td></tr>
-<tr><td>D8</td><td>Stream injection</td><td>High</td><td>Event spoofing, window manipulation</td><td><code>artifact-bytes</code> for committed partitions</td><td>L2</td><td>Not yet</td></tr>
-<tr><td>D9</td><td>Display-layer obfuscation</td><td>High</td><td>Invisible Unicode, variation selectors, bidirectional controls</td><td><code>authorization-thresholds</code></td><td>L2</td><td><a href="/demos/06/">Case 06</a></td></tr>
+<p>Severity is editorial: how much damage a successful attack does before anyone notices. The check column is the report check that fails first. The last two columns name the first useful producer <a href="/levels/">track level</a> and the receiver property that applies; “base” means ordinary verification handles it without a property.</p>
+<table class="wide-table"><caption>On narrow screens, scroll right to see the verifier check and proof.</caption><thead><tr><th>ID</th><th>Threat</th><th>Severity</th><th>Attack vector</th><th>Failing check</th><th>Track level</th><th>Receiver property</th><th>Proof</th></tr></thead><tbody>
+<tr><td>D1</td><td>Source impersonation</td><td>Critical</td><td>Spoofed source identifiers, unauthorized collector keys</td><td><code>authorization-thresholds</code></td><td>Origin L1, L2</td><td><code>MAKOTO_AUTHORIZED</code></td><td><a href="/demos/06/">Case 06</a></td></tr>
+<tr><td>D2</td><td>Data tampering</td><td>Critical</td><td>Man-in-the-middle, storage compromise, injection</td><td><code>artifact-bytes</code></td><td>Origin or Transform L1</td><td>Base; <code>MAKOTO_GRAPH_COMPLETE</code></td><td><a href="/demos/01/">Case 01</a></td></tr>
+<tr><td>D3</td><td>Lineage falsification</td><td>High</td><td>Removed or rewired steps, fabricated chains</td><td><code>graph</code>, <code>signatures</code></td><td>Transform L1</td><td><code>MAKOTO_GRAPH_COMPLETE</code></td><td><a href="/demos/02/">Case 02</a></td></tr>
+<tr><td>D4</td><td>Timestamp manipulation and replay</td><td>High</td><td>Backdated claims, replayed handoffs</td><td><code>freshness-anchors</code></td><td>None required</td><td><code>MAKOTO_FRESHNESS_ANCHORED</code></td><td>Not yet</td></tr>
+<tr><td>D5</td><td>Unauthorized attribution</td><td>High</td><td>Key theft, known key outside its role</td><td><code>authorization-thresholds</code></td><td>Origin or Transform L2</td><td><code>MAKOTO_AUTHORIZED</code></td><td><a href="/demos/03/">Case 03</a></td></tr>
+<tr><td>D6</td><td>Attestation forgery</td><td>Critical</td><td>Edited payloads, substituted envelopes</td><td><code>signatures</code>, <code>index-payloads</code></td><td>Origin or Transform L2</td><td>Base</td><td><a href="/demos/04/">Case 04</a></td></tr>
+<tr><td>D7</td><td>Privacy violation</td><td>Medium</td><td>Metadata over-sharing, reintroduced identifiers</td><td><code>artifact-profiles</code></td><td>Origin L3</td><td><code>MAKOTO_SCHEMA_CONFORMANT</code></td><td><a href="/demos/05/">Case 05</a></td></tr>
+<tr><td>D8</td><td>Stream injection</td><td>High</td><td>Event spoofing, window manipulation</td><td><code>artifact-bytes</code> for committed partitions</td><td>Transform L1, committed partitions only</td><td>Base</td><td>Not yet</td></tr>
+<tr><td>D9</td><td>Display-layer obfuscation</td><td>High</td><td>Invisible Unicode, variation selectors, bidirectional controls</td><td><code>authorization-thresholds</code></td><td>Origin L3</td><td><code>MAKOTO_SCHEMA_CONFORMANT</code>, <code>MAKOTO_AUTHORIZED</code></td><td><a href="/demos/06/">Case 06</a></td></tr>
 </tbody></table>
+</section>
+
+<section aria-labelledby="beyond">
+<h2 id="beyond">Beyond D1–D9: the rest of the catalogue</h2>
+<p>The core coverage matrix also maps the failure modes the site's <a href="/why-lineage/">lineage page</a>, <a href="/demos/">casebook</a>, and public talks describe. Each row names the first useful producer level and receiver property, the deterministic diagnostics, and what stays outside Makoto.</p>
+<table><thead><tr><th>Failure mode</th><th>Level / property</th><th>Diagnostics</th><th>Residual risk or boundary</th></tr></thead><tbody>
+<tr><td><strong>Branch omission</strong> An inconvenient but valid branch is left out of the presented history.</td><td><a href="/levels/#transform-l1">Transform L1</a>; <a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a></td><td><code>E_MANIFEST_SET</code>; selection mismatches use <code>E_EXPECTED_HEAD</code> or <code>E_EXPECTED_MANIFEST</code></td><td>The producer-declared set can omit an event the receiver never independently expected.</td></tr>
+<tr><td><strong>Missing or null approval</strong> The author is unauthorized or an approver is absent.</td><td><a href="/levels/#origin-l3">Origin L3</a> or <a href="/levels/#transform-l2">Transform L2</a>; <a href="/levels/#property-authorized"><code>MAKOTO_AUTHORIZED</code></a> and <a href="/levels/#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a></td><td><code>E_SIGNER_UNAUTHORIZED</code>, <code>E_PROFILE_INVALID</code>, <code>E_REQUIRED_PROFILE_MISSING</code></td><td>Makoto verifies that approval evidence satisfies policy, not that the approver made a good decision.</td></tr>
+<tr><td><strong>Profile substitution</strong> A familiar schema URI resolves to weaker bytes or omits transitive references.</td><td>Base; <a href="/levels/#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a></td><td><code>E_PROFILE_UNRESOLVED</code>, <code>E_PROFILE_INVALID</code>, <code>E_REQUIRED_PROFILE_MISSING</code>, <code>E_CATALOG_INVALID</code></td><td>Consumer policy must require the intended profile and protect its catalog.</td></tr>
+<tr><td><strong>Resource exhaustion</strong> A hostile bundle, graph, JSON, schema closure, regex, or report size.</td><td>Base, independent of track</td><td><code>E_RESOURCE_LIMIT</code>; bounded optional work may warn with <code>W_PROFILE_RESOURCE_LIMIT</code> or <code>W_ARTIFACT_VALIDATION_LIMIT</code></td><td>Limits are implementation security controls, not proof that all denial of service is impossible.</td></tr>
+<tr><td><strong>Content hazard</strong> A poisoned label or biased or wrong data present before signing, including SQL-like payloads, NaN values, or physically impossible readings.</td><td><a href="/levels/#origin-l3">Origin L3</a> can require declared scans; <a href="/levels/#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a> checks only expressible policy</td><td><code>E_PROFILE_INVALID</code> or <code>E_REQUIRED_PROFILE_MISSING</code> for declared rules</td><td><strong>Content correctness, quality, safety, bias, and malicious-but-authorized inputs are out of scope.</strong> Passing integrity and schema checks is not a correctness claim.</td></tr>
+<tr><td><strong>Scientific reproducibility gap</strong> The raw version, outlier rule, tool, parameters, or intermediate evidence is missing.</td><td><a href="/levels/#transform-l1">Transform L1</a> preserves the method trace; <a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a>; <a href="/levels/#property-reproduced"><code>MAKOTO_REPRODUCED</code></a> only after an independent repeat</td><td><code>E_PREDECESSOR_MISSING</code>, <code>E_INPUT_DIGEST</code>, <code>E_ARTIFACT_MISSING</code>, <code>E_MANIFEST_SET</code>; a failed repeat emits <code>E_PROPERTY_REPRODUCED</code></td><td>Makoto cannot reconstruct evidence that was never captured or prove instrument calibration. Reproduction can faithfully repeat a wrong method.</td></tr>
+<tr><td><strong>CI job or dataset release treated as proof</strong> A green job or valid signature is mistaken for authorized provenance.</td><td><a href="/levels/#transform-l2">Transform L2</a> requires the hosted platform itself to generate and sign provenance; <a href="/levels/#property-authorized"><code>MAKOTO_AUTHORIZED</code></a></td><td><code>E_SIGNER_UNAUTHORIZED</code>; changed bytes use <code>E_ARTIFACT_DIGEST</code></td><td>CI is a trigger, not automatically the attester; compromised platform authority remains a trust risk.</td></tr>
+<tr><td><strong>Configuration postmortem gap</strong> Who, what, and when exist, but exact configuration or affected outputs are not bound.</td><td><a href="/levels/#transform-l1">Transform L1</a>; <a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a></td><td><code>E_INPUT_DIGEST</code>, <code>E_PREDECESSOR_MISSING</code>, <code>E_ARTIFACT_MISSING</code>, <code>E_SIGNATURE_INVALID</code></td><td>Human intent, the wisdom of the change, alerting, and root-cause judgment remain external.</td></tr>
+<tr><td><strong>Schema drift or missing IDs</strong> A source ID, ingestion timestamp, or run ID is missing.</td><td><a href="/levels/#origin-l3">Origin L3</a> or <a href="/levels/#transform-l1">Transform L1</a>; <a href="/levels/#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a></td><td><code>E_PROFILE_INVALID</code>, <code>E_REQUIRED_PROFILE_MISSING</code></td><td>A syntactically present ID or timestamp can still be false. These fields remain use-case profiles, not universal core requirements.</td></tr>
+<tr><td><strong>Wrong chatbot answer</strong> The assistant quotes a 365-day policy when the real policy is 30 days.</td><td>Origin and Transform tracks preserve provenance; <a href="/levels/#property-freshness-anchored"><code>MAKOTO_FRESHNESS_ANCHORED</code></a>, <a href="/levels/#property-authorized"><code>MAKOTO_AUTHORIZED</code></a>, and <a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a> identify stale or untrusted inputs</td><td>Missing lineage: <code>E_PREDECESSOR_MISSING</code>, <code>E_INPUT_DIGEST</code>, <code>E_MANIFEST_SET</code>. Stale or unexpected: <code>E_HANDOFF_STALE</code>, <code>E_EXPECTED_MANIFEST</code>, <code>E_EXPECTED_HEAD</code>, <code>E_EXPECTED_ARTIFACT</code>. Unauthorized: <code>E_SIGNER_UNAUTHORIZED</code></td><td>Makoto cannot decide which policy text is substantively correct or whether the model interpreted it correctly. A downstream correctness evaluator must make that judgment.</td></tr>
+<tr><td><strong>Inference or post-training lineage breaks from the training anchor</strong> Outputs can no longer be traced to the model and data that produced them.</td><td><a href="/levels/#transform-l1">Transform L1</a>; <a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a></td><td><code>E_PREDECESSOR_MISSING</code>, <code>E_PREDECESSOR_SUBJECT</code>, <code>E_INPUT_DIGEST</code>, <code>E_MANIFEST_SET</code></td><td>Runtime nondeterminism and model semantic behavior require separate evidence; sensitive prompts may need privacy-preserving references.</td></tr>
+<tr><td><strong>Copies lose blast-radius evidence</strong> Object storage, warehouse marts, a feature store, backups, vendor SaaS, or an old notebook hold untraced copies.</td><td><a href="/levels/#transform-l1">Transform L1</a>; <a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a></td><td><code>E_PREDECESSOR_MISSING</code>, <code>E_INPUT_DIGEST</code>, <code>E_MANIFEST_SET</code>; a copy never presented to Makoto has no diagnostic</td><td>Copies made outside the evidence graph are invisible. Makoto is not a universal discovery system.</td></tr>
+<tr><td><strong>Deletion or retention policy lost downstream</strong> A retention rule does not travel with the copies.</td><td><a href="/levels/#origin-l3">Origin L3</a> may require a retention or SLO profile; <a href="/levels/#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a> carries it through declared handoffs</td><td><code>E_REQUIRED_PROFILE_MISSING</code>, <code>E_PROFILE_INVALID</code></td><td>Makoto records obligations and custody; it cannot delete unknown copies or prove a storage system honored deletion.</td></tr>
+<tr><td><strong>The exact bytes that trained a model are unknown</strong> A table name or path stands in for the training input.</td><td><a href="/levels/#origin-l1">Origin L1</a> plus <a href="/levels/#transform-l1">Transform L1</a>; <a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a></td><td><code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_MISSING</code>, <code>E_INPUT_DIGEST</code>, <code>E_PREDECESSOR_MISSING</code>, <code>E_MANIFEST_SET</code></td><td>A digest identifies bytes, not whether the data was representative, licensed, or correct.</td></tr>
+<tr><td><strong>Custody or downstream policy is ambiguous</strong> Who made, approved, or may use each copy is unclear.</td><td><a href="/levels/#origin-l3">Origin L3</a> for capture controls and <a href="/levels/#transform-l2">Transform L2</a> for platform identity; <a href="/levels/#property-authorized"><code>MAKOTO_AUTHORIZED</code></a> and <a href="/levels/#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a></td><td><code>E_SIGNER_UNAUTHORIZED</code>, <code>E_PROFILE_INVALID</code>, <code>E_REQUIRED_PROFILE_MISSING</code></td><td>Organizational responsibility and legal accountability are broader than cryptographic identity.</td></tr>
+<tr><td><strong>A step silently changes the dataset</strong> Normalization, filtering, enrichment, redaction, or newline conversion changes bytes.</td><td><a href="/levels/#transform-l1">Transform L1</a>; <a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a>; base artifact checks</td><td><code>E_ARTIFACT_DIGEST</code>, <code>E_INPUT_DIGEST</code>, <code>E_MANIFEST_SET</code></td><td>Makoto shows that bytes changed and under which claim; it does not decide whether the change preserved intended meaning.</td></tr>
+</tbody></table>
+<p class="callout"><strong>The correctness boundary.</strong> Makoto will never certify data-content correctness. A downstream process can consume Makoto's exact origin, operation, signer, graph, profile, and artifact identities, run its own tests, review, or evaluation, and bind that result to the same digests in a separate attestation. See <a href="/levels/#correctness">handing off to a correctness process</a>.</p>
 </section>
 
 <section aria-labelledby="surface">
@@ -174,18 +198,18 @@
 <li><strong>Same envelope.</strong> Makoto statements are in-toto Statements carried in DSSE envelopes.</li>
 <li><strong>Tamper-evident.</strong> Exact-byte SHA-256 digests make modification detectable.</li>
 <li><strong>Receiver-owned policy.</strong> Makoto's receiver decides which keys may make which claims; the bundle never declares itself trusted.</li>
-<li><strong>Progressive levels.</strong> Both name cumulative levels. Makoto defines <a href="/levels/">L1 authentic, L2 authorized and complete, and L3 anchored</a> as fixed sets of report checks, so a denied handoff still shows exactly which check stopped it. See the <a href="/comparison/">comparisons</a>.</li>
+<li><strong>Tracks and verified properties.</strong> Both separate producer tracks with cumulative levels from receiver results carried in a Verification Summary Attestation. Makoto has <a href="/levels/#origin">Origin</a> and <a href="/levels/#transform">Transform</a> tracks, and a denied handoff still shows exactly which check stopped it. See the <a href="/comparison/">comparisons</a>.</li>
 </ul>
 </section>
 
 <section aria-labelledby="depth">
 <h2 id="depth">Defense in depth</h2>
 <ol class="provenance-spine">
-<li><strong>Detection (L1, L2)</strong><span>Exact-byte digests expose any change to statement payloads at L1 and to received artifacts at L2.</span></li>
-<li><strong>Authentication (L1)</strong><span>DSSE signatures bind each statement and handoff to a key.</span></li>
-<li><strong>Authorization (L2)</strong><span>Receiver policy limits each key to the sources, operations, profiles, and handoffs it may sign.</span></li>
-<li><strong>Completeness and freshness (L2, L3)</strong><span>A signed handoff defeats omission at L2; an independent anchor defeats replay at L3.</span></li>
-<li><strong>Content policy (L2)</strong><span>Digest-pinned private profiles reject unchanged bytes that were never acceptable.</span></li>
+<li><strong>Detection (Origin and Transform L1)</strong><span>Exact-byte digests expose any change to statement payloads and to received artifacts.</span></li>
+<li><strong>Authentication (L2 platforms)</strong><span>DSSE signatures bind each statement and handoff to a key; at L2 that key belongs to a hosted platform, not a person.</span></li>
+<li><strong>Authorization (<code>MAKOTO_AUTHORIZED</code>)</strong><span>Receiver policy limits each key to the sources, operations, profiles, and handoffs it may sign.</span></li>
+<li><strong>Completeness and freshness (<code>MAKOTO_GRAPH_COMPLETE</code>, <code>MAKOTO_FRESHNESS_ANCHORED</code>)</strong><span>A signed handoff defeats omission; an independent anchor defeats replay.</span></li>
+<li><strong>Content policy (<code>MAKOTO_SCHEMA_CONFORMANT</code>, Origin L3)</strong><span>Digest-pinned private profiles reject unchanged bytes that were never acceptable, and Origin L3 enforces them at capture.</span></li>
 <li><strong>Privacy</strong><span>Minimized metadata and separately exchanged profiles limit what evidence discloses.</span></li>
 </ol>
 </section>

@@ -67,8 +67,8 @@ CANONICAL_PRESENTATION_PAGES = (
 )
 # Superseded-format pages. They stay reachable and labelled (sections 17 and 21),
 # so the retired version string is expected here and its absence is the error.
-# The L1-L3 pages are not in this set: they document the current Section 8.3
-# assurance levels.
+# The L1-L3 pages are not in this set: they explain the current Section 8.3
+# Origin and Transform track levels.
 SUPERSEDED_FORMAT_PAGES = ("spec/signature-guide.html",)
 LEVEL_PAGES = (
     "spec/l1-requirements.html",
@@ -137,8 +137,8 @@ CURRENT_INTEGRATION_PAGES = tuple(
     )
 )
 CURRENT_SHELL_PAGES += CURRENT_INTEGRATION_PAGES
-# Retired numeric-level constructs. These must not match the current string
-# levels "L1"-"L3" defined by Section 8.3.
+# Retired numeric-level constructs. These must not match the current track
+# levels ("Origin L2", MAKOTO_TRANSFORM_LEVEL_3) defined by Section 8.3.
 STALE_LEVEL_PATTERNS = (
     ("makoto.level", r"\bmakoto\.level\b"),
     # Tags and quotes may sit between the name and the number in highlighted markup.

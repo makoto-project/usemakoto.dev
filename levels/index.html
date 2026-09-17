@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Makoto assurance is built from independently testable evidence checks, not one security badge."><title>Assurance model — Makoto</title>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Makoto assurance follows SLSA: Origin and Transform tracks with three levels each for producers, and verified properties for receivers. Neither is a correctness score."><title>Assurance model — Makoto</title>
   <link rel="canonical" href="https://usemakoto.dev/levels/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Makoto">
   <meta property="og:title" content="Assurance model — Makoto">
-  <meta property="og:description" content="Makoto assurance is built from independently testable evidence checks, not one security badge.">
+  <meta property="og:description" content="Makoto assurance follows SLSA: Origin and Transform tracks with three levels each for producers, and verified properties for receivers. Neither is a correctness score.">
   <meta property="og:url" content="https://usemakoto.dev/levels/">
   <meta property="og:image" content="https://usemakoto.dev/assets/og-card.png">
   <meta property="og:image:width" content="1200">
@@ -13,106 +13,255 @@
   <meta property="og:image:alt" content="Makoto: know where data began, what changed, and who attested to it. A receiver&#x27;s verification run refuses a handoff whose final bytes changed after signing.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Assurance model — Makoto">
-  <meta name="twitter:description" content="Makoto assurance is built from independently testable evidence checks, not one security badge.">
+  <meta name="twitter:description" content="Makoto assurance follows SLSA: Origin and Transform tracks with three levels each for producers, and verified properties for receivers. Neither is a correctness score.">
   <meta name="twitter:image" content="https://usemakoto.dev/assets/og-card.png"><link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script></head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/levels/" aria-current="page">Assurance model</a><a href="/threats/">Threat model</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
 <div class="site-shell"><aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/levels/" aria-current="page">Assurance model</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/verify/">Verification</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integration patterns</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
 <div class="site-main"><main id="main" class="page wide">
-<span class="kicker">Assurance levels</span><h1>Three levels. Each one is a set of checks you can inspect.</h1><p class="lead">Like SLSA, Makoto names progressive levels so a receiver can say “L2 or higher” in one phrase. Unlike a badge, every level is a fixed set of verification-report checks: when a handoff falls short, the report names exactly which check stopped it.</p>
+<span class="kicker">Assurance model</span><h1>Two tracks for how evidence was made. Five properties for what a receiver verified.</h1><p class="lead">Like SLSA, Makoto separates producer controls from receiver results. The <strong>Origin</strong> and <strong>Transform</strong> tracks each have three cumulative levels that a producer adopts one step at a time. A receiver's results are separate <strong>verified properties</strong>, carried in a standard SLSA Verification Summary Attestation. None of them is a correctness score.</p>
 
-<p class="callout"><strong>Key principle.</strong> Start at L1 and climb as the decision demands it. Each level is useful on its own, and each includes everything below it. A level is always relative to the receiver's own policy, schema catalog, and expectations.</p>
-<p class="editorial-note"><strong>Status.</strong> The level definitions and the <code>makoto report level</code> command are proposed in <a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a> and are not yet in the pinned core release. The verification checks they read are already in that release.</p>
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#code-summarize">Summarize a verification</a> below.</figcaption><pre><code class="language-bash">makoto vsa summarize \
+  --report report.json \
+  --attestations bundle/attestations \
+  --policy receiver/policy.json \
+  --verifier-id https://verifier.example/makoto \
+  --key keys/verifier.private.pem \
+  --evaluation-out summary-evaluation.json \
+  --out summary.vsa.dsse.json</code></pre></figure>
+
+<p class="callout"><strong>Key principle.</strong> A track level says how origin or transformation evidence was produced. A verified property says what a verifier established for one handoff. A diagnostic says exactly why an attempted verification failed. Keep all three apart, and never read any of them as a claim that the data is correct.</p>
 
 <section aria-labelledby="glance">
-<h2 id="glance">Levels at a glance</h2>
-<table class="wide-table"><caption>On narrow screens, scroll right to compare what each level adds.</caption><thead><tr><th>Level</th><th>Name</th><th>What it establishes</th><th>What the receiver still trusts</th></tr></thead><tbody>
-<tr><td><a href="#l1">L1</a></td><td>Provenance is authentic</td><td>Well-formed statements whose exact bytes were signed by configured keys.</td><td>That those keys were allowed to make those claims, and that nothing was left out.</td></tr>
-<tr><td><a href="#l2">L2</a></td><td>Provenance is authorized and complete</td><td>L1, plus authorized signers, a continuous graph to declared origins, an authorized handoff whose exact sets match, required profiles, and received bytes that match.</td><td>That this is the handoff it should be receiving now, not an older valid one.</td></tr>
-<tr><td><a href="#l3">L3</a></td><td>Provenance is anchored</td><td>L2, plus an independent freshness anchor and an <code>allow</code> decision.</td><td>That authorized signers told the truth, and that their keys were not stolen.</td></tr>
+<h2 id="glance">The model at a glance</h2>
+<table><thead><tr><th>Producer track</th><th>L1</th><th>L2</th><th>L3</th></tr></thead><tbody>
+<tr><td><a href="#origin">Origin</a></td><td><a href="#origin-l1">Traceable capture</a>: the first observed bytes have origin evidence.</td><td><a href="#origin-l2">Platform-authenticated capture</a>: a hosted capture platform generates and signs that evidence.</td><td><a href="#origin-l3">Policy-controlled capture</a>: the platform continuously enforces declared capture controls.</td></tr>
+<tr><td><a href="#transform">Transform</a></td><td><a href="#transform-l1">Traceable execution</a>: every step binds exact inputs, predecessors, operation identity, and outputs.</td><td><a href="#transform-l2">Platform-authenticated execution</a>: a hosted pipeline generates and signs the evidence.</td><td><a href="#transform-l3">Hardened execution</a>: isolated, ephemeral runs protect both execution and signing from user-controlled steps.</td></tr>
 </tbody></table>
+<p>Origin answers whether the data was captured under a known process. Transform answers whether its processing history was produced under a known execution process. Receiver results answer different questions: whether this handoff is <a href="#property-authorized">authorized</a>, <a href="#property-graph-complete">graph-complete</a>, <a href="#property-schema-conformant">schema-conformant</a>, <a href="#property-freshness-anchored">fresh</a>, or <a href="#property-reproduced">reproduced</a>.</p>
+<p>No third track is needed. Transport integrity, authorization, completeness, freshness, schema conformance, privacy rules, and reproducibility are properties of a particular verification or policy, not independently adoptable producer processes.</p>
 </section>
 
-<section aria-labelledby="l1">
-<h2 id="l1">L1 · Provenance is authentic</h2>
-<p>“These exact statement bytes are well-formed and were signed by keys the receiver has configured.”</p>
-<table><thead><tr><th>Requirement</th><th>Report checks that must pass</th></tr></thead><tbody>
-<tr><td>Safe, bounded bundle and strict JSON</td><td><code>load-safely</code>, <code>parse-strictly</code></td></tr>
-<tr><td>Every statement digest recomputes from its payload</td><td><code>index-payloads</code></td></tr>
-<tr><td>Core statement, handoff, and policy schemas</td><td><code>core-schemas</code></td></tr>
-<tr><td>Valid DSSE signatures from configured keys</td><td><code>signatures</code></td></tr>
-</tbody></table>
+<section aria-labelledby="rules">
+<h2 id="rules">How levels are counted</h2>
+<ul>
+<li><strong>Cumulative within a track.</strong> Each level includes everything below it.</li>
+<li><strong>The weakest step sets the level.</strong> The level for a final artifact is the minimum qualified level among all reachable statements in that track.</li>
+<li><strong>Absence is not promoted.</strong> A graph with no transformation has no Transform level; it is reported as <code>UNEVALUATED</code>, never silently as L1.</li>
+<li><strong>A level names its authority.</strong> Receivers may accept or reject the authority that issued a level, but accepting a different trust root never recalculates the producer's level from unrelated bundle checks. The accepted level always names its assessment policy and issuer.</li>
+<li><strong>Not an allow/deny score.</strong> A track level is never derived by grouping arbitrary receiver checks.</li>
+</ul>
+<p>The stable identifiers are <code>MAKOTO_ORIGIN_LEVEL_1</code>, <code>MAKOTO_ORIGIN_LEVEL_2</code>, <code>MAKOTO_ORIGIN_LEVEL_3</code>, <code>MAKOTO_TRANSFORM_LEVEL_1</code>, <code>MAKOTO_TRANSFORM_LEVEL_2</code>, and <code>MAKOTO_TRANSFORM_LEVEL_3</code>, plus <code>MAKOTO_ORIGIN_LEVEL_UNEVALUATED</code> and <code>MAKOTO_TRANSFORM_LEVEL_UNEVALUATED</code> when no claim is made. They deliberately do not begin with <code>SLSA_</code>, which SLSA reserves for its own results.</p>
+</section>
+
+<section aria-labelledby="origin">
+<h2 id="origin">Origin track</h2>
+<p>The Origin track grades the process that first captures data into a Makoto graph. It does not ask Salesforce, a partner API, or a sensor to adopt Makoto. The adopting producer is the collector or capture platform that observes that external source.</p>
+
+<h3 id="origin-l1">Origin L1 · Traceable capture</h3>
 <table><tbody>
-<tr><th>Denies with</th><td><code>E_BUNDLE_UNSAFE_PATH</code>, <code>E_HANDOFF_REQUIRED</code>, <code>E_RESOURCE_LIMIT</code>, <code>E_JSON_DUPLICATE_KEY</code>, <code>E_ENVELOPE_MALFORMED</code>, <code>E_STATEMENT_DIGEST</code>, <code>E_CORE_SCHEMA</code>, <code>E_SIGNATURE_INVALID</code></td></tr>
-<tr><th>Threats stopped</th><td><a href="/threats/#d6">D6</a> attestation forgery, resource exhaustion</td></tr>
-<tr><th>Use it for</th><td>Internal lineage and debugging, audit trails inside one team, and getting started.</td></tr>
-<tr><th>Runnable proof</th><td><a href="/demos/04/">Case 04</a>: both edited records fall below L1. <a href="/demos/01/">Case 01</a>, <a href="/demos/03/">03</a>, and <a href="/demos/05/">05</a> reach L1 and stop there.</td></tr>
+<tr><th>User benefit</th><td>A consumer can trace the artifact to one claimed source observation instead of starting with an unexplained file.</td></tr>
+<tr><th>Producer evidence</th><td>A core-valid Makoto origin statement names the source kind, unique event ID, claimed event time, and exact subject digests, and is carried in a valid DSSE envelope.</td></tr>
+<tr><th>Receiver verification</th><td>Verify the envelope and payload through <code>parse-strictly</code>, <code>core-schemas</code>, <code>index-payloads</code>, and <code>signatures</code>; verify that each reachable root is an origin and that its subject digest is the predecessor digest used downstream. Artifact bytes, when supplied, must match.</td></tr>
+<tr><th>Summary diagnostic</th><td><code>E_ORIGIN_LEVEL_1</code></td></tr>
 </tbody></table>
-</section>
 
-<section aria-labelledby="l2">
-<h2 id="l2">L2 · Provenance is authorized and complete</h2>
-<p>“Every signer was allowed to make its claim, every step binds the exact step and bytes before it, the handoff is the whole graph, and the bytes I received are the bytes that were signed.”</p>
-<table><thead><tr><th>Requirement</th><th>Report checks</th></tr></thead><tbody>
-<tr><td>All of L1</td><td>—</td></tr>
-<tr><td>Every statement and the handoff meet an authorization rule and threshold</td><td><code>authorization-thresholds</code>, <code>authorization</code> must pass</td></tr>
-<tr><td>A continuous, acyclic graph from every head to declared origins</td><td><code>graph</code>, <code>roots-and-heads</code> must pass; <code>graph-dependency-artifacts</code> passes or is <code>not_checked</code></td></tr>
-<tr><td>An authorized handoff whose statement, root, head, profile, and artifact sets match exactly</td><td><code>completeness-anchor</code> must pass</td></tr>
-<tr><td>Received final-artifact bytes match the signed digests</td><td><code>artifact-bytes</code> must pass</td></tr>
-<tr><td>Required metadata and artifact profiles pass</td><td><code>metadata-profiles</code>, <code>artifact-profiles</code> pass or are <code>not_checked</code> when nothing applies</td></tr>
-</tbody></table>
+<h3 id="origin-l2">Origin L2 · Platform-authenticated capture</h3>
 <table><tbody>
-<tr><th>Denies with</th><td><code>E_SIGNER_UNAUTHORIZED</code>, <code>E_PREDECESSOR_MISSING</code>, <code>E_PREDECESSOR_SUBJECT</code>, <code>E_INPUT_DIGEST</code>, <code>E_GRAPH_CYCLE</code>, <code>E_ROOT_INVALID</code>, <code>E_MANIFEST_SET</code>, <code>E_REQUIRED_PROFILE_MISSING</code>, <code>E_PROFILE_UNRESOLVED</code>, <code>E_PROFILE_INVALID</code>, <code>E_ARTIFACT_DIGEST</code>, <code>E_ARTIFACT_SIZE</code>, <code>E_ARTIFACT_MISSING</code></td></tr>
-<tr><th>Threats stopped</th><td><a href="/threats/#d1">D1</a> source impersonation, <a href="/threats/#d2">D2</a> data tampering, <a href="/threats/#d3">D3</a> lineage falsification, <a href="/threats/#d5">D5</a> unauthorized attribution, <a href="/threats/#d7">D7</a> content privacy violations, <a href="/threats/#d9">D9</a> display-layer obfuscation</td></tr>
-<tr><th>Use it for</th><td>Data shared with partners, regulated audit trails, training-data governance, and any transfer across an organizational boundary.</td></tr>
-<tr><th>Runnable proof</th><td><a href="/demos/01/">Case 01</a> (bytes), <a href="/demos/02/">02</a> (graph), <a href="/demos/03/">03</a> (authorization), <a href="/demos/05/">05</a> (profile), and <a href="/demos/06/">06</a> (render-safety rule) each stop at L1 on one L2 check.</td></tr>
+<tr><th>User benefit</th><td>A consumer can detect evidence added or changed after capture and can attribute the observation to a hosted capture platform rather than a person's workstation.</td></tr>
+<tr><th>Producer evidence</th><td>Origin L1 evidence plus a SLSA VSA issued by the capture platform. Its <code>inputAttestations</code> include the exact origin envelope; its assessment policy requires automatic, contemporaneous provenance generation and a platform signing identity, rather than a user-supplied provenance document.</td></tr>
+<tr><th>Receiver verification</th><td>Verify the VSA signature with a consumer-configured key; require the configured <code>verifier.id</code> and assessment-policy URI and digest; require <code>verificationResult: PASSED</code>, a subject matching the captured artifact, the exact origin-envelope digest in <code>inputAttestations</code>, and <code>MAKOTO_ORIGIN_LEVEL_2</code> or higher in <code>verifiedLevels</code>. No fuzzy name or score is accepted.</td></tr>
+<tr><th>Summary diagnostic</th><td><code>E_ORIGIN_LEVEL_2</code></td></tr>
 </tbody></table>
-</section>
 
-<section aria-labelledby="l3">
-<h2 id="l3">L3 · Provenance is anchored</h2>
-<p>“This is the handoff I expected now, and the verifier allowed it.”</p>
-<table><thead><tr><th>Requirement</th><th>Report checks</th></tr></thead><tbody>
-<tr><td>All of L2</td><td>—</td></tr>
-<tr><td>An independent freshness anchor: expected manifest, head set, or final-artifact set; a consumer nonce; or a maximum age at a consumer-controlled evaluation time</td><td><code>freshness-anchors</code> must pass. A policy that waives replay protection records <code>not_checked</code> and stops at L2.</td></tr>
-<tr><td>The overall decision is <code>allow</code></td><td>Report <code>decision</code></td></tr>
-</tbody></table>
+<h3 id="origin-l3">Origin L3 · Policy-controlled capture</h3>
 <table><tbody>
-<tr><th>Denies with</th><td><code>E_EXPECTED_MANIFEST</code>, <code>E_EXPECTED_HEAD</code>, <code>E_EXPECTED_ARTIFACT</code>, <code>E_HANDOFF_NONCE</code>, <code>E_HANDOFF_STALE</code>, <code>E_FRESHNESS_REQUIRED</code></td></tr>
-<tr><th>Threats stopped</th><td><a href="/threats/#d4">D4</a> timestamp manipulation and replay, branch omission relative to what the receiver expected</td></tr>
-<tr><th>Use it for</th><td>Load, mirror, and training gates that must not accept yesterday's valid release as today's.</td></tr>
-<tr><th>Runnable proof</th><td>The untampered handoff in <a href="/demos/01/">case 01</a> and the safe file in <a href="/demos/06/">case 06</a> reach L3. Every casebook gate requires it.</td></tr>
+<tr><th>User benefit</th><td>A consumer can tell that required source identifiers, capture timing, approvals, and content controls were enforced at acquisition rather than documented later.</td></tr>
+<tr><th>Producer evidence</th><td>Origin L2 evidence plus a digest-pinned assessment policy and contemporaneous control evidence showing that the capture platform continuously enforced the organization's declared controls. Use-case fields such as source record or device ID, ingestion timestamp, run ID, approver, and source-specific SLO remain digest-pinned profiles or input attestations rather than universal core fields.</td></tr>
+<tr><th>Receiver verification</th><td>Perform every Origin L2 check; require <code>MAKOTO_ORIGIN_LEVEL_3</code>; require the VSA policy digest to equal the consumer's expected L3 assessment policy; and require every profile and control-evidence digest named by that policy to be present and passing in the verification inputs. A missing, <code>not_checked</code>, or failed required control denies L3.</td></tr>
+<tr><th>Summary diagnostic</th><td><code>E_ORIGIN_LEVEL_3</code></td></tr>
+</tbody></table>
+<p>Origin L3 is analogous to SLSA Source L3: it provides evidence that declared organizational controls were enforced. It does not establish that a sensor reading was physically true or that an authorized collector was honest. The <a href="#reference-profile">reference profile</a> below is one standard control set for it.</p>
+</section>
+
+<section aria-labelledby="transform">
+<h2 id="transform">Transform track</h2>
+<p>The Transform track grades the platform controls under which data transformations run and their provenance is produced.</p>
+
+<h3 id="transform-l1">Transform L1 · Traceable execution</h3>
+<table><tbody>
+<tr><th>User benefit</th><td>A consumer gets a stack trace for data: the exact predecessor and operation behind every handed-off artifact are named.</td></tr>
+<tr><th>Producer evidence</th><td>Every reachable non-origin node is a core-valid Makoto transformation statement binding each input digest to a predecessor statement and subject, naming an <code>operation.type</code>, and binding exact output digests.</td></tr>
+<tr><th>Receiver verification</th><td>Require <code>core-schemas</code>, <code>graph</code>, <code>graph-dependency-artifacts</code>, <code>roots-and-heads</code>, and <code>completeness-anchor</code> to pass; recompute statement, predecessor, input, and subject digests. Missing or rewired steps fail deterministically rather than lowering a score.</td></tr>
+<tr><th>Summary diagnostic</th><td><code>E_TRANSFORM_LEVEL_1</code></td></tr>
+</tbody></table>
+
+<h3 id="transform-l2">Transform L2 · Platform-authenticated execution</h3>
+<table><tbody>
+<tr><th>User benefit</th><td>A consumer can detect tampering after the run and attribute the provenance to a hosted pipeline rather than user-authored metadata.</td></tr>
+<tr><th>Producer evidence</th><td>Transform L1 evidence plus a platform-issued SLSA VSA. Its assessment policy requires all steps to run on hosted infrastructure and the platform, not user-defined steps, to generate and sign provenance.</td></tr>
+<tr><th>Receiver verification</th><td>Verify the VSA signature, configured verifier identity, assessment-policy digest, subjects, and every referenced transformation envelope; require <code>verificationResult: PASSED</code> and <code>MAKOTO_TRANSFORM_LEVEL_2</code> or higher. The receiver's trust input explicitly lists the platform or assessor key allowed to make this claim.</td></tr>
+<tr><th>Summary diagnostic</th><td><code>E_TRANSFORM_LEVEL_2</code></td></tr>
+</tbody></table>
+
+<h3 id="transform-l3">Transform L3 · Hardened execution</h3>
+<table><tbody>
+<tr><th>User benefit</th><td>A consumer gets strong evidence that another tenant, a prior run, compromised upload credentials, or user-defined pipeline code could not silently rewrite the execution evidence.</td></tr>
+<tr><th>Producer evidence</th><td>Transform L2 evidence plus a qualification showing ephemeral and isolated execution; no cross-run memory, filesystem, service, or cache influence; no access by user steps to provenance signing material; and capture of every permitted external influence as an input or parameter. The qualification is named by exact policy digest in the VSA.</td></tr>
+<tr><th>Receiver verification</th><td>Perform every Transform L2 check; require <code>MAKOTO_TRANSFORM_LEVEL_3</code>; pin the L3 assessment policy and verifier key; and verify every qualification evidence digest named by the VSA. A hardware quote may be an input only when the receiver explicitly trusts its quote verifier and policy. Raw quote bytes alone never satisfy L3.</td></tr>
+<tr><th>Summary diagnostic</th><td><code>E_TRANSFORM_LEVEL_3</code></td></tr>
+</tbody></table>
+<p>Makoto does not define a hardware-attestation wire format. Transform L3 defines the control outcome and uses the same delegation model as a SLSA VSA: a receiver trusts a named verifier under an exact assessment policy. A trusted Transform L3 assessment carries at least one raw hardware-evidence descriptor, only the evidence URI and SHA-256 digest, in its standard <code>inputAttestations</code>. Which TPM, TEE, confidential-computing, or cloud-attestation evidence to accept is an open question, and implementations must not advertise raw hardware verification they do not perform.</p>
+</section>
+
+<section aria-labelledby="properties">
+<h2 id="properties">Verified properties</h2>
+<p>Track levels deliberately do not absorb receiver outcomes. Each property below is issued only when its exact rule passes against a schema-valid Makoto verification report and the exact consumer policy it names.</p>
+
+<h3 id="property-authorized"><code>MAKOTO_AUTHORIZED</code></h3>
+<table><tbody>
+<tr><th>User benefit</th><td>The receiver knows that the keys were allowed to make these source, operation, profile, and handoff claims.</td></tr>
+<tr><th>Evidence supplied</th><td>The schema-valid verification report and the exact consumer policy identified by <code>policyDigest</code>.</td></tr>
+<tr><th>Issued only when</th><td><code>signatures</code>, <code>authorization-thresholds</code>, and <code>authorization</code> are <code>pass</code>, and handoff authorization is <code>pass</code>.</td></tr>
+</tbody></table>
+
+<h3 id="property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></h3>
+<table><tbody>
+<tr><th>User benefit</th><td>The receiver can traverse from every handed-off artifact to all producer-declared origins and detect removed or rewired steps.</td></tr>
+<tr><th>Evidence supplied</th><td>The signed handoff, all graph statements, supplied dependency artifacts, and the report.</td></tr>
+<tr><th>Issued only when</th><td><code>index-payloads</code>, <code>graph-dependency-artifacts</code>, <code>graph</code>, <code>roots-and-heads</code>, and <code>completeness-anchor</code> are <code>pass</code>.</td></tr>
+</tbody></table>
+<p>This is the one property beyond the four motivating examples. Lineage falsification and branch omission are receiver-established results, but neither is an Origin or Transform platform level, and none of the other properties says the presented graph is complete.</p>
+
+<h3 id="property-freshness-anchored"><code>MAKOTO_FRESHNESS_ANCHORED</code></h3>
+<table><tbody>
+<tr><th>User benefit</th><td>The receiver can reject a stale or replayed handoff relative to one explicit independent expectation or time policy.</td></tr>
+<tr><th>Evidence supplied</th><td>The report plus the independently supplied expected manifest, head set, artifact set, nonce, or age policy used by verification.</td></tr>
+<tr><th>Issued only when</th><td><code>freshness-anchors</code> is <code>pass</code> and the report records at least one corresponding freshness method as <code>pass</code>. <code>allowReplayableHandoff</code> and <code>not_checked</code> never qualify.</td></tr>
+</tbody></table>
+
+<h3 id="property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></h3>
+<table><tbody>
+<tr><th>User benefit</th><td>The receiver can detect declared schema drift, missing required metadata, privacy regressions, and content-policy violations in supported formats.</td></tr>
+<tr><th>Evidence supplied</th><td>Digest-pinned required profiles, authenticated local catalog bytes, applicable artifact bytes, and the report.</td></tr>
+<tr><th>Issued only when</th><td><code>core-schemas</code>, <code>metadata-profiles</code>, and <code>artifact-profiles</code> are <code>pass</code>, the consumer policy required at least one profile, and every required profile record resolved and validated with <code>pass</code>.</td></tr>
+</tbody></table>
+
+<h3 id="property-reproduced"><code>MAKOTO_REPRODUCED</code></h3>
+<table><tbody>
+<tr><th>User benefit</th><td>A researcher or model builder can see that independent executions of the declared method produced the same exact result.</td></tr>
+<tr><th>Evidence supplied</th><td>At least two <code>allow</code> reports and their referenced statements from independently operated Transform L2-or-higher platforms, using the same root artifact digests and producing the same transformation-node tuples and final subjects. Each node tuple is sorted input artifact digests, <code>operation.type</code>, <code>tool.digest</code>, <code>parametersDigest</code>, and sorted output subject names and digests.</td></tr>
+<tr><th>Issued only when</th><td>Both graphs and reports verify, the platforms sit in distinct independence groups configured by the consumer, and the complete sorted node-tuple multisets and final subjects are exactly equal. Missing tool or parameter digests, reused independence groups, or any differing tuple fails. Repetition is not correctness.</td></tr>
 </tbody></table>
 </section>
 
-<section aria-labelledby="cli">
-<h2 id="cli">Check the level of any report</h2>
-<p><code>makoto report level</code> reads a report written by <code>makoto verify bundle --json</code>, prints each level with the checks that fell short, and exits 1 when a required level is not met. The two runs below are real output against the published <a href="/demos/end-to-end/artifacts/reports/positive.json">allow</a> and <a href="/demos/end-to-end/artifacts/reports/mutated-final-data.json">tampered-bytes</a> reports.</p>
-<pre><code class="language-bash">$ makoto report level makoto-report.positive.json --require L3
-PASS        L1 Provenance is authentic
-PASS        L2 Provenance is authorized and complete
-PASS        L3 Provenance is anchored
-LEVEL       L3
-REQUIRED    L3 met
-$ echo $?
-0</code></pre>
-<pre><code class="language-bash">$ makoto report level makoto-report.mutated-final-data.json --require L3
-PASS        L1 Provenance is authentic
-FAIL        L2 Provenance is authorized and complete: artifact-bytes fail
-FAIL        L3 Provenance is anchored: decision deny
-LEVEL       L1
-REQUIRED    L3 not met
-$ echo $?
-1</code></pre>
-<p>With <code>--json</code>, the command writes one deterministic object with <code>decision</code>, <code>level</code>, and a <code>levels</code> array of <code>satisfied</code> and <code>unmetChecks</code> per level, so a gate or dashboard can record exactly why a handoff fell short.</p>
+<section aria-labelledby="summary">
+<h2 id="summary">The verification summary</h2>
+<p>Makoto reuses the SLSA v1 Verification Summary Attestation instead of inventing a second summary envelope. It is an in-toto Statement v1 in DSSE whose <code>predicateType</code> is exactly <code>https://slsa.dev/verification_summary/v1</code>:</p>
+<ul>
+<li><code>subject</code> holds the final artifact names and digests summarized.</li>
+<li><code>verifier</code>, <code>timeVerified</code>, <code>resourceUri</code>, <code>policy</code>, <code>inputAttestations</code>, <code>verificationResult</code>, <code>verifiedLevels</code>, <code>dependencyLevels</code>, and <code>slsaVersion</code> keep their SLSA meanings; <code>slsaVersion</code> is <code>1.2</code>.</li>
+<li><code>verifiedLevels</code> contains at most one highest value for each Makoto track plus every verified property whose exact rule passed.</li>
+<li><code>verificationResult</code> is <code>PASSED</code> only when the report decision is <code>allow</code> and every level or property the summary policy requires was established. Otherwise it is <code>FAILED</code> and <code>verifiedLevels</code> holds only <code>FAILED</code>; the optional evaluation sidecar keeps any individually established levels, properties, and diagnostics.</li>
+</ul>
+<p>A receiver accepts a VSA only after validating the DSSE signature, exact subjects, expected <code>resourceUri</code>, configured verifier ID and key, exact policy URI and digest, <code>verificationResult: PASSED</code>, required level and property identifiers, and every locally required input-attestation digest. This is a closed boolean procedure, not an opaque score. A consumer that needs the detailed reasoning keeps or recomputes the underlying report.</p>
+<p>The statement, handoff, bundle, and verification-report wire formats do not change. The receiver supplies its VSA trust inputs in the existing trust policy's optional <a href="/spec/schemas/trust-policy/"><code>verificationSummary</code></a> member: the resource URI, the exact summary-policy descriptor, the required levels and properties, and each trusted verifier's key IDs, verifier ID, accepted assessment policy, allowed level claims, required evidence, and independence group. There is no second policy file.</p>
+
+<h3 id="code-summarize">Summarize a verification</h3>
+<p>These are the reference CLI's flags at the pinned core commit. <code>makoto vsa assess</code> is what a capture platform or pipeline runs to issue an L2 or L3 assessment; <code>makoto vsa summarize</code> is what a receiver or delegated verifier runs over a completed report. <code>summarize</code> exits 1 when the summary does not pass.</p>
+<pre><code class="language-bash"># A platform assesses its own run at Transform L2.
+makoto vsa assess \
+  --track transform \
+  --level 2 \
+  --input-attestation bundle/attestations/&lt;statement&gt;.dsse.json \
+  --verifier-id https://pipeline.example/makoto-assessor \
+  --resource-uri https://pipeline.example/runs/1234 \
+  --policy-uri https://pipeline.example/policies/transform-l2 \
+  --policy-digest sha256:&lt;assessment policy digest&gt; \
+  --key keys/assessor.private.pem \
+  --out transform-l2.vsa.dsse.json
+
+# The receiver summarizes one verified handoff.
+makoto vsa summarize \
+  --report report.json \
+  --attestations bundle/attestations \
+  --policy receiver/policy.json \
+  --assessment transform-l2.vsa.dsse.json \
+  --verifier-id https://verifier.example/makoto \
+  --key keys/verifier.private.pem \
+  --evaluation-out summary-evaluation.json \
+  --out summary.vsa.dsse.json</code></pre>
+<p>The report's <code>policyDigest</code> must equal the digest of the policy passed to <code>summarize</code>, and that policy must carry a <code>verificationSummary</code> member. The summary evaluator has its own closed diagnostic vocabulary, reported in the evaluation sidecar and never replacing the more specific bundle diagnostics: <code>E_ORIGIN_LEVEL_1</code> through <code>E_ORIGIN_LEVEL_3</code>, <code>E_TRANSFORM_LEVEL_1</code> through <code>E_TRANSFORM_LEVEL_3</code>, <code>E_ASSESSMENT_TRUST</code>, <code>E_ASSESSMENT_SIGNATURE</code>, <code>E_ORIGIN_ASSESSMENT_SUBJECTS</code>, <code>E_ORIGIN_ASSESSMENT_INPUTS</code>, <code>E_TRANSFORM_ASSESSMENT_SUBJECTS</code>, <code>E_TRANSFORM_ASSESSMENT_INPUTS</code>, <code>E_PROPERTY_AUTHORIZED</code>, <code>E_PROPERTY_GRAPH_COMPLETE</code>, <code>E_PROPERTY_FRESHNESS_ANCHORED</code>, <code>E_PROPERTY_SCHEMA_CONFORMANT</code>, <code>E_PROPERTY_REPRODUCED</code>, <code>E_REQUIRED_VERIFICATION_RESULT</code>, and <code>E_REPORT_DENIED</code>.</p>
 </section>
 
-<section aria-labelledby="dimensions"><h2 id="dimensions">Seven dimensions behind the levels</h2><p>The levels group seven separate answers. A report keeps all seven, so a receiver can always read past the level to the evidence.</p><table class="stack-table assurance-table"><thead><tr><th>Dimension</th><th>Evidence required</th><th>What it does not establish</th></tr></thead><tbody><tr><td>Structure (L1)</td><td>Core schemas and any required organizational profiles pass.</td><td>Who signed the claim or whether it is complete.</td></tr><tr><td>Authenticity (L1)</td><td>DSSE signatures authenticate the exact payload bytes.</td><td>Whether that key was permitted to make the claim.</td></tr><tr><td>Authorization (L2)</td><td>Receiver policy authorizes each key for its source, operation, profile, or handoff role.</td><td>Whether the claimed event really happened.</td></tr><tr><td>Continuity (L2)</td><td>Every transformation binds exact predecessor statements and input artifact digests.</td><td>Whether an entire branch was withheld.</td></tr><tr><td>Completeness (L2)</td><td>A signed handoff commits to exact roots, heads, statements, profiles, and final artifacts.</td><td>Whether an older complete handoff was replayed.</td></tr><tr><td>Artifact integrity (L2)</td><td>The receiver hashes the bytes it actually received and matches the signed subject.</td><td>Whether those unchanged bytes are safe or useful.</td></tr><tr><td>Freshness (L3)</td><td>An independent expected head, manifest, nonce, artifact, or age bound matches.</td><td>Data quality or source truthfulness.</td></tr></tbody></table></section>
+<section aria-labelledby="reference-profile">
+<h2 id="reference-profile">The Origin L3 reference profile</h2>
+<p>Core ships one standard reference profile for policy-controlled capture, <code>origin-l3-reference-v1</code>. Applied to an origin predicate, it requires a source record or device identifier, an ingestion timestamp, a run identifier, a non-null approver, and a freshness SLO. It is an example control set, not a universal core schema: producers pin its exact root and closure digests in an ordinary profile reference, receivers list that reference in the trusted Origin L3 assessor rule, and an organization may use a stricter private profile instead.</p>
+<pre><code class="language-json">{
+  "$schema": "https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json",
+  "$id": "https://usemakoto.dev/profiles/v0.2/origin-l3-reference-v1.schema.json",
+  "title": "Makoto Origin L3 reference capture controls",
+  "type": "object",
+  "required": ["event", "source", "extensions"],
+  "properties": {
+    "event": {
+      "type": "object",
+      "required": ["occurredAt"]
+    },
+    "source": {
+      "type": "object",
+      "required": ["uri"]
+    },
+    "extensions": {
+      "type": "object",
+      "required": ["https://usemakoto.dev/profile/origin-l3/v1"],
+      "properties": {
+        "https://usemakoto.dev/profile/origin-l3/v1": {
+          "type": "object",
+          "required": [
+            "sourceRecordOrDeviceId",
+            "ingestedAt",
+            "runId",
+            "approver",
+            "freshnessSloSeconds"
+          ],
+          "properties": {
+            "sourceRecordOrDeviceId": { "type": "string", "minLength": 1 },
+            "ingestedAt": { "type": "string", "minLength": 20, "maxLength": 30 },
+            "runId": { "type": "string", "minLength": 1 },
+            "approver": { "type": "string", "minLength": 1 },
+            "freshnessSloSeconds": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  }
+}</code></pre>
+<p>Its exact profile reference, which a producer pins and a receiver trusts:</p>
+<pre><code class="language-json">{"closureDigest":{"sha256":"c02fed306cd6300d537c2664ad88b877dc5605b49b7d9dd0d03bf6c6332b6687"},"critical":true,"digest":{"sha256":"a6196356b740d8f7c72bce9093956c1e9457a8479a7b13269d00f9ff51af2f86"},"id":"https://usemakoto.dev/profiles/v0.2/origin-l3-reference-v1.schema.json","resources":[],"target":"predicate"}</code></pre>
+<p>Both are byte-for-byte the files in <a href="https://github.com/makoto-project/makoto/tree/7044f803dc300cd3b7f8b24f40a0bb9d7151113f/docs/profiles">core <code>docs/profiles/</code> at the pinned commit</a>. The profile's <code>$id</code> is not served from this site yet: the hosted-schema release tooling mirrors only the core schema set, so resolve the profile from your local catalog by its digest, as every profile is resolved.</p>
+</section>
+
+<section aria-labelledby="dimensions"><h2 id="dimensions">Seven checks behind every result</h2><p>Levels and properties are built from seven separate answers a verifier gives. A report keeps all seven, so a receiver can always read past a summary to the evidence.</p><table class="stack-table assurance-table"><thead><tr><th>Dimension</th><th>Evidence required</th><th>Feeds</th><th>What it does not establish</th></tr></thead><tbody><tr><td>Structure</td><td>Core schemas and any required organizational profiles pass.</td><td>Origin and Transform L1; <a href="#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a></td><td>Who signed the claim or whether it is complete.</td></tr><tr><td>Authenticity</td><td>DSSE signatures authenticate the exact payload bytes.</td><td>Origin L1; <a href="#property-authorized"><code>MAKOTO_AUTHORIZED</code></a></td><td>Whether that key was permitted to make the claim.</td></tr><tr><td>Authorization</td><td>Receiver policy authorizes each key for its source, operation, profile, or handoff role.</td><td><a href="#property-authorized"><code>MAKOTO_AUTHORIZED</code></a></td><td>Whether the claimed event really happened.</td></tr><tr><td>Continuity</td><td>Every transformation binds exact predecessor statements and input artifact digests.</td><td>Transform L1; <a href="#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a></td><td>Whether an entire branch was withheld.</td></tr><tr><td>Completeness</td><td>A signed handoff commits to exact roots, heads, statements, profiles, and final artifacts.</td><td>Transform L1; <a href="#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a></td><td>Whether an older complete handoff was replayed.</td></tr><tr><td>Artifact integrity</td><td>The receiver hashes the bytes it actually received and matches the signed subject.</td><td>Base verification (<code>artifact-bytes</code>)</td><td>Whether those unchanged bytes are safe or useful.</td></tr><tr><td>Freshness</td><td>An independent expected head, manifest, nonce, artifact, or age bound matches.</td><td><a href="#property-freshness-anchored"><code>MAKOTO_FRESHNESS_ANCHORED</code></a></td><td>Data quality or source truthfulness.</td></tr></tbody></table></section>
+
+<section aria-labelledby="adopt"><h2 id="adopt">Adopting it step by step</h2><ol class="provenance-spine"><li><strong>Start at one source (Origin L1)</strong><span>Choose a real collection boundary and bind a signed origin claim to exact source bytes.</span></li><li><strong>Append one transform (Transform L1)</strong><span>Make the next producer name its exact predecessor statement and input artifact instead of rewriting a shared history.</span></li><li><strong>Separate the receiver</strong><span>Move trust policy, authorization rules, and schema catalogs outside the producer's bundle.</span></li><li><strong>Sign the handoff</strong><span>Commit to the exact graph and artifacts intentionally transferred across the organizational boundary, and add private profiles for the rules that matter.</span></li><li><strong>Anchor it</strong><span>Pin the expected manifest, head, or artifact through an independent channel, or require a nonce or maximum age.</span></li><li><strong>Move generation onto a platform (L2, then L3)</strong><span>Let a hosted capture platform or pipeline generate, sign, and assess the same evidence, then harden and isolate it.</span></li></ol></section>
+
+<section aria-labelledby="configure">
+<h2 id="configure">Configuring the receiver</h2>
+<table><thead><tr><th>If you need</th><th>What to configure</th><th>Property it supports</th></tr></thead><tbody>
+<tr><td>Signed evidence you can check</td><td>Signed origin and transform statements; configured public keys.</td><td><a href="#property-authorized"><code>MAKOTO_AUTHORIZED</code></a></td></tr>
+<tr><td>A partner or regulated handoff</td><td>Per-role <code>authorizedKeyIds</code>, a handoff key, and <code>requiredProfiles</code> for content rules.</td><td><a href="#property-authorized"><code>MAKOTO_AUTHORIZED</code></a>, <a href="#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a></td></tr>
+<tr><td>A gate in front of load, mirror, or training</td><td><code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, <code>requireExpectedArtifacts</code>, or <code>requireNonce</code> with a consumer nonce.</td><td><a href="#property-freshness-anchored"><code>MAKOTO_FRESHNESS_ANCHORED</code></a></td></tr>
+<tr><td>Protection against one stolen key</td><td><code>minimumSignatures</code> greater than one on the rules where a single key is not enough.</td><td><a href="#property-authorized"><code>MAKOTO_AUTHORIZED</code></a></td></tr>
+</tbody></table>
+<p>One stolen authorized key can sign accepted statements, and even an internally consistent graph. Defeating it also needs the receiver's expected values, or a threshold above one. Hardware-backed keys, transparency logs, access controls, and governance systems may strengthen a deployment; none is implied by a passing report.</p>
+</section>
 
 <section aria-labelledby="example">
 <h2 id="example">What the evidence looks like</h2>
-<p>A signed origin statement from the reference handoff, decoded. It binds the exact source bytes by digest and names the source kind and URI that receiver rules match against.</p>
+<p>A signed origin statement from the reference handoff, decoded. It is Origin L1 evidence: it binds the exact source bytes by digest and names the source kind and URI that receiver rules match against.</p>
 <pre><code class="language-json">{
   "_type": "https://in-toto.io/Statement/v1",
   "predicate": {
@@ -138,7 +287,7 @@ $ echo $?
   ]
 }</code></pre>
 <p>Output of <code>jq -r .payload attestations/56b7be43….dsse.json | base64 -d | jq .</code> on the <a href="/demos/end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json">published envelope</a>.</p>
-<p>The receiver side of the same boundary: the rule that authorizes that origin claim (an L2 requirement) and the handoff expectations that make L3 possible.</p>
+<p>The receiver side of the same boundary: the rule that authorizes that origin claim, which <code>MAKOTO_AUTHORIZED</code> reads, and the handoff expectations that make <code>MAKOTO_FRESHNESS_ANCHORED</code> possible.</p>
 <pre><code class="language-json">{
   "rules": [
     {
@@ -174,12 +323,10 @@ $ echo $?
 <p>Output of <code>jq '{rules: [.rules[] | select(.id == "urn:makoto:demo:rule:origin")], handoff}' policy.json</code> on the <a href="/demos/end-to-end/artifacts/receiver/policy.json">published receiver policy</a>.</p>
 </section>
 
-<section aria-labelledby="climb"><h2 id="climb">Climbing the levels</h2><ol class="provenance-spine"><li><strong>Start at one source (toward L1)</strong><span>Choose a real collection boundary and bind a signed origin claim to exact source bytes.</span></li><li><strong>Append one transform (toward L1)</strong><span>Make the next producer name its exact predecessor statement and input artifact instead of rewriting a shared history.</span></li><li><strong>Separate the receiver (L2)</strong><span>Move trust policy, authorization rules, and schema catalogs outside the producer's bundle.</span></li><li><strong>Sign the handoff (L2)</strong><span>Commit to the exact graph and artifacts intentionally transferred across the organizational boundary, and add private profiles for the rules that matter.</span></li><li><strong>Anchor it (L3)</strong><span>Pin the expected manifest, head, or artifact through an independent channel, or require a nonce or maximum age.</span></li></ol></section>
-
 <section aria-labelledby="commands">
-<h2 id="commands">The same climb with the reference CLI</h2>
-<p>These are the command shapes the reference end-to-end proof runs, with its paths shortened. Steps 1 to 4 use flags that exist in the pinned core release; step 6 needs <a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>.</p>
-<pre><code class="language-bash"># 1. Start at one source: sign an origin claim over exact bytes.
+<h2 id="commands">From L1 evidence to a verified handoff</h2>
+<p>These are the command shapes the reference end-to-end proof runs, with its paths shortened. Steps 1 and 2 produce Origin L1 and Transform L1 evidence from a developer machine; L2 and L3 need a hosted platform to generate, sign, and assess that same evidence, as above.</p>
+<pre><code class="language-bash"># 1. Origin L1: sign an origin claim over exact bytes.
 makoto key generate --private-out keys/origin.private.pem --public-out keys/origin.public.pem
 makoto attest origin \
   --subject customers.raw.json=data/customers.raw.json \
@@ -190,7 +337,7 @@ makoto attest origin \
   --key keys/origin.private.pem \
   --out attestations/01-origin.dsse.json
 
-# 2. Append one transform that binds its predecessor and input bytes.
+# 2. Transform L1: append one step that binds its predecessor and input bytes.
 makoto attest transform \
   --subject customers.normalized.json=data/customers.normalized.json \
   --input-binding bindings/normalize-input.json \
@@ -213,45 +360,53 @@ makoto handoff create \
   --key keys/handoff.private.pem \
   --out bundle
 
-# 5. Verify as the receiver, with receiver-held expectations for L3.
+# 5. Verify as the receiver, with receiver-held expectations.
 makoto verify bundle bundle \
   --policy receiver/policy.json \
   --schema-catalog receiver/catalog.json \
   --expected-manifest sha256:&lt;published manifest digest&gt; \
   --expected-head sha256:&lt;published head digest&gt; \
   --expected-artifact receiver/expected-artifact.json \
-  --json &gt; report.json
-
-# 6. Require a level.
-makoto report level report.json --require L3</code></pre>
-<p>Run the whole path, including private profiles and seven denial cases, with the <a href="/demos/end-to-end/">end-to-end proof</a>. Put steps 5 and 6 in CI with any casebook <a href="/demos/01/makoto-gate.yml">gate workflow</a>.</p>
+  --json &gt; report.json</code></pre>
+<p>Run the whole path, including private profiles and seven denial cases, with the <a href="/demos/end-to-end/">end-to-end proof</a>. Put step 5 in CI with any casebook <a href="/demos/01/makoto-gate.yml">gate workflow</a>, then <a href="#code-summarize">summarize</a> the report when a downstream party needs a signed result.</p>
 </section>
 
 <section aria-labelledby="choose">
-<h2 id="choose">Choosing a level</h2>
-<table class="wide-table"><caption>On narrow screens, scroll right to see when to move up.</caption><thead><tr><th>If you need</th><th>Require</th><th>What to configure</th><th>Move up when</th></tr></thead><tbody>
-<tr><td>Internal lineage for debugging</td><td>L1</td><td>Signed origin and transform statements; configured public keys.</td><td>Data leaves the team or feeds a decision someone will audit.</td></tr>
-<tr><td>A partner or regulated handoff</td><td>L2</td><td>Per-role <code>authorizedKeyIds</code>, a handoff key, and <code>requiredProfiles</code> for content rules.</td><td>Handoffs recur and replay becomes plausible.</td></tr>
-<tr><td>A gate in front of load, mirror, or training</td><td>L3</td><td><code>requireExpectedManifest</code>, <code>requireExpectedHead</code>, <code>requireExpectedArtifacts</code>, or <code>requireNonce</code> with a consumer nonce.</td><td>—</td></tr>
-<tr><td>Protection against one stolen key</td><td>L2 or L3 with thresholds</td><td><code>minimumSignatures</code> greater than one on the rules where a single key is not enough.</td><td>—</td></tr>
+<h2 id="choose">What to ask for</h2>
+<table><thead><tr><th>If you need</th><th>Ask the producer for</th><th>Require as a receiver</th></tr></thead><tbody>
+<tr><td>To know where a file came from and every step it went through</td><td>Origin L1 and Transform L1</td><td><code>MAKOTO_GRAPH_COMPLETE</code></td></tr>
+<tr><td>Assurance that nobody edited the evidence after capture or after the run</td><td>Origin L2 and Transform L2 from a hosted platform</td><td><code>MAKOTO_AUTHORIZED</code></td></tr>
+<tr><td>Source IDs, ingestion time, run ID, and approver enforced at capture</td><td>Origin L3 under a pinned profile such as <a href="#reference-profile">the reference profile</a></td><td><code>MAKOTO_SCHEMA_CONFORMANT</code></td></tr>
+<tr><td>Protection from other tenants and user pipeline code rewriting evidence</td><td>Transform L3</td><td><code>MAKOTO_AUTHORIZED</code></td></tr>
+<tr><td>A gate that will not accept yesterday's valid release as today's</td><td>Any track level</td><td><code>MAKOTO_FRESHNESS_ANCHORED</code></td></tr>
+<tr><td>Independent confirmation that a method repeats exactly</td><td>Transform L2 or higher from two independent platforms</td><td><code>MAKOTO_REPRODUCED</code></td></tr>
 </tbody></table>
+<p>Every row maps to the <a href="/threats/">threat model</a>, which follows the core failure-mode coverage matrix.</p>
 </section>
 
-<section aria-labelledby="compare">
-<h2 id="compare">Level comparison summary</h2>
-<table class="wide-table"><caption>On narrow screens, scroll right to compare all three levels.</caption><thead><tr><th>Aspect</th><th>L1</th><th>L2</th><th>L3</th></tr></thead><tbody>
-<tr><td>Statements signed</td><td>Yes, by configured keys</td><td>Yes, by authorized keys</td><td>Yes, by authorized keys</td></tr>
-<tr><td>Signer authorization</td><td>Not checked into the level</td><td>Required per rule and threshold</td><td>Required</td></tr>
-<tr><td>Graph and handoff completeness</td><td>No</td><td>Exact sets must match</td><td>Exact sets must match</td></tr>
-<tr><td>Received bytes</td><td>Not required</td><td>Must match signed digests</td><td>Must match signed digests</td></tr>
-<tr><td>Replay defense</td><td>No</td><td>No</td><td>Independent anchor required</td></tr>
-<tr><td>Impact of one stolen authorized key</td><td>Can sign accepted statements</td><td>Can sign an internally consistent graph</td><td>Also needs the receiver's expected values, or a threshold above one</td></tr>
-<tr><td>Casebook results</td><td>Cases 01, 02 (missing step), 03, 05, 06 (flagged)</td><td>None stop exactly here</td><td>Case 01 control, case 06 safe file</td></tr>
-</tbody></table>
+<section aria-labelledby="not-covered">
+<h2 id="not-covered">What Makoto does not cover</h2>
+<p>Makoto cannot establish that:</p>
+<ul>
+<li>a signer told the truth;</li>
+<li>a described transformation actually executed, unless a separately trusted Transform-track assessment establishes the execution controls, and even then it cannot establish that the transformation was correct;</li>
+<li>the source itself was correct, complete, licensed, safe, or legally usable;</li>
+<li>a bundle history is complete without an authorized handoff manifest, or fresh without an independently obtained expected manifest, head, or artifact set, nonce challenge, or consumer age policy; explicit replay acceptance waives rather than establishes freshness;</li>
+<li>an unavailable historical artifact still matches its recorded digest;</li>
+<li>a timestamp came from a trusted clock;</li>
+<li>a URI still serves the original bytes;</li>
+<li>signing keys were stored securely; or</li>
+<li>data is confidential merely because provenance exists.</li>
+</ul>
+<p>Like SLSA, Makoto does not cover every way a producer can cause harm. It does not establish data-content correctness, code or model quality, freedom from bias or poison, the good intent of an authorized producer, confidentiality, legal compliance, deletion from every downstream copy, or the safety of a consumer that ignores a denial. A hardened platform limits who can tamper with an execution; it does not make the requested execution wise.</p>
 </section>
 
-<section aria-labelledby="claims"><h2 id="claims">What no level claims</h2><p>No level calls data “unforgeable,” proves that transformation code executed, certifies a source as truthful, establishes legal compliance, or makes unchanged content safe. Hardware-backed keys, isolated builders, transparency logs, access controls, and governance systems may strengthen a deployment; a future level for isolated evidence generation is reserved until its evidence and conformance tests exist.</p><p>Earlier Makoto drafts used the same three names with different requirements: provenance exists, provenance is signed, provenance is generated by isolated infrastructure. Those requirements are not these levels, and a claim made under them does not carry over. The current levels are defined only by checks the reference verifier runs.</p></section>
+<section aria-labelledby="correctness">
+<h2 id="correctness">Handing off to a correctness process</h2>
+<p>Makoto will never certify data-content correctness. Its evidence is still what a correctness process needs. A downstream evaluator can consume Makoto's exact origin, operation, signer, graph, profile, and artifact identities; run domain tests, human review, calibration checks, retrieval evaluation, or model evaluation; and bind that result to the same digests in a separate attestation.</p>
+<p>Makoto then supplies the stack trace for data needed to locate and replace a bad input or step. The downstream process owns the correctness judgment. That division keeps Makoto simple and transparent while making incorrect outcomes diagnosable and replaceable.</p>
+</section>
 
-<section class="community-band"><span class="kicker">Require a level</span><h2>Make the receiving decision one line, and still inspectable.</h2><p>Every casebook gate verifies the bundle, keeps the report, and requires L3. Start there, then add the organizational profiles and signer rules your handoff needs.</p><div class="actions"><a class="button" href="/demos/01/">See a gate require L3</a><a class="button secondary" href="/verify/">Read the verification guide</a></div></section>
-</main><footer class="footer"><div class="footer-inner"><p class="footer-line">Makoto assurance levels · Checks you can inspect · Receiver-owned policy</p><nav class="footer-nav" aria-label="Site"><a href="/spec/">Specification</a><a href="/spec/schemas/">Hosted schemas</a><a href="/demos/end-to-end/">Runnable proof</a><a href="/examples/">Examples</a><a href="/community/">Community</a><a href="/privacy/">Privacy</a></nav><p class="footer-meta">Apache-2.0 · <a href="https://github.com/makoto-project/usemakoto.dev">Site source on GitHub</a></p></div></footer></div></div>
+<section class="community-band"><span class="kicker">Adopt one level at a time</span><h2>Start with traceable evidence. Harden where it is made. Verify what you received.</h2><p>Every casebook gate already produces the report a verification summary reads. Start there, then ask your producers for the track level your decision needs.</p><div class="actions"><a class="button" href="/demos/01/">See a receiver gate</a><a class="button secondary" href="/threats/">Map it to the threats</a></div></section>
+</main><footer class="footer"><div class="footer-inner"><p class="footer-line">Makoto assurance model · Origin and Transform tracks · Verified properties</p><nav class="footer-nav" aria-label="Site"><a href="/spec/">Specification</a><a href="/spec/schemas/">Hosted schemas</a><a href="/demos/end-to-end/">Runnable proof</a><a href="/examples/">Examples</a><a href="/community/">Community</a><a href="/privacy/">Privacy</a></nav><p class="footer-meta">Apache-2.0 · <a href="https://github.com/makoto-project/usemakoto.dev">Site source on GitHub</a></p></div></footer></div></div>
 <script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script></body></html>

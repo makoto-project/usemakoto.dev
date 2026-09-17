@@ -56,7 +56,7 @@
 <section aria-labelledby="run"><h2 id="run">Run the reference verifier</h2><p>Start with the deterministic handoff fixture. It produces one allowed bundle and seven denial cases, so the first experience includes the failure boundary as well as the happy path.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto
 uv sync --locked --dev
-./scripts/demo-v0.2.sh --acceptance</code></pre><p>To inspect the receiver command directly:</p><pre><code class="language-bash">uv run makoto verify bundle demos/v0.2-end-to-end/generated/positive-bundle \
+./scripts/demo.sh --acceptance</code></pre><p>To inspect the receiver command directly:</p><pre><code class="language-bash">uv run makoto verify bundle demos/v0.2-end-to-end/generated/positive-bundle \
   --policy demos/v0.2-end-to-end/generated/receiver/policy.json \
   --schema-catalog demos/v0.2-end-to-end/generated/receiver/catalog.json \
   --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \

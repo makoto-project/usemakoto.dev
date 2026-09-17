@@ -28,7 +28,7 @@
 cd makoto
 uv sync --locked --dev
 uv run makoto --help
-./scripts/demo-v0.2.sh --acceptance</code></pre><p>This is a source checkout, not an install command for a published package. The demo is the shortest verified path through the implementation.</p>
+./scripts/demo.sh --acceptance</code></pre><p>This is a source checkout, not an install command for a published package. The demo is the shortest verified path through the implementation.</p>
 
 <h2>Choose the right surface</h2><ol class="provenance-spine"><li><strong>CLI and Python library</strong><span>Start here for real generation and verification work. Inspect the source, run the acceptance demo, and treat its positive and negative fixtures as the behavioral contract. <a href="/verify/">Read the verification guide</a></span></li><li><strong>Hosted schemas</strong><span>Use the catalog for core resources. Private organizational profiles can remain private and still resolve by URI plus exact digest. <a href="/schema/v0.2/catalog.json">Open the schema catalog</a></span></li><li><strong>Python experiment</strong><span>The prototype source records ideas from the first API exploration. It is not wire-compatible with the reference implementation and is not a published Makoto distribution. <a href="https://github.com/makoto-project/usemakoto.dev/tree/main/sdk/python">Browse the source ↗</a></span></li><li><strong>JavaScript experiment</strong><span>The browser and Node examples preserve useful ideas for future client libraries, but are not a supported package. <a href="https://github.com/makoto-project/usemakoto.dev/tree/main/sdk/javascript">Browse the source ↗</a></span></li></ol>
 
