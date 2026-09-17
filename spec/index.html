@@ -157,7 +157,7 @@
       <tr><td><a href="/spec/schemas/#handoff-schema-json">handoff.schema.json</a></td><td>Roots, heads, statement set, required profiles, recipients.</td></tr>
       <tr><td><a href="/spec/schemas/#bundle-schema-json">bundle.schema.json</a></td><td>The on-disk layout a sender actually transfers.</td></tr>
       <tr><td><a href="/spec/schemas/#dataset-manifest-schema-json">dataset-manifest.schema.json</a></td><td>A partitioned dataset described as one subject.</td></tr>
-      <tr><td><a href="/spec/schemas/#trust-policy-schema-json">trust-policy.schema.json</a></td><td>Receiver-owned keys, roles, thresholds, and limits.</td></tr>
+      <tr><td><a href="/spec/schemas/#trust-policy-schema-json">trust-policy.schema.json</a></td><td>Receiver-owned keys, roles, thresholds, limits, and verification-summary trust inputs.</td></tr>
       <tr><td><a href="/spec/schemas/#verification-report-schema-json">verification-report.schema.json</a></td><td>Per-check outcomes, never one collapsed verdict.</td></tr>
       <tr><td><a href="/spec/schemas/#catalog-schema-json">catalog.schema.json</a></td><td>The index itself, so a resolver can validate it before trusting it.</td></tr>
       <tr><td><a href="/spec/schemas/#catalog-json">catalog.json</a></td><td>The published index and the digests everything else is pinned by.</td></tr>
@@ -166,13 +166,13 @@
   </section>
 
   <section aria-labelledby="levels"><h2 id="levels">Assurance levels</h2>
-    <p>Like SLSA, Makoto names cumulative levels. Each level is a fixed set of verification-report checks, so a receiver can require “L2 or higher” and still read exactly which check fell short. A level is derived from a completed report; deriving it never changes a check, a diagnostic, or the <code>allow</code>/<code>deny</code> decision.</p>
-    <table class="stack-table level-table"><thead><tr><th scope="col">Level</th><th scope="col">Means</th><th scope="col">Adds</th></tr></thead><tbody>
-      <tr><td><a href="/spec/l1-requirements.html">L1</a></td><td>Provenance is authentic</td><td>Well-formed statements signed by configured keys.</td></tr>
-      <tr><td><a href="/spec/l2-requirements.html">L2</a></td><td>Provenance is authorized and complete</td><td>Authorized signers, a continuous graph, a matching signed handoff, and matching received bytes.</td></tr>
-      <tr><td><a href="/spec/l3-requirements.html">L3</a></td><td>Provenance is anchored</td><td>An independent freshness anchor and an <code>allow</code> decision.</td></tr>
+    <p>Like SLSA, Makoto separates producer tracks from receiver results. The Origin and Transform tracks each define three cumulative levels a producer adopts one step at a time; what a receiver established about one handoff is a separate verified property, carried in a standard SLSA Verification Summary Attestation. Neither is an allow/deny score or a correctness claim.</p>
+    <table class="stack-table level-table"><thead><tr><th scope="col">Level</th><th scope="col">Origin track</th><th scope="col">Transform track</th></tr></thead><tbody>
+      <tr><td><a href="/spec/l1-requirements.html">L1</a></td><td>Traceable capture: the first observed bytes have origin evidence.</td><td>Traceable execution: every step binds exact inputs, predecessors, operation identity, and outputs.</td></tr>
+      <tr><td><a href="/spec/l2-requirements.html">L2</a></td><td>Platform-authenticated capture: a hosted capture platform generates and signs that evidence.</td><td>Platform-authenticated execution: a hosted pipeline generates and signs the evidence.</td></tr>
+      <tr><td><a href="/spec/l3-requirements.html">L3</a></td><td>Policy-controlled capture: the platform continuously enforces declared capture controls.</td><td>Hardened execution: isolated, ephemeral runs protect both execution and signing from user-controlled steps.</td></tr>
     </tbody></table>
-    <p>No level asserts that a signer told the truth, that a transformation executed as described, or that evidence is unforgeable.</p>
+    <p>The verified properties are <code>MAKOTO_AUTHORIZED</code>, <code>MAKOTO_GRAPH_COMPLETE</code>, <code>MAKOTO_FRESHNESS_ANCHORED</code>, <code>MAKOTO_SCHEMA_CONFORMANT</code>, and <code>MAKOTO_REPRODUCED</code>. <a href="/levels/">Read the assurance model</a> for each level's evidence and each property's exact issuance rule, or <a href="/spec/text/#8-guarantee-model">Section 8</a> for the normative text.</p>
   </section>
 
   <section aria-labelledby="limits"><h2 id="limits">What Makoto does not claim</h2>

@@ -22,9 +22,6 @@ env:
   # Pinned so these fixtures replay identically. Delete this line to
   # evaluate against the runner clock.
   EVALUATION_TIME: "2026-09-16T16:00:00Z"
-  # Minimum assurance level to accept. L3 (anchored) is the only level
-  # that implies an allow decision; a deny still fails at any level.
-  REQUIRED_LEVEL: L3
 
 jobs:
   gate:
@@ -42,12 +39,12 @@ jobs:
       - uses: actions/checkout@v4
       # Pin the verifier to an exact core commit, like any dependency.
       # Run it from a checkout: the CLI resolves its core schemas from
-      # the repository tree. This commit adds `makoto report level`
-      # (makoto-project/makoto#5); move the pin to the merged release.
+      # the repository tree. This is the core commit the hosted
+      # schemas are pinned to.
       - uses: actions/checkout@v4
         with:
           repository: makoto-project/makoto
-          ref: 731c5c9e3dc59161bd797de70d1d478115bb4c8c
+          ref: 7044f803dc300cd3b7f8b24f40a0bb9d7151113f
           path: .makoto-core
           persist-credentials: false
       - uses: astral-sh/setup-uv@v6
@@ -71,8 +68,6 @@ jobs:
           status=0
           verify --json > makoto-report.json || status=$?
           verify || true
-          uv run --project .makoto-core makoto report level makoto-report.json \
-            --require "$REQUIRED_LEVEL" || status=1
           exit "$status"
       - name: Keep the verification report
         if: always()

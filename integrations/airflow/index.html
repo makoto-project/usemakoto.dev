@@ -36,7 +36,7 @@
 
 <section aria-labelledby="install"><h2 id="install">1. Install the verifier beside Airflow</h2><p>The workers call the reference CLI, so the pinned core checkout and <code>uv</code> must exist on every machine that runs a Makoto task. Airflow and Makoto keep separate Python environments; nothing is imported across them.</p><pre><code class="language-bash"># The reference verifier, pinned and synced once per worker image.
 git clone https://github.com/makoto-project/makoto.git /opt/makoto
-git -C /opt/makoto checkout 0e41afbd0c3f1c389d6643bfe279ab159e4f53ac
+git -C /opt/makoto checkout 7044f803dc300cd3b7f8b24f40a0bb9d7151113f
 (cd /opt/makoto &amp;&amp; uv sync --locked --dev)
 
 # Airflow itself, installed with its published constraints.

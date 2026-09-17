@@ -34,7 +34,7 @@
   <p class="editorial-note"><strong>Publication status.</strong> The normative text and implementation are available for public review. They are not yet an immutable tagged release.</p>
   <dl class="schema-meta">
     <dt>Source</dt><dd><a href="/spec/v0.2/spec.md">/spec/v0.2/spec.md</a></dd>
-    <dt>Digest</dt><dd>sha256:30e1d961be024f15d7d0ba75424f9526882a97c35bf2535c780254a15085043e</dd>
+    <dt>Digest</dt><dd>sha256:9036f5a5a67f61538b18292ea0eb0631448c294bb25be652778ae4679a13d05a</dd>
   </dl>
   <p class="spec-jump"><a href="#contents">Contents</a><a href="/spec/">Specification overview</a><a href="/spec/schemas/">Hosted schemas</a><a href="/spec/v0.2/spec.md">Raw text</a></p>
 
@@ -1167,10 +1167,10 @@ https://usemakoto.dev/schema/v0.2/catalog.json</code></pre>
 <li>verify the positive bundle;</li>
 <li>execute all seven negative fixtures grouped into the five webpage attack stories;</li>
 <li>return nonzero if any expected result differs; and</li>
-<li>finish in under 60 seconds on both release baselines named in Section 23.2. The measured window begins immediately before <code>./scripts/demo-v0.2.sh --acceptance</code> starts its first cleanup/generation operation and ends only after positive/negative report comparisons and successful final cleanup complete. Dependency resolution/download is a separate prerequisite outside that window; interpreter startup and all subprocess startup are inside it. The script MUST print the monotonic elapsed duration and the two boundary labels it enforced. The named-runner stability remedy in Section 23.2 applies equally to this 60-second gate: instability requires an evidence-backed specification revision, never an ad hoc waiver.</li>
+<li>finish in under 60 seconds on both release baselines named in Section 23.2. The measured window begins immediately before <code>./scripts/demo.sh --acceptance</code> starts its first cleanup/generation operation and ends only after positive/negative report comparisons and successful final cleanup complete. Dependency resolution/download is a separate prerequisite outside that window; interpreter startup and all subprocess startup are inside it. The script MUST print the monotonic elapsed duration and the two boundary labels it enforced. The named-runner stability remedy in Section 23.2 applies equally to this 60-second gate: instability requires an evidence-backed specification revision, never an ad hoc waiver.</li>
 </ul>
 <p>The command MUST not require cloud credentials, a hosted service, Docker, or write access outside the demo work directory. It MUST clean up generated temporary files or place them in a documented ignored directory.</p>
-<p>The fixed acceptance entry point is <code>./scripts/demo-v0.2.sh --acceptance</code>, run from the core repository root. It writes only beneath ignored <code>demos/v0.2-end-to-end/.work/</code>, removes that directory before and after a successful run, and retains it with an explicit path on failure for diagnosis. <code>scripts/check.sh</code> invokes this exact command.</p>
+<p>The fixed acceptance entry point is <code>./scripts/demo.sh --acceptance</code>, run from the core repository root. The compatibility entry point <code>./scripts/demo-v0.2.sh --acceptance</code> remains supported and has identical acceptance behavior. The demo writes only beneath ignored <code>demos/v0.2-end-to-end/.work/</code>, removes that directory before and after a successful run, and retains it with an explicit path on failure for diagnosis. <code>scripts/check.sh</code> invokes the versionless entry point.</p>
 <p>The demo MAY also expose a separate <code>--fresh-keys</code> semantic mode. That mode generates new keys and therefore new statement, manifest, and report bytes; it must prove the same allow/deny semantics but is excluded from byte-digest comparisons, hosted artifact pins, and the 60-second canonical acceptance gate. Documentation MUST never describe fresh-key output as byte-deterministic.</p>
 <h2 id="19-website-requirements">19. Website requirements<a class="anchor-link" href="#19-website-requirements" aria-label="Permalink">#</a></h2>
 <p>The core v0.2 webpage must be the canonical narrative counterpart to the runnable repository demo. It must include:</p>

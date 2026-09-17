@@ -95,15 +95,36 @@
 <span class="kicker">Case 02 · scientific reproducibility</span>
 <h1>The chart survived. The method did not.</h1>
 <p class="lead">A paper cites an experiment file, but the source instrument export, outlier rule, normalization parameters, and exact plotting input disappeared when the postdoc left.</p>
-<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#code-the-assurance-level-it-reaches">The assurance level it reaches</a> below.</figcaption><pre><code class="language-bash">$ makoto report level makoto-report.removed-predecessor.json --require L3
-PASS        L1 Provenance is authentic
-FAIL        L2 Provenance is authorized and complete: graph fail, completeness-anchor fail
-FAIL        L3 Provenance is anchored: decision deny
-LEVEL       L1
-REQUIRED    L3 not met
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#code-the-output-that-catches-it">The output that catches it</a> below.</figcaption><pre><code class="language-bash">$ makoto verify bundle handoffs/removed-predecessor/bundle \
+  --policy receiver/policy.json \
+  --schema-catalog receiver/catalog.json \
+  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
+  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-artifact receiver/expected/removed-predecessor.artifact.json \
+  --evaluation-time 2026-09-16T16:00:00Z
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+FAIL        graph
+PASS        roots-and-heads
+FAIL        completeness-anchor
+PASS        freshness-anchors
+PASS        artifact-bytes
+PASS        artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+E_PREDECESSOR_MISSING: predecessor 56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a is absent
+E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle index
 $ echo $?
 1</code></pre></figure>
-<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core at commit <code>731c5c9</code>, which adds assurance levels (<a href="https://github.com/makoto-project/makoto/pull/5">makoto#5</a>, not yet released). Its verifier output is identical to the pinned release <code>0e41afb</code>. The verification reports are byte-for-byte the files published under <a href="/demos/end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core verifier at commit <code>0e41afb</code>. The pinned core commit <code>7044f80</code> adds verification summaries without changing the verifier, and the gate below runs it. Verification-summary tables are computed from the published reports with its property rules. The verification reports are byte-for-byte the files published under <a href="/demos/end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
 
 <section>
 <h2>The problem</h2>
@@ -188,9 +209,6 @@ env:
   # Pinned so these fixtures replay identically. Delete this line to
   # evaluate against the runner clock.
   EVALUATION_TIME: "2026-09-16T16:00:00Z"
-  # Minimum assurance level to accept. L3 (anchored) is the only level
-  # that implies an allow decision; a deny still fails at any level.
-  REQUIRED_LEVEL: L3
 
 jobs:
   gate:
@@ -211,12 +229,12 @@ jobs:
       - uses: actions/checkout@v4
       # Pin the verifier to an exact core commit, like any dependency.
       # Run it from a checkout: the CLI resolves its core schemas from
-      # the repository tree. This commit adds `makoto report level`
-      # (makoto-project/makoto#5); move the pin to the merged release.
+      # the repository tree. This is the core commit the hosted
+      # schemas are pinned to.
       - uses: actions/checkout@v4
         with:
           repository: makoto-project/makoto
-          ref: 731c5c9e3dc59161bd797de70d1d478115bb4c8c
+          ref: 7044f803dc300cd3b7f8b24f40a0bb9d7151113f
           path: .makoto-core
           persist-credentials: false
       - uses: astral-sh/setup-uv@v6
@@ -240,8 +258,6 @@ jobs:
           status=0
           verify --json &gt; makoto-report.json || status=$?
           verify || true
-          uv run --project .makoto-core makoto report level makoto-report.json \
-            --require "$REQUIRED_LEVEL" || status=1
           exit "$status"
       - name: Keep the verification report
         if: always()
@@ -259,7 +275,7 @@ jobs:
       - name: Rebuild figures from verified bytes
         run: echo "replace with your existing step"</code></pre>
 <p><a href="makoto-gate.yml">Download makoto-gate.yml</a>. Note the second matrix entry pins the manifest and head that the rewired bundle's own handoff declares. Even when the expectations match what was sent, the lineage still has to verify.</p>
-<p>The gate also requires an assurance level. After writing the report it runs <code>makoto report level --require "$REQUIRED_LEVEL"</code>; this workflow requires <a href="/levels/">L3</a>, the only level that implies an allow decision.</p>
+<p>The gate keeps the JSON report as a build artifact, so a later job can <a href="/levels/#summary">summarize it</a> into a signed verification summary without running verification again.</p>
 <h3>Which identity may sign which step</h3>
 <p>The receiver's trust policy binds each operation type to one authorized key. A statement cannot borrow another step's authority.</p>
 <pre><code class="language-bash">$ jq '.rules[] | {id, operationTypes, authorizedKeyIds}' receiver/policy.json
@@ -291,7 +307,7 @@ jobs:
 </div></li>
 
 <li><div>
-<h2>The output that catches it</h2>
+<h2 id="code-the-output-that-catches-it">The output that catches it</h2>
 <h3>Missing step</h3>
 <p>Signatures, authorization, and final bytes all pass. The <code>graph</code> check fails because the normalization statement names a predecessor that is not in the bundle, and <code>completeness-anchor</code> fails because the signed manifest committed to three statements.</p>
 <pre><code class="language-bash">$ makoto verify bundle handoffs/removed-predecessor/bundle \
@@ -359,16 +375,16 @@ $ echo $?
     }
   ]
 }</code></pre>
-<h3 id="code-the-assurance-level-it-reaches">The assurance level it reaches</h3>
-<p>Every remaining signature is valid, so this reaches <strong>L1</strong>. L2 needs a continuous graph and a matching handoff; <code>graph</code> and <code>completeness-anchor</code> failed.</p>
-<pre><code class="language-bash">$ makoto report level makoto-report.removed-predecessor.json --require L3
-PASS        L1 Provenance is authentic
-FAIL        L2 Provenance is authorized and complete: graph fail, completeness-anchor fail
-FAIL        L3 Provenance is anchored: decision deny
-LEVEL       L1
-REQUIRED    L3 not met
-$ echo $?
-1</code></pre>
+<h3 id="what-a-summary-records">What a verification summary records</h3>
+<p>A <a href="/levels/#summary">verification summary</a> over this report is <code>FAILED</code> with <code>E_REPORT_DENIED</code>, because the decision is <code>deny</code>. Its evaluation sidecar still records each verified property's exact rule against the report's checks:</p>
+<table><thead><tr><th>Property</th><th>What its rule reads in this report</th><th>Result</th></tr></thead><tbody>
+<tr><td><a href="/levels/#property-authorized"><code>MAKOTO_AUTHORIZED</code></a></td><td><code>signatures</code> pass, <code>authorization-thresholds</code> pass, <code>authorization</code> pass; handoff authorization pass</td><td>Established</td></tr>
+<tr><td><a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a></td><td><code>index-payloads</code> pass, <code>graph-dependency-artifacts</code> pass, <code>graph</code> fail, <code>roots-and-heads</code> pass, <code>completeness-anchor</code> fail</td><td>Not established: <code>E_PROPERTY_GRAPH_COMPLETE</code></td></tr>
+<tr><td><a href="/levels/#property-freshness-anchored"><code>MAKOTO_FRESHNESS_ANCHORED</code></a></td><td><code>freshness-anchors</code> pass; methods: <code>expected-artifacts</code> pass, <code>expected-heads</code> pass, <code>expected-manifest</code> pass, <code>max-age</code> not_checked, <code>nonce</code> not_checked</td><td>Established</td></tr>
+<tr><td><a href="/levels/#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a></td><td><code>core-schemas</code> pass, <code>metadata-profiles</code> pass, <code>artifact-profiles</code> pass; the policy requires 2 digest-pinned profiles</td><td>Established</td></tr>
+<tr><td><a href="/levels/#property-reproduced"><code>MAKOTO_REPRODUCED</code></a></td><td>Needs a second <code>allow</code> report from an independent Transform L2-or-higher platform; none is supplied</td><td>Not established: <code>E_PROPERTY_REPRODUCED</code></td></tr>
+</tbody></table>
+<p>Computed from <a href="/demos/end-to-end/artifacts/reports/removed-predecessor.json">the published report</a> and the policy whose digest it records, with the property rules in core at the pinned commit. Track levels are not shown: they also need the statements themselves and any platform assessments.</p>
 <p><a href="/demos/end-to-end/artifacts/reports/removed-predecessor.json">Open the complete removed-predecessor report</a>.</p>
 <h3>Rewritten step</h3>
 <p>The copied signature no longer matches the edited payload, so <code>signatures</code> fails first. Without a valid signature no policy rule is satisfied, and the graph checks that depend on it are skipped rather than reported as passing.</p>
@@ -491,16 +507,16 @@ $ echo $?
     }
   ]
 }</code></pre>
-<h3>The assurance level it reaches</h3>
-<p>The copied signature fails, so the rewired bundle reaches <strong>no level</strong>: L1 itself requires valid signatures.</p>
-<pre><code class="language-bash">$ makoto report level makoto-report.rewired-step.json --require L3
-FAIL        L1 Provenance is authentic: signatures fail
-FAIL        L2 Provenance is authorized and complete: authorization-thresholds fail, authorization fail, graph skipped, roots-and-heads skipped, completeness-anchor fail, artifact-bytes skipped, artifact-profiles skipped
-FAIL        L3 Provenance is anchored: decision deny
-LEVEL       none
-REQUIRED    L3 not met
-$ echo $?
-1</code></pre>
+<h3>What a verification summary records</h3>
+<p>A <a href="/levels/#summary">verification summary</a> over this report is <code>FAILED</code> with <code>E_REPORT_DENIED</code>, because the decision is <code>deny</code>. Its evaluation sidecar still records each verified property's exact rule against the report's checks:</p>
+<table><thead><tr><th>Property</th><th>What its rule reads in this report</th><th>Result</th></tr></thead><tbody>
+<tr><td><a href="/levels/#property-authorized"><code>MAKOTO_AUTHORIZED</code></a></td><td><code>signatures</code> fail, <code>authorization-thresholds</code> fail, <code>authorization</code> fail; handoff authorization pass</td><td>Not established: <code>E_PROPERTY_AUTHORIZED</code></td></tr>
+<tr><td><a href="/levels/#property-graph-complete"><code>MAKOTO_GRAPH_COMPLETE</code></a></td><td><code>index-payloads</code> pass, <code>graph-dependency-artifacts</code> pass, <code>graph</code> skipped, <code>roots-and-heads</code> skipped, <code>completeness-anchor</code> fail</td><td>Not established: <code>E_PROPERTY_GRAPH_COMPLETE</code></td></tr>
+<tr><td><a href="/levels/#property-freshness-anchored"><code>MAKOTO_FRESHNESS_ANCHORED</code></a></td><td><code>freshness-anchors</code> pass; methods: <code>expected-artifacts</code> pass, <code>expected-heads</code> pass, <code>expected-manifest</code> pass, <code>max-age</code> not_checked, <code>nonce</code> not_checked</td><td>Established</td></tr>
+<tr><td><a href="/levels/#property-schema-conformant"><code>MAKOTO_SCHEMA_CONFORMANT</code></a></td><td><code>core-schemas</code> pass, <code>metadata-profiles</code> pass, <code>artifact-profiles</code> skipped; the policy requires 2 digest-pinned profiles</td><td>Not established: <code>E_PROPERTY_SCHEMA_CONFORMANT</code></td></tr>
+<tr><td><a href="/levels/#property-reproduced"><code>MAKOTO_REPRODUCED</code></a></td><td>Needs a second <code>allow</code> report from an independent Transform L2-or-higher platform; none is supplied</td><td>Not established: <code>E_PROPERTY_REPRODUCED</code></td></tr>
+</tbody></table>
+<p>Computed from <a href="/demos/end-to-end/artifacts/reports/rewired-step.json">the published report</a> and the policy whose digest it records, with the property rules in core at the pinned commit. Track levels are not shown: they also need the statements themselves and any platform assessments.</p>
 <p><a href="/demos/end-to-end/artifacts/reports/rewired-step.json">Open the complete rewired-step report</a>.</p>
 </div></li>
 </ol>

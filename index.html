@@ -55,7 +55,7 @@
           <li class="proof-step">
           <p class="proof-label"><span>1</span> The gate you add</p>
           <figure class="hero-file">
-            <pre data-flow-id="gate" data-filename="makoto-gate.yml · lines 57–79"><code class="language-yaml">      - name: Verify the received bundle
+            <pre data-flow-id="gate" data-filename="makoto-gate.yml · lines 54–74"><code class="language-yaml">      - name: Verify the received bundle
         id: verify
         shell: bash
         env:
@@ -75,8 +75,6 @@
           status=0
           verify --json &gt; makoto-report.json || status=$?
           verify || true
-          uv run --project .makoto-core makoto report level makoto-report.json \
-            --require "$REQUIRED_LEVEL" || status=1
           exit "$status"</code></pre>
             <figcaption class="hero-caption">The receiver's CI gate, quoted from <a href="/demos/01/makoto-gate.yml"><code>demos/01/makoto-gate.yml</code></a>. The load job declares <code>needs: gate</code>, so nothing loads until Makoto allows the exact bytes that arrived.</figcaption>
           </figure>
