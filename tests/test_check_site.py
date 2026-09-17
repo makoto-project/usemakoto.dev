@@ -740,3 +740,28 @@ def test_versioned_learning_url_guard_rejects_new_links(content: str) -> None:
 )
 def test_versioned_learning_url_guard_keeps_core_paths_and_wire_identifiers(content: str) -> None:
     assert not check_site.VERSIONED_LEARNING_URL.search(content)
+
+
+def test_explorer_loads_only_published_artifacts_and_reports_every_attack() -> None:
+    script = (check_site.ROOT / "assets/explorer.js").read_text(encoding="utf-8")
+    properties = json.loads(
+        (check_site.ROOT / "explorer/properties.json").read_text(encoding="utf-8")
+    )
+    artifacts = check_site.ROOT / "demos/end-to-end/artifacts"
+    attacks = set(re.findall(r'\{ id: "([a-z-]+)"', script))
+    assert len(attacks) == 7
+    for name in attacks | {"positive"}:
+        assert (artifacts / f"reports/{name}.json").is_file(), name
+        assert set(properties[name]) == {
+            "MAKOTO_AUTHORIZED",
+            "MAKOTO_FRESHNESS_ANCHORED",
+            "MAKOTO_GRAPH_COMPLETE",
+            "MAKOTO_REPRODUCED",
+            "MAKOTO_SCHEMA_CONFORMANT",
+        }
+    for data in set(re.findall(r'"(customers\.[a-z]+\.json)"', script)):
+        assert (artifacts / "data" / data).is_file(), data
+    for digest in set(re.findall(r'"([0-9a-f]{64})"', script)):
+        assert (artifacts / f"positive-bundle/attestations/{digest}.dsse.json").is_file(), digest
+    for page in re.findall(r'casebook: "(/demos/0[1-6]/)"', script):
+        assert (check_site.ROOT / page.strip("/") / "index.html").is_file(), page

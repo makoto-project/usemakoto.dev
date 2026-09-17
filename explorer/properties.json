@@ -1,0 +1,58 @@
+{
+  "edited-signed-metadata": {
+    "MAKOTO_AUTHORIZED": false,
+    "MAKOTO_FRESHNESS_ANCHORED": true,
+    "MAKOTO_GRAPH_COMPLETE": false,
+    "MAKOTO_REPRODUCED": false,
+    "MAKOTO_SCHEMA_CONFORMANT": false
+  },
+  "mutated-final-data": {
+    "MAKOTO_AUTHORIZED": true,
+    "MAKOTO_FRESHNESS_ANCHORED": true,
+    "MAKOTO_GRAPH_COMPLETE": true,
+    "MAKOTO_REPRODUCED": false,
+    "MAKOTO_SCHEMA_CONFORMANT": false
+  },
+  "positive": {
+    "MAKOTO_AUTHORIZED": true,
+    "MAKOTO_FRESHNESS_ANCHORED": true,
+    "MAKOTO_GRAPH_COMPLETE": true,
+    "MAKOTO_REPRODUCED": false,
+    "MAKOTO_SCHEMA_CONFORMANT": true
+  },
+  "private-schema-violation": {
+    "MAKOTO_AUTHORIZED": true,
+    "MAKOTO_FRESHNESS_ANCHORED": true,
+    "MAKOTO_GRAPH_COMPLETE": true,
+    "MAKOTO_REPRODUCED": false,
+    "MAKOTO_SCHEMA_CONFORMANT": false
+  },
+  "removed-predecessor": {
+    "MAKOTO_AUTHORIZED": true,
+    "MAKOTO_FRESHNESS_ANCHORED": true,
+    "MAKOTO_GRAPH_COMPLETE": false,
+    "MAKOTO_REPRODUCED": false,
+    "MAKOTO_SCHEMA_CONFORMANT": true
+  },
+  "rewired-step": {
+    "MAKOTO_AUTHORIZED": false,
+    "MAKOTO_FRESHNESS_ANCHORED": true,
+    "MAKOTO_GRAPH_COMPLETE": false,
+    "MAKOTO_REPRODUCED": false,
+    "MAKOTO_SCHEMA_CONFORMANT": false
+  },
+  "statement-digest-mismatch": {
+    "MAKOTO_AUTHORIZED": true,
+    "MAKOTO_FRESHNESS_ANCHORED": true,
+    "MAKOTO_GRAPH_COMPLETE": false,
+    "MAKOTO_REPRODUCED": false,
+    "MAKOTO_SCHEMA_CONFORMANT": false
+  },
+  "unauthorized-signer": {
+    "MAKOTO_AUTHORIZED": false,
+    "MAKOTO_FRESHNESS_ANCHORED": true,
+    "MAKOTO_GRAPH_COMPLETE": false,
+    "MAKOTO_REPRODUCED": false,
+    "MAKOTO_SCHEMA_CONFORMANT": false
+  }
+}
