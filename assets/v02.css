@@ -1001,3 +1001,53 @@ tbody th { font-weight: 650; }
 @media (max-width: 1100px) {
   .explorer-panes, .explorer-verify { grid-template-columns: minmax(0,1fr); }
 }
+
+/* ---------------------------------------------------------------------------
+   Walkthrough steps, borrowing the Explorer's layout. A data step and the
+   statement step it produced sit side by side ("The data", "What Makoto
+   adds"); each is a head and a body on shared subgrid rows, so the two
+   exhibits start on one line. The step index reuses the Explorer's stage row;
+   steps.js makes it sticky and marks the step in view. Without JS it is a
+   plain list of anchors.
+   --------------------------------------------------------------------------- */
+.explorer-jump { margin: 0 0 var(--space-5); font-weight: 650; }
+.step-track { container-type: inline-size; margin-top: var(--space-7); }
+.step-index { z-index: 20; background: var(--paper); }
+.step-index .explorer-stages { margin: 0; padding: 0 0 var(--space-1); list-style: none; }
+.step-index li { max-width: none; margin: 0; min-width: 0; }
+.step-index .explorer-stage, .step-index .explorer-stage:visited { color: var(--muted); text-decoration: none; }
+.step-index .explorer-stage:hover { color: var(--ink); }
+.step-index .explorer-stage[aria-current="step"] { color: var(--ink); text-decoration: underline; text-decoration-color: currentColor; text-decoration-thickness: 2px; text-underline-offset: .35rem; }
+.step-index.is-live { position: sticky; top: calc(var(--topbar-height) + env(safe-area-inset-top, 0px)); }
+.step-index.is-compact .explorer-stages { flex-wrap: nowrap; gap: 0 var(--space-3); }
+.step-index.is-compact li { flex: 0 0 auto; }
+.step-index.is-compact li.is-current { flex: 1 1 auto; }
+.step-index.is-compact li:not(.is-current) .step-index-label { display: none; }
+.step-track .setup-sequence { margin-top: var(--space-6); }
+.step-track .setup-sequence > li { scroll-margin-top: calc(var(--topbar-height) + env(safe-area-inset-top, 0px) + var(--step-index-h, 0px) + var(--space-4)); }
+.step-head > .explorer-pane-title { margin: 0 0 var(--space-1); }
+.exhibit-name .exhibit-digest { padding: 0; border: 0; background: transparent; box-shadow: none; color: var(--file-muted); font: 500 .78rem/1.35 var(--mono); }
+@container (min-width: 940px) {
+  .setup-sequence.is-paired { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); column-gap: var(--space-7); }
+  .setup-sequence.is-paired > li { grid-column: 1 / -1; }
+  .setup-sequence.is-paired > li.pair-data { grid-column: 1; }
+  .setup-sequence.is-paired > li.pair-statement { grid-column: 2; }
+  .setup-sequence.is-paired > li:is(.pair-data, .pair-statement) { grid-row: span 2; grid-template-rows: subgrid; }
+  /* Placed explicitly: an item with a definite row is placed before the
+     numeral and would otherwise take its column. */
+  .setup-sequence.is-paired > li:is(.pair-data, .pair-statement)::before { grid-column: 1; grid-row: 1; }
+  .setup-sequence.is-paired > li:is(.pair-data, .pair-statement) > div { grid-column: 2; grid-row: 1 / span 2; display: grid; grid-template-rows: subgrid; }
+  /* The rail runs down the data column to the next pair; the statement beside
+     it needs none. */
+  .setup-sequence.is-paired > li.pair-statement::after { display: none; }
+  .is-paired .step-body > :is(pre, .exhibit):first-child { margin-top: var(--space-5); }
+  .is-paired .step-head > :last-child { margin-bottom: 0; }
+  /* Half a page is too narrow for four columns: tables stack as they do on a
+     phone. theme.js supplies the labels. */
+  .is-paired .step-foot :is(table, tbody, tr, td, th) { display: block; width: auto; }
+  .is-paired .step-foot table { table-layout: auto; border-top: 0; }
+  .is-paired .step-foot thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .is-paired .step-foot tr { padding: var(--space-3) 0; border-top: 1px solid var(--line-strong); }
+  .is-paired .step-foot :is(td, tbody th) { padding: var(--space-1) 0; border: 0; min-width: 0; }
+  .is-paired .step-foot td[data-label]::before { content: attr(data-label); display: block; color: var(--muted); font: 600 .84rem/1.5 var(--sans); }
+}

@@ -273,6 +273,17 @@
       var name = document.createElement("span");
       name.className = "exhibit-name";
       name.textContent = filename;
+      // data-digest="sha256:<hex>" shows as a short SHA; hover and copy give the full hex.
+      var digest = /^sha256:([0-9a-f]{64})$/.exec(pre.dataset.digest || "");
+      if (digest) {
+        var hash = document.createElement("code");
+        hash.className = "hash exhibit-digest";
+        hash.textContent = "sha256:" + digest[1].slice(0, 7);
+        hash.title = "sha256:" + digest[1];
+        hash.dataset.full = digest[1];
+        name.appendChild(document.createTextNode(" · "));
+        name.appendChild(hash);
+      }
       head.appendChild(name);
     }
 
@@ -356,6 +367,18 @@
     var blocks = document.querySelectorAll("pre");
     for (var i = 0; i < blocks.length; i++) frame(blocks[i]);
   }
+
+  // Copying a short SHA (all or part of it) copies the full digest instead.
+  document.addEventListener("copy", function (event) {
+    var selection = window.getSelection && window.getSelection();
+    if (!selection || selection.isCollapsed || !event.clipboardData) return;
+    function element(node) { return node && (node.nodeType === 1 ? node : node.parentElement); }
+    var start = element(selection.anchorNode), end = element(selection.focusNode);
+    var hash = start && start.closest("[data-full]");
+    if (!hash || !end || end.closest("[data-full]") !== hash) return;
+    event.clipboardData.setData("text/plain", hash.dataset.full);
+    event.preventDefault();
+  });
 
   // Deferred: the DOM is complete, and Prism has not highlighted yet.
   run();
