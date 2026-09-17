@@ -25,6 +25,7 @@
   <span class="kicker">Worked walkthrough · one table, edited in place</span>
   <h1>Same table. New state. New statement.</h1>
   <p class="lead">Most tables are not copied at every step; they are updated where they sit. This page runs real SQL against one SQLite table, twice, and attests every state the table passes through. The database keeps only the latest rows. Makoto keeps every state as its own digest, each statement naming the one before it.</p>
+  <p class="explorer-jump"><a href="/explorer/">Step through this in the Explorer</a>. It follows the same three customer records through the new-file version of this lifecycle, one stage at a time.</p>
   <p class="editorial-note"><strong>Every value on this page is generated.</strong> The commands are committed files, <a href="https://github.com/makoto-project/usemakoto.dev/blob/main/scripts/in_place_example.py"><code>scripts/in_place_example.py</code></a> runs them against a fresh SQLite database, and every export, digest and statement below comes from that run and validates against the published schemas. If your pipeline writes a new file at every step instead, <a href="/examples/lifecycle/">the lifecycle walkthrough</a> follows that shape.</p>
 
   <figure class="inplace-flow" data-flow="inplace" aria-labelledby="inplace-flow-caption">
@@ -66,7 +67,9 @@ WHERE age &lt; 18 AND marketing_consent = 1;</code></pre></div>
     </div>
   </figure>
 
-  <ol class="setup-sequence">
+<div class="step-track" data-step-track>
+  <nav class="step-index" aria-label="Steps on this page" data-step-index><ol class="explorer-stages"><li><a class="explorer-stage" href="#table" aria-label="Step 1: The table"><span class="explorer-stage-n">1</span> <span class="step-index-label">The table</span></a></li><li><a class="explorer-stage" href="#load" aria-label="Steps 2–3: Load"><span class="explorer-stage-n">2–3</span> <span class="step-index-label">Load</span></a></li><li><a class="explorer-stage" href="#normalize" aria-label="Steps 4–5: Normalize"><span class="explorer-stage-n">4–5</span> <span class="step-index-label">Normalize</span></a></li><li><a class="explorer-stage" href="#withdraw" aria-label="Steps 6–7: Withdraw consent"><span class="explorer-stage-n">6–7</span> <span class="step-index-label">Withdraw consent</span></a></li><li><a class="explorer-stage" href="#what-survives" aria-label="Step 8: What survives"><span class="explorer-stage-n">8</span> <span class="step-index-label">What survives</span></a></li></ol></nav>
+  <ol class="setup-sequence is-paired">
 
   <li id="table"><div><h2>The table and what gets hashed</h2>
     <p>One table, created once. The consent column has no declared type, so SQLite stores whatever each command writes into it: text on the way in, integers once normalized.</p>
@@ -92,18 +95,20 @@ FROM (SELECT * FROM customers ORDER BY customer_id);</code></pre>
     <dl class="meta-list"><dt>Export query</dt><dd><a href="/examples/in-place/sql/export.sql">export.sql</a><br><code class="hash">8513ac471e80707fab7bc153743ecfab5777a3c73e651e813223c527cac89aa2</code></dd><dt>Subject name</dt><dd><code>customers.db#customers</code>, the same in every statement</dd></dl>
   </div></li>
 
-  <li id="load"><div><h2>Load the table and attest it</h2>
+  <li id="load" class="pair-data"><div><div class="step-head"><p class="explorer-pane-title">The data</p><h2>Load the table and attest it</h2>
     <p>The first command loads three partner records with the usual intake defects: padded whitespace, mixed case, and three spellings of a consent answer.</p>
     <pre data-filename="01-load.sql"><code class="language-sql">INSERT INTO customers (customer_id, email, marketing_consent, region, age) VALUES
   ('C-1001', ' Alice@Example.COM ', ' YES ', 'us', 34),
   ('C-1002', 'BOB@EXAMPLE.COM', 'false', 'gb', 67),
   ('C-1003', ' carol@example.com', '1', 'ca', 17);</code></pre>
-    <p>Exported, the table is state 1:</p>
-    <pre data-filename="state-1.json"><code class="language-json">[{"age":34,"customer_id":"C-1001","email":" Alice@Example.COM ","marketing_consent":" YES ","region":"us"},{"age":67,"customer_id":"C-1002","email":"BOB@EXAMPLE.COM","marketing_consent":"false","region":"gb"},{"age":17,"customer_id":"C-1003","email":" carol@example.com","marketing_consent":"1","region":"ca"}]</code></pre>
-    <dl class="meta-list"><dt>State 1</dt><dd><a href="/examples/in-place/states/state-1.json">state-1.json</a>, 311 bytes<br><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></dd></dl>
+    <p>Exported, the table is state 1:</p></div>
+    <div class="step-body"><pre data-filename="state-1.json" data-digest="sha256:4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919"><code class="language-json">[{"age":34,"customer_id":"C-1001","email":" Alice@Example.COM ","marketing_consent":" YES ","region":"us"},{"age":67,"customer_id":"C-1002","email":"BOB@EXAMPLE.COM","marketing_consent":"false","region":"gb"},{"age":17,"customer_id":"C-1003","email":" carol@example.com","marketing_consent":"1","region":"ca"}]</code></pre>
+    <div class="step-foot"><dl class="meta-list"><dt>State 1</dt><dd><a href="/examples/in-place/states/state-1.json">state-1.json</a>, 311 bytes<br><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></dd></dl>
     <p>That digest is the same one <a href="/examples/lifecycle/#dataset">the lifecycle walkthrough</a> starts from: the export is byte-for-byte the raw customer file used there. The records are the same; only what happens to them next differs.</p>
-    <p>An <a href="/predicate/v0.2/origin/">origin</a> statement attests state 1. The extension block records which database, table, commands and export produced the subject, because none of that is visible in the digest itself.</p>
-    <pre><code class="language-json">{
+  </div></div></div></li>
+  <li id="attest-load" class="pair-statement"><div><div class="step-head"><p class="explorer-pane-title">What Makoto adds</p><h2>Attest the loaded state</h2>
+    <p>An <a href="/predicate/v0.2/origin/">origin</a> statement attests state 1. The extension block records which database, table, commands and export produced the subject, because none of that is visible in the digest itself.</p></div>
+    <div class="step-body"><pre data-filename="Origin statement" data-digest="sha256:a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383"><code class="language-json">{
   "_type": "https://in-toto.io/Statement/v1",
   "subject": [
     {
@@ -142,10 +147,10 @@ FROM (SELECT * FROM customers ORDER BY customer_id);</code></pre>
     }
   }
 }</code></pre>
-    <dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></dd><dt>Statement digest</dt><dd><code class="hash">a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383</code></dd><dt>Document</dt><dd><a href="/examples/in-place/attestations/state-1-origin.json">state-1-origin.json</a></dd></dl>
-  </div></li>
+    <div class="step-foot"><dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></dd><dt>Statement digest</dt><dd><code class="hash">a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383</code></dd><dt>Document</dt><dd><a href="/examples/in-place/attestations/state-1-origin.json">state-1-origin.json</a></dd></dl>
+  </div></div></div></li>
 
-  <li id="normalize"><div><h2>Edit it in place</h2>
+  <li id="normalize" class="pair-data"><div><div class="step-head"><p class="explorer-pane-title">The data</p><h2>Edit it in place</h2>
     <p class="lf-note">Same table, same file. State 1 is gone from storage.</p>
     <p>One <code>UPDATE</code> normalizes every row where it sits: whitespace trimmed, email folded to lower case, consent resolved to 1 or 0, region upper-cased.</p>
     <pre data-filename="02-normalize.sql"><code class="language-sql">UPDATE customers
@@ -154,19 +159,19 @@ SET email = lower(trim(email)),
       WHEN 'yes' THEN 1 WHEN 'true' THEN 1 WHEN '1' THEN 1
       WHEN 'no' THEN 0 WHEN 'false' THEN 0 WHEN '0' THEN 0
     END,
-    region = upper(region);</code></pre>
-    <pre data-filename="state-2.json"><code class="language-json">[{"age":34,"customer_id":"C-1001","email":"alice@example.com","marketing_consent":1,"region":"US"},{"age":67,"customer_id":"C-1002","email":"bob@example.com","marketing_consent":0,"region":"GB"},{"age":17,"customer_id":"C-1003","email":"carol@example.com","marketing_consent":1,"region":"CA"}]</code></pre>
-    <table class="wide-table"><caption>Before and after the normalize command, for customer <code>C-1001</code>.</caption>
+    region = upper(region);</code></pre></div>
+    <div class="step-body"><pre data-filename="state-2.json" data-digest="sha256:1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982"><code class="language-json">[{"age":34,"customer_id":"C-1001","email":"alice@example.com","marketing_consent":1,"region":"US"},{"age":67,"customer_id":"C-1002","email":"bob@example.com","marketing_consent":0,"region":"GB"},{"age":17,"customer_id":"C-1003","email":"carol@example.com","marketing_consent":1,"region":"CA"}]</code></pre>
+    <div class="step-foot"><table class="wide-table"><caption>Before and after the normalize command, for customer <code>C-1001</code>.</caption>
       <thead><tr><th scope="col">Column</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">What happened</th></tr></thead>
       <tbody><tr><td><code>email</code></td><td><code>" Alice@Example.COM "</code></td><td><code>"alice@example.com"</code></td><td>Whitespace trimmed, case folded.</td></tr><tr><td><code>marketing_consent</code></td><td><code>" YES "</code></td><td><code>1</code></td><td>Text answer resolved to an integer.</td></tr><tr><td><code>region</code></td><td><code>"us"</code></td><td><code>"US"</code></td><td>Upper-cased.</td></tr><tr><td><code>age</code></td><td><code>34</code></td><td><code>34</code></td><td>Unchanged.</td></tr><tr><td><code>customer_id</code></td><td><code>"C-1001"</code></td><td><code>"C-1001"</code></td><td>Unchanged.</td></tr></tbody>
     </table>
     <dl class="meta-list"><dt>State before</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></dd><dt>State after</dt><dd><a href="/examples/in-place/states/state-2.json">state-2.json</a>, 294 bytes<br><code class="hash">1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982</code></dd></dl>
     <p><strong>Nothing in the database remembers state 1 now.</strong> Querying the table cannot recover those rows and cannot prove they existed. The only surviving record of state 1 is its digest, inside statement 1.</p>
-  </div></li>
+  </div></div></div></li>
 
-  <li id="attest-normalize"><div><h2>Attest the new state</h2>
-    <p>A <a href="/predicate/v0.2/transform/">transformation</a> statement attests state 2, and its <code>inputs</code> block ties it to the state it replaced.</p>
-    <pre><code class="language-json">{
+  <li id="attest-normalize" class="pair-statement"><div><div class="step-head"><p class="explorer-pane-title">What Makoto adds</p><h2>Attest the new state</h2>
+    <p>A <a href="/predicate/v0.2/transform/">transformation</a> statement attests state 2, and its <code>inputs</code> block ties it to the state it replaced.</p></div>
+    <div class="step-body"><pre data-filename="Transformation statement" data-digest="sha256:8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63"><code class="language-json">{
   "_type": "https://in-toto.io/Statement/v1",
   "subject": [
     {
@@ -224,28 +229,28 @@ SET email = lower(trim(email)),
     ]
   }
 }</code></pre>
-    <dl class="meta-list"><dt>Input digest</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code><br><code>inputs[0].digest</code>: state 1, the rows the command rewrote.</dd><dt>Predecessor</dt><dd><code class="hash">a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383</code><br><code>inputs[0].<wbr>provenance.<wbr>statementDigest</code>: statement 1.</dd><dt>Parameters</dt><dd><code class="hash">a9f53771a9db5a50f78ffffd600f43684ea8bec8b9b347627f4c14d410660b1b</code><br><code>operation.parametersDigest</code>: the SHA-256 of <a href="/examples/in-place/sql/02-normalize.sql">02-normalize.sql</a>, so the statement names the exact command that edited the table.</dd></dl>
+    <div class="step-foot"><dl class="meta-list"><dt>Input digest</dt><dd><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code><br><code>inputs[0].digest</code>: state 1, the rows the command rewrote.</dd><dt>Predecessor</dt><dd><code class="hash">a158413155f40165adb7fa52553fb9008b33189e38ffc82d653d9892a8e2b383</code><br><code>inputs[0].<wbr>provenance.<wbr>statementDigest</code>: statement 1.</dd><dt>Parameters</dt><dd><code class="hash">a9f53771a9db5a50f78ffffd600f43684ea8bec8b9b347627f4c14d410660b1b</code><br><code>operation.parametersDigest</code>: the SHA-256 of <a href="/examples/in-place/sql/02-normalize.sql">02-normalize.sql</a>, so the statement names the exact command that edited the table.</dd></dl>
     <p>The input and the subject share one name, <code>customers.db#customers</code>, and differ only in digest. That is the in-place pattern in one line: the name says which table, the digest says which state.</p>
     <dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982</code></dd><dt>Statement digest</dt><dd><code class="hash">8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63</code></dd><dt>Document</dt><dd><a href="/examples/in-place/attestations/state-2-normalize.json">state-2-normalize.json</a></dd></dl>
-  </div></li>
+  </div></div></div></li>
 
-  <li id="withdraw"><div><h2>Edit it again</h2>
+  <li id="withdraw" class="pair-data"><div><div class="step-head"><p class="explorer-pane-title">The data</p><h2>Edit it again</h2>
     <p class="lf-note">Same table again. State 2 is gone from storage too.</p>
     <p>A policy fix: a customer under 18 cannot give marketing consent. The command touches one row.</p>
     <pre data-filename="03-withdraw-minor-consent.sql"><code class="language-sql">UPDATE customers
 SET marketing_consent = 0
-WHERE age &lt; 18 AND marketing_consent = 1;</code></pre>
-    <pre data-filename="state-3.json"><code class="language-json">[{"age":34,"customer_id":"C-1001","email":"alice@example.com","marketing_consent":1,"region":"US"},{"age":67,"customer_id":"C-1002","email":"bob@example.com","marketing_consent":0,"region":"GB"},{"age":17,"customer_id":"C-1003","email":"carol@example.com","marketing_consent":0,"region":"CA"}]</code></pre>
-    <table class="wide-table"><caption>Before and after the withdrawal, for customer <code>C-1003</code>, the only row it changed.</caption>
+WHERE age &lt; 18 AND marketing_consent = 1;</code></pre></div>
+    <div class="step-body"><pre data-filename="state-3.json" data-digest="sha256:86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0"><code class="language-json">[{"age":34,"customer_id":"C-1001","email":"alice@example.com","marketing_consent":1,"region":"US"},{"age":67,"customer_id":"C-1002","email":"bob@example.com","marketing_consent":0,"region":"GB"},{"age":17,"customer_id":"C-1003","email":"carol@example.com","marketing_consent":0,"region":"CA"}]</code></pre>
+    <div class="step-foot"><table class="wide-table"><caption>Before and after the withdrawal, for customer <code>C-1003</code>, the only row it changed.</caption>
       <thead><tr><th scope="col">Column</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">What happened</th></tr></thead>
       <tbody><tr><td><code>email</code></td><td><code>"carol@example.com"</code></td><td><code>"carol@example.com"</code></td><td>Unchanged.</td></tr><tr><td><code>marketing_consent</code></td><td><code>1</code></td><td><code>0</code></td><td>Withdrawn: the customer is 17.</td></tr><tr><td><code>region</code></td><td><code>"CA"</code></td><td><code>"CA"</code></td><td>Unchanged.</td></tr><tr><td><code>age</code></td><td><code>17</code></td><td><code>17</code></td><td>Unchanged.</td></tr><tr><td><code>customer_id</code></td><td><code>"C-1003"</code></td><td><code>"C-1003"</code></td><td>Unchanged.</td></tr></tbody>
     </table>
     <dl class="meta-list"><dt>State before</dt><dd><code class="hash">1985f7b32568c7c5740b4008cc9c1212850b13b6bf027ba963cc46b9e67aa982</code></dd><dt>State after</dt><dd><a href="/examples/in-place/states/state-3.json">state-3.json</a>, 294 bytes<br><code class="hash">86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0</code></dd></dl>
-  </div></li>
+  </div></div></div></li>
 
-  <li id="attest-withdraw"><div><h2>Attest it again</h2>
-    <p>The same pattern, one link further along: the input is state 2 and the predecessor is statement 2.</p>
-    <pre><code class="language-json">{
+  <li id="attest-withdraw" class="pair-statement"><div><div class="step-head"><p class="explorer-pane-title">What Makoto adds</p><h2>Attest it again</h2>
+    <p>The same pattern, one link further along: the input is state 2 and the predecessor is statement 2.</p></div>
+    <div class="step-body"><pre data-filename="Transformation statement" data-digest="sha256:f57f35ea803045407dc5a12a15f250dd5ac31a420bddd48a89e9bafaa6841746"><code class="language-json">{
   "_type": "https://in-toto.io/Statement/v1",
   "subject": [
     {
@@ -303,8 +308,8 @@ WHERE age &lt; 18 AND marketing_consent = 1;</code></pre>
     ]
   }
 }</code></pre>
-    <dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0</code></dd><dt>Statement digest</dt><dd><code class="hash">f57f35ea803045407dc5a12a15f250dd5ac31a420bddd48a89e9bafaa6841746</code></dd><dt>Points back to</dt><dd><code class="hash">8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63</code></dd><dt>Parameters</dt><dd><code class="hash">181098ef88909bae3dc238a10be2cc630907584eed6fd57330dd65bcc25c5a79</code></dd><dt>Document</dt><dd><a href="/examples/in-place/attestations/state-3-withdraw-minor-consent.json">state-3-withdraw-minor-consent.json</a></dd></dl>
-  </div></li>
+    <div class="step-foot"><dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">86c8be84d5e35cb1a5ebb0fbde14f3bd622f69cc021492ec8ff98456daa8b1d0</code></dd><dt>Statement digest</dt><dd><code class="hash">f57f35ea803045407dc5a12a15f250dd5ac31a420bddd48a89e9bafaa6841746</code></dd><dt>Points back to</dt><dd><code class="hash">8444407e871286f68eef9aaee6cbbc1d76eff5fea18d311d74d89e425d841c63</code></dd><dt>Parameters</dt><dd><code class="hash">181098ef88909bae3dc238a10be2cc630907584eed6fd57330dd65bcc25c5a79</code></dd><dt>Document</dt><dd><a href="/examples/in-place/attestations/state-3-withdraw-minor-consent.json">state-3-withdraw-minor-consent.json</a></dd></dl>
+  </div></div></div></li>
 
   <li id="what-survives"><div><h2>What storage keeps, and what Makoto keeps</h2>
     <table class="wide-table"><caption>After both edits. Only state 3 is still in the database; statements name all three.</caption>
@@ -321,6 +326,7 @@ WHERE age &lt; 18 AND marketing_consent = 1;</code></pre>
   </div></li>
 
   </ol>
+</div>
 
   <h2 id="reproduce">Reproduce every digest on this page</h2>
   <p>State digests need only the sqlite3 shell and <code>shasum</code>. Start in an empty directory; the create command fails if <code>customers.db</code> already exists.</p>
@@ -359,5 +365,5 @@ EOF</code></pre>
   </section>
 </main>
 <footer class="footer"><div class="footer-inner"><p class="footer-line">Makoto casebook · every digest on this page is generated from committed SQL · <a href="https://github.com/makoto-project/makoto">Open source on GitHub</a></p><nav class="footer-nav" aria-label="Site"><a href="/spec/">Specification</a><a href="/spec/schemas/">Hosted schemas</a><a href="/demos/end-to-end/">Runnable proof</a><a href="/examples/">Examples</a><a href="/community/">Community</a><a href="/privacy/">Privacy</a></nav><p class="footer-meta">Apache-2.0 · <a href="https://github.com/makoto-project/usemakoto.dev">Site source on GitHub</a></p></div></footer></div></div>
-<script defer src="/assets/flow.js"></script><script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+<script defer src="/assets/flow.js"></script><script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script><script defer src="/assets/steps.js"></script>
 </body></html>
