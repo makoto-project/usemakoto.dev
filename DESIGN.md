@@ -3,10 +3,11 @@
 The site files real exhibits (configuration, commands, captured output) and
 frames them with prose. It never describes code it could show.
 
-All styling lives in `assets/v02.css`. Behaviour lives in three small scripts:
+All styling lives in `assets/v02.css`. Behaviour lives in small scripts:
 `assets/theme.js` (theme and table labels, every page), `assets/code.js` (code
-frames), and `assets/flow.js` (drawn connectors on flow diagrams). There is no
-build step.
+frames), `assets/flow.js` (drawn connectors on flow diagrams),
+`assets/explorer.js` (the Explorer) and `assets/steps.js` (the walkthroughs'
+step index). There is no build step.
 
 ## Surfaces
 
@@ -111,6 +112,10 @@ them. Tables fit their column and, below 720px, reflow into stacked label and
 value rows. `tests/test_layout_guards.py` fails on `overflow-x` scrolling, on
 coloured side stripes, and on JSON lines that could be split but are not.
 
+A `<pre>` with `data-digest="sha256:<hex>"` shows the digest in its tab as a
+short SHA (`sha256:4e90181`); hovering shows the full value and copying the
+short SHA copies the full hex.
+
 A page about code opens with a `figure.lead-exhibit` repeating its decisive
 block verbatim, captioned with a link to where it appears.
 
@@ -130,6 +135,20 @@ measured and redrawn on resize, stacked layouts route lines down a gutter,
 and under
 reduced motion the lines stay and nothing moves. Load
 `<script defer src="/assets/flow.js"></script>` on those pages.
+
+## Walkthroughs
+
+The example walkthroughs (`/examples/lifecycle/`, `/examples/in-place/`)
+borrow the Explorer's layout but stay one scrolling page. A data step
+(`li.pair-data`, labelled "The data") is followed by the statement step it
+produced (`li.pair-statement`, "What Makoto adds"); when the steps are at
+least 940px wide they sit side by side on shared subgrid rows, head then body,
+so both exhibits start on one line, and their tables stack. Keep each step's
+own number: the prose cites steps by number. A `nav.step-index` of in-page
+anchors, styled as the Explorer's stage row, sits above the sequence inside
+`.step-track`; `steps.js` makes it sticky and marks the step in view, and
+without JavaScript it is a plain list. Each page links to `/explorer/` from
+the top.
 
 ## Generated pages
 

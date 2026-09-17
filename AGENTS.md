@@ -12,6 +12,7 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 - Moving the core pin is more than `sync_core_release.py` plus `render_spec.py`: grep for the old SHA and update the `git checkout` lines in `verify/`, `integrations/`, `sdk/`, and the `ref:` in each `demos/0N/makoto-gate.yml` (quoted verbatim in its page and on the homepage). `check_site.py` only enforces the end-to-end source link.
 - `/explorer/` (`assets/explorer.js`) replays the end-to-end artifacts; its `explorer/properties.json` comes from `uv run --project ../core python scripts/explorer_properties.py` (`--check` detects drift). Rerun it after a pin move or new reports.
 - `levels/`, `threats/` and `spec/lN-requirements.html` restate core `spec/v0.2.md` section 8 and `spec/failure-mode-coverage.md` (Origin/Transform tracks, verified properties); change them only from those sources.
+- The lifecycle and in-place walkthroughs pair each data step with its statement step and index them with `assets/steps.js` (`DESIGN.md`, "Walkthroughs"). Never merge or renumber steps: the prose cites them by number ("step 02").
 - `scripts/check_site.py` forbids visible `v0.1`/`v0.2` text on narrative pages; put identifiers inside `<code>`.
 - Every styled page carries the same `<head>` social block (canonical, Open Graph, Twitter) and the same footer structure; `DESIGN.md` ("Shell") says where each comes from. The card `assets/og-card.png` is rendered from `scripts/og_card.html` (instructions inside); re-render it when the identity changes.
 
