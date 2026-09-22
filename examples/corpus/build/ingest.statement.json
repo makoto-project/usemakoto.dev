@@ -1,0 +1,96 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "predicate": {
+    "event": {
+      "id": "urn:uuid:8d4f2b61-0a3c-4e7d-b1f9-6c2e5a8d3b47",
+      "occurredAt": "2026-09-02T09:20:00Z"
+    },
+    "extensions": {
+      "https://corpus.example/makoto/license/v1": {
+        "default": {
+          "evidence": "https://archive.example/harbour-letters/rights",
+          "license": "CC0-1.0"
+        },
+        "overrides": [
+          {
+            "attribution": "Transcribed by the Harbour Letters Society",
+            "entryName": "shards/letters-00001.ndjson",
+            "evidence": "https://archive.example/harbour-letters/society-terms",
+            "license": "CC-BY-4.0",
+            "subjectName": "letters.shards.json"
+          }
+        ]
+      }
+    },
+    "inputs": [
+      {
+        "digest": {
+          "sha256": "0358912c7afe582ab9c93d2a1e19922b35ca4d72bcf5f86b02da74b911d2142b"
+        },
+        "name": "raw",
+        "provenance": {
+          "statementDigest": {
+            "sha256": "cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8"
+          },
+          "subjectName": "letters.raw.json"
+        }
+      }
+    ],
+    "operation": {
+      "name": "Ingest the letters series into NDJSON shards",
+      "parametersDigest": {
+        "sha256": "fdf257d83b86202ff5874f5c5aabb1d06942abd8e145700ab7bdf46454cad0db"
+      },
+      "tool": {
+        "name": "corpus-ingest",
+        "uri": "https://tools.corpus.example/corpus-ingest",
+        "version": "1.4.0"
+      },
+      "type": "urn:makoto:example:operation:corpus-ingest"
+    },
+    "profiles": [
+      {
+        "closureDigest": {
+          "sha256": "a16890114db598c65f7e35790e6f5b0193e0a3c8e452cd9727dd1d3442525bc2"
+        },
+        "critical": true,
+        "digest": {
+          "sha256": "5a0498a2911bbe3029c9dbcbcbbbb2c2ce683d280b796a5f09ad271d8e9b034f"
+        },
+        "id": "https://usemakoto.dev/schema/v0.2/dataset-manifest.schema.json",
+        "mediaType": "application/vnd.makoto.dataset-manifest.v0.2+json",
+        "resources": [],
+        "subjectName": "letters.shards.json",
+        "target": "artifact"
+      },
+      {
+        "closureDigest": {
+          "sha256": "fbac8a68cb1a9ad0347e74c104ee885ed607bb7b837a4e1f3372163afc73c35d"
+        },
+        "critical": true,
+        "digest": {
+          "sha256": "ce30589e17abff371e461b6fd75723b055fdddef6e865bcc5fabcf327f07b9ab"
+        },
+        "id": "https://corpus.example/makoto/license/v1/predicate.schema.json",
+        "resources": [],
+        "target": "predicate"
+      }
+    ],
+    "schemaVersion": "0.2"
+  },
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/transform",
+  "subject": [
+    {
+      "digest": {
+        "sha256": "599532ac3af859e59d2e9fad4c74cb3299fbb699357034db86c8881e95d6d49f"
+      },
+      "name": "letters.yaml"
+    },
+    {
+      "digest": {
+        "sha256": "d8df4b70de36f576e7d430cf970e462b28ab44f3eb1d1e44220def9058ab487b"
+      },
+      "name": "letters.shards.json"
+    }
+  ]
+}

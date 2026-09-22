@@ -1,0 +1,2 @@
+PASS text/letters/makoto verifies against the current files
+exit 0

@@ -1,0 +1,24 @@
+# Leaf manifest, written by corpus-ingest. Edit ingest.yaml and re-run the
+# ingest instead of editing this file: the lineage record pins its bytes.
+name: harbour-letters
+title: Harbour Letters
+languages: [en]
+license: CC0-1.0
+license_evidence: https://archive.example/harbour-letters/rights
+sources:
+  - name: Harbour town archive, letters series
+    uri: https://archive.example/harbour-letters/
+    version: "2026-09-01"
+    retrieved_at: "2026-09-02T09:00:00Z"
+shards:
+  - name: shards/letters-00000.ndjson
+    sha256: 38b25153d8aee6004af8f13dcc459cf3be694fd35595303587637d9937dba952
+    bytes: 898
+    records: 3
+  - name: shards/letters-00001.ndjson
+    sha256: 6d2313de212a449feb04b7d9cd223305d4896fbd43371d43edd06048046b4dd3
+    bytes: 743
+    records: 2
+    license: CC-BY-4.0
+    attribution: "Transcribed by the Harbour Letters Society"
+    license_evidence: https://archive.example/harbour-letters/society-terms

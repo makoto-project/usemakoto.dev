@@ -1,0 +1,3 @@
+# Directories beneath this one that hold corpora.
+children:
+  - text/

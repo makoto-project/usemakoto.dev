@@ -1,0 +1,17 @@
+[
+  {
+    "declaredSize": "743",
+    "digest": {
+      "sha256": "6d2313de212a449feb04b7d9cd223305d4896fbd43371d43edd06048046b4dd3"
+    },
+    "digestPrerequisiteChecks": [],
+    "digestStatus": "pass",
+    "entryName": "shards/letters-00001.ndjson",
+    "manifestStatementDigest": {
+      "sha256": "a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"
+    },
+    "manifestSubjectName": "letters.shards.json",
+    "sizePrerequisiteChecks": [],
+    "sizeStatus": "pass"
+  }
+]
