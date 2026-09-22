@@ -584,8 +584,12 @@ def build(out: Path) -> None:
         write(display / "verify-without-license.txt", transcript(*refused).encode())
 
         # The check a pull request runs, on a change it accepts and one it refuses.
-        write(display / "check-current.txt", check_lineage(repo, work, edit=False).encode())
-        write(display / "check-stale.txt", check_lineage(repo, work, edit=True).encode())
+        write(display / "check-current.txt", check_lineage(repo, work, "readme").encode())
+        write(display / "check-stale.txt", check_lineage(repo, work, "manifest").encode())
+        for change in ("parameters", "missing"):
+            write(display / f"check-{change}.txt", check_lineage(repo, work, change).encode())
+        refused_self = check_lineage(repo, work, "self-authorize", bare_repo / LEAF / "makoto")
+        write(display / "check-self-authorize.txt", refused_self.encode())
 
 
 def handoff(work: Path, attestations: Path, out: Path, leaf_manifest: Path, lineage: Path) -> None:
@@ -676,9 +680,13 @@ def verify_bundle(
     return lines, output
 
 
-def check_lineage(repo: Path, work: Path, *, edit: bool) -> str:
-    """Run the repository's pull-request check on a throwaway Git copy of the corpus."""
-    clone = work / ("check-stale" if edit else "check-current")
+def check_lineage(repo: Path, work: Path, change: str, bare_record: Path | None = None) -> str:
+    """Run the repository's pull-request check on a throwaway Git copy of the corpus.
+
+    `change` names the contribution on the pull-request branch. Only "readme"
+    passes; every other change must be refused.
+    """
+    clone = work / f"check-{change}"
     shutil.copytree(repo, clone)
     env = {
         **os.environ,
@@ -697,27 +705,45 @@ def check_lineage(repo: Path, work: Path, *, edit: bool) -> str:
     git("add", "-A")
     git("commit", "--quiet", "-s", "-m", "Add the letters corpus")
     git("checkout", "--quiet", "-b", "contribution")
-    manifest = clone / LEAF / LEAF_MANIFEST
-    if edit:
-        # A contributor adds a shard to the manifest by hand and leaves the record alone.
-        manifest.write_bytes(
-            manifest.read_bytes()
+    leaf = clone / LEAF
+    if change == "readme":
+        # A change the record does not cover.
+        (clone / "README.md").write_bytes(b"Harbour Letters corpus.\n")
+    elif change == "manifest":
+        # A shard added to the manifest by hand, the record left alone.
+        (leaf / LEAF_MANIFEST).write_bytes(
+            (leaf / LEAF_MANIFEST).read_bytes()
             + b"  - name: shards/letters-00002.ndjson\n"
             + f"    sha256: {sha256(b'extra')}\n".encode()
             + b"    bytes: 5\n    records: 1\n"
         )
+    elif change == "parameters":
+        # Settings edited without re-running the ingest.
+        (leaf / "ingest.yaml").write_bytes((leaf / "ingest.yaml").read_bytes() + b"# edited\n")
+    elif change == "missing":
+        # A new leaf directory with no record.
+        write(clone / "text/diaries/ingest.yaml", b"source: https://archive.example/diaries/\n")
+    elif change == "self-authorize":
+        # A record without the license claim, plus a policy edit that would accept it.
+        assert bare_record is not None
+        shutil.rmtree(leaf / "makoto")
+        shutil.copytree(bare_record, leaf / "makoto")
+        policy = json.loads((clone / "lineage/policy.json").read_bytes())
+        for rule in policy["rules"]:
+            rule.pop("profileConstraints", None)
+        write_json(clone / "lineage/policy.json", policy)
     else:
-        # A contributor changes a file the record does not cover.
-        (clone / "README.md").write_bytes(b"Harbour Letters corpus.\n")
+        raise ValueError(change)
     git("add", "-A")
-    git("commit", "--quiet", "-s", "-m", "Update the letters corpus")
+    git("commit", "--quiet", "-s", "-m", "Update the corpus")
     command = ["uv", "run", "--no-project", "lineage/check_lineage.py", "--base", "main"]
     completed = subprocess.run(
         command, cwd=clone, env=env, check=False, capture_output=True, text=True
     )
-    if completed.returncode != (1 if edit else 0):
+    if completed.returncode != (0 if change == "readme" else 1):
         raise SystemExit(
-            f"check_lineage exited {completed.returncode}\n{completed.stdout}{completed.stderr}"
+            f"check_lineage ({change}) exited {completed.returncode}\n"
+            f"{completed.stdout}{completed.stderr}"
         )
     return transcript([" ".join(command)], completed.stdout)
 

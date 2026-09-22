@@ -58,11 +58,11 @@
   <table class="status-table"><thead><tr><th>Level</th><th>Where the corpus keeps it</th><th>What Makoto does with it</th></tr></thead><tbody>
     <tr><td>Set</td><td><code>license</code> and <code>license_evidence</code> in <code>letters.yaml</code>.</td><td><strong>Proposed extension.</strong> The <code>default</code> in a claim on the ingest statement, validated by a profile.</td></tr>
     <tr><td>Shard</td><td><code>license</code>, <code>attribution</code> and <code>license_evidence</code> on one shard's entry in <code>letters.yaml</code>.</td><td><strong>Proposed extension.</strong> An <code>overrides</code> entry keyed by the shard manifest's <code>subjectName</code> and the shard's <code>entryName</code>.</td></tr>
-    <tr><td>Row</td><td><code>license</code>, <code>attribution</code>, <code>source</code> and <code>maintainer</code> in every row.</td><td><strong>Nothing.</strong> The shard's digest commits to every row, so a changed row changes the digest, but no verifier reads row values.</td></tr>
+    <tr><td>Row</td><td><code>license</code>, <code>attribution</code>, <code>source</code> and <code>maintainer</code> in every row.</td><td><strong>Nothing in this record.</strong> The shard's digest commits to every row, so a changed row changes the digest. These shards are dataset-manifest entries, and profiles apply to statement subjects, so no profile reads their rows.</td></tr>
   </tbody></table>
 
   <h2 id="claim">The claim</h2>
-  <p>The ingest writes the claim into its statement's <code>extensions</code> (<a href="/spec/text/#112-common-makoto-predicate-fields">section 11.2</a>). Extension keys are URIs, and the core schemas accept any of them. This is the file passed to <code>makoto attest transform --extensions</code>:</p>
+  <p>The ingest writes the claim into its statement's <code>extensions</code> (<a href="/spec/text/#112-common-makoto-predicate-fields">section 11.2</a>). Extension keys are absolute HTTPS URIs or URNs, and the core schemas accept any such key. The claim sits on the ingest rather than the origin because per-shard overrides need shard names, which exist only once the ingest has run. This is the file passed to <code>makoto attest transform --extensions</code>:</p>
   <pre data-filename="extensions for the ingest statement"><code class="language-json">{
   "https://corpus.example/makoto/license/v1": {
     "default": {
@@ -170,7 +170,7 @@
   <pre data-filename="lineage/license.profile.json"><code class="language-json">{"closureDigest":{"sha256":"fbac8a68cb1a9ad0347e74c104ee885ed607bb7b837a4e1f3372163afc73c35d"},"critical":true,"digest":{"sha256":"ce30589e17abff371e461b6fd75723b055fdddef6e865bcc5fabcf327f07b9ab"},"id":"https://corpus.example/makoto/license/v1/predicate.schema.json","resources":[],"target":"predicate"}</code></pre>
 
   <h2 id="policy">Refuse a step without it</h2>
-  <p>The repository's policy authorizes the ingest key only for statements that carry this exact profile, through <code>profileConstraints</code> (<a href="/spec/text/#14-consumer-trust-policy">section 14</a>):</p>
+  <p>The repository's policy authorizes <code>corpus-ingest</code> transforms only when the statement carries this exact profile, through <code>profileConstraints</code> (<a href="/spec/text/#14-consumer-trust-policy">section 14</a>):</p>
   <pre data-filename="lineage/policy.json · the ingest rule"><code class="language-json">{
   "authorizedKeyIds": [
     "sha256:21981d07157626519dc4de7c1c09043877f8e66afd3554169bf9496df8419f50"
@@ -226,8 +226,9 @@ E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle 
   <p><code>E_SIGNER_UNAUTHORIZED</code> is the cause. The <code>E_MANIFEST_SET</code> lines follow from it: the unauthorized statement drops out of the graph, which then no longer matches what the handoff names.</p>
 
   <h2 id="scope">What this establishes</h2>
-  <p><strong>It establishes</strong> that a key the reader trusts put a well-formed license claim on every ingest it signed, and that the claim cannot change without the signature failing.</p>
-  <p><strong>It does not establish</strong> that the claim is legally correct. The <code>evidence</code> URL points at the terms a reviewer should read, and a reader's own review decides. Nor does it say anything about individual rows: the verifier reads only JSON and NDJSON contents (<a href="/spec/text/#124-validating-actual-data-contents">section 12.4</a>), and a Parquet shard is opaque to it.</p>
+  <p><strong>It establishes</strong> that each ingest statement in a record that verifies was signed by a key the reader trusts for ingests, carries a license claim of the shape the profile requires, and cannot change without its signature failing.</p>
+  <p><strong>It does not establish</strong> that the claim is legally correct. The <code>evidence</code> URL points at the terms a reviewer should read, and the reader's own review decides. The profile checks shape only: it wants non-empty strings, not valid SPDX expressions, and nothing resolves the claim's <code>subjectName</code> and <code>entryName</code> against the record the way the verifier resolves <code>inputs[].provenance.entryName</code>. A stricter profile, or a reviewer, would have to.</p>
+  <p><strong>Rows need a different shape.</strong> The verifier can validate every line of an NDJSON subject against an artifact profile (<a href="/spec/text/#124-validating-actual-data-contents">section 12.4</a>). A corpus that named each JSON or NDJSON shard as its own subject, instead of listing it in a dataset manifest, could therefore require a license on every row. Parquet shards cannot be checked this way; the verifier hashes and sizes them and reads nothing inside.</p>
 
   <section class="community-band" aria-labelledby="next"><h2 id="next">Next: maintain the corpus through Git.</h2>
     <p>Sign-off, pull requests, and a check that refuses a manifest edited without its lineage record.</p>

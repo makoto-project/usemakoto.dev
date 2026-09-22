@@ -47,4 +47,8 @@ jobs:
       - name: Manifests and lineage records agree
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
-        run: uv run --no-project lineage/check_lineage.py --base "$BASE"
+        # Run the base commit's check, which also reads the base commit's policy,
+        # so a pull request cannot change the rules it is checked against.
+        run: |
+          git show "$BASE:lineage/check_lineage.py" > "$RUNNER_TEMP/check_lineage.py"
+          uv run --no-project "$RUNNER_TEMP/check_lineage.py" --base "$BASE"

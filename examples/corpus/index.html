@@ -26,7 +26,7 @@
   <h1>Map a corpus index onto Makoto documents.</h1>
   <p class="lead">Many corpora live as a Git repository of small index files that point at large shards stored elsewhere. This guide follows one such corpus from its directory indexes down to a single shard, and shows which Makoto document carries each part, what a reader can then check, and what stays outside Makoto.</p>
   <nav class="spec-jump" aria-label="This guide"><a href="/examples/corpus/" aria-current="page">1. Map the index</a><a href="/examples/corpus/licenses/">2. Carry licenses</a><a href="/examples/corpus/maintenance/">3. Maintain it in Git</a></nav>
-  <p class="editorial-note"><strong>Every value in this guide is real.</strong> <code>scripts/corpus_example.py</code> builds the corpus, signs its record with the Makoto reference CLI at the pinned core commit, runs each command shown, and saves what it printed. The keys are insecure example-only keys derived from fixed seeds. The archive, the letters and the society that transcribed some of them are fictional.</p>
+  <p class="editorial-note"><strong>Every digest, signature and transcript in this guide is generated.</strong> <code>scripts/corpus_example.py</code> builds the corpus, signs its record with the Makoto reference CLI at the pinned core commit, runs each command shown, and saves what it printed. The keys are insecure example-only keys derived from fixed seeds. The archive, the letters and the society that transcribed some of them are fictional.</p>
 
   <figure class="lead-exhibit"><figcaption><strong>The command this guide builds toward.</strong> Repeated from <a href="#verify">Verify the record</a> below.</figcaption><pre><code class="language-bash">$ makoto verify bundle text/letters/makoto \
   --policy lineage/policy.json \
@@ -113,11 +113,11 @@ shards:
     <tr><td>The record in Git</td><td>A handoff bundle in <code>makoto/</code> beside the manifest, signed by an index maintainer's key (<a href="/spec/text/#133-reference-bundle-layout">section 13.3</a>).</td><td>Today</td></tr>
     <tr><td>Set and shard licenses</td><td>A claim in the ingest statement's <code>extensions</code>, required by a profile. <a href="/examples/corpus/licenses/">Carry licenses</a> shows it.</td><td>Proposed extension</td></tr>
     <tr><td>Languages, record counts</td><td>Would follow the same pattern as licenses: a named extension and a profile. Not included here.</td><td>Would need an extension</td></tr>
-    <tr><td>Row source, license, maintainer</td><td>Columns in the shard rows. The shard's digest commits to them; no verifier reads them.</td><td>Stays outside Makoto</td></tr>
+    <tr><td>Row source, license, maintainer</td><td>Columns in the shard rows. The shard's digest commits to them; nothing in this record reads them. <a href="/examples/corpus/licenses/#scope">Carry licenses</a> says when rows can be checked.</td><td>Stays outside this record</td></tr>
   </tbody></table>
 
   <h2 id="documents">The documents, in the order they were signed</h2>
-  <p>Each statement below is the exact payload its signature covers. Copy a block and hash it with <code>shasum -a 256</code> to get the statement digest quoted beneath it. The signed envelopes are in <a href="/examples/corpus/repo/text/letters/makoto/attestations/cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8.dsse.json">makoto/attestations/</a>.</p>
+  <p>Each statement below is the exact payload its signature covers. Copy a block and hash it with <code>shasum -a 256</code> to get the statement digest quoted beneath it. (The dataset manifests end with a newline the blocks omit; their signed bytes are in <a href="/examples/corpus/repo/text/letters/makoto/bundle.json">the record</a>.) The signed envelopes are in <a href="/examples/corpus/repo/text/letters/makoto/attestations/cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8.dsse.json">makoto/attestations/</a>.</p>
 
   <h3 id="raw">The raw files, as a dataset manifest</h3>
   <p>A directory is not a finite byte sequence, so the ingest lists the files it fetched in a dataset manifest (<a href="/spec/text/#125-partitioned-dataset-manifests">section 12.5</a>) and the origin names that manifest as its subject.</p>
@@ -140,10 +140,10 @@ shards:
   <h3 id="handoff">Handoff: the record a reader receives</h3>
   <p>An index maintainer's key signs the handoff. It fixes the exact set of statements, their root and head, and the artifact handed off: the leaf manifest. The two dataset manifests travel in the bundle as supporting material, because their profile requires their bytes.</p>
   <pre data-filename="handoff manifest · signed payload"><code class="language-json">{"artifacts":[{"digest":{"sha256":"599532ac3af859e59d2e9fad4c74cb3299fbb699357034db86c8881e95d6d49f"},"head":{"sha256":"a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"},"name":"letters.yaml"}],"bundleId":"urn:uuid:e2b7c4d9-5f0a-4c18-a36e-9b1d7f2c8e05","heads":[{"sha256":"a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"}],"issuedAt":"2026-09-02T09:30:00Z","requiredProfiles":[],"roots":[{"sha256":"cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8"}],"statements":[{"sha256":"a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"},{"sha256":"cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8"}],"version":"0.2"}</code></pre>
-  <p>Manifest digest <code class="hash" title="sha256:b30f91d37734806e0b5e8d87f9a2a00c28202ea361c9737e2a9e70b7bc65157b">b30f91d</code>. The whole record is <a href="/examples/corpus/repo/text/letters/makoto/bundle.json">text/letters/makoto/</a>: an unsigned index, the signed handoff, two signed statements, and the artifact bytes.</p>
+  <p>Manifest digest <code class="hash" title="sha256:b30f91d37734806e0b5e8d87f9a2a00c28202ea361c9737e2a9e70b7bc65157b">b30f91d</code>. The whole record is <a href="/examples/corpus/repo/text/letters/makoto/bundle.json">text/letters/makoto/</a>: an unsigned index, the signed handoff, two signed statements, the artifact bytes, and the license profile's schema.</p>
 
   <h2 id="verify">Verify the record</h2>
-  <p>A reader runs the verifier from the repository root, with the repository's policy, and names the leaf-manifest bytes they expect. Here the expectation is the file they checked out:</p>
+  <p>A reader runs the verifier from the repository root under a policy they hold themselves (<a href="/spec/text/#14-consumer-trust-policy">section 14</a>). This reader has reviewed the repository's <code>lineage/policy.json</code> and uses it; a reader who does not accept the maintainers' choice of keys writes their own. The expected-artifact binding sits beside the checkout, outside the repository, and names the leaf-manifest bytes they checked out:</p>
   <pre data-filename="../expected-letters.json"><code class="language-json">{"digest":{"sha256":"599532ac3af859e59d2e9fad4c74cb3299fbb699357034db86c8881e95d6d49f"},"head":{"sha256":"a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"},"subjectName":"letters.yaml"}</code></pre>
   <pre><code class="language-bash">$ makoto verify bundle text/letters/makoto \
   --policy lineage/policy.json \
@@ -254,7 +254,7 @@ E_ARTIFACT_DIGEST: dataset-entry bytes differ from the manifest member digest</c
   <h2 id="limits">Limits worth knowing</h2>
   <dl class="troubleshooting">
     <dt>Parallel work</dt><dd>Makoto records the results of sharded, parallel work. It does not schedule or describe the fan-out. One statement per worker means many statements and keys; one statement per ingest, as here, means trusting whoever aggregated the workers' output.</dd>
-    <dt>Scale</dt><dd>The specification's performance target is a 1,000-statement graph verified in at most 2 seconds at p95 (<a href="/spec/text/#232-performance-targets">section 23.2</a>). That is a target, not a measurement at the size of a large corpus.</dd>
+    <dt>Scale</dt><dd>The specification's performance target is a 1,000-statement graph verified in at most 2 seconds at p95, excluding artifact hashing, on two named baseline machines (<a href="/spec/text/#232-performance-targets">section 23.2</a>). That is a target, not a measurement at the size of a large corpus.</dd>
     <dt>Rows</dt><dd>The finest unit is the shard. Proving that a row belongs to a verified shard would need a new predicate, and current verifiers reject predicates they do not know (<a href="/spec/text/#111-common-in-toto-statement">section 11.1</a>).</dd>
     <dt>Keys</dt><dd>Signatures use Ed25519 keys named in the reader's policy. Keyless signing, transparency logs and certificate authorities are outside the current specification (<a href="/spec/text/#5-non-goals-for-v02">section 5</a>).</dd>
     <dt>Replacement</dt><dd>A re-ingest that replaces a corpus produces a new origin and a new head. The reader's policy decides whether an older record is still acceptable.</dd>
