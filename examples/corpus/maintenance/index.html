@@ -48,7 +48,7 @@ FAIL text/letters/makoto deny: E_EXPECTED_ARTIFACT</code></pre></figure>
     <li>The workflow runs two jobs: every commit needs a sign-off from its author, and every record must verify against the files in the pull request.</li>
     <li>Reviewers read the manifest diff and the record's statements, which are small JSON documents once decoded.</li>
   </ol>
-  <p>A contributor without an authorized key can still open the pull request; a maintainer re-runs the ingest on the branch and signs. A policy can require two maintainers for a step with <code>minimumSignatures</code>, and <code>makoto envelope cosign</code> adds the second signature (<a href="/spec/text/#161-required-commands">§16.1</a>).</p>
+  <p>A contributor without an authorized key can still open the pull request; a maintainer re-runs the ingest on the branch and signs. A policy can require two maintainers for a step with <code>minimumSignatures</code>, and <code>makoto envelope cosign</code> adds the second signature (<a href="/spec/text/#161-required-commands">section 16.1</a>).</p>
 
   <h2 id="workflow">The workflow</h2>
   <p>Two jobs, on every pull request. The Makoto CLI is installed from source at the same core commit this site is pinned to.</p>

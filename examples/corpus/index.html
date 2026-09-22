@@ -104,13 +104,13 @@ shards:
 
   <h2 id="mapping">Which Makoto document carries which part</h2>
   <table class="status-table"><thead><tr><th>Corpus part</th><th>Carried by</th><th>Status</th></tr></thead><tbody>
-    <tr><td>Directory index files</td><td>Nothing. Makoto has no catalog or directory concept, and forbids hashing a directory by walking it (<a href="/spec/text/#125-partitioned-dataset-manifests">§12.5</a>). The tree stays in Git.</td><td>Stays outside Makoto</td></tr>
-    <tr><td>Upstream source</td><td>An origin statement: <code>source.kind</code>, <code>uri</code>, <code>name</code>, <code>version</code>, <code>retrievedAt</code> (<a href="/spec/text/#113-origin-predicate">§11.3</a>).</td><td>Today</td></tr>
+    <tr><td>Directory index files</td><td>Nothing. Makoto has no catalog or directory concept, and forbids hashing a directory by walking it (<a href="/spec/text/#125-partitioned-dataset-manifests">section 12.5</a>). The tree stays in Git.</td><td>Stays outside Makoto</td></tr>
+    <tr><td>Upstream source</td><td>An origin statement: <code>source.kind</code>, <code>uri</code>, <code>name</code>, <code>version</code>, <code>retrievedAt</code> (<a href="/spec/text/#113-origin-predicate">section 11.3</a>).</td><td>Today</td></tr>
     <tr><td>Raw files fetched from it</td><td>Entries in a dataset manifest (name, digest, size, media type) that the origin names as its subject.</td><td>Today</td></tr>
-    <tr><td>The ingest run</td><td>A transform statement. Its input is the raw manifest; <code>operation.tool</code> names the ingester; <code>operation.parametersDigest</code> pins the exact bytes of <code>ingest.yaml</code> (<a href="/spec/text/#114-transformation-predicate">§11.4</a>).</td><td>Today</td></tr>
+    <tr><td>The ingest run</td><td>A transform statement. Its input is the raw manifest; <code>operation.tool</code> names the ingester; <code>operation.parametersDigest</code> pins the exact bytes of <code>ingest.yaml</code> (<a href="/spec/text/#114-transformation-predicate">section 11.4</a>).</td><td>Today</td></tr>
     <tr><td>Shards</td><td>Entries in a second dataset manifest, a subject of the ingest statement.</td><td>Today</td></tr>
     <tr><td>Leaf manifest</td><td>The ingest statement's other subject, handed off as the record's final artifact.</td><td>Today</td></tr>
-    <tr><td>The record in Git</td><td>A handoff bundle in <code>makoto/</code> beside the manifest, signed by an index maintainer's key (<a href="/spec/text/#133-reference-bundle-layout">§13.3</a>).</td><td>Today</td></tr>
+    <tr><td>The record in Git</td><td>A handoff bundle in <code>makoto/</code> beside the manifest, signed by an index maintainer's key (<a href="/spec/text/#133-reference-bundle-layout">section 13.3</a>).</td><td>Today</td></tr>
     <tr><td>Set and shard licenses</td><td>A claim in the ingest statement's <code>extensions</code>, required by a profile. <a href="/examples/corpus/licenses/">Carry licenses</a> shows it.</td><td>Proposed extension</td></tr>
     <tr><td>Languages, record counts</td><td>Would follow the same pattern as licenses: a named extension and a profile. Not included here.</td><td>Would need an extension</td></tr>
     <tr><td>Row source, license, maintainer</td><td>Columns in the shard rows. The shard's digest commits to them; no verifier reads them.</td><td>Stays outside Makoto</td></tr>
@@ -120,7 +120,7 @@ shards:
   <p>Each statement below is the exact payload its signature covers. Copy a block and hash it with <code>shasum -a 256</code> to get the statement digest quoted beneath it. The signed envelopes are in <a href="/examples/corpus/repo/text/letters/makoto/attestations/cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8.dsse.json">makoto/attestations/</a>.</p>
 
   <h3 id="raw">The raw files, as a dataset manifest</h3>
-  <p>A directory is not a finite byte sequence, so the ingest lists the files it fetched in a dataset manifest (<a href="/spec/text/#125-partitioned-dataset-manifests">§12.5</a>) and the origin names that manifest as its subject.</p>
+  <p>A directory is not a finite byte sequence, so the ingest lists the files it fetched in a dataset manifest (<a href="/spec/text/#125-partitioned-dataset-manifests">section 12.5</a>) and the origin names that manifest as its subject.</p>
   <pre data-filename="letters.raw.json"><code class="language-json">{"entries":[{"digest":{"sha256":"fb9186aeee2df0e682e23ef346d0d62f2d480ea8002d859144e153ddce1e42ba"},"mediaType":"text/plain","name":"letter-001.txt","size":145},{"digest":{"sha256":"d6592205ac62f1a4b8f1fbc3db50bcfdb0bc67aad07a8bc94f90ab950fe719b0"},"mediaType":"text/plain","name":"letter-002.txt","size":112},{"digest":{"sha256":"0473052deb29d1d987e8186945a3ba8fc0d124be0838f68fce49540a57eaea52"},"mediaType":"text/plain","name":"letter-003.txt","size":128},{"digest":{"sha256":"968b232149af2b66d3adf07414c03e3105c62f3ad43a9d291730709e113c82f5"},"mediaType":"text/plain","name":"letter-004.txt","size":139},{"digest":{"sha256":"d457e56492dbeeaede0c6ad15f839c44f57b28c2c36a242c5f419237917ca393"},"mediaType":"text/plain","name":"letter-005.txt","size":140}],"version":"0.2"}</code></pre>
 
   <h3 id="origin">Origin: where the bytes came from</h3>
@@ -129,7 +129,7 @@ shards:
   <p>Statement digest <code class="hash" title="sha256:cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8">cc67488</code>.</p>
 
   <h3 id="shards">The shards, as a second dataset manifest</h3>
-  <p>Each entry carries a name, digest, size and media type. The shards here are NDJSON so their rows are readable on this page. Parquet shards are listed the same way, with <code>application/vnd.apache.parquet</code>; the verifier hashes and sizes them but cannot read inside them (<a href="/spec/text/#124-validating-actual-data-contents">§12.4</a>).</p>
+  <p>Each entry carries a name, digest, size and media type. The shards here are NDJSON so their rows are readable on this page. Parquet shards are listed the same way, with <code>application/vnd.apache.parquet</code>; the verifier hashes and sizes them but cannot read inside them (<a href="/spec/text/#124-validating-actual-data-contents">section 12.4</a>).</p>
   <pre data-filename="letters.shards.json"><code class="language-json">{"entries":[{"digest":{"sha256":"38b25153d8aee6004af8f13dcc459cf3be694fd35595303587637d9937dba952"},"mediaType":"application/x-ndjson","name":"shards/letters-00000.ndjson","size":898},{"digest":{"sha256":"6d2313de212a449feb04b7d9cd223305d4896fbd43371d43edd06048046b4dd3"},"mediaType":"application/x-ndjson","name":"shards/letters-00001.ndjson","size":743}],"version":"0.2"}</code></pre>
 
   <h3 id="ingest">Ingest: what turned raw files into shards</h3>
@@ -249,14 +249,14 @@ PASS        decision
 DENY        decision
 manifest sha256:b30f91d37734806e0b5e8d87f9a2a00c28202ea361c9737e2a9e70b7bc65157b
 E_ARTIFACT_DIGEST: dataset-entry bytes differ from the manifest member digest</code></pre>
-  <p>A later step that uses only this shard names it in its own transform statement with <code>inputs[].provenance.entryName</code> (<a href="/spec/text/#114-transformation-predicate">§11.4</a>), so its lineage chains to this record by digest without listing the other shard.</p>
+  <p>A later step that uses only this shard names it in its own transform statement with <code>inputs[].provenance.entryName</code> (<a href="/spec/text/#114-transformation-predicate">section 11.4</a>), so its lineage chains to this record by digest without listing the other shard.</p>
 
   <h2 id="limits">Limits worth knowing</h2>
   <dl class="troubleshooting">
     <dt>Parallel work</dt><dd>Makoto records the results of sharded, parallel work. It does not schedule or describe the fan-out. One statement per worker means many statements and keys; one statement per ingest, as here, means trusting whoever aggregated the workers' output.</dd>
-    <dt>Scale</dt><dd>The specification's performance target is a 1,000-statement graph verified in at most 2 seconds at p95 (<a href="/spec/text/#232-performance-targets">§23.2</a>). That is a target, not a measurement at the size of a large corpus.</dd>
-    <dt>Rows</dt><dd>The finest unit is the shard. Proving that a row belongs to a verified shard would need a new predicate, and current verifiers reject predicates they do not know (<a href="/spec/text/#111-common-in-toto-statement">§11.1</a>).</dd>
-    <dt>Keys</dt><dd>Signatures use Ed25519 keys named in the reader's policy. Keyless signing, transparency logs and certificate authorities are outside the current specification (<a href="/spec/text/#5-non-goals-for-v02">§5</a>).</dd>
+    <dt>Scale</dt><dd>The specification's performance target is a 1,000-statement graph verified in at most 2 seconds at p95 (<a href="/spec/text/#232-performance-targets">section 23.2</a>). That is a target, not a measurement at the size of a large corpus.</dd>
+    <dt>Rows</dt><dd>The finest unit is the shard. Proving that a row belongs to a verified shard would need a new predicate, and current verifiers reject predicates they do not know (<a href="/spec/text/#111-common-in-toto-statement">section 11.1</a>).</dd>
+    <dt>Keys</dt><dd>Signatures use Ed25519 keys named in the reader's policy. Keyless signing, transparency logs and certificate authorities are outside the current specification (<a href="/spec/text/#5-non-goals-for-v02">section 5</a>).</dd>
     <dt>Replacement</dt><dd>A re-ingest that replaces a corpus produces a new origin and a new head. The reader's policy decides whether an older record is still acceptable.</dd>
     <dt>Implementation</dt><dd>The reference implementation is Python. From Go, drive the pinned CLI through <code>os/exec</code> and read its JSON report, as <a href="/verify/go.html">the Go page</a> shows.</dd>
   </dl>

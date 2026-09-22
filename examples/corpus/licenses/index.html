@@ -24,7 +24,7 @@
 <main id="main" class="page wide">
 <span class="kicker">Guide · a sharded corpus kept in Git</span>
   <h1>Carry set, shard and row licenses.</h1>
-  <p class="lead">Makoto has no license field, and a verifier cannot establish that a source was licensed or legally usable (<a href="/spec/text/#82-what-makoto-does-not-cover">§8.2</a>). What it can do is carry a license claim, require the claim's shape, and let a reader refuse a step that arrives without one. Whether the claim is true stays with the people who review it.</p>
+  <p class="lead">Makoto has no license field, and a verifier cannot establish that a source was licensed or legally usable (<a href="/spec/text/#82-what-makoto-does-not-cover">section 8.2</a>). What it can do is carry a license claim, require the claim's shape, and let a reader refuse a step that arrives without one. Whether the claim is true stays with the people who review it.</p>
   <nav class="spec-jump" aria-label="This guide"><a href="/examples/corpus/">1. Map the index</a><a href="/examples/corpus/licenses/" aria-current="page">2. Carry licenses</a><a href="/examples/corpus/maintenance/">3. Maintain it in Git</a></nav>
   <div class="callout warning"><p><strong>Proposed extension.</strong> The vocabulary on this page, <code>https://corpus.example/makoto/license/v1</code>, is an example and not part of Makoto. A corpus would publish its own under a namespace it controls, or several corpora could agree on one shared profile. The mechanisms that carry it (extensions, profiles and policy rules) are current Makoto.</p></div>
 
@@ -62,7 +62,7 @@
   </tbody></table>
 
   <h2 id="claim">The claim</h2>
-  <p>The ingest writes the claim into its statement's <code>extensions</code> (<a href="/spec/text/#112-common-makoto-predicate-fields">§11.2</a>). Extension keys are URIs, and the core schemas accept any of them. This is the file passed to <code>makoto attest transform --extensions</code>:</p>
+  <p>The ingest writes the claim into its statement's <code>extensions</code> (<a href="/spec/text/#112-common-makoto-predicate-fields">section 11.2</a>). Extension keys are URIs, and the core schemas accept any of them. This is the file passed to <code>makoto attest transform --extensions</code>:</p>
   <pre data-filename="extensions for the ingest statement"><code class="language-json">{
   "https://corpus.example/makoto/license/v1": {
     "default": {
@@ -83,7 +83,7 @@
   <p>Shard <code>letters-00001</code> is the only override; <code>letters-00000</code> falls under the default. The manifest's own license fields and this claim are covered by the same signature, because the manifest's bytes are a subject of the same statement. Nothing checks that the two agree.</p>
 
   <h2 id="profile">Require its shape with a profile</h2>
-  <p>A profile is a JSON Schema pinned by digest (<a href="/spec/text/#121-profile-reference">§12.1</a>). This one targets the predicate, so it validates the claim inside the signed statement:</p>
+  <p>A profile is a JSON Schema pinned by digest (<a href="/spec/text/#121-profile-reference">section 12.1</a>). This one targets the predicate, so it validates the claim inside the signed statement:</p>
   <pre data-filename="lineage/schemas/license-v1.schema.json"><code class="language-json">{
   "$schema": "https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json",
   "$id": "https://corpus.example/makoto/license/v1/predicate.schema.json",
@@ -166,11 +166,11 @@
     }
   }
 }</code></pre>
-  <p><code>makoto profile create</code> turns the schema into a reference carrying its digest and closure digest. The ingest lists that reference in <code>profiles</code>, and the producer refuses to sign when the claim does not validate.</p>
+  <p><code>makoto profile create</code> turns the schema into a reference carrying its digest and closure digest. The ingest lists that reference in <code>profiles</code>, and the reference producer refuses to write the statement when the claim does not validate.</p>
   <pre data-filename="lineage/license.profile.json"><code class="language-json">{"closureDigest":{"sha256":"fbac8a68cb1a9ad0347e74c104ee885ed607bb7b837a4e1f3372163afc73c35d"},"critical":true,"digest":{"sha256":"ce30589e17abff371e461b6fd75723b055fdddef6e865bcc5fabcf327f07b9ab"},"id":"https://corpus.example/makoto/license/v1/predicate.schema.json","resources":[],"target":"predicate"}</code></pre>
 
   <h2 id="policy">Refuse a step without it</h2>
-  <p>The repository's policy authorizes the ingest key only for statements that carry this exact profile, through <code>profileConstraints</code> (<a href="/spec/text/#14-consumer-trust-policy">§14</a>):</p>
+  <p>The repository's policy authorizes the ingest key only for statements that carry this exact profile, through <code>profileConstraints</code> (<a href="/spec/text/#14-consumer-trust-policy">section 14</a>):</p>
   <pre data-filename="lineage/policy.json · the ingest rule"><code class="language-json">{
   "authorizedKeyIds": [
     "sha256:21981d07157626519dc4de7c1c09043877f8e66afd3554169bf9496df8419f50"
@@ -227,7 +227,7 @@ E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle 
 
   <h2 id="scope">What this establishes</h2>
   <p><strong>It establishes</strong> that a key the reader trusts put a well-formed license claim on every ingest it signed, and that the claim cannot change without the signature failing.</p>
-  <p><strong>It does not establish</strong> that the claim is legally correct. The <code>evidence</code> URL points at the terms a reviewer should read, and a reader's own review decides. Nor does it say anything about individual rows: the verifier reads only JSON and NDJSON contents (<a href="/spec/text/#124-validating-actual-data-contents">§12.4</a>), and a Parquet shard is opaque to it.</p>
+  <p><strong>It does not establish</strong> that the claim is legally correct. The <code>evidence</code> URL points at the terms a reviewer should read, and a reader's own review decides. Nor does it say anything about individual rows: the verifier reads only JSON and NDJSON contents (<a href="/spec/text/#124-validating-actual-data-contents">section 12.4</a>), and a Parquet shard is opaque to it.</p>
 
   <section class="community-band" aria-labelledby="next"><h2 id="next">Next: maintain the corpus through Git.</h2>
     <p>Sign-off, pull requests, and a check that refuses a manifest edited without its lineage record.</p>
