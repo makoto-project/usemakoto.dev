@@ -1,0 +1,25 @@
+{
+  "authorizedKeyIds": [
+    "sha256:21981d07157626519dc4de7c1c09043877f8e66afd3554169bf9496df8419f50"
+  ],
+  "id": "urn:makoto:example:rule:letters-ingest",
+  "minimumSignatures": 1,
+  "operationTypes": [
+    "urn:makoto:example:operation:corpus-ingest"
+  ],
+  "predicateTypes": [
+    "https://usemakoto.dev/predicate/v0.2/transform"
+  ],
+  "profileConstraints": [
+    {
+      "closureDigest": {
+        "sha256": "fbac8a68cb1a9ad0347e74c104ee885ed607bb7b837a4e1f3372163afc73c35d"
+      },
+      "digest": {
+        "sha256": "ce30589e17abff371e461b6fd75723b055fdddef6e865bcc5fabcf327f07b9ab"
+      },
+      "id": "https://corpus.example/makoto/license/v1/predicate.schema.json",
+      "target": "predicate"
+    }
+  ]
+}

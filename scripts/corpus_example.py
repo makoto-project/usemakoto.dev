@@ -515,11 +515,19 @@ def build(out: Path) -> None:
             ("handoff.json", manifest_payload),
             (RAW_MANIFEST, (work / RAW_MANIFEST).read_bytes()),
             (SHARD_MANIFEST, (work / SHARD_MANIFEST).read_bytes()),
+            ("license-extension.json", (work / "license-extension.json").read_bytes()),
         ):
             write(display / name, pretty(json.loads(data)))
 
-        verify = verify_bundle(leaf / "makoto", repo, leaf / LEAF_MANIFEST)
-        write(display / "verify.txt", verify.encode())
+        record = leaf / "makoto"
+        write(
+            display / "verify.txt",
+            transcript(*verify_bundle(record, repo, leaf / LEAF_MANIFEST)).encode(),
+        )
+        expected_artifact(record, leaf / LEAF_MANIFEST, display / "expected-letters.json")
+        rules = json.loads((lineage / "policy.json").read_bytes())["rules"]
+        (ingest_rule,) = [rule for rule in rules if rule.get("operationTypes") == [INGEST_TYPE]]
+        write(display / "ingest-rule.json", pretty(ingest_rule))
 
         # A reader fetched one shard from the lookaside and checks it against the record.
         shard_name = SHARDS[1][0]
@@ -532,30 +540,31 @@ def build(out: Path) -> None:
             "path": "letters-00001.ndjson",
         }
         write(display / "shard-binding.json", pretty(shard_binding))
-        fetched = verify_bundle(
-            leaf / "makoto", repo, leaf / LEAF_MANIFEST,
-            "--dataset-entry-binding", "../downloads/letters-00001.json",
-            "--json",
-            beside={
+        entry = ("--dataset-entry-binding", "../downloads/letters-00001.json")
+
+        def downloads(data: bytes) -> dict[str, bytes]:
+            return {
                 "downloads/letters-00001.json": canonical_json(shard_binding) + b"\n",
-                "downloads/letters-00001.ndjson": shard,
-            },
-        )  # fmt: skip
-        report = json.loads(fetched)
+                "downloads/letters-00001.ndjson": data,
+            }
+
+        fetched = verify_bundle(record, repo, leaf / LEAF_MANIFEST, entry, beside=downloads(shard))
+        write(display / "shard-verify.txt", transcript(*fetched).encode())
+        _, as_json = verify_bundle(
+            record, repo, leaf / LEAF_MANIFEST, entry, ("--json", ""), beside=downloads(shard)
+        )
+        report = json.loads(as_json)
         assert report["decision"] == "allow", report["errors"]
         write(display / "shard-entries.json", pretty(report["datasetEntries"]))
-        altered = shard.replace(b"Friday", b"Monday")
         tampered = verify_bundle(
-            leaf / "makoto", repo, leaf / LEAF_MANIFEST,
-            "--dataset-entry-binding", "../downloads/letters-00001.json",
-            beside={
-                "downloads/letters-00001.json": canonical_json(shard_binding) + b"\n",
-                "downloads/letters-00001.ndjson": altered,
-            },
+            record,
+            repo,
+            leaf / LEAF_MANIFEST,
+            entry,
+            beside=downloads(shard.replace(b"Friday", b"Monday")),
             expect=1,
-        )  # fmt: skip
-        write(display / "shard-tampered.txt", tampered.encode())
-        expected_artifact(leaf / "makoto", leaf / LEAF_MANIFEST, display / "expected-letters.json")
+        )
+        write(display / "shard-tampered.txt", transcript(*tampered).encode())
 
         # Negative case for the licensing page: the same ingest, signed without the
         # license claim, is refused by the rule that demands the license profile.
@@ -563,11 +572,18 @@ def build(out: Path) -> None:
         (bare / "attestations").mkdir(parents=True)
         shutil.copy(attestations / "01-origin.dsse.json", bare / "attestations")
         makoto(*ingest, "--out", str(bare / "attestations/02-ingest.dsse.json"), cwd=work)
-        handoff(work, bare / "attestations", bare / "makoto", leaf / LEAF_MANIFEST, lineage)
-        refused = verify_bundle(bare / "makoto", repo, leaf / LEAF_MANIFEST, expect=1)
-        write(display / "verify-without-license.txt", refused.encode())
+        bare_repo = work / "bare-repo/repo"
+        shutil.copytree(repo, bare_repo)
+        shutil.rmtree(bare_repo / LEAF / "makoto")
+        handoff(
+            work, bare / "attestations", bare_repo / LEAF / "makoto", leaf / LEAF_MANIFEST, lineage
+        )
+        refused = verify_bundle(
+            bare_repo / LEAF / "makoto", bare_repo, bare_repo / LEAF / LEAF_MANIFEST, expect=1
+        )
+        write(display / "verify-without-license.txt", transcript(*refused).encode())
 
-        # Negative case for the maintenance page: the check a pull request runs.
+        # The check a pull request runs, on a change it accepts and one it refuses.
         write(display / "check-current.txt", check_lineage(repo, work, edit=False).encode())
         write(display / "check-stale.txt", check_lineage(repo, work, edit=True).encode())
 
@@ -620,37 +636,44 @@ def expected_artifact(bundle: Path, leaf_manifest: Path, path: Path) -> None:
     )
 
 
+def transcript(lines: list[str], output: str) -> str:
+    """A shell transcript: the command as a reader would type it, then what it printed."""
+    return "$ " + " \\\n  ".join(lines) + "\n" + output
+
+
 def verify_bundle(
     bundle: Path,
     repo: Path,
     leaf_manifest: Path,
-    *arguments: str,
+    *options: tuple[str, str],
     beside: dict[str, bytes] | None = None,
     expect: int = 0,
-) -> str:
-    """Run the receiver's command from the repository root and return what it prints.
+) -> tuple[list[str], str]:
+    """Run the receiver's command from the repository root.
 
-    The consumer's own files (the expected-artifact binding and anything in
+    Returns the command, one option per line, and what it printed. The
+    consumer's own files (the expected-artifact binding and anything in
     `beside`) sit next to the repository, outside the bundle, as the CLI requires.
     """
     staged = {"expected-letters.json": b""} | (beside or {})
     for name, data in staged.items():
         write(repo.parent / name, data)
     expected_artifact(bundle, leaf_manifest, repo.parent / "expected-letters.json")
+    lines = [
+        f"makoto verify bundle {os.path.relpath(bundle, repo)}",
+        "--policy lineage/policy.json",
+        "--schema-catalog lineage/catalog.json",
+        "--expected-artifact ../expected-letters.json",
+        *(f"{flag} {value}".rstrip() for flag, value in options),
+    ]
     try:
-        return makoto(
-            "verify", "bundle", os.path.relpath(bundle, repo),
-            "--policy", "lineage/policy.json",
-            "--schema-catalog", "lineage/catalog.json",
-            "--expected-artifact", "../expected-letters.json",
-            *arguments,
-            cwd=repo,
-            expect=expect,
-        )  # fmt: skip
+        tokens = [token for line in lines for token in line.split()]
+        output = makoto(*tokens[1:], cwd=repo, expect=expect)
     finally:
         for name in staged:
             (repo.parent / name).unlink()
         shutil.rmtree(repo.parent / "downloads", ignore_errors=True)
+    return lines, output
 
 
 def check_lineage(repo: Path, work: Path, *, edit: bool) -> str:
@@ -673,6 +696,7 @@ def check_lineage(repo: Path, work: Path, *, edit: bool) -> str:
     git("init", "--quiet", "--initial-branch=main")
     git("add", "-A")
     git("commit", "--quiet", "-s", "-m", "Add the letters corpus")
+    git("checkout", "--quiet", "-b", "contribution")
     manifest = clone / LEAF / LEAF_MANIFEST
     if edit:
         # A contributor adds a shard to the manifest by hand and leaves the record alone.
@@ -683,23 +707,19 @@ def check_lineage(repo: Path, work: Path, *, edit: bool) -> str:
             + b"    bytes: 5\n    records: 1\n"
         )
     else:
-        # A contributor re-runs nothing and edits a file the record does not cover.
+        # A contributor changes a file the record does not cover.
         (clone / "README.md").write_bytes(b"Harbour Letters corpus.\n")
     git("add", "-A")
     git("commit", "--quiet", "-s", "-m", "Update the letters corpus")
+    command = ["uv", "run", "--no-project", "lineage/check_lineage.py", "--base", "main"]
     completed = subprocess.run(
-        [sys.executable, "lineage/check_lineage.py", "--base", "HEAD~1"],
-        cwd=clone,
-        env=env,
-        check=False,
-        capture_output=True,
-        text=True,
+        command, cwd=clone, env=env, check=False, capture_output=True, text=True
     )
     if completed.returncode != (1 if edit else 0):
         raise SystemExit(
             f"check_lineage exited {completed.returncode}\n{completed.stdout}{completed.stderr}"
         )
-    return completed.stdout + completed.stderr + f"exit {completed.returncode}\n"
+    return transcript([" ".join(command)], completed.stdout)
 
 
 def tree(root: Path) -> dict[str, bytes]:

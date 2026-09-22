@@ -1,2 +1,2 @@
+$ uv run --no-project lineage/check_lineage.py --base main
 PASS text/letters/makoto verifies against the current files
-exit 0

@@ -1,7 +1,8 @@
 $ makoto verify bundle text/letters/makoto \
   --policy lineage/policy.json \
   --schema-catalog lineage/catalog.json \
-  --expected-artifact ../expected-letters.json
+  --expected-artifact ../expected-letters.json \
+  --dataset-entry-binding ../downloads/letters-00001.json
 PASS        load-safely
 PASS        parse-strictly
 PASS        index-payloads

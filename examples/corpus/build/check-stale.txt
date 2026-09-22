@@ -1,4 +1,4 @@
+$ uv run --no-project lineage/check_lineage.py --base main
 FAIL text/letters/letters.yaml changed but text/letters/makoto/ did not
      re-run the ingest so the lineage record describes the new bytes
 FAIL text/letters/makoto deny: E_EXPECTED_ARTIFACT
-exit 1

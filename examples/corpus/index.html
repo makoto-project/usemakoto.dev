@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A corpus kept in Git as directory indexes, leaf manifests and shards, mapped onto Makoto origin, transform and handoff documents, signed and verified."><title>Map a sharded corpus onto Makoto — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/examples/corpus/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Makoto">
+  <meta property="og:title" content="Map a sharded corpus onto Makoto — Makoto">
+  <meta property="og:description" content="A corpus kept in Git as directory indexes, leaf manifests and shards, mapped onto Makoto origin, transform and handoff documents, signed and verified.">
+  <meta property="og:url" content="https://usemakoto.dev/examples/corpus/">
+  <meta property="og:image" content="https://usemakoto.dev/assets/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Makoto: know where data began, what changed, and who attested to it. A receiver&#x27;s verification run refuses a handoff whose final bytes changed after signing.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Map a sharded corpus onto Makoto — Makoto">
+  <meta name="twitter:description" content="A corpus kept in Git as directory indexes, leaf manifests and shards, mapped onto Makoto origin, transform and handoff documents, signed and verified.">
+  <meta name="twitter:image" content="https://usemakoto.dev/assets/og-card.png"><link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/end-to-end/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/end-to-end/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main">
+<main id="main" class="page wide">
+<span class="kicker">Guide · a sharded corpus kept in Git</span>
+  <h1>Map a corpus index onto Makoto documents.</h1>
+  <p class="lead">Many corpora live as a Git repository of small index files that point at large shards stored elsewhere. This guide follows one such corpus from its directory indexes down to a single shard, and shows which Makoto document carries each part, what a reader can then check, and what stays outside Makoto.</p>
+  <nav class="spec-jump" aria-label="This guide"><a href="/examples/corpus/" aria-current="page">1. Map the index</a><a href="/examples/corpus/licenses/">2. Carry licenses</a><a href="/examples/corpus/maintenance/">3. Maintain it in Git</a></nav>
+  <p class="editorial-note"><strong>Every value in this guide is real.</strong> <code>scripts/corpus_example.py</code> builds the corpus, signs its record with the Makoto reference CLI at the pinned core commit, runs each command shown, and saves what it printed. The keys are insecure example-only keys derived from fixed seeds. The archive, the letters and the society that transcribed some of them are fictional.</p>
+
+  <figure class="lead-exhibit"><figcaption><strong>The command this guide builds toward.</strong> Repeated from <a href="#verify">Verify the record</a> below.</figcaption><pre><code class="language-bash">$ makoto verify bundle text/letters/makoto \
+  --policy lineage/policy.json \
+  --schema-catalog lineage/catalog.json \
+  --expected-artifact ../expected-letters.json
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+PASS        graph
+PASS        roots-and-heads
+PASS        completeness-anchor
+PASS        freshness-anchors
+PASS        artifact-bytes
+PASS        artifact-profiles
+PASS        decision
+ALLOW       decision
+manifest sha256:b30f91d37734806e0b5e8d87f9a2a00c28202ea361c9737e2a9e70b7bc65157b</code></pre></figure>
+
+  <h2 id="layout">The corpus as it sits in Git</h2>
+  <p>The repository holds index files, manifests and lineage records. The shards, which in a real corpus run to hundreds of megabytes each, live in a separate content-addressed store (a lookaside) and are fetched by digest. They never enter Git.</p>
+  <pre data-filename="repository layout"><code class="language-none">index.yaml                       lists the directories below it
+text/
+  index.yaml                     lists letters/
+  letters/
+    letters.yaml                 leaf manifest: languages, license, sources, shards
+    ingest.yaml                  the settings the ingest ran with
+    makoto/                      the lineage record for this leaf
+lineage/
+  policy.json                    which keys may sign which kind of step
+  catalog.json                   schemas the policy names
+  license.profile.json           the digest-pinned reference to one of them
+  schemas/license-v1.schema.json
+  check_lineage.py               the pull-request check
+.github/workflows/lineage.yml    runs the check and a sign-off check</code></pre>
+  <p>Every indexable directory has an <code>index.yaml</code> naming the directories below it, so a tool pointed at any directory can walk down to every leaf manifest beneath it.</p>
+  <pre data-filename="index.yaml"><code class="language-yaml"># Directories beneath this one that hold corpora.
+children:
+  - text/</code></pre>
+  <pre data-filename="text/index.yaml"><code class="language-yaml">children:
+  - letters/</code></pre>
+  <p>The leaf manifest is the file contributors and readers care about. It declares the corpus's languages, its set-level license and evidence for it, the upstream source, and every shard by name, digest and size. Shard <code>letters-00001</code> carries its own license, which overrides the set's.</p>
+  <pre data-filename="text/letters/letters.yaml"><code class="language-yaml"># Leaf manifest, written by corpus-ingest. Edit ingest.yaml and re-run the
+# ingest instead of editing this file: the lineage record pins its bytes.
+name: harbour-letters
+title: Harbour Letters
+languages: [en]
+license: CC0-1.0
+license_evidence: https://archive.example/harbour-letters/rights
+sources:
+  - name: Harbour town archive, letters series
+    uri: https://archive.example/harbour-letters/
+    version: "2026-09-01"
+    retrieved_at: "2026-09-02T09:00:00Z"
+shards:
+  - name: shards/letters-00000.ndjson
+    sha256: 38b25153d8aee6004af8f13dcc459cf3be694fd35595303587637d9937dba952
+    bytes: 898
+    records: 3
+  - name: shards/letters-00001.ndjson
+    sha256: 6d2313de212a449feb04b7d9cd223305d4896fbd43371d43edd06048046b4dd3
+    bytes: 743
+    records: 2
+    license: CC-BY-4.0
+    attribution: "Transcribed by the Harbour Letters Society"
+    license_evidence: https://archive.example/harbour-letters/society-terms</code></pre>
+  <p>Inside a shard every row carries its own source, license and maintainer. These are the rows of shard <code>letters-00001</code>, one JSON object per line:</p>
+  <pre data-filename="lookaside · shards/letters-00001.ndjson"><code class="language-none">{"id":"letter-004","text":"Dear Mrs Pryce,\nThank you for the loan of the ledger. I have copied the tide\ntables for the society and will return it by Friday.\nE. Marsh\n","source":"https://archive.example/harbour-letters/letter-004.txt","license":"CC-BY-4.0","maintainer":"letters-maintainers","language":"en","attribution":"Transcribed by the Harbour Letters Society"}
+{"id":"letter-005","text":"Dear Society members,\nThe copied ledgers are now shelved in the reading room.\nPlease sign the book when you borrow one.\nE. Marsh, secretary\n","source":"https://archive.example/harbour-letters/letter-005.txt","license":"CC-BY-4.0","maintainer":"letters-maintainers","language":"en","attribution":"Transcribed by the Harbour Letters Society"}</code></pre>
+
+  <h2 id="mapping">Which Makoto document carries which part</h2>
+  <table class="status-table"><thead><tr><th>Corpus part</th><th>Carried by</th><th>Status</th></tr></thead><tbody>
+    <tr><td>Directory index files</td><td>Nothing. Makoto has no catalog or directory concept, and forbids hashing a directory by walking it (<a href="/spec/text/#125-partitioned-dataset-manifests">§12.5</a>). The tree stays in Git.</td><td>Stays outside Makoto</td></tr>
+    <tr><td>Upstream source</td><td>An origin statement: <code>source.kind</code>, <code>uri</code>, <code>name</code>, <code>version</code>, <code>retrievedAt</code> (<a href="/spec/text/#113-origin-predicate">§11.3</a>).</td><td>Today</td></tr>
+    <tr><td>Raw files fetched from it</td><td>Entries in a dataset manifest (name, digest, size, media type) that the origin names as its subject.</td><td>Today</td></tr>
+    <tr><td>The ingest run</td><td>A transform statement. Its input is the raw manifest; <code>operation.tool</code> names the ingester; <code>operation.parametersDigest</code> pins the exact bytes of <code>ingest.yaml</code> (<a href="/spec/text/#114-transformation-predicate">§11.4</a>).</td><td>Today</td></tr>
+    <tr><td>Shards</td><td>Entries in a second dataset manifest, a subject of the ingest statement.</td><td>Today</td></tr>
+    <tr><td>Leaf manifest</td><td>The ingest statement's other subject, handed off as the record's final artifact.</td><td>Today</td></tr>
+    <tr><td>The record in Git</td><td>A handoff bundle in <code>makoto/</code> beside the manifest, signed by an index maintainer's key (<a href="/spec/text/#133-reference-bundle-layout">§13.3</a>).</td><td>Today</td></tr>
+    <tr><td>Set and shard licenses</td><td>A claim in the ingest statement's <code>extensions</code>, required by a profile. <a href="/examples/corpus/licenses/">Carry licenses</a> shows it.</td><td>Proposed extension</td></tr>
+    <tr><td>Languages, record counts</td><td>Would follow the same pattern as licenses: a named extension and a profile. Not included here.</td><td>Would need an extension</td></tr>
+    <tr><td>Row source, license, maintainer</td><td>Columns in the shard rows. The shard's digest commits to them; no verifier reads them.</td><td>Stays outside Makoto</td></tr>
+  </tbody></table>
+
+  <h2 id="documents">The documents, in the order they were signed</h2>
+  <p>Each statement below is the exact payload its signature covers. Copy a block and hash it with <code>shasum -a 256</code> to get the statement digest quoted beneath it. The signed envelopes are in <a href="/examples/corpus/repo/text/letters/makoto/attestations/cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8.dsse.json">makoto/attestations/</a>.</p>
+
+  <h3 id="raw">The raw files, as a dataset manifest</h3>
+  <p>A directory is not a finite byte sequence, so the ingest lists the files it fetched in a dataset manifest (<a href="/spec/text/#125-partitioned-dataset-manifests">§12.5</a>) and the origin names that manifest as its subject.</p>
+  <pre data-filename="letters.raw.json"><code class="language-json">{"entries":[{"digest":{"sha256":"fb9186aeee2df0e682e23ef346d0d62f2d480ea8002d859144e153ddce1e42ba"},"mediaType":"text/plain","name":"letter-001.txt","size":145},{"digest":{"sha256":"d6592205ac62f1a4b8f1fbc3db50bcfdb0bc67aad07a8bc94f90ab950fe719b0"},"mediaType":"text/plain","name":"letter-002.txt","size":112},{"digest":{"sha256":"0473052deb29d1d987e8186945a3ba8fc0d124be0838f68fce49540a57eaea52"},"mediaType":"text/plain","name":"letter-003.txt","size":128},{"digest":{"sha256":"968b232149af2b66d3adf07414c03e3105c62f3ad43a9d291730709e113c82f5"},"mediaType":"text/plain","name":"letter-004.txt","size":139},{"digest":{"sha256":"d457e56492dbeeaede0c6ad15f839c44f57b28c2c36a242c5f419237917ca393"},"mediaType":"text/plain","name":"letter-005.txt","size":140}],"version":"0.2"}</code></pre>
+
+  <h3 id="origin">Origin: where the bytes came from</h3>
+  <pre data-filename="origin statement · signed payload"><code class="language-json">{"_type":"https://in-toto.io/Statement/v1","predicate":{"event":{"id":"urn:uuid:3c0e8a52-7f1d-4b2a-9d6e-1a5b7c9e0f21","occurredAt":"2026-09-02T09:05:00Z"},"profiles":[{"closureDigest":{"sha256":"a16890114db598c65f7e35790e6f5b0193e0a3c8e452cd9727dd1d3442525bc2"},"critical":true,"digest":{"sha256":"5a0498a2911bbe3029c9dbcbcbbbb2c2ce683d280b796a5f09ad271d8e9b034f"},"id":"https://usemakoto.dev/schema/v0.2/dataset-manifest.schema.json","mediaType":"application/vnd.makoto.dataset-manifest.v0.2+json","resources":[],"subjectName":"letters.raw.json","target":"artifact"}],"schemaVersion":"0.2","source":{"kind":"urn:makoto:example:source:archive-series","mediaType":"text/plain","name":"Harbour town archive, letters series","retrievedAt":"2026-09-02T09:00:00Z","uri":"https://archive.example/harbour-letters/","version":"2026-09-01"}},"predicateType":"https://usemakoto.dev/predicate/v0.2/origin","subject":[{"digest":{"sha256":"0358912c7afe582ab9c93d2a1e19922b35ca4d72bcf5f86b02da74b911d2142b"},"name":"letters.raw.json"}]}</code></pre>
+  <dl class="troubleshooting"><dt><code>predicate.source</code></dt><dd>The archive series, its version, and when it was fetched. The <code>uri</code> is informative: a receiver cannot check from the statement that the URL still serves these bytes.</dd><dt><code>subject[0]</code></dt><dd>The raw-file manifest, by digest.</dd><dt><code>predicate.profiles[0]</code></dt><dd>The core dataset-manifest profile. Every dataset-manifest subject must carry it, and it makes the manifest's bytes required when the record is verified.</dd></dl>
+  <p>Statement digest <code class="hash" title="sha256:cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8">cc67488</code>.</p>
+
+  <h3 id="shards">The shards, as a second dataset manifest</h3>
+  <p>Each entry carries a name, digest, size and media type. The shards here are NDJSON so their rows are readable on this page. Parquet shards are listed the same way, with <code>application/vnd.apache.parquet</code>; the verifier hashes and sizes them but cannot read inside them (<a href="/spec/text/#124-validating-actual-data-contents">§12.4</a>).</p>
+  <pre data-filename="letters.shards.json"><code class="language-json">{"entries":[{"digest":{"sha256":"38b25153d8aee6004af8f13dcc459cf3be694fd35595303587637d9937dba952"},"mediaType":"application/x-ndjson","name":"shards/letters-00000.ndjson","size":898},{"digest":{"sha256":"6d2313de212a449feb04b7d9cd223305d4896fbd43371d43edd06048046b4dd3"},"mediaType":"application/x-ndjson","name":"shards/letters-00001.ndjson","size":743}],"version":"0.2"}</code></pre>
+
+  <h3 id="ingest">Ingest: what turned raw files into shards</h3>
+  <pre data-filename="ingest statement · signed payload"><code class="language-json">{"_type":"https://in-toto.io/Statement/v1","predicate":{"event":{"id":"urn:uuid:8d4f2b61-0a3c-4e7d-b1f9-6c2e5a8d3b47","occurredAt":"2026-09-02T09:20:00Z"},"extensions":{"https://corpus.example/makoto/license/v1":{"default":{"evidence":"https://archive.example/harbour-letters/rights","license":"CC0-1.0"},"overrides":[{"attribution":"Transcribed by the Harbour Letters Society","entryName":"shards/letters-00001.ndjson","evidence":"https://archive.example/harbour-letters/society-terms","license":"CC-BY-4.0","subjectName":"letters.shards.json"}]}},"inputs":[{"digest":{"sha256":"0358912c7afe582ab9c93d2a1e19922b35ca4d72bcf5f86b02da74b911d2142b"},"name":"raw","provenance":{"statementDigest":{"sha256":"cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8"},"subjectName":"letters.raw.json"}}],"operation":{"name":"Ingest the letters series into NDJSON shards","parametersDigest":{"sha256":"fdf257d83b86202ff5874f5c5aabb1d06942abd8e145700ab7bdf46454cad0db"},"tool":{"name":"corpus-ingest","uri":"https://tools.corpus.example/corpus-ingest","version":"1.4.0"},"type":"urn:makoto:example:operation:corpus-ingest"},"profiles":[{"closureDigest":{"sha256":"a16890114db598c65f7e35790e6f5b0193e0a3c8e452cd9727dd1d3442525bc2"},"critical":true,"digest":{"sha256":"5a0498a2911bbe3029c9dbcbcbbbb2c2ce683d280b796a5f09ad271d8e9b034f"},"id":"https://usemakoto.dev/schema/v0.2/dataset-manifest.schema.json","mediaType":"application/vnd.makoto.dataset-manifest.v0.2+json","resources":[],"subjectName":"letters.shards.json","target":"artifact"},{"closureDigest":{"sha256":"fbac8a68cb1a9ad0347e74c104ee885ed607bb7b837a4e1f3372163afc73c35d"},"critical":true,"digest":{"sha256":"ce30589e17abff371e461b6fd75723b055fdddef6e865bcc5fabcf327f07b9ab"},"id":"https://corpus.example/makoto/license/v1/predicate.schema.json","resources":[],"target":"predicate"}],"schemaVersion":"0.2"},"predicateType":"https://usemakoto.dev/predicate/v0.2/transform","subject":[{"digest":{"sha256":"599532ac3af859e59d2e9fad4c74cb3299fbb699357034db86c8881e95d6d49f"},"name":"letters.yaml"},{"digest":{"sha256":"d8df4b70de36f576e7d430cf970e462b28ab44f3eb1d1e44220def9058ab487b"},"name":"letters.shards.json"}]}</code></pre>
+  <dl class="troubleshooting"><dt><code>predicate.inputs[0]</code></dt><dd>The raw-file manifest, and the origin statement that described it (<code class="hash" title="sha256:cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8">cc67488</code>). This is the edge in the graph: it cannot be rewired without re-signing.</dd><dt><code>predicate.<wbr>operation.<wbr>parametersDigest</code></dt><dd>The SHA-256 of <code>ingest.yaml</code> exactly as committed (<code class="hash" title="sha256:fdf257d83b86202ff5874f5c5aabb1d06942abd8e145700ab7bdf46454cad0db">fdf257d</code>). <code>shasum -a 256 text/letters/ingest.yaml</code> reproduces it.</dd><dt><code>subject</code></dt><dd>Two outputs: the leaf manifest's bytes (<code class="hash" title="sha256:599532ac3af859e59d2e9fad4c74cb3299fbb699357034db86c8881e95d6d49f">599532a</code>) and the shard manifest.</dd><dt><code>predicate.extensions</code></dt><dd>The license claim. <a href="/examples/corpus/licenses/">Carry licenses</a> explains it.</dd></dl>
+  <p>Statement digest <code class="hash" title="sha256:a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031">a4449e2</code>.</p>
+
+  <h3 id="handoff">Handoff: the record a reader receives</h3>
+  <p>An index maintainer's key signs the handoff. It fixes the exact set of statements, their root and head, and the artifact handed off: the leaf manifest. The two dataset manifests travel in the bundle as supporting material, because their profile requires their bytes.</p>
+  <pre data-filename="handoff manifest · signed payload"><code class="language-json">{"artifacts":[{"digest":{"sha256":"599532ac3af859e59d2e9fad4c74cb3299fbb699357034db86c8881e95d6d49f"},"head":{"sha256":"a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"},"name":"letters.yaml"}],"bundleId":"urn:uuid:e2b7c4d9-5f0a-4c18-a36e-9b1d7f2c8e05","heads":[{"sha256":"a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"}],"issuedAt":"2026-09-02T09:30:00Z","requiredProfiles":[],"roots":[{"sha256":"cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8"}],"statements":[{"sha256":"a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"},{"sha256":"cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8"}],"version":"0.2"}</code></pre>
+  <p>Manifest digest <code class="hash" title="sha256:b30f91d37734806e0b5e8d87f9a2a00c28202ea361c9737e2a9e70b7bc65157b">b30f91d</code>. The whole record is <a href="/examples/corpus/repo/text/letters/makoto/bundle.json">text/letters/makoto/</a>: an unsigned index, the signed handoff, two signed statements, and the artifact bytes.</p>
+
+  <h2 id="verify">Verify the record</h2>
+  <p>A reader runs the verifier from the repository root, with the repository's policy, and names the leaf-manifest bytes they expect. Here the expectation is the file they checked out:</p>
+  <pre data-filename="../expected-letters.json"><code class="language-json">{"digest":{"sha256":"599532ac3af859e59d2e9fad4c74cb3299fbb699357034db86c8881e95d6d49f"},"head":{"sha256":"a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"},"subjectName":"letters.yaml"}</code></pre>
+  <pre><code class="language-bash">$ makoto verify bundle text/letters/makoto \
+  --policy lineage/policy.json \
+  --schema-catalog lineage/catalog.json \
+  --expected-artifact ../expected-letters.json
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+PASS        graph
+PASS        roots-and-heads
+PASS        completeness-anchor
+PASS        freshness-anchors
+PASS        artifact-bytes
+PASS        artifact-profiles
+PASS        decision
+ALLOW       decision
+manifest sha256:b30f91d37734806e0b5e8d87f9a2a00c28202ea361c9737e2a9e70b7bc65157b</code></pre>
+  <p><strong>What <code>ALLOW</code> establishes:</strong> each statement is signed by a key the policy authorizes for that kind of step; the ingest's license claim validates against the profile the policy demands; the graph runs unbroken from the handoff back to the origin; and the leaf manifest's bytes are the ones the record names.</p>
+  <p><strong>What it does not:</strong> that the archive's rights statement is correct, that the letters were transcribed faithfully, or that any shard you have not supplied is intact.</p>
+
+  <h2 id="fetch">Fetch one shard and check it</h2>
+  <p>A reader who wants only the society's letters reads the leaf manifest, fetches shard <code>letters-00001</code> from the lookaside by digest, and checks the downloaded bytes against the signed shard manifest:</p>
+  <pre data-filename="../downloads/letters-00001.json"><code class="language-json">{
+  "manifestStatementDigest": {
+    "sha256": "a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"
+  },
+  "manifestSubjectName": "letters.shards.json",
+  "entryName": "shards/letters-00001.ndjson",
+  "digest": {
+    "sha256": "6d2313de212a449feb04b7d9cd223305d4896fbd43371d43edd06048046b4dd3"
+  },
+  "path": "letters-00001.ndjson"
+}</code></pre>
+  <pre><code class="language-bash">$ makoto verify bundle text/letters/makoto \
+  --policy lineage/policy.json \
+  --schema-catalog lineage/catalog.json \
+  --expected-artifact ../expected-letters.json \
+  --dataset-entry-binding ../downloads/letters-00001.json
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+PASS        graph
+PASS        roots-and-heads
+PASS        completeness-anchor
+PASS        freshness-anchors
+PASS        artifact-bytes
+PASS        artifact-profiles
+PASS        decision
+ALLOW       decision
+manifest sha256:b30f91d37734806e0b5e8d87f9a2a00c28202ea361c9737e2a9e70b7bc65157b</code></pre>
+  <p>The same run with <code>--json</code> reports the entry it checked:</p>
+  <pre data-filename="report · datasetEntries"><code class="language-json">[
+  {
+    "declaredSize": "743",
+    "digest": {
+      "sha256": "6d2313de212a449feb04b7d9cd223305d4896fbd43371d43edd06048046b4dd3"
+    },
+    "digestPrerequisiteChecks": [],
+    "digestStatus": "pass",
+    "entryName": "shards/letters-00001.ndjson",
+    "manifestStatementDigest": {
+      "sha256": "a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"
+    },
+    "manifestSubjectName": "letters.shards.json",
+    "sizePrerequisiteChecks": [],
+    "sizeStatus": "pass"
+  }
+]</code></pre>
+  <p>Change one word in the downloaded shard and the same command refuses it:</p>
+  <pre><code class="language-bash">$ makoto verify bundle text/letters/makoto \
+  --policy lineage/policy.json \
+  --schema-catalog lineage/catalog.json \
+  --expected-artifact ../expected-letters.json \
+  --dataset-entry-binding ../downloads/letters-00001.json
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+PASS        graph
+PASS        roots-and-heads
+PASS        completeness-anchor
+PASS        freshness-anchors
+FAIL        artifact-bytes
+PASS        artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:b30f91d37734806e0b5e8d87f9a2a00c28202ea361c9737e2a9e70b7bc65157b
+E_ARTIFACT_DIGEST: dataset-entry bytes differ from the manifest member digest</code></pre>
+  <p>A later step that uses only this shard names it in its own transform statement with <code>inputs[].provenance.entryName</code> (<a href="/spec/text/#114-transformation-predicate">§11.4</a>), so its lineage chains to this record by digest without listing the other shard.</p>
+
+  <h2 id="limits">Limits worth knowing</h2>
+  <dl class="troubleshooting">
+    <dt>Parallel work</dt><dd>Makoto records the results of sharded, parallel work. It does not schedule or describe the fan-out. One statement per worker means many statements and keys; one statement per ingest, as here, means trusting whoever aggregated the workers' output.</dd>
+    <dt>Scale</dt><dd>The specification's performance target is a 1,000-statement graph verified in at most 2 seconds at p95 (<a href="/spec/text/#232-performance-targets">§23.2</a>). That is a target, not a measurement at the size of a large corpus.</dd>
+    <dt>Rows</dt><dd>The finest unit is the shard. Proving that a row belongs to a verified shard would need a new predicate, and current verifiers reject predicates they do not know (<a href="/spec/text/#111-common-in-toto-statement">§11.1</a>).</dd>
+    <dt>Keys</dt><dd>Signatures use Ed25519 keys named in the reader's policy. Keyless signing, transparency logs and certificate authorities are outside the current specification (<a href="/spec/text/#5-non-goals-for-v02">§5</a>).</dd>
+    <dt>Replacement</dt><dd>A re-ingest that replaces a corpus produces a new origin and a new head. The reader's policy decides whether an older record is still acceptable.</dd>
+    <dt>Implementation</dt><dd>The reference implementation is Python. From Go, drive the pinned CLI through <code>os/exec</code> and read its JSON report, as <a href="/verify/go.html">the Go page</a> shows.</dd>
+  </dl>
+
+  <section class="community-band" aria-labelledby="next"><h2 id="next">Next: carry set, shard and row licenses.</h2>
+    <p>The license claim in the ingest statement, the profile that requires it, and what a reader sees when a step arrives without it.</p>
+    <div class="actions"><a class="button" href="/examples/corpus/licenses/">Carry licenses</a><a class="button secondary" href="/examples/corpus/maintenance/">Maintain it in Git</a><a class="button secondary" href="/examples/">Back to the casebook</a></div>
+  </section>
+</main>
+<footer class="footer"><div class="footer-inner"><p class="footer-line">Makoto casebook · every value in this guide comes from a signed, verified example corpus · <a href="https://github.com/makoto-project/makoto">Open source on GitHub</a></p><nav class="footer-nav" aria-label="Site"><a href="/spec/">Specification</a><a href="/spec/schemas/">Hosted schemas</a><a href="/demos/end-to-end/">Runnable proof</a><a href="/examples/">Examples</a><a href="/community/">Community</a><a href="/privacy/">Privacy</a></nav><p class="footer-meta">Apache-2.0 · <a href="https://github.com/makoto-project/usemakoto.dev">Site source on GitHub</a></p></div></footer></div></div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body></html>
