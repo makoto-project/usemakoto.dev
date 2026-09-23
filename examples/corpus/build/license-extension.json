@@ -1,0 +1,17 @@
+{
+  "https://corpus.example/makoto/license/v1": {
+    "default": {
+      "evidence": "https://archive.example/harbour-letters/rights",
+      "license": "CC0-1.0"
+    },
+    "overrides": [
+      {
+        "attribution": "Transcribed by the Harbour Letters Society",
+        "entryName": "shards/letters-00001.ndjson",
+        "evidence": "https://archive.example/harbour-letters/society-terms",
+        "license": "CC-BY-4.0",
+        "subjectName": "letters.shards.json"
+      }
+    ]
+  }
+}

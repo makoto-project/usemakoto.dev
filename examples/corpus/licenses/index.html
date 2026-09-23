@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Set, shard and row licenses for a sharded corpus: a proposed license extension, the profile that requires it, and the policy rule that refuses a step without it."><title>Carry corpus licenses in Makoto — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/examples/corpus/licenses/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Makoto">
+  <meta property="og:title" content="Carry corpus licenses in Makoto — Makoto">
+  <meta property="og:description" content="Set, shard and row licenses for a sharded corpus: a proposed license extension, the profile that requires it, and the policy rule that refuses a step without it.">
+  <meta property="og:url" content="https://usemakoto.dev/examples/corpus/licenses/">
+  <meta property="og:image" content="https://usemakoto.dev/assets/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Makoto: know where data began, what changed, and who attested to it. A receiver&#x27;s verification run refuses a handoff whose final bytes changed after signing.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Carry corpus licenses in Makoto — Makoto">
+  <meta name="twitter:description" content="Set, shard and row licenses for a sharded corpus: a proposed license extension, the profile that requires it, and the policy rule that refuses a step without it.">
+  <meta name="twitter:image" content="https://usemakoto.dev/assets/og-card.png"><link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/end-to-end/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/end-to-end/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main">
+<main id="main" class="page wide">
+<span class="kicker">Guide · a sharded corpus kept in Git</span>
+  <h1>Carry set, shard and row licenses.</h1>
+  <p class="lead">Makoto has no license field, and a verifier cannot establish that a source was licensed or legally usable (<a href="/spec/text/#82-what-makoto-does-not-cover">section 8.2</a>). What it can do is carry a license claim, require the claim's shape, and let a reader refuse a step that arrives without one. Whether the claim is true stays with the people who review it.</p>
+  <nav class="spec-jump" aria-label="This guide"><a href="/examples/corpus/">1. Map the index</a><a href="/examples/corpus/licenses/" aria-current="page">2. Carry licenses</a><a href="/examples/corpus/maintenance/">3. Maintain it in Git</a></nav>
+  <div class="callout warning"><p><strong>Proposed extension.</strong> The vocabulary on this page, <code>https://corpus.example/makoto/license/v1</code>, is an example and not part of Makoto. A corpus would publish its own under a namespace it controls, or several corpora could agree on one shared profile. The mechanisms that carry it (extensions, profiles and policy rules) are current Makoto.</p></div>
+
+  <figure class="lead-exhibit"><figcaption><strong>The rule this page is about.</strong> Repeated from <a href="#policy">Refuse a step without it</a> below.</figcaption><pre data-filename="lineage/policy.json · the ingest rule"><code class="language-json">{
+  "authorizedKeyIds": [
+    "sha256:21981d07157626519dc4de7c1c09043877f8e66afd3554169bf9496df8419f50"
+  ],
+  "id": "urn:makoto:example:rule:letters-ingest",
+  "minimumSignatures": 1,
+  "operationTypes": [
+    "urn:makoto:example:operation:corpus-ingest"
+  ],
+  "predicateTypes": [
+    "https://usemakoto.dev/predicate/v0.2/transform"
+  ],
+  "profileConstraints": [
+    {
+      "closureDigest": {
+        "sha256": "fbac8a68cb1a9ad0347e74c104ee885ed607bb7b837a4e1f3372163afc73c35d"
+      },
+      "digest": {
+        "sha256": "ce30589e17abff371e461b6fd75723b055fdddef6e865bcc5fabcf327f07b9ab"
+      },
+      "id": "https://corpus.example/makoto/license/v1/predicate.schema.json",
+      "target": "predicate"
+    }
+  ]
+}</code></pre></figure>
+
+  <h2 id="levels">Three levels, three answers</h2>
+  <table class="status-table"><thead><tr><th>Level</th><th>Where the corpus keeps it</th><th>What Makoto does with it</th></tr></thead><tbody>
+    <tr><td>Set</td><td><code>license</code> and <code>license_evidence</code> in <code>letters.yaml</code>.</td><td><strong>Proposed extension.</strong> The <code>default</code> in a claim on the ingest statement, validated by a profile.</td></tr>
+    <tr><td>Shard</td><td><code>license</code>, <code>attribution</code> and <code>license_evidence</code> on one shard's entry in <code>letters.yaml</code>.</td><td><strong>Proposed extension.</strong> An <code>overrides</code> entry keyed by the shard manifest's <code>subjectName</code> and the shard's <code>entryName</code>.</td></tr>
+    <tr><td>Row</td><td><code>license</code>, <code>attribution</code>, <code>source</code> and <code>maintainer</code> in every row.</td><td><strong>Nothing in this record.</strong> The shard's digest commits to every row, so a changed row changes the digest. These shards are dataset-manifest entries, and profiles apply to statement subjects, so no profile reads their rows.</td></tr>
+  </tbody></table>
+
+  <h2 id="claim">The claim</h2>
+  <p>The ingest writes the claim into its statement's <code>extensions</code> (<a href="/spec/text/#112-common-makoto-predicate-fields">section 11.2</a>). Extension keys are absolute HTTPS URIs or URNs, and the core schemas accept any such key. The claim sits on the ingest rather than the origin because per-shard overrides need shard names, which exist only once the ingest has run. This is the file passed to <code>makoto attest transform --extensions</code>:</p>
+  <pre data-filename="extensions for the ingest statement"><code class="language-json">{
+  "https://corpus.example/makoto/license/v1": {
+    "default": {
+      "evidence": "https://archive.example/harbour-letters/rights",
+      "license": "CC0-1.0"
+    },
+    "overrides": [
+      {
+        "attribution": "Transcribed by the Harbour Letters Society",
+        "entryName": "shards/letters-00001.ndjson",
+        "evidence": "https://archive.example/harbour-letters/society-terms",
+        "license": "CC-BY-4.0",
+        "subjectName": "letters.shards.json"
+      }
+    ]
+  }
+}</code></pre>
+  <p>Shard <code>letters-00001</code> is the only override; <code>letters-00000</code> falls under the default. The manifest's own license fields and this claim are covered by the same signature, because the manifest's bytes are a subject of the same statement. Nothing checks that the two agree.</p>
+
+  <h2 id="profile">Require its shape with a profile</h2>
+  <p>A profile is a JSON Schema pinned by digest (<a href="/spec/text/#121-profile-reference">section 12.1</a>). This one targets the predicate, so it validates the claim inside the signed statement:</p>
+  <pre data-filename="lineage/schemas/license-v1.schema.json"><code class="language-json">{
+  "$schema": "https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json",
+  "$id": "https://corpus.example/makoto/license/v1/predicate.schema.json",
+  "type": "object",
+  "required": [
+    "extensions"
+  ],
+  "properties": {
+    "extensions": {
+      "type": "object",
+      "required": [
+        "https://corpus.example/makoto/license/v1"
+      ],
+      "properties": {
+        "https://corpus.example/makoto/license/v1": {
+          "type": "object",
+          "required": [
+            "default",
+            "overrides"
+          ],
+          "properties": {
+            "default": {
+              "type": "object",
+              "required": [
+                "license",
+                "evidence"
+              ],
+              "properties": {
+                "license": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "attribution": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "evidence": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "overrides": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "subjectName",
+                  "entryName",
+                  "license",
+                  "evidence"
+                ],
+                "properties": {
+                  "subjectName": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "entryName": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "license": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attribution": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}</code></pre>
+  <p><code>makoto profile create</code> turns the schema into a reference carrying its digest and closure digest. The ingest lists that reference in <code>profiles</code>, and the reference producer refuses to write the statement when the claim does not validate.</p>
+  <pre data-filename="lineage/license.profile.json"><code class="language-json">{"closureDigest":{"sha256":"fbac8a68cb1a9ad0347e74c104ee885ed607bb7b837a4e1f3372163afc73c35d"},"critical":true,"digest":{"sha256":"ce30589e17abff371e461b6fd75723b055fdddef6e865bcc5fabcf327f07b9ab"},"id":"https://corpus.example/makoto/license/v1/predicate.schema.json","resources":[],"target":"predicate"}</code></pre>
+
+  <h2 id="policy">Refuse a step without it</h2>
+  <p>The repository's policy authorizes <code>corpus-ingest</code> transforms only when the statement carries this exact profile, through <code>profileConstraints</code> (<a href="/spec/text/#14-consumer-trust-policy">section 14</a>):</p>
+  <pre data-filename="lineage/policy.json · the ingest rule"><code class="language-json">{
+  "authorizedKeyIds": [
+    "sha256:21981d07157626519dc4de7c1c09043877f8e66afd3554169bf9496df8419f50"
+  ],
+  "id": "urn:makoto:example:rule:letters-ingest",
+  "minimumSignatures": 1,
+  "operationTypes": [
+    "urn:makoto:example:operation:corpus-ingest"
+  ],
+  "predicateTypes": [
+    "https://usemakoto.dev/predicate/v0.2/transform"
+  ],
+  "profileConstraints": [
+    {
+      "closureDigest": {
+        "sha256": "fbac8a68cb1a9ad0347e74c104ee885ed607bb7b837a4e1f3372163afc73c35d"
+      },
+      "digest": {
+        "sha256": "ce30589e17abff371e461b6fd75723b055fdddef6e865bcc5fabcf327f07b9ab"
+      },
+      "id": "https://corpus.example/makoto/license/v1/predicate.schema.json",
+      "target": "predicate"
+    }
+  ]
+}</code></pre>
+  <p>Here is the same ingest, signed by the same key, without the claim. The signature is valid, but no rule authorizes the statement, so the graph behind the handoff cannot be completed:</p>
+  <pre><code class="language-bash">$ makoto verify bundle text/letters/makoto \
+  --policy lineage/policy.json \
+  --schema-catalog lineage/catalog.json \
+  --expected-artifact ../expected-letters.json
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+FAIL        authorization-thresholds
+PASS        metadata-profiles
+FAIL        authorization
+PASS        graph-dependency-artifacts
+SKIPPED     graph
+SKIPPED     roots-and-heads
+FAIL        completeness-anchor
+PASS        freshness-anchors
+SKIPPED     artifact-bytes
+SKIPPED     artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:d9deee4b8ca966a6b1207111f0d40fde78b8b2a7bb7c1fd2aeb8e2758572f8f5
+E_SIGNER_UNAUTHORIZED: no matching policy rule met its signature threshold
+E_MANIFEST_SET: final artifact is not an exact terminal subject of its declared head
+E_MANIFEST_SET: historical artifact mapping is not an exact manifest-listed signed subject
+E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle index</code></pre>
+  <p><code>E_SIGNER_UNAUTHORIZED</code> is the cause. The <code>E_MANIFEST_SET</code> lines follow from it: the unauthorized statement drops out of the graph, which then no longer matches what the handoff names.</p>
+
+  <h2 id="scope">What this establishes</h2>
+  <p><strong>It establishes</strong> that each ingest statement in a record that verifies was signed by a key the reader trusts for ingests, carries a license claim of the shape the profile requires, and cannot change without its signature failing.</p>
+  <p><strong>It does not establish</strong> that the claim is legally correct. The <code>evidence</code> URL points at the terms a reviewer should read, and the reader's own review decides. The profile checks shape only: it wants non-empty strings, not valid SPDX expressions, and nothing resolves the claim's <code>subjectName</code> and <code>entryName</code> against the record the way the verifier resolves <code>inputs[].provenance.entryName</code>. A stricter profile, or a reviewer, would have to.</p>
+  <p><strong>Rows need a different shape.</strong> The verifier can validate every line of an NDJSON subject against an artifact profile (<a href="/spec/text/#124-validating-actual-data-contents">section 12.4</a>). A corpus that named each JSON or NDJSON shard as its own subject, instead of listing it in a dataset manifest, could therefore require a license on every row. Parquet shards cannot be checked this way; the verifier hashes and sizes them and reads nothing inside.</p>
+
+  <section class="community-band" aria-labelledby="next"><h2 id="next">Next: maintain the corpus through Git.</h2>
+    <p>Sign-off, pull requests, and a check that refuses a manifest edited without its lineage record.</p>
+    <div class="actions"><a class="button" href="/examples/corpus/maintenance/">Maintain it in Git</a><a class="button secondary" href="/examples/corpus/">Map the index</a><a class="button secondary" href="/examples/">Back to the casebook</a></div>
+  </section>
+</main>
+<footer class="footer"><div class="footer-inner"><p class="footer-line">Makoto casebook · the license vocabulary on this page is a proposed extension, not part of Makoto · <a href="https://github.com/makoto-project/makoto">Open source on GitHub</a></p><nav class="footer-nav" aria-label="Site"><a href="/spec/">Specification</a><a href="/spec/schemas/">Hosted schemas</a><a href="/demos/end-to-end/">Runnable proof</a><a href="/examples/">Examples</a><a href="/community/">Community</a><a href="/privacy/">Privacy</a></nav><p class="footer-meta">Apache-2.0 · <a href="https://github.com/makoto-project/usemakoto.dev">Site source on GitHub</a></p></div></footer></div></div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body></html>

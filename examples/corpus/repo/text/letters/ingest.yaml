@@ -1,0 +1,11 @@
+# Parameters for corpus-ingest. The ingest statement pins these exact bytes
+# as operation.parametersDigest, so a reviewer can see which settings ran.
+source: https://archive.example/harbour-letters/
+records_per_shard: 3
+shard_format: ndjson
+text_normalization: none
+license_overrides:
+  - shard: shards/letters-00001.ndjson
+    license: CC-BY-4.0
+    attribution: "Transcribed by the Harbour Letters Society"
+    evidence: https://archive.example/harbour-letters/society-terms

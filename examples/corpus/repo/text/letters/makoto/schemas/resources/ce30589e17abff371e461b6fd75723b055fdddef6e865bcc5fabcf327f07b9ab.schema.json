@@ -1,0 +1,82 @@
+{
+  "$schema": "https://usemakoto.dev/schema/v0.2/profile-dialect.schema.json",
+  "$id": "https://corpus.example/makoto/license/v1/predicate.schema.json",
+  "type": "object",
+  "required": [
+    "extensions"
+  ],
+  "properties": {
+    "extensions": {
+      "type": "object",
+      "required": [
+        "https://corpus.example/makoto/license/v1"
+      ],
+      "properties": {
+        "https://corpus.example/makoto/license/v1": {
+          "type": "object",
+          "required": [
+            "default",
+            "overrides"
+          ],
+          "properties": {
+            "default": {
+              "type": "object",
+              "required": [
+                "license",
+                "evidence"
+              ],
+              "properties": {
+                "license": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "attribution": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "evidence": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "overrides": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "subjectName",
+                  "entryName",
+                  "license",
+                  "evidence"
+                ],
+                "properties": {
+                  "subjectName": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "entryName": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "license": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attribution": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

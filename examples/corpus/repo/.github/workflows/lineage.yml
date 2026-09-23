@@ -1,0 +1,54 @@
+name: corpus checks
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dco:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Every commit carries a sign-off from its author
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          status=0
+          for commit in $(git rev-list "$BASE..HEAD"); do
+            author=$(git log -1 --format='%an <%ae>' "$commit")
+            if ! git log -1 --format='%(trailers:key=Signed-off-by,valueonly)' "$commit" |
+              grep -qxF "$author"; then
+              echo "::error::$commit lacks 'Signed-off-by: $author' (commit with -s)"
+              status=1
+            fi
+          done
+          exit "$status"
+
+  lineage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+      - name: Install the Makoto reference CLI
+        run: |
+          uv tool install \
+            "git+https://github.com/makoto-project/makoto@7044f803dc300cd3b7f8b24f40a0bb9d7151113f"
+          uv tool dir --bin >> "$GITHUB_PATH"
+      - name: Manifests and lineage records agree
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        # Run the base commit's check, which also reads the base commit's policy,
+        # so a pull request cannot change the rules it is checked against.
+        run: |
+          git show "$BASE:lineage/check_lineage.py" > "$RUNNER_TEMP/check_lineage.py"
+          uv run --no-project "$RUNNER_TEMP/check_lineage.py" --base "$BASE"

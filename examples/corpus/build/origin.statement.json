@@ -1,0 +1,43 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "predicate": {
+    "event": {
+      "id": "urn:uuid:3c0e8a52-7f1d-4b2a-9d6e-1a5b7c9e0f21",
+      "occurredAt": "2026-09-02T09:05:00Z"
+    },
+    "profiles": [
+      {
+        "closureDigest": {
+          "sha256": "a16890114db598c65f7e35790e6f5b0193e0a3c8e452cd9727dd1d3442525bc2"
+        },
+        "critical": true,
+        "digest": {
+          "sha256": "5a0498a2911bbe3029c9dbcbcbbbb2c2ce683d280b796a5f09ad271d8e9b034f"
+        },
+        "id": "https://usemakoto.dev/schema/v0.2/dataset-manifest.schema.json",
+        "mediaType": "application/vnd.makoto.dataset-manifest.v0.2+json",
+        "resources": [],
+        "subjectName": "letters.raw.json",
+        "target": "artifact"
+      }
+    ],
+    "schemaVersion": "0.2",
+    "source": {
+      "kind": "urn:makoto:example:source:archive-series",
+      "mediaType": "text/plain",
+      "name": "Harbour town archive, letters series",
+      "retrievedAt": "2026-09-02T09:00:00Z",
+      "uri": "https://archive.example/harbour-letters/",
+      "version": "2026-09-01"
+    }
+  },
+  "predicateType": "https://usemakoto.dev/predicate/v0.2/origin",
+  "subject": [
+    {
+      "digest": {
+        "sha256": "0358912c7afe582ab9c93d2a1e19922b35ca4d72bcf5f86b02da74b911d2142b"
+      },
+      "name": "letters.raw.json"
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+$ uv run --no-project lineage/check_lineage.py --base main
+FAIL text/letters/ingest.yaml differs from the parameters the record pins

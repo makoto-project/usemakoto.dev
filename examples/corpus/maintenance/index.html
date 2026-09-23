@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Community maintenance of a sharded corpus with Git, DCO sign-off and pull requests, and a CI check that fails a change whose lineage record was not updated."><title>Maintain a corpus through Git — Makoto</title>
+  <link rel="canonical" href="https://usemakoto.dev/examples/corpus/maintenance/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Makoto">
+  <meta property="og:title" content="Maintain a corpus through Git — Makoto">
+  <meta property="og:description" content="Community maintenance of a sharded corpus with Git, DCO sign-off and pull requests, and a CI check that fails a change whose lineage record was not updated.">
+  <meta property="og:url" content="https://usemakoto.dev/examples/corpus/maintenance/">
+  <meta property="og:image" content="https://usemakoto.dev/assets/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Makoto: know where data began, what changed, and who attested to it. A receiver&#x27;s verification run refuses a handoff whose final bytes changed after signing.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Maintain a corpus through Git — Makoto">
+  <meta name="twitter:description" content="Community maintenance of a sharded corpus with Git, DCO sign-off and pull requests, and a CI check that fails a change whose lineage record was not updated.">
+  <meta name="twitter:image" content="https://usemakoto.dev/assets/og-card.png"><link rel="stylesheet" href="/assets/v02.css"><script src="/assets/theme.js"></script></head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">誠</span> Makoto</a><nav class="nav" aria-label="Primary"><a href="/examples/">Examples</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/community/">Community</a><a class="github-link" href="https://github.com/makoto-project/makoto">GitHub ↗</a></nav><details class="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile"><p class="mobile-section">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/end-to-end/">Runnable proof</a><p class="mobile-section">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a><p class="mobile-section">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a><p class="mobile-section">Community</p><a href="/community/">Get involved</a><a href="https://github.com/makoto-project/makoto">GitHub repository ↗</a></nav></details></div></header>
+<div class="site-shell">
+<aside class="docs-sidebar" aria-label="Documentation"><nav class="docs-nav"><div class="docs-nav-group"><p class="docs-nav-title">Start</p><a href="/">Overview</a><a href="/why-lineage/">Why lineage matters</a><a href="/spec/">Specification</a><a href="/demos/end-to-end/">Runnable proof</a></div><div class="docs-nav-group"><p class="docs-nav-title">Learn</p><a href="/examples/">Examples</a><a href="/threats/">Threat model</a><a href="/comparison/">Comparisons</a><a href="/demos/">Demos</a></div><div class="docs-nav-group"><p class="docs-nav-title">Build</p><a href="/spec/schemas/">Hosted schemas</a><a href="/predicate/v0.2/origin/">Origin predicate</a><a href="/predicate/v0.2/transform/">Transform predicate</a><a href="/source/file/">File source kind</a><a href="/vocab/v0.2/bounded-pattern/">Bounded-pattern vocabulary</a><a href="/tooling/">Tooling &amp; SDKs</a><a href="/integrations/">Integrations</a></div><div class="docs-nav-group"><p class="docs-nav-title">Community</p><a href="/community/">Get involved</a><a class="external" href="https://github.com/makoto-project/makoto">Core repository</a><a class="external" href="https://github.com/makoto-project/makoto/issues">Issues</a></div></nav></aside>
+<div class="site-main">
+<main id="main" class="page wide">
+<span class="kicker">Guide · a sharded corpus kept in Git</span>
+  <h1>Maintain it through Git, sign-off and pull requests.</h1>
+  <p class="lead">Makoto defines no Git, sign-off or review process. Its records are small signed files that sit beside the manifests they describe, and a signed statement is never edited: a change produces a new statement, and a re-ingest produces a new record. That suits a repository where every change arrives as a reviewed pull request and Git keeps every earlier record.</p>
+  <nav class="spec-jump" aria-label="This guide"><a href="/examples/corpus/">1. Map the index</a><a href="/examples/corpus/licenses/">2. Carry licenses</a><a href="/examples/corpus/maintenance/" aria-current="page">3. Maintain it in Git</a></nav>
+
+  <figure class="lead-exhibit"><figcaption><strong>The check this page is about.</strong> Repeated from <a href="#runs">What it accepts and refuses</a> below.</figcaption><pre><code class="language-bash">$ uv run --no-project lineage/check_lineage.py --base main
+FAIL text/letters/letters.yaml changed but text/letters/makoto/ did not
+     re-run the ingest so the lineage record describes the new bytes
+FAIL text/letters/makoto deny: E_EXPECTED_ARTIFACT</code></pre></figure>
+
+  <h2 id="roles">Three mechanisms, three questions</h2>
+  <table class="status-table"><thead><tr><th>Mechanism</th><th>Answers</th><th>Where it lives</th></tr></thead><tbody>
+    <tr><td>Sign-off</td><td>Who contributed this change and certified the right to submit it, under the Developer Certificate of Origin.</td><td>A <code>Signed-off-by</code> trailer from <code>git commit -s</code>. It is a statement in the commit message, not a cryptographic signature; the workflow's <code>dco</code> job checks it is there.</td></tr>
+    <tr><td>Makoto signature</td><td>Which key vouched for a lineage step.</td><td>The signed envelopes in <code>text/letters/makoto/attestations/</code>.</td></tr>
+    <tr><td>Policy</td><td>Which keys the repository trusts for which kind of step.</td><td><code>lineage/policy.json</code> on the base branch. The check reads it from there, so a pull request cannot change the policy it is checked against.</td></tr>
+  </tbody></table>
+  <p>Keeping them apart matters. A signed-off commit can carry a record signed by a key the base policy does not authorize, and the lineage check refuses it. A properly signed record can arrive in a commit without a sign-off, and the <code>dco</code> job refuses that. Adding a maintainer key is its own pull request that edits the policy; records signed with that key pass once it has merged.</p>
+  <div class="callout warning"><p><strong>Protect the rules themselves.</strong> On <code>pull_request</code>, GitHub runs the workflow file from the pull request. The job runs the base branch's copy of the check script, but a pull request could still edit the workflow. Require review for <code>.github/</code> and <code>lineage/</code>, for example with a CODEOWNERS entry and a branch rule, so a change to either is reviewed before it can weaken the check.</p></div>
+
+  <h2 id="flow">A contribution, end to end</h2>
+  <ol>
+    <li>Edit <code>ingest.yaml</code>, or add a leaf directory with its own.</li>
+    <li>Run the ingest. It writes shards to the lookaside, rewrites the leaf manifest, and writes a new record under <code>makoto/</code>, signed with a key the policy authorizes.</li>
+    <li>Commit everything with <code>git commit -s</code> and open a pull request.</li>
+    <li>The workflow runs two jobs: every commit needs a sign-off from its author, and every record must verify against the files in the pull request.</li>
+    <li>Reviewers read the manifest diff and the record's statements, which are small JSON documents once decoded.</li>
+  </ol>
+  <p>A contributor without an authorized key can still open the pull request; a maintainer re-runs the ingest on the branch and signs. A policy can require two maintainers for a step with <code>minimumSignatures</code>, and <code>makoto envelope cosign</code> adds the second signature (<a href="/spec/text/#161-required-commands">section 16.1</a>).</p>
+
+  <h2 id="workflow">The workflow</h2>
+  <p>Two jobs, on every pull request. The Makoto CLI is installed from source at the same core commit this site is pinned to.</p>
+  <pre data-filename=".github/workflows/lineage.yml"><code class="language-yaml">name: corpus checks
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dco:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Every commit carries a sign-off from its author
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          status=0
+          for commit in $(git rev-list "$BASE..HEAD"); do
+            author=$(git log -1 --format='%an &lt;%ae&gt;' "$commit")
+            if ! git log -1 --format='%(trailers:key=Signed-off-by,valueonly)' "$commit" |
+              grep -qxF "$author"; then
+              echo "::error::$commit lacks 'Signed-off-by: $author' (commit with -s)"
+              status=1
+            fi
+          done
+          exit "$status"
+
+  lineage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+      - name: Install the Makoto reference CLI
+        run: |
+          uv tool install \
+            "git+https://github.com/makoto-project/makoto@7044f803dc300cd3b7f8b24f40a0bb9d7151113f"
+          uv tool dir --bin &gt;&gt; "$GITHUB_PATH"
+      - name: Manifests and lineage records agree
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        # Run the base commit's check, which also reads the base commit's policy,
+        # so a pull request cannot change the rules it is checked against.
+        run: |
+          git show "$BASE:lineage/check_lineage.py" &gt; "$RUNNER_TEMP/check_lineage.py"
+          uv run --no-project "$RUNNER_TEMP/check_lineage.py" --base "$BASE"</code></pre>
+
+  <h2 id="check">The check</h2>
+  <p>It reads the policy and catalog from the base branch, requires a record in every directory that holds an <code>ingest.yaml</code>, fails when a handed-off file changed without its record, and runs the verifier with each file's current bytes as the expected artifact. Once a record verifies, it compares <code>ingest.yaml</code> with the <code>parametersDigest</code> the ingest statement pins. Any other fault, such as an unauthorized key, a missing statement or an edited envelope, surfaces as the verifier's own error code.</p>
+  <pre data-filename="lineage/check_lineage.py"><code class="language-python">"""Fail a pull request whose corpus manifests and lineage records disagree.
+
+The policy and schema catalog come from the base commit, never from the pull
+request, so a contribution cannot authorize its own key. A policy change is a
+separate pull request that merges first.
+
+Every leaf directory (one holding an `ingest.yaml`) must have a `makoto/`
+lineage record, and every record is checked three ways:
+
+1. If the pull request changed a file the record hands off (the leaf manifest)
+   but changed nothing under that record, the contributor edited the corpus
+   without re-running the ingest that updates its lineage.
+2. `makoto verify bundle` must allow the record under the base policy, with the
+   handed-off file's current bytes as the expected artifact. A stale,
+   hand-edited or wrongly signed record is denied.
+3. Once the record verifies, the ingest statement's `parametersDigest` must
+   match the `ingest.yaml` in the pull request.
+
+Usage, from the repository root:
+
+    uv run --no-project lineage/check_lineage.py --base origin/main
+
+Requires Git and the `makoto` command on PATH. Standard library only.
+"""
+
+from __future__ import annotations
+
+import argparse
+import base64
+import hashlib
+import json
+import subprocess
+import tempfile
+from pathlib import Path
+
+POLICY = "lineage/policy.json"
+CATALOG = "lineage/catalog.json"
+SKIPPED = {".git", ".venv", "node_modules"}
+
+
+def git(*arguments: str) -&gt; bytes:
+    return subprocess.run(["git", *arguments], check=True, capture_output=True).stdout
+
+
+def sha256(data: bytes) -&gt; str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def decode(envelope: Path) -&gt; dict:
+    return json.loads(base64.b64decode(json.loads(envelope.read_bytes())["payload"]))
+
+
+def directories_holding(pattern: str) -&gt; list[Path]:
+    return sorted(
+        path.parent for path in Path(".").glob(f"**/{pattern}") if not SKIPPED &amp; set(path.parts)
+    )
+
+
+def base_config(base: str, scratch: Path) -&gt; tuple[Path, Path]:
+    """The base commit's policy and catalog, with every schema the catalog names."""
+    names = [POLICY, CATALOG]
+    catalog = json.loads(git("show", f"{base}:{CATALOG}"))
+    names += [f"{Path(CATALOG).parent.as_posix()}/{item['path']}" for item in catalog["resources"]]
+    for name in names:
+        target = scratch / "base" / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(git("show", f"{base}:{name}"))
+    return scratch / "base" / POLICY, scratch / "base" / CATALOG
+
+
+def verify(record: Path, artifacts: list[dict], config: tuple[Path, Path], scratch: Path):
+    policy, catalog = config
+    command = [
+        "makoto", "verify", "bundle", str(record),
+        "--policy", str(policy),
+        "--schema-catalog", str(catalog),
+        "--json",
+    ]  # fmt: skip
+    for index, artifact in enumerate(artifacts):
+        current = record.parent / artifact["name"]
+        data = current.read_bytes() if current.is_file() else b""
+        binding = scratch / f"expected-{sha256(str(record).encode())[:12]}-{index}.json"
+        binding.write_text(
+            json.dumps(
+                {
+                    "head": artifact["head"],
+                    "subjectName": artifact["name"],
+                    "digest": {"sha256": sha256(data)},
+                }
+            )
+        )
+        command += ["--expected-artifact", str(binding)]
+    result = subprocess.run(command, check=False, capture_output=True, text=True)
+    try:
+        report = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return "error", [result.stderr.strip() or f"makoto exited {result.returncode}"]
+    return report["decision"], sorted({item["code"] for item in report.get("errors", [])})
+
+
+def pinned_parameters(record: Path) -&gt; set[str]:
+    """The parametersDigest of each head statement, read after the record verified."""
+    index = json.loads((record / "bundle.json").read_bytes())
+    paths = {item["statementDigest"]["sha256"]: item["path"] for item in index["attestations"]}
+    pinned = set()
+    for head in decode(record / "manifest.dsse.json")["heads"]:
+        operation = decode(record / paths[head["sha256"]])["predicate"].get("operation", {})
+        pinned.add(operation.get("parametersDigest", {}).get("sha256", ""))
+    return pinned
+
+
+def main() -&gt; int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--base", required=True, help="Git ref the pull request targets")
+    args = parser.parse_args()
+    changed = set(git("diff", "--name-only", f"{args.base}...HEAD").decode().splitlines())
+    failures = 0
+    for leaf in directories_holding("ingest.yaml"):
+        if not (leaf / "makoto/bundle.json").is_file():
+            print(f"FAIL {leaf.as_posix()}/ has ingest.yaml but no makoto/ lineage record")
+            failures += 1
+    with tempfile.TemporaryDirectory() as scratch_name:
+        scratch = Path(scratch_name)
+        config = base_config(args.base, scratch)
+        for record in directories_holding("makoto/bundle.json"):
+            # Read only to learn which files to expect; the verifier checks the signature.
+            artifacts = decode(record / "manifest.dsse.json")["artifacts"]
+            record_changed = any(path.startswith(f"{record.as_posix()}/") for path in changed)
+            for artifact in artifacts:
+                name = (record.parent / artifact["name"]).as_posix()
+                if name in changed and not record_changed:
+                    print(f"FAIL {name} changed but {record.as_posix()}/ did not")
+                    print("     re-run the ingest so the lineage record describes the new bytes")
+                    failures += 1
+            decision, codes = verify(record, artifacts, config, scratch)
+            if decision != "allow":
+                print(f"FAIL {record.as_posix()} {decision}: {', '.join(codes)}")
+                failures += 1
+                continue
+            parameters = record.parent / "ingest.yaml"
+            if parameters.is_file() and sha256(parameters.read_bytes()) not in pinned_parameters(
+                record
+            ):
+                print(f"FAIL {parameters.as_posix()} differs from the parameters the record pins")
+                failures += 1
+                continue
+            print(f"PASS {record.as_posix()} verifies against the current files")
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())</code></pre>
+
+  <h2 id="runs">What it accepts and refuses</h2>
+  <p>A change the record does not cover passes:</p>
+  <pre><code class="language-bash">$ uv run --no-project lineage/check_lineage.py --base main
+PASS text/letters/makoto verifies against the current files</code></pre>
+  <p>A contributor who adds a shard to <code>letters.yaml</code> by hand, without re-running the ingest, is refused twice. The record did not change with the manifest, and the verifier denies the handoff because the manifest's bytes no longer match the digest the record names:</p>
+  <pre><code class="language-bash">$ uv run --no-project lineage/check_lineage.py --base main
+FAIL text/letters/letters.yaml changed but text/letters/makoto/ did not
+     re-run the ingest so the lineage record describes the new bytes
+FAIL text/letters/makoto deny: E_EXPECTED_ARTIFACT</code></pre>
+  <p>Three more contributions it refuses. Settings edited without re-running the ingest:</p>
+  <pre><code class="language-bash">$ uv run --no-project lineage/check_lineage.py --base main
+FAIL text/letters/ingest.yaml differs from the parameters the record pins</code></pre>
+  <p>A new leaf directory with no record:</p>
+  <pre><code class="language-bash">$ uv run --no-project lineage/check_lineage.py --base main
+FAIL text/diaries/ has ingest.yaml but no makoto/ lineage record
+PASS text/letters/makoto verifies against the current files</code></pre>
+  <p>A record signed without the license claim, together with an edit to <code>lineage/policy.json</code> that drops the rule demanding it. The check reads the base branch's policy, so the edit has no effect:</p>
+  <pre><code class="language-bash">$ uv run --no-project lineage/check_lineage.py --base main
+FAIL text/letters/makoto deny: E_MANIFEST_SET, E_SIGNER_UNAUTHORIZED</code></pre>
+  <p>Each refusal exits 1, so the job fails, and the pull request cannot merge while the check is required.</p>
+
+  <h2 id="history">History</h2>
+  <p>Git keeps every earlier record. Makoto does not require a new record to name the one it replaces: a re-ingest that replaces the corpus starts from a new origin, and each reader's policy decides whether an older record is still acceptable. A step that builds on existing shards, rather than replacing them, names them as inputs and extends the graph instead.</p>
+
+  <section class="community-band" aria-labelledby="next"><h2 id="next">Every file in this guide is published.</h2>
+    <p>The example repository, its record, the workflow and the check script are served beside these pages, and <code>scripts/corpus_example.py</code> rebuilds them.</p>
+    <div class="actions"><a class="button" href="/examples/corpus/repo/lineage/check_lineage.py">Read the check script</a><a class="button secondary" href="/examples/corpus/">Map the index</a><a class="button secondary" href="/examples/">Back to the casebook</a></div>
+  </section>
+</main>
+<footer class="footer"><div class="footer-inner"><p class="footer-line">Makoto casebook · Makoto defines no Git or review process; this guide shows one that fits · <a href="https://github.com/makoto-project/makoto">Open source on GitHub</a></p><nav class="footer-nav" aria-label="Site"><a href="/spec/">Specification</a><a href="/spec/schemas/">Hosted schemas</a><a href="/demos/end-to-end/">Runnable proof</a><a href="/examples/">Examples</a><a href="/community/">Community</a><a href="/privacy/">Privacy</a></nav><p class="footer-meta">Apache-2.0 · <a href="https://github.com/makoto-project/usemakoto.dev">Site source on GitHub</a></p></div></footer></div></div>
+<script defer src="/assets/prism.js"></script><script defer src="/assets/code.js"></script>
+</body></html>
