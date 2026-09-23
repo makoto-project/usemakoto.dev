@@ -1,0 +1,45 @@
+{
+  "entries": [
+    {
+      "digest": {
+        "sha256": "fb9186aeee2df0e682e23ef346d0d62f2d480ea8002d859144e153ddce1e42ba"
+      },
+      "mediaType": "text/plain",
+      "name": "letter-001.txt",
+      "size": 145
+    },
+    {
+      "digest": {
+        "sha256": "d6592205ac62f1a4b8f1fbc3db50bcfdb0bc67aad07a8bc94f90ab950fe719b0"
+      },
+      "mediaType": "text/plain",
+      "name": "letter-002.txt",
+      "size": 112
+    },
+    {
+      "digest": {
+        "sha256": "0473052deb29d1d987e8186945a3ba8fc0d124be0838f68fce49540a57eaea52"
+      },
+      "mediaType": "text/plain",
+      "name": "letter-003.txt",
+      "size": 128
+    },
+    {
+      "digest": {
+        "sha256": "968b232149af2b66d3adf07414c03e3105c62f3ad43a9d291730709e113c82f5"
+      },
+      "mediaType": "text/plain",
+      "name": "letter-004.txt",
+      "size": 139
+    },
+    {
+      "digest": {
+        "sha256": "d457e56492dbeeaede0c6ad15f839c44f57b28c2c36a242c5f419237917ca393"
+      },
+      "mediaType": "text/plain",
+      "name": "letter-005.txt",
+      "size": 140
+    }
+  ],
+  "version": "0.2"
+}

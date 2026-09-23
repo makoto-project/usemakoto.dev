@@ -1,0 +1,35 @@
+{
+  "artifacts": [
+    {
+      "digest": {
+        "sha256": "599532ac3af859e59d2e9fad4c74cb3299fbb699357034db86c8881e95d6d49f"
+      },
+      "head": {
+        "sha256": "a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"
+      },
+      "name": "letters.yaml"
+    }
+  ],
+  "bundleId": "urn:uuid:e2b7c4d9-5f0a-4c18-a36e-9b1d7f2c8e05",
+  "heads": [
+    {
+      "sha256": "a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"
+    }
+  ],
+  "issuedAt": "2026-09-02T09:30:00Z",
+  "requiredProfiles": [],
+  "roots": [
+    {
+      "sha256": "cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8"
+    }
+  ],
+  "statements": [
+    {
+      "sha256": "a4449e246f93d9a68a19481b2338590efe99e9b2f4e7614c2e80e8bd51bee031"
+    },
+    {
+      "sha256": "cc674882b6f8d3ba63a076a2f39e476bebffb52c144ca96cf735044f101645d8"
+    }
+  ],
+  "version": "0.2"
+}

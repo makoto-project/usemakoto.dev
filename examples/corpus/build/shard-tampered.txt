@@ -1,0 +1,24 @@
+$ makoto verify bundle text/letters/makoto \
+  --policy lineage/policy.json \
+  --schema-catalog lineage/catalog.json \
+  --expected-artifact ../expected-letters.json \
+  --dataset-entry-binding ../downloads/letters-00001.json
+PASS        load-safely
+PASS        parse-strictly
+PASS        index-payloads
+PASS        core-schemas
+PASS        signatures
+PASS        authorization-thresholds
+PASS        metadata-profiles
+PASS        authorization
+PASS        graph-dependency-artifacts
+PASS        graph
+PASS        roots-and-heads
+PASS        completeness-anchor
+PASS        freshness-anchors
+FAIL        artifact-bytes
+PASS        artifact-profiles
+PASS        decision
+DENY        decision
+manifest sha256:b30f91d37734806e0b5e8d87f9a2a00c28202ea361c9737e2a9e70b7bc65157b
+E_ARTIFACT_DIGEST: dataset-entry bytes differ from the manifest member digest

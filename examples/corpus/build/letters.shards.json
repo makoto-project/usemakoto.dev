@@ -1,0 +1,21 @@
+{
+  "entries": [
+    {
+      "digest": {
+        "sha256": "38b25153d8aee6004af8f13dcc459cf3be694fd35595303587637d9937dba952"
+      },
+      "mediaType": "application/x-ndjson",
+      "name": "shards/letters-00000.ndjson",
+      "size": 898
+    },
+    {
+      "digest": {
+        "sha256": "6d2313de212a449feb04b7d9cd223305d4896fbd43371d43edd06048046b4dd3"
+      },
+      "mediaType": "application/x-ndjson",
+      "name": "shards/letters-00001.ndjson",
+      "size": 743
+    }
+  ],
+  "version": "0.2"
+}
