@@ -44,7 +44,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: makoto-project/makoto
-          ref: 7044f803dc300cd3b7f8b24f40a0bb9d7151113f
+          ref: 27d335292ad240fb9ebd6d5d6778a2a3ab3465f7
           path: .makoto-core
           persist-credentials: false
       - uses: astral-sh/setup-uv@v6

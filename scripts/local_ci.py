@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -177,9 +178,11 @@ def check_actionlint() -> tuple[str, str]:
     return "fail", ((result.stdout or "") + (result.stderr or "")).strip()
 
 
-def step(name: str, argv: list[str]) -> bool:
+def step(name: str, argv: list[str], core: Path) -> bool:
     print(f"\nlocal-ci: {name}")
-    return subprocess.run(argv, cwd=ROOT, check=False).returncode == 0
+    # Tests that compare the site with core read the same checkout check_site uses.
+    env = {**os.environ, "MAKOTO_CORE_REPO": str(core)}
+    return subprocess.run(argv, cwd=ROOT, check=False, env=env).returncode == 0
 
 
 def main() -> int:
@@ -234,7 +237,7 @@ def main() -> int:
 
     failed = ["workflow lint"] if lint_status == "fail" else []
     failed += ["workflow action references"] if problems else []
-    failed += [name for name, argv in checks if not step(name, argv)]
+    failed += [name for name, argv in checks if not step(name, argv, core)]
     if failed:
         print(f"\nlocal-ci: FAILED: {', '.join(failed)}")
         return 1

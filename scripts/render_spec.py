@@ -4,6 +4,9 @@
 Two pages and one pointer are generated, never hand-edited:
 
 * ``spec/text/index.html``    — the full normative text of ``spec/v0.2/spec.md``.
+* ``spec/v0.3/index.html``    — the full normative text of ``spec/v0.3/spec.md``,
+  with every hosted v0.3 resource. Published beside the current version, not
+  as the default.
 * ``spec/schemas/index.html`` — every hosted schema under ``schema/v0.2/``.
 * ``schema/latest.json``      — the convenience pointer to the current catalog.
 
@@ -41,6 +44,16 @@ SCHEMA_DIR = ROOT / "schema/v0.2"
 TEXT_PAGE = ROOT / "spec/text/index.html"
 SCHEMA_PAGE = ROOT / "spec/schemas/index.html"
 LATEST_POINTER = ROOT / "schema/latest.json"
+V03_SPEC_SOURCE = ROOT / "spec/v0.3/spec.md"
+V03_SCHEMA_DIR = ROOT / "schema/v0.3"
+V03_TEXT_PAGE = ROOT / "spec/v0.3/index.html"
+# Hosted v0.3 resources outside /schema/v0.3/, in the order the page lists them.
+V03_OTHER_RESOURCES = (
+    ("profile/v0.3/license-claim-v1.schema.json", "Standard licence-claim profile"),
+    ("spec/v0.3/diagnostic-map.json", "Diagnostic map"),
+    ("release/v0.3/checksums.json", "Core checksum inventory"),
+    ("docs/v0.3-migration.md", "Migration notes"),
+)
 
 # One sentence per hosted resource, describing what the schema constrains.
 # Kept here rather than derived from the schema's own description so the index
@@ -187,6 +200,61 @@ def text_page() -> str:
             "source file with its digest."
         ),
         canonical="/spec/text/",
+        main=main,
+    )
+
+
+def short_digest(data: bytes) -> str:
+    """A digest shown like a short Git SHA; hovering shows the full value."""
+    full = hashlib.sha256(data).hexdigest()
+    return f'<code title="sha256:{full}">sha256:{full[:7]}</code>'
+
+
+def v03_text_page() -> str:
+    source = V03_SPEC_SOURCE.read_text(encoding="utf-8")
+    body, outline = render(source)
+    body = re.sub(r"^<h1 id=\"[^\"]+\">.*?</h1>\n", "", body, count=1, flags=re.DOTALL)
+    rows = []
+    for name in sorted((p.name for p in V03_SCHEMA_DIR.iterdir() if p.is_file()), key=str.encode):
+        relative = f"schema/v0.3/{name}"
+        rows.append(
+            f'<tr><td><a href="/{relative}"><code>{html.escape(name)}</code></a></td>'
+            f"<td>{short_digest((ROOT / relative).read_bytes())}</td></tr>"
+        )
+    for relative, label in V03_OTHER_RESOURCES:
+        rows.append(
+            f'<tr><td><a href="/{relative}">{html.escape(label)}</a></td>'
+            f"<td>{short_digest((ROOT / relative).read_bytes())}</td></tr>"
+        )
+    main = f"""  <span class="kicker">Next protocol version</span>
+  <h1>Makoto <code>0.3</code>: the complete specification, as written.</h1>
+  <p class="lead">Version <code>0.3</code> adds a standard licence-claim profile and optional record-level commitments inside dataset manifests. It is a separate protocol family: evidence keeps the version it was written in, and a verifier never mixes the two.</p>
+  <p class="editorial-note"><strong>Publication status.</strong> Published for review. It is not yet a tagged release and not the default; <a href="/spec/">the current specification</a> remains the reference for everything else on this site.</p>
+  <dl class="schema-meta">
+    <dt>Source</dt><dd><a href="/spec/v0.3/spec.md">/spec/v0.3/spec.md</a></dd>
+    <dt>Digest</dt><dd>{short_digest(V03_SPEC_SOURCE.read_bytes())}</dd>
+  </dl>
+  <p class="spec-jump"><a href="#contents">Contents</a><a href="#hosted-resources">Hosted resources</a><a href="/spec/">Current specification</a><a href="/spec/v0.3/spec.md">Raw text</a></p>
+
+  <section aria-labelledby="hosted-resources"><h2 id="hosted-resources">Hosted resources</h2>
+    <p>Each file is served at its identifier with the exact bytes the core release inventory pins. Digests are shown short; hover for the full value.</p>
+    <table class="stack-table schema-table"><thead><tr><th scope="col">Resource</th><th scope="col">SHA-256</th></tr></thead><tbody>{"".join(rows)}</tbody></table>
+  </section>
+
+  <section aria-labelledby="contents"><h2 id="contents">Contents</h2>
+{contents(outline)}
+  </section>
+
+  <article class="doc-body">
+{body}
+  </article>"""
+    return page(
+        title="Makoto 0.3 specification — Makoto",
+        description=(
+            "The complete normative text of Makoto protocol version 0.3, published for "
+            "review, with every hosted 0.3 schema and profile."
+        ),
+        canonical="/spec/v0.3/",
         main=main,
     )
 
@@ -1061,6 +1129,7 @@ def main() -> int:
     args = parser.parse_args()
     targets = (
         (TEXT_PAGE, text_page()),
+        (V03_TEXT_PAGE, v03_text_page()),
         (SCHEMA_PAGE, schema_page()),
         (LATEST_POINTER, latest_pointer()),
         *reference_pages(),

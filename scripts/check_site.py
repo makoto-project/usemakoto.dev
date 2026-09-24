@@ -35,6 +35,22 @@ CORE_SCHEMA_NAMES = (
     "trust-policy.schema.json",
     "verification-report.schema.json",
 )
+V03_CORE_SCHEMA_NAMES = tuple(
+    sorted(
+        (
+            *CORE_SCHEMA_NAMES,
+            "record-declaration.schema.json",
+            "record-inclusion-proof.schema.json",
+        ),
+        key=str.encode,
+    )
+)
+# Hosted schema families. v0.3 is published beside v0.2 and is not the default.
+CORE_SCHEMA_FAMILIES = {"v0.2": CORE_SCHEMA_NAMES, "v0.3": V03_CORE_SCHEMA_NAMES}
+# The core release inventory that authenticates both families' bytes.
+CORE_CHECKSUM_MANIFEST = "release/v0.3/checksums.json"
+LICENSE_PROFILE_SOURCE = "src/makoto/standard-profiles/v0.3/license-claim-v1.schema.json"
+LICENSE_PROFILE_PATH = "profile/v0.3/license-claim-v1.schema.json"
 LINEAGE_PAGE = "why-lineage/index.html"
 WALKTHROUGH_PAGE = "demos/end-to-end/index.html"
 # Learning content lives at permanent versionless URLs. The retired versioned
@@ -82,15 +98,20 @@ SUPERSEDED_BANNER_TEXT = ("Historical v0.1 material.", "not wire-compatible")
 # Pages that reproduce canonical source text verbatim. The retired version is
 # discussed by the specification itself, so a faithful rendering has to contain
 # it; scripts/render_spec.py --check is what keeps these honest.
-VERBATIM_SOURCE_PAGES = ("spec/text/index.html",)
+VERBATIM_SOURCE_PAGES = ("spec/text/index.html", "spec/v0.3/index.html")
 # Pages permitted to display a version label at all.
 TECHNICAL_VERSION_PAGES = {
+    "claim/v0.3/license/index.html",
     "predicate/v0.2/origin/index.html",
     "predicate/v0.2/transform/index.html",
+    "predicate/v0.3/origin/index.html",
+    "predicate/v0.3/transform/index.html",
     "source/file/index.html",
     "spec/schemas/index.html",
     "spec/text/index.html",
+    "spec/v0.3/index.html",
     "vocab/v0.2/bounded-pattern/index.html",
+    "vocab/v0.3/bounded-pattern/index.html",
     *SUPERSEDED_FORMAT_PAGES,
 }
 CURRENT_SHELL_PAGES = (
@@ -191,12 +212,17 @@ CANDIDATE_STATUS_TEXT = {
     "demos/end-to-end/index.html": ("Runnable reference proof",),
 }
 DOCUMENTATION_FILES = {
+    "/claim/v0.3/license/": "claim/v0.3/license/index.html",
     "/demos/end-to-end/": "demos/end-to-end/index.html",
     "/predicate/v0.2/origin/": "predicate/v0.2/origin/index.html",
     "/predicate/v0.2/transform/": "predicate/v0.2/transform/index.html",
+    "/predicate/v0.3/origin/": "predicate/v0.3/origin/index.html",
+    "/predicate/v0.3/transform/": "predicate/v0.3/transform/index.html",
     "/source/file/": "source/file/index.html",
     "/spec/v0.2/": "spec/v0.2/index.html",
+    "/spec/v0.3/": "spec/v0.3/index.html",
     "/vocab/v0.2/bounded-pattern/": "vocab/v0.2/bounded-pattern/index.html",
+    "/vocab/v0.3/bounded-pattern/": "vocab/v0.3/bounded-pattern/index.html",
 }
 STATIC_RESOURCES = {
     "docs/v0.2-adversarial-review.md": (
@@ -206,14 +232,22 @@ STATIC_RESOURCES = {
     "docs/v0.2-architecture.md": ("docs/v0.2-architecture.md", "text/markdown"),
     "docs/v0.2-integrations.md": ("docs/v0.2-integrations.md", "text/markdown"),
     "docs/v0.2-migration.md": ("docs/v0.2-migration.md", "text/markdown"),
+    "docs/v0.3-migration.md": ("docs/v0.3-migration.md", "text/markdown"),
     "release/checksums.schema.json": (
         "tooling/release/checksums.schema.json",
         "application/json",
     ),
     "release/v0.2/checksums.json": ("release/v0.2/checksums.json", "application/json"),
+    "release/v0.3/checksums.json": ("release/v0.3/checksums.json", "application/json"),
     "spec/v0.2.md": ("spec/v0.2/spec.md", "text/markdown"),
+    "spec/v0.3.md": ("spec/v0.3/spec.md", "text/markdown"),
+    LICENSE_PROFILE_SOURCE: (LICENSE_PROFILE_PATH, "application/json"),
     "testdata/v0.2/diagnostic-map.json": (
         "spec/v0.2/diagnostic-map.json",
+        "application/json",
+    ),
+    "testdata/v0.3/diagnostic-map.json": (
+        "spec/v0.3/diagnostic-map.json",
         "application/json",
     ),
 }
@@ -276,10 +310,13 @@ FORBIDDEN_TRACKED_SEGMENTS = {
 CORE_CHECKSUM_PREFIXES = (
     "demos/v0.2-end-to-end",
     "docs",
+    "examples/go",
     "schemas/v0.2",
+    "schemas/v0.3",
     "scripts",
     "src/makoto",
     "testdata/v0.2",
+    "testdata/v0.3",
     "tests",
 )
 CORE_CHECKSUM_EXACT_PATHS = (
@@ -288,6 +325,7 @@ CORE_CHECKSUM_EXACT_PATHS = (
     "pyproject.toml",
     "release/checksums.schema.json",
     "spec/v0.2.md",
+    "spec/v0.3.md",
     "uv.lock",
 )
 CORE_CHECKSUM_FORBIDDEN_SEGMENTS = {
@@ -472,7 +510,11 @@ def validate_pin(mode: str, core_repo: Path | None, errors: list[str]) -> Path |
         paths = [item["path"] for item in pin[collection]]
         if paths != sorted(paths, key=str.encode) or len(paths) != len(set(paths)):
             errors.append(f"{mode} pin {collection} paths are not sorted and unique")
-    expected_schema_paths = {f"/schema/v0.2/{name}" for name in CORE_SCHEMA_NAMES}
+    expected_schema_paths = {
+        f"/schema/{family}/{name}"
+        for family, names in CORE_SCHEMA_FAMILIES.items()
+        for name in names
+    }
     schema_entries = {item["path"]: item for item in pin["schemas"]}
     if set(schema_entries) != expected_schema_paths:
         errors.append(f"{mode} pin schema path set is not exact")
@@ -544,7 +586,7 @@ def expected_core_checksum_paths(core: Path) -> tuple[str, ...]:
 
 
 def validate_core_checksums(core: Path, errors: list[str]) -> dict[str, str]:
-    manifest_path = core / "release/v0.2/checksums.json"
+    manifest_path = core / CORE_CHECKSUM_MANIFEST
     schema_path = core / "release/checksums.schema.json"
     try:
         manifest = strict_json(manifest_path)
@@ -578,46 +620,20 @@ def validate_core_checksums(core: Path, errors: list[str]) -> dict[str, str]:
 
 def check_core_parity(core: Path, errors: list[str]) -> None:
     checksum_digests = validate_core_checksums(core, errors)
-    website_schema = ROOT / "schema/v0.2"
-    core_schema = core / "schemas/v0.2"
-    actual_names = tuple(sorted(path.name for path in website_schema.iterdir() if path.is_file()))
-    if actual_names != tuple(sorted(CORE_SCHEMA_NAMES)):
-        errors.append(f"website v0.2 schema set is wrong: {actual_names!r}")
-    for name in CORE_SCHEMA_NAMES:
-        website_path = website_schema / name
-        core_path = core_schema / name
-        if not website_path.is_file() or not core_path.is_file():
-            errors.append(f"missing v0.2 schema resource: {name}")
-            continue
-        if website_path.read_bytes() != core_path.read_bytes():
-            errors.append(f"schema bytes differ from core: {name}")
-        checksum_digest = checksum_digests.get(f"schemas/v0.2/{name}")
-        if checksum_digest is not None and sha256(website_path) != checksum_digest:
-            errors.append(f"website schema differs from core checksum manifest: {name}")
-        if name.endswith(".schema.json"):
-            try:
-                value = strict_json(website_path)
-                Draft202012Validator.check_schema(value)
-            except (OSError, ValueError, SchemaError) as error:
-                errors.append(f"invalid JSON Schema {name}: {error}")
-            else:
-                expected_id = f"https://usemakoto.dev/schema/v0.2/{name}"
-                if value.get("$id") != expected_id:
-                    errors.append(f"schema $id differs from hosted URL: {name}")
-    catalog_path = website_schema / "catalog.json"
-    try:
-        catalog = strict_json(catalog_path)
-    except (OSError, ValueError) as error:
-        errors.append(f"invalid core catalog: {error}")
-    else:
-        for resource in catalog.get("resources", []):
-            resource_path = website_schema / resource["path"]
-            if not resource_path.is_file() or sha256(resource_path) != resource["digest"]["sha256"]:
-                errors.append(f"catalog digest mismatch: {resource.get('path')}")
+    for family, names in CORE_SCHEMA_FAMILIES.items():
+        check_schema_family_parity(core, family, names, checksum_digests, errors)
     core_spec = core / "spec/v0.2.md"
-    website_spec = ROOT / "spec/v0.2/spec.md"
-    if core_spec.read_bytes() != website_spec.read_bytes():
-        errors.append("spec/v0.2/spec.md differs from core spec/v0.2.md")
+    for family in CORE_SCHEMA_FAMILIES:
+        try:
+            same = (core / f"spec/{family}.md").read_bytes() == (
+                ROOT / f"spec/{family}/spec.md"
+            ).read_bytes()
+        except OSError as error:
+            errors.append(f"cannot compare spec/{family}/spec.md with core: {error}")
+            continue
+        if not same:
+            errors.append(f"spec/{family}/spec.md differs from core spec/{family}.md")
+    check_license_profile(errors)
     legacy_spec_copy = ROOT / "docs/specs/makoto-v0.2-project-spec.md"
     if legacy_spec_copy.is_file() and legacy_spec_copy.read_bytes() != core_spec.read_bytes():
         errors.append("docs/specs/makoto-v0.2-project-spec.md differs from canonical core spec")
@@ -646,6 +662,68 @@ def check_core_parity(core: Path, errors: list[str]) -> None:
     )
     check_legacy_demo_mirror(errors)
     check_demo_manifest(errors)
+
+
+def check_schema_family_parity(
+    core: Path,
+    family: str,
+    names: tuple[str, ...],
+    checksum_digests: dict[str, str],
+    errors: list[str],
+) -> None:
+    website_schema = ROOT / "schema" / family
+    core_schema = core / "schemas" / family
+    actual_names = (
+        tuple(sorted(path.name for path in website_schema.iterdir() if path.is_file()))
+        if website_schema.is_dir()
+        else ()
+    )
+    if actual_names != tuple(sorted(names)):
+        errors.append(f"website {family} schema set is wrong: {actual_names!r}")
+    for name in names:
+        website_path = website_schema / name
+        core_path = core_schema / name
+        if not website_path.is_file() or not core_path.is_file():
+            errors.append(f"missing {family} schema resource: {name}")
+            continue
+        if website_path.read_bytes() != core_path.read_bytes():
+            errors.append(f"schema bytes differ from core: {family}/{name}")
+        checksum_digest = checksum_digests.get(f"schemas/{family}/{name}")
+        if checksum_digest is not None and sha256(website_path) != checksum_digest:
+            errors.append(f"website schema differs from core checksum manifest: {family}/{name}")
+        if name.endswith(".schema.json"):
+            try:
+                value = strict_json(website_path)
+                Draft202012Validator.check_schema(value)
+            except (OSError, ValueError, SchemaError) as error:
+                errors.append(f"invalid JSON Schema {family}/{name}: {error}")
+            else:
+                expected_id = f"https://usemakoto.dev/schema/{family}/{name}"
+                if value.get("$id") != expected_id:
+                    errors.append(f"schema $id differs from hosted URL: {family}/{name}")
+    catalog_path = website_schema / "catalog.json"
+    try:
+        catalog = strict_json(catalog_path)
+    except (OSError, ValueError) as error:
+        errors.append(f"invalid {family} core catalog: {error}")
+    else:
+        for resource in catalog.get("resources", []):
+            resource_path = website_schema / resource["path"]
+            if not resource_path.is_file() or sha256(resource_path) != resource["digest"]["sha256"]:
+                errors.append(f"{family} catalog digest mismatch: {resource.get('path')}")
+
+
+def check_license_profile(errors: list[str]) -> None:
+    """The standard profile is served at its own $id, as a valid JSON Schema."""
+    path = ROOT / LICENSE_PROFILE_PATH
+    try:
+        profile = strict_json(path)
+        Draft202012Validator.check_schema(profile)
+    except (OSError, ValueError, SchemaError) as error:
+        errors.append(f"invalid standard licence-claim profile: {error}")
+        return
+    if profile.get("$id") != f"https://usemakoto.dev/{LICENSE_PROFILE_PATH}":
+        errors.append("standard licence-claim profile $id differs from its hosted URL")
 
 
 def check_legacy_demo_mirror(errors: list[str]) -> None:

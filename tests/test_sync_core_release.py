@@ -75,7 +75,7 @@ def make_checksum_core(
             }
         )
     if include_manifest:
-        write(core / "release/v0.2/checksums.json", manifest_bytes)
+        write(core / sync_core_release.CHECKSUM_MANIFEST, manifest_bytes)
     subprocess.run(["git", "init", "-q"], cwd=core, check=True)
     subprocess.run(["git", "config", "user.name", "Test"], cwd=core, check=True)
     subprocess.run(["git", "config", "user.email", "test@example.invalid"], cwd=core, check=True)
@@ -309,8 +309,15 @@ def test_promote_rolls_back_every_replacement_on_failure(
     root = tmp_path / "site"
     staging = tmp_path / "staging"
     monkeypatch.setattr(sync_core_release, "ROOT", root)
+    # One static resource keeps the failure point after every directory swap.
+    monkeypatch.setattr(
+        sync_core_release,
+        "STATIC_RESOURCES",
+        {"spec/v0.2.md": ("spec/v0.2/spec.md", "text/markdown")},
+    )
     old_targets = {
         "schema/v0.2/old.json": b"old schema\n",
+        "schema/v0.3/old.json": b"old schema\n",
         "spec/v0.2/spec.md": b"old spec\n",
         "demos/end-to-end/artifacts/old.json": b"old demo\n",
         "demos/v0.2-end-to-end/artifacts/old.json": b"old demo\n",
@@ -320,6 +327,7 @@ def test_promote_rolls_back_every_replacement_on_failure(
     for relative, data in old_targets.items():
         write(root / relative, data)
     write(staging / "schema/v0.2/new.json", b"new schema\n")
+    write(staging / "schema/v0.3/new.json", b"new schema\n")
     write(staging / "spec/v0.2/spec.md", b"new spec\n")
     write(staging / "demos/end-to-end/artifacts/new.json", b"new demo\n")
     write(staging / "demos/v0.2-end-to-end/artifacts/new.json", b"new demo\n")
@@ -339,6 +347,7 @@ def test_promote_rolls_back_every_replacement_on_failure(
     for relative, data in old_targets.items():
         assert (root / relative).read_bytes() == data
     assert not (root / "schema/v0.2/new.json").exists()
+    assert not (root / "schema/v0.3/new.json").exists()
 
 
 def test_copy_release_content_mirrors_demo_artifacts_at_the_retired_path(
@@ -346,27 +355,30 @@ def test_copy_release_content_mirrors_demo_artifacts_at_the_retired_path(
 ) -> None:
     blobs: dict[str, bytes] = {}
     checksum_digests: dict[str, str] = {}
-    for name in sync_core_release.SCHEMA_NAMES:
-        path = f"schemas/v0.2/{name}"
-        if name == "catalog.json":
-            data = sync_core_release.jcs({"resources": []})
-        else:
-            data = sync_core_release.jcs(
-                {
-                    "$schema": "https://json-schema.org/draft/2020-12/schema",
-                    "$id": f"https://usemakoto.dev/schema/v0.2/{name}",
-                    "type": "object",
-                }
-            )
-        blobs[path] = data
-        checksum_digests[path] = sha256(data)
+    for family, names in sync_core_release.SCHEMA_FAMILIES.items():
+        for name in names:
+            path = f"schemas/{family}/{name}"
+            if name == "catalog.json":
+                data = sync_core_release.jcs({"resources": []})
+            else:
+                data = sync_core_release.jcs(
+                    {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "$id": f"https://usemakoto.dev/schema/{family}/{name}",
+                        "type": "object",
+                    }
+                )
+            blobs[path] = data
+            checksum_digests[path] = sha256(data)
     demo_source = "demos/v0.2-end-to-end/generated/data/customers.raw.json"
     blobs[demo_source] = b"[1]\n"
 
     def fake_tree(core: Path, revision: str, prefix: str) -> tuple[str, ...]:
         del core, revision
-        if prefix == "schemas/v0.2":
-            return tuple(f"schemas/v0.2/{name}" for name in sync_core_release.SCHEMA_NAMES)
+        family = prefix.removeprefix("schemas/")
+        if family in sync_core_release.SCHEMA_FAMILIES:
+            names = sync_core_release.SCHEMA_FAMILIES[family]
+            return tuple(f"{prefix}/{name}" for name in names)
         if prefix == "demos/v0.2-end-to-end/generated":
             return (demo_source,)
         raise AssertionError(prefix)

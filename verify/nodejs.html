@@ -32,10 +32,10 @@ decision=deny primaryError=E_ARTIFACT_DIGEST
   check artifact-bytes: fail []
   step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
   signatures 4/4 valid, policy 614eb137303b</code></pre></figure>
-<p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>7044f803dc30</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
+<p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>27d335292ad2</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
 <section aria-labelledby="install"><h2 id="install">1. Install the verifier and one dependency</h2><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto
-git checkout 7044f803dc300cd3b7f8b24f40a0bb9d7151113f
+git checkout 27d335292ad240fb9ebd6d5d6778a2a3ab3465f7
 uv sync --locked --dev
 
 # Writes the deterministic fixture set: one allowed bundle, seven denials.
