@@ -165,6 +165,14 @@
     <p>The <a href="/demos/end-to-end/">runnable proof</a> exercises an allowed handoff and seven deterministic denials against the pinned reference implementation.</p>
   </section>
 
+  <section aria-labelledby="versions"><h2 id="versions">Versions</h2>
+    <p>Each protocol version is a separate family of identifiers. Evidence keeps the version it was written in, and a verifier never mixes two families in one verification.</p>
+    <table class="stack-table"><thead><tr><th scope="col">Version</th><th scope="col">Status</th><th scope="col">Text and schemas</th></tr></thead><tbody>
+      <tr><td><code>0.2</code></td><td>Current. Everything else on this site describes it.</td><td><a href="/spec/text/">Normative text</a> · <a href="/spec/schemas/">Hosted schemas</a></td></tr>
+      <tr><td><code>0.3</code></td><td>Published for review; not yet tagged or the default. Adds a standard licence-claim profile and record-level commitments.</td><td><a href="/spec/v0.3/">Normative text and hosted schemas</a></td></tr>
+    </tbody></table>
+  </section>
+
   <section aria-labelledby="levels"><h2 id="levels">Assurance levels</h2>
     <p>Like SLSA, Makoto separates producer tracks from receiver results. The Origin and Transform tracks each define three cumulative levels a producer adopts one step at a time; what a receiver established about one handoff is a separate verified property, carried in a standard SLSA Verification Summary Attestation. Neither is an allow/deny score or a correctness claim.</p>
     <table class="stack-table level-table"><thead><tr><th scope="col">Level</th><th scope="col">Origin track</th><th scope="col">Transform track</th></tr></thead><tbody>

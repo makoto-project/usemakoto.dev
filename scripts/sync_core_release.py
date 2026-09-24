@@ -33,18 +33,41 @@ SCHEMA_NAMES = (
     "trust-policy.schema.json",
     "verification-report.schema.json",
 )
+V03_SCHEMA_NAMES = tuple(
+    sorted(
+        (*SCHEMA_NAMES, "record-declaration.schema.json", "record-inclusion-proof.schema.json"),
+        key=str.encode,
+    )
+)
+# Each hosted schema family: the core tree it comes from and the exact file set.
+# v0.3 is published beside v0.2; neither family's URLs or bytes replace the other.
+SCHEMA_FAMILIES = {"v0.2": SCHEMA_NAMES, "v0.3": V03_SCHEMA_NAMES}
+# The core checksum manifest that authenticates every mirrored byte. The v0.3
+# release inventory covers the v0.2 family too (core spec/v0.3.md section 17).
+CHECKSUM_MANIFEST = "release/v0.3/checksums.json"
+# Unauthenticated by the manifest: a checksum manifest never lists itself.
+CHECKSUM_MANIFESTS = ("release/v0.2/checksums.json", CHECKSUM_MANIFEST)
+# The verifier-owned standard licence-claim profile. Its hosted URL is its $id,
+# and its bytes must equal the core copy the verifier checksum-pins.
+LICENSE_PROFILE_SOURCE = "src/makoto/standard-profiles/v0.3/license-claim-v1.schema.json"
+LICENSE_PROFILE_PATH = "profile/v0.3/license-claim-v1.schema.json"
 # The walkthrough's permanent home. Its artifacts are also mirrored, byte for
 # byte, at the retired versioned path so curl + shasum commands published before
 # the move keep verifying forever.
 DEMO_ARTIFACTS = "demos/end-to-end/artifacts"
 LEGACY_DEMO_ARTIFACTS = "demos/v0.2-end-to-end/artifacts"
 DOCUMENTATION = {
+    "/claim/v0.3/license/": "claim/v0.3/license/index.html",
     "/demos/end-to-end/": "demos/end-to-end/index.html",
     "/predicate/v0.2/origin/": "predicate/v0.2/origin/index.html",
     "/predicate/v0.2/transform/": "predicate/v0.2/transform/index.html",
+    "/predicate/v0.3/origin/": "predicate/v0.3/origin/index.html",
+    "/predicate/v0.3/transform/": "predicate/v0.3/transform/index.html",
     "/source/file/": "source/file/index.html",
     "/spec/v0.2/": "spec/v0.2/index.html",
+    "/spec/v0.3/": "spec/v0.3/index.html",
     "/vocab/v0.2/bounded-pattern/": "vocab/v0.2/bounded-pattern/index.html",
+    "/vocab/v0.3/bounded-pattern/": "vocab/v0.3/bounded-pattern/index.html",
 }
 STATIC_RESOURCES = {
     "docs/v0.2-adversarial-review.md": (
@@ -54,14 +77,22 @@ STATIC_RESOURCES = {
     "docs/v0.2-architecture.md": ("docs/v0.2-architecture.md", "text/markdown"),
     "docs/v0.2-integrations.md": ("docs/v0.2-integrations.md", "text/markdown"),
     "docs/v0.2-migration.md": ("docs/v0.2-migration.md", "text/markdown"),
+    "docs/v0.3-migration.md": ("docs/v0.3-migration.md", "text/markdown"),
     "release/checksums.schema.json": (
         "tooling/release/checksums.schema.json",
         "application/json",
     ),
     "release/v0.2/checksums.json": ("release/v0.2/checksums.json", "application/json"),
+    "release/v0.3/checksums.json": ("release/v0.3/checksums.json", "application/json"),
     "spec/v0.2.md": ("spec/v0.2/spec.md", "text/markdown"),
+    "spec/v0.3.md": ("spec/v0.3/spec.md", "text/markdown"),
+    LICENSE_PROFILE_SOURCE: (LICENSE_PROFILE_PATH, "application/json"),
     "testdata/v0.2/diagnostic-map.json": (
         "spec/v0.2/diagnostic-map.json",
+        "application/json",
+    ),
+    "testdata/v0.3/diagnostic-map.json": (
+        "spec/v0.3/diagnostic-map.json",
         "application/json",
     ),
 }
@@ -79,10 +110,13 @@ PUBLIC_TEXT_REWRITES = {
 CHECKSUM_PREFIXES = (
     "demos/v0.2-end-to-end",
     "docs",
+    "examples/go",
     "schemas/v0.2",
+    "schemas/v0.3",
     "scripts",
     "src/makoto",
     "testdata/v0.2",
+    "testdata/v0.3",
     "tests",
 )
 CHECKSUM_EXACT_PATHS = (
@@ -91,6 +125,7 @@ CHECKSUM_EXACT_PATHS = (
     "pyproject.toml",
     "release/checksums.schema.json",
     "spec/v0.2.md",
+    "spec/v0.3.md",
     "uv.lock",
 )
 CHECKSUM_FORBIDDEN_SEGMENTS = {
@@ -248,12 +283,12 @@ def checksum_paths(core: Path, revision: str | None) -> tuple[str, ...]:
     paths = set(CHECKSUM_EXACT_PATHS)
     for prefix in CHECKSUM_PREFIXES:
         paths.update(source_tree(core, revision, prefix))
-    paths.discard("release/v0.2/checksums.json")
+    paths.difference_update(CHECKSUM_MANIFESTS)
     return tuple(sorted(paths, key=str.encode))
 
 
 def load_core_checksums(core: Path, revision: str | None) -> dict[str, str]:
-    manifest_bytes = source_blob(core, revision, "release/v0.2/checksums.json")
+    manifest_bytes = source_blob(core, revision, CHECKSUM_MANIFEST)
     schema_bytes = source_blob(core, revision, "release/checksums.schema.json")
     manifest = strict_json_bytes(manifest_bytes, label="core checksum manifest")
     schema = strict_json_bytes(schema_bytes, label="core checksum schema")
@@ -281,6 +316,42 @@ def load_core_checksums(core: Path, revision: str | None) -> dict[str, str]:
     return digests
 
 
+def copy_schema_family(
+    core: Path,
+    revision: str | None,
+    staging: Path,
+    checksum_digests: dict[str, str],
+    family: str,
+    names: tuple[str, ...],
+) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    schema_target = staging / "schema" / family
+    schema_target.mkdir(parents=True)
+    core_schema_paths = source_tree(core, revision, f"schemas/{family}")
+    expected_schema_paths = tuple(f"schemas/{family}/{name}" for name in names)
+    if core_schema_paths != expected_schema_paths:
+        raise SyncError(
+            f"core {family} schema set differs: "
+            f"expected={expected_schema_paths!r} actual={core_schema_paths!r}"
+        )
+    for name in names:
+        data = source_blob(core, revision, f"schemas/{family}/{name}")
+        if digest(data)["sha256"] != checksum_digests.get(f"schemas/{family}/{name}"):
+            raise SyncError(f"schema does not match core checksum manifest: {family}/{name}")
+        if name.endswith(".schema.json"):
+            schema = strict_json_bytes(data, label=f"core schema {family}/{name}")
+            try:
+                Draft202012Validator.check_schema(schema)
+            except SchemaError as error:
+                raise SyncError(f"invalid core JSON Schema {family}/{name}: {error}") from error
+            expected_id = f"https://usemakoto.dev/schema/{family}/{name}"
+            if schema.get("$id") != expected_id:
+                raise SyncError(f"core schema $id differs from hosted URL: {family}/{name}")
+        (schema_target / name).write_bytes(data)
+        entries.append({"path": f"/schema/{family}/{name}", "digest": digest(data)})
+    return entries
+
+
 def copy_release_content(
     core: Path,
     revision: str | None,
@@ -289,35 +360,20 @@ def copy_release_content(
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     schema_entries: list[dict[str, Any]] = []
     resource_entries: list[dict[str, Any]] = []
-    schema_target = staging / "schema/v0.2"
-    schema_target.mkdir(parents=True)
-    core_schema_paths = source_tree(core, revision, "schemas/v0.2")
-    expected_schema_paths = tuple(f"schemas/v0.2/{name}" for name in SCHEMA_NAMES)
-    if core_schema_paths != expected_schema_paths:
-        raise SyncError(
-            f"core schema set differs: expected={expected_schema_paths!r} actual={core_schema_paths!r}"
+    for family, names in SCHEMA_FAMILIES.items():
+        schema_entries.extend(
+            copy_schema_family(core, revision, staging, checksum_digests, family, names)
         )
-    for name in SCHEMA_NAMES:
-        data = source_blob(core, revision, f"schemas/v0.2/{name}")
-        if digest(data)["sha256"] != checksum_digests.get(f"schemas/v0.2/{name}"):
-            raise SyncError(f"schema does not match core checksum manifest: {name}")
-        if name.endswith(".schema.json"):
-            schema = strict_json_bytes(data, label=f"core schema {name}")
-            try:
-                Draft202012Validator.check_schema(schema)
-            except SchemaError as error:
-                raise SyncError(f"invalid core JSON Schema {name}: {error}") from error
-            expected_id = f"https://usemakoto.dev/schema/v0.2/{name}"
-            if schema.get("$id") != expected_id:
-                raise SyncError(f"core schema $id differs from hosted URL: {name}")
-        (schema_target / name).write_bytes(data)
-        schema_entries.append({"path": f"/schema/v0.2/{name}", "digest": digest(data)})
     for source_path, (relative, media_type) in STATIC_RESOURCES.items():
         data = source_blob(core, revision, source_path)
-        if source_path != "release/v0.2/checksums.json" and digest(data)[
-            "sha256"
-        ] != checksum_digests.get(source_path):
+        if source_path not in CHECKSUM_MANIFESTS and digest(data)["sha256"] != checksum_digests.get(
+            source_path
+        ):
             raise SyncError(f"resource does not match core checksum manifest: {source_path}")
+        if source_path == LICENSE_PROFILE_SOURCE:
+            profile = strict_json_bytes(data, label="standard licence-claim profile")
+            if profile.get("$id") != f"https://usemakoto.dev/{LICENSE_PROFILE_PATH}":
+                raise SyncError("standard licence-claim profile $id differs from hosted URL")
         data = public_resource_bytes(source_path, data)
         target = staging / relative
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -367,16 +423,14 @@ def documentation_entries() -> list[dict[str, Any]]:
 
 def promote(staging: Path, pin_name: str | None, remove_name: str | None) -> None:
     replacements = [
-        (staging / "schema/v0.2", ROOT / "schema/v0.2"),
-        (staging / "spec/v0.2/spec.md", ROOT / "spec/v0.2/spec.md"),
+        *((staging / "schema" / family, ROOT / "schema" / family) for family in SCHEMA_FAMILIES),
         (staging / DEMO_ARTIFACTS, ROOT / DEMO_ARTIFACTS),
         (staging / LEGACY_DEMO_ARTIFACTS, ROOT / LEGACY_DEMO_ARTIFACTS),
     ]
     if pin_name is not None:
         replacements.append((staging / pin_name, ROOT / pin_name))
     for relative, _ in STATIC_RESOURCES.values():
-        if relative != "spec/v0.2/spec.md":
-            replacements.append((staging / relative, ROOT / relative))
+        replacements.append((staging / relative, ROOT / relative))
     backups: list[tuple[Path, Path]] = []
     installed: list[Path] = []
     try:
