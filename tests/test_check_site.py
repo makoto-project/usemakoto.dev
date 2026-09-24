@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -60,7 +61,7 @@ def write_checksum_manifest(core: Path, paths: tuple[str, ...]) -> None:
         for relative in sorted(paths, key=str.encode)
     ]
     write(
-        core / "release/v0.2/checksums.json",
+        core / check_site.CORE_CHECKSUM_MANIFEST,
         canonical({"version": "1", "tag": "v0.2.0", "files": files}),
     )
 
@@ -69,28 +70,30 @@ def make_parity_trees(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[
     site = tmp_path / "site"
     core = tmp_path / "core"
     checksum_paths: list[str] = []
-    for name in check_site.CORE_SCHEMA_NAMES:
-        if name == "catalog.json":
-            data = canonical({"resources": []})
-        else:
-            data = canonical(
-                {
-                    "$schema": "https://json-schema.org/draft/2020-12/schema",
-                    "$id": f"https://usemakoto.dev/schema/v0.2/{name}",
-                    "type": "object",
-                }
-            )
-        write(site / f"schema/v0.2/{name}", data)
-        write(core / f"schemas/v0.2/{name}", data)
-        checksum_paths.append(f"schemas/v0.2/{name}")
-    write(site / "spec/v0.2/spec.md", b"spec\n")
-    write(core / "spec/v0.2.md", b"spec\n")
+    for family, names in check_site.CORE_SCHEMA_FAMILIES.items():
+        for name in names:
+            if name == "catalog.json":
+                data = canonical({"resources": []})
+            else:
+                data = canonical(
+                    {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "$id": f"https://usemakoto.dev/schema/{family}/{name}",
+                        "type": "object",
+                    }
+                )
+            write(site / f"schema/{family}/{name}", data)
+            write(core / f"schemas/{family}/{name}", data)
+            checksum_paths.append(f"schemas/{family}/{name}")
+        write(site / f"spec/{family}/spec.md", b"spec\n")
+        write(core / f"spec/{family}.md", b"spec\n")
+        checksum_paths.append(f"spec/{family}.md")
     write(site / "demos/end-to-end/artifacts/.keep", b"")
     write(site / "demos/v0.2-end-to-end/artifacts/.keep", b"")
     write(core / "demos/v0.2-end-to-end/generated/.keep", b"")
     schema_bytes = canonical(checksum_schema())
     write(core / "release/checksums.schema.json", schema_bytes)
-    checksum_paths.extend(("release/checksums.schema.json", "spec/v0.2.md"))
+    checksum_paths.append("release/checksums.schema.json")
     write_checksum_manifest(core, tuple(checksum_paths))
     monkeypatch.setattr(check_site, "ROOT", site)
     monkeypatch.setattr(check_site, "CORE_CHECKSUM_PREFIXES", ())
@@ -446,7 +449,8 @@ def test_community_page_links_real_public_participation_paths() -> None:
 
 def test_current_site_matches_sibling_core_working_tree() -> None:
     errors: list[str] = []
-    core = check_site.ROOT.parent / "core"
+    # scripts/local_ci.py --core-repo passes its checkout here; CI uses ../core.
+    core = Path(os.environ.get("MAKOTO_CORE_REPO", check_site.ROOT.parent / "core"))
 
     check_site.check_core_parity(core, errors)
 
@@ -566,7 +570,7 @@ def test_core_parity_rejects_schema_id_that_differs_from_hosted_url(
 
     check_site.check_core_parity(core, errors)
 
-    assert f"schema $id differs from hosted URL: {name}" in errors
+    assert f"schema $id differs from hosted URL: v0.2/{name}" in errors
 
 
 def test_validate_pin_defaults_to_sibling_core(

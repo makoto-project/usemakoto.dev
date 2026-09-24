@@ -27,7 +27,7 @@
 set -euo pipefail
 curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh
 git clone https://github.com/makoto-project/makoto.git /opt/makoto
-git -C /opt/makoto checkout 7044f803dc300cd3b7f8b24f40a0bb9d7151113f
+git -C /opt/makoto checkout 27d335292ad240fb9ebd6d5d6778a2a3ab3465f7
 cd /opt/makoto &amp;&amp; uv sync --locked --dev</code></pre><pre><code class="language-bash">uv run makoto_bootstrap.py /Volumes/main/finance/makoto \
   --source-kind urn:example:source:delta-table-version \
   --source-uri databricks://acme/main.sales.orders \
