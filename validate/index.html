@@ -40,7 +40,7 @@ set -euo pipefail
 A=https://usemakoto.dev/demos/end-to-end/artifacts
 curl -fsS -o policy.json "$A/receiver/policy.json"
 curl -fsS -o attestation.dsse.json \
-  "$A/positive-bundle/attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json"
+  "$A/positive-bundle/attestations/99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce.dsse.json"
 curl -fsS -o report.json "$A/reports/mutated-final-data.json"
 
 # The signed statement is the base64 payload inside the DSSE envelope.
@@ -511,12 +511,12 @@ jobs:
             "$RUNNER_TEMP"/statements/*.json</code></pre></section>
 
 <section aria-labelledby="receiver"><h2 id="receiver">Complete receiver decision</h2><p>Schema validation never answers whether to accept data. The reference verifier does: it runs structure as one step of sixteen, then signatures over exact payload bytes, receiver authorization, profiles, graph continuity, handoff completeness, independent freshness anchors, and the bytes that actually arrived.</p><pre><code class="language-bash">cd makoto   # a reviewed checkout, synced with uv sync --locked --dev
-G=demos/v0.2-end-to-end/generated
+G=demos/end-to-end/generated
 uv run makoto verify bundle "$G/positive-bundle" \
   --policy "$G/receiver/policy.json" \
   --schema-catalog "$G/receiver/catalog.json" \
-  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
-  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7 \
+  --expected-head sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce \
   --expected-artifact "$G/receiver/expected-artifact.json" \
   --evaluation-time 2026-09-16T16:00:00Z \
   --json</code></pre><p>Each language binding wraps this command with install steps, a tampered-bundle denial, and report handling: <a href="/verify/bash.html">Bash</a>, <a href="/verify/python.html">Python</a>, <a href="/verify/nodejs.html">JavaScript</a>, <a href="/verify/typescript.html">TypeScript</a>, and <a href="/verify/go.html">Go</a>.</p></section>

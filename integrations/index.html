@@ -305,7 +305,7 @@ policy_path.write_text(json.dumps(policy, indent=2) + "\n")
 makoto("policy", "check", "--policy", policy_path)
 print(f"export MAKOTO_KEYS={keys_dir}")
 print(f"export MAKOTO_POLICY={policy_path}")</code></pre><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git /opt/makoto
-git -C /opt/makoto checkout 27d335292ad240fb9ebd6d5d6778a2a3ab3465f7
+git -C /opt/makoto checkout 276008eeec0f10d5322c4c627b8c103222fee841
 (cd /opt/makoto &amp;&amp; uv sync --locked --dev)
 export MAKOTO_CORE=/opt/makoto
 uv run makoto_bootstrap.py /srv/makoto \

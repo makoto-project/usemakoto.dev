@@ -105,11 +105,12 @@ PUBLIC_TEXT_REWRITES = {
         ),
         ("(../spec/v0.2.md)", "(../spec/v0.2/spec.md)"),
     ),
-    "docs/v0.2-migration.md": (("(../demos/v0.2-end-to-end/README.md)", "(../demos/end-to-end/)"),),
+    "docs/v0.2-migration.md": (("(../demos/end-to-end/README.md)", "(../demos/end-to-end/)"),),
 }
 CHECKSUM_PREFIXES = (
-    "demos/v0.2-end-to-end",
+    "demos/end-to-end",
     "docs",
+    "examples/github-actions",
     "examples/go",
     "schemas/v0.2",
     "schemas/v0.3",
@@ -386,11 +387,11 @@ def copy_release_content(
                 "cors": True,
             }
         )
-    demo_paths = source_tree(core, revision, "demos/v0.2-end-to-end/generated")
+    demo_paths = source_tree(core, revision, "demos/end-to-end/generated")
     if not demo_paths:
-        raise SyncError("core candidate has no generated v0.2 demo artifacts")
+        raise SyncError("core candidate has no generated end-to-end demo artifacts")
     for source_path in demo_paths:
-        relative = Path(source_path).relative_to("demos/v0.2-end-to-end/generated")
+        relative = Path(source_path).relative_to("demos/end-to-end/generated")
         data = source_blob(core, revision, source_path)
         for artifacts in (DEMO_ARTIFACTS, LEGACY_DEMO_ARTIFACTS):
             target = staging / artifacts / relative

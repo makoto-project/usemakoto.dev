@@ -155,7 +155,7 @@ def test_probe_once_accepts_exact_bytes_media_types_cors_and_tag_link(
 ) -> None:
     base = "https://example.test"
     schema = b'{"type":"object"}\n'
-    tag_link = "https://github.com/makoto-project/makoto/tree/v0.2.0/demos/v0.2-end-to-end"
+    tag_link = "https://github.com/makoto-project/makoto/tree/v0.2.0/demos/end-to-end"
     walkthrough = f'<a href="{tag_link}">tag</a>\n'.encode()
     pin_bytes = write_release_pin(tmp_path, schema_body=schema, walkthrough=walkthrough)
     responses = {
@@ -188,7 +188,7 @@ def test_probe_once_accepts_exact_candidate_commit_link_and_disclosure(
 ) -> None:
     base = "https://example.test"
     schema = b'{"type":"object"}\n'
-    commit_link = f"https://github.com/makoto-project/makoto/tree/{'a' * 40}/demos/v0.2-end-to-end"
+    commit_link = f"https://github.com/makoto-project/makoto/tree/{'a' * 40}/demos/end-to-end"
     walkthrough = f'<a href="{commit_link}">candidate source</a>\n'.encode()
     pin_bytes = write_candidate_pin(tmp_path, schema_body=schema, walkthrough=walkthrough)
     responses = candidate_responses(
@@ -224,7 +224,7 @@ def test_candidate_probe_rejects_missing_specification_disclosure(
 ) -> None:
     base = "https://example.test"
     schema = b'{"type":"object"}\n'
-    commit_link = f"https://github.com/makoto-project/makoto/tree/{'a' * 40}/demos/v0.2-end-to-end"
+    commit_link = f"https://github.com/makoto-project/makoto/tree/{'a' * 40}/demos/end-to-end"
     walkthrough = f'<a href="{commit_link}">candidate source</a>\n'.encode()
     pin_bytes = write_candidate_pin(tmp_path, schema_body=schema, walkthrough=walkthrough)
     status_page = b"<main>status omitted</main>\n"
@@ -246,7 +246,7 @@ def test_candidate_probe_rejects_missing_specification_disclosure(
 
 def test_candidate_expectations_reject_coexisting_release_pin(tmp_path: Path) -> None:
     schema = b'{"type":"object"}\n'
-    commit_link = f"https://github.com/makoto-project/makoto/tree/{'a' * 40}/demos/v0.2-end-to-end"
+    commit_link = f"https://github.com/makoto-project/makoto/tree/{'a' * 40}/demos/end-to-end"
     walkthrough = f'<a href="{commit_link}">candidate source</a>\n'.encode()
     write_candidate_pin(tmp_path, schema_body=schema, walkthrough=walkthrough)
     (tmp_path / "schema/core-release.json").write_bytes(b"{}\n")
