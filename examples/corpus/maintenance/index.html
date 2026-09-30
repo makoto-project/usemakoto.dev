@@ -97,7 +97,7 @@ jobs:
       - name: Install the Makoto reference CLI
         run: |
           uv tool install \
-            "git+https://github.com/makoto-project/makoto@27d335292ad240fb9ebd6d5d6778a2a3ab3465f7"
+            "git+https://github.com/makoto-project/makoto@276008eeec0f10d5322c4c627b8c103222fee841"
           uv tool dir --bin &gt;&gt; "$GITHUB_PATH"
       - name: Manifests and lineage records agree
         env:

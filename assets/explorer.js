@@ -15,10 +15,11 @@
   "use strict";
 
   var ART = "/demos/end-to-end/artifacts/";
+
   var ST = {
     origin: "56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a",
     normalize: "1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848",
-    publicSafe: "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+    publicSafe: "99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce"
   };
 
   var STAGES = [
@@ -85,29 +86,40 @@
   var PROPERTIES = ["MAKOTO_AUTHORIZED", "MAKOTO_GRAPH_COMPLETE", "MAKOTO_FRESHNESS_ANCHORED", "MAKOTO_SCHEMA_CONFORMANT", "MAKOTO_REPRODUCED"];
 
   var root = document.querySelector("[data-explorer]");
+
   if (!root || !window.fetch) return;
 
   var cache = {};
+
   function load(path, kind) {
     var id = (kind || "json") + " " + path;
+
     if (!cache[id]) {
       cache[id] = fetch(path).then(function (r) {
         if (!r.ok) throw new Error(path + ": " + r.status);
+
         return kind === "bytes" ? r.arrayBuffer() : r.json();
       });
     }
+
     return cache[id];
   }
+
   function statement(digest) {
     return load(ART + "positive-bundle/attestations/" + digest + ".dsse.json").then(decode);
   }
+
   function decode(envelope) {
     var bin = atob(envelope.payload), bytes = new Uint8Array(bin.length);
+
     for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+
     return JSON.parse(new TextDecoder().decode(bytes));
   }
+
   function sha256(buffer) {
     if (!window.crypto || !crypto.subtle) return Promise.resolve(null);
+
     return crypto.subtle.digest("SHA-256", buffer).then(function (h) {
       return Array.prototype.map.call(new Uint8Array(h), function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
     });
@@ -116,28 +128,69 @@
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
+
+  /* Every value shown here came from JSON.parse, so its JSON text names its kind. */
+  function jsonKind(v) {
+    var text = JSON.stringify(v);
+
+    if (text === undefined) return "absent";
+
+    var first = text.charAt(0);
+
+    if (first === '"') return "string";
+
+    if (first === "{") return "object";
+
+    if (first === "[") return "array";
+
+    if (first === "t" || first === "f") return "boolean";
+
+    if (first === "n") return "null";
+
+    return "number";
+  }
+
   function scalar(v) {
-    if (typeof v === "string") return '<span class="token string">' + esc(JSON.stringify(v)) + "</span>";
-    if (typeof v === "number") return '<span class="token number">' + v + "</span>";
-    if (typeof v === "boolean") return '<span class="token boolean">' + v + "</span>";
-    if (v === null) return '<span class="token null">null</span>';
+    var kind = jsonKind(v);
+
+    if (kind === "string") return '<span class="token string">' + esc(JSON.stringify(v)) + "</span>";
+
+    if (kind === "number") return '<span class="token number">' + v + "</span>";
+
+    if (kind === "boolean") return '<span class="token boolean">' + v + "</span>";
+
+    if (kind === "null") return '<span class="token null">null</span>';
+
     return "";
   }
+
   function key(k) {
     return '<span class="token property">' + esc(JSON.stringify(k)) + '</span><span class="token punctuation">:</span> ';
   }
+
   function punct(s) { return '<span class="token punctuation">' + s + "</span>"; }
 
   /* Lay a value out one member per line. mark(path, value) returns a class for a line. */
   function lines(value, mark) {
     var out = [];
+
     function walk(v, depth, prefix, path, comma) {
       var pad = "", c = comma ? punct(",") : "";
+
       for (var i = 0; i < depth; i++) pad += "  ";
-      if (v && typeof v === "object") {
-        var arr = Array.isArray(v), keys = arr ? v.map(function (_, i) { return i; }) : Object.keys(v);
+
+      var kind = jsonKind(v);
+
+      if (kind === "object" || kind === "array") {
+        var arr = kind === "array", keys = arr ? v.map(function (_, i) { return i; }) : Object.keys(v);
         var open = arr ? "[" : "{", close = arr ? "]" : "}";
-        if (!keys.length) { out.push({ html: pad + prefix + punct(open + close) + c, cls: mark(path, v), depth: depth }); return; }
+
+        if (!keys.length) {
+          out.push({ html: pad + prefix + punct(open + close) + c, cls: mark(path, v), depth: depth });
+
+          return;
+        }
+
         out.push({ html: pad + prefix + punct(open), cls: mark(path, v, "open"), depth: depth });
         keys.forEach(function (k, idx) {
           walk(v[k], depth + 1, arr ? "" : key(k), path.concat([k]), idx < keys.length - 1);
@@ -145,45 +198,60 @@
         var extra = mark(path.concat(["__removed__"]), v) || [];
         extra.forEach(function (line) { out.push({ html: pad + "  " + line, cls: "is-removed", depth: depth + 1 }); });
         out.push({ html: pad + punct(close) + c, cls: "", depth: depth });
+
         return;
       }
+
       out.push({ html: pad + prefix + scalar(v) + c, cls: mark(path, v), depth: depth });
     }
+
     walk(value, 0, "", [], false);
+
     return out;
   }
 
   function renderLines(pre, rows, changesOnly) {
     var html = rows.map(function (row) {
       var hidden = changesOnly && !row.cls && row.depth > 1 ? " hidden" : "";
+
       return '<span class="line' + (row.cls ? " " + row.cls : "") + '"' + hidden + ' style="--indent:' + Math.min(row.depth * 2, 12) + '">' + row.html + "</span>";
     }).join("");
+
     pre.querySelector("code").innerHTML = html;
   }
 
   /* Data diff: match each row with its predecessor row by a field, then mark added, changed, removed members. */
   function dataRows(current, previous, match) {
     var byKey = {};
+
     if (previous) {
       previous.forEach(function (row) {
         var k = String(row[match]).trim().toUpperCase();
         byKey[k] = row;
       });
     }
+
     return lines(current, function (path, v, open) {
       var removedMarker = path[path.length - 1] === "__removed__";
+
       if (removedMarker && (path.length !== 2 || !previous)) return [];
+
       if (!previous || path.length < 1) return "";
       var row = current[path[0]], before = byKey[String(row[match]).trim().toUpperCase()];
+
       if (!before) return path.length === 1 && open ? "is-added" : "";
+
       if (path.length === 2 && path[1] === "__removed__") {
         return Object.keys(before).filter(function (k) { return !(k in row); }).map(function (k) {
           return key(k) + scalar(before[k]);
         });
       }
+
       if (path.length !== 2) return "";
       var field = path[1];
+
       if (!(field in before)) return "is-added";
+
       return JSON.stringify(before[field]) === JSON.stringify(v) ? "" : "is-changed";
     });
   }
@@ -191,7 +259,8 @@
   function linkRows(value, links) {
     return lines(value, function (path, v) {
       if (path[path.length - 1] === "__removed__") return [];
-      return typeof v === "string" && links.indexOf(v) !== -1 ? "is-link" : "";
+
+      return links.indexOf(v) !== -1 ? "is-link" : "";
     });
   }
 
@@ -199,6 +268,7 @@
 
   /* ---------- DOM ---------- */
   var q = function (sel) { return root.querySelector(sel); };
+
   var stageNav = q("[data-stage-nav]");
   var titleEl = q("[data-stage-title]"), countEl = q("[data-stage-count]"), whatEl = q("[data-stage-what]"), levelEl = q("[data-stage-level]");
   var dataName = q("[data-data-name]"), dataPre = q("[data-data] pre"), dataNote = q("[data-data-note]");
@@ -208,11 +278,14 @@
   var prevBtn = q("[data-prev]"), nextBtn = q("[data-next]");
 
   var state = { stage: 1, tamper: "", changesOnly: false };
+
   try {
     var params = new URLSearchParams(window.location.search);
     var s = parseInt(params.get("stage"), 10);
+
     if (s >= 1 && s <= STAGES.length) state.stage = s;
     var t = params.get("tamper") || "";
+
     if (ATTACKS.some(function (a) { return a.id === t; })) state.tamper = t;
   } catch (e) { /* keep defaults */ }
 
@@ -253,10 +326,13 @@
     sync();
     render();
   }
+
   function sync() {
     try {
       var params = new URLSearchParams();
+
       if (state.stage !== 1) params.set("stage", state.stage);
+
       if (state.tamper) params.set("tamper", state.tamper);
       var qs = params.toString();
       history.replaceState(null, "", window.location.pathname + (qs ? "?" + qs : ""));
@@ -264,6 +340,7 @@
   }
 
   var token = 0;
+
   function render() {
     var mine = ++token, stage = STAGES[state.stage - 1];
     var attack = ATTACKS.filter(function (a) { return a.id === state.tamper; })[0] || ATTACKS[0];
@@ -291,6 +368,7 @@
       if (mine !== token) return;
       var data = r[0], previous = r[1], ev = r[2];
       dataName.textContent = stage.data + (data.digest ? " · " + short(data.digest) : "");
+
       if (data.digest) dataName.title = "sha256:" + data.digest + " (hashed in your browser)";
       renderLines(dataPre, dataRows(data.json, previous, stage.match), false);
       changesToggle.hidden = !previous;
@@ -314,10 +392,13 @@
 
   function evidence(stage, attack) {
     var e = stage.evidence;
+
     if (e.kind === "statement") {
       var prevDigest = stage.prev ? (state.stage === 2 ? ST.origin : ST.normalize) : null;
+
       return Promise.all([statement(e.digest), stage.prev ? load(ART + "data/" + stage.prev, "bytes").then(sha256) : Promise.resolve(null)]).then(function (r) {
         var links = [prevDigest, r[1]].filter(Boolean);
+
         return {
           name: e.label + " · " + short(e.digest),
           rows: linkRows(r[0], links),
@@ -327,6 +408,7 @@
         };
       });
     }
+
     if (e.kind === "manifest") {
       return load(ART + "positive-bundle/manifest.dsse.json").then(function (env) {
         return {
@@ -336,21 +418,31 @@
         };
       });
     }
+
     var reportName = attack.id || "positive";
+
     return Promise.all([load(ART + "reports/" + reportName + ".json"), load("/explorer/properties.json")]).then(function (r) {
       var report = r[0], props = r[1][reportName];
       var checks = report.checks.map(function (c) { return { id: c.id, status: c.status }; });
+
       var rows = lines({ decision: report.decision, checks: checks, errors: report.errors.map(function (x) { return { code: x.code, message: x.message }; }) }, function (path, v) {
         if (path[path.length - 1] === "__removed__") return [];
+
         if (path[0] === "decision") return v === "allow" ? "is-pass" : "is-fail";
+
         if (path[0] === "checks" && path.length === 3 && path[2] === "status") return v === "pass" ? "" : "is-fail";
+
         if (path[0] === "errors" && path.length === 3 && path[2] === "code") return "is-fail";
+
         return "";
       });
+
       var established = PROPERTIES.map(function (p) {
         var ok = props && props[p];
+
         return "<tr><td><a href=\"/levels/#property-" + p.slice(7).toLowerCase().replace(/_/g, "-") + "\"><code>" + p + "</code></a></td><td>" + (ok ? "Established" : "Not established") + "</td></tr>";
       }).join("");
+
       return {
         name: "Verification report · " + reportName + ".json",
         rows: rows,
@@ -371,11 +463,15 @@
       { at: 2, label: "Normalize", digest: ST.normalize },
       { at: 3, label: "Public-safe", digest: ST.publicSafe }
     ].filter(function (i) { return i.at <= n; });
+
     var html = items.map(function (i, idx) {
       return "<li><span>" + esc(i.label) + '</span> <code class="hash" title="sha256:' + i.digest + '">' + i.digest.slice(0, 7) + "</code>" + (idx === 0 ? " root" : "") + (idx === items.length - 1 && n >= 3 ? " head" : "") + "</li>";
     });
+
     if (n >= 4) html.push("<li><span>Handoff manifest</span> signed</li>");
+
     if (n >= 5) html.push("<li><span>Receiver</span> " + (attack.id ? "denied" : "allowed") + "</li>");
+
     return Promise.resolve(html.join(""));
   }
 

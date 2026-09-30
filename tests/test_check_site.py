@@ -90,7 +90,7 @@ def make_parity_trees(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[
         checksum_paths.append(f"spec/{family}.md")
     write(site / "demos/end-to-end/artifacts/.keep", b"")
     write(site / "demos/v0.2-end-to-end/artifacts/.keep", b"")
-    write(core / "demos/v0.2-end-to-end/generated/.keep", b"")
+    write(core / "demos/end-to-end/generated/.keep", b"")
     schema_bytes = canonical(checksum_schema())
     write(core / "release/checksums.schema.json", schema_bytes)
     checksum_paths.append("release/checksums.schema.json")
@@ -625,7 +625,7 @@ def test_validate_source_revision_link_accepts_exact_candidate_commit(
         site / check_site.WALKTHROUGH_PAGE,
         (
             '<a href="https://github.com/makoto-project/makoto/tree/'
-            f'{commit}/demos/v0.2-end-to-end">source</a>\n'
+            f'{commit}/demos/end-to-end">source</a>\n'
         ).encode(),
     )
     monkeypatch.setattr(check_site, "ROOT", site)
@@ -644,7 +644,7 @@ def test_validate_source_revision_link_rejects_stale_candidate_commit(
         site / check_site.WALKTHROUGH_PAGE,
         (
             '<a href="https://github.com/makoto-project/makoto/tree/'
-            f'{"b" * 40}/demos/v0.2-end-to-end">source</a>\n'
+            f'{"b" * 40}/demos/end-to-end">source</a>\n'
         ).encode(),
     )
     monkeypatch.setattr(check_site, "ROOT", site)
@@ -736,14 +736,44 @@ def test_versioned_learning_url_guard_rejects_new_links(content: str) -> None:
 @pytest.mark.parametrize(
     "content",
     [
-        "https://github.com/makoto-project/makoto/tree/main/demos/v0.2-end-to-end",
-        'DEMO="$CORE/demos/v0.2-end-to-end/generated"',
+        "https://github.com/makoto-project/makoto/tree/main/demos/end-to-end",
+        'DEMO="$CORE/demos/end-to-end/generated"',
         '<a href="/spec/v0.2/">spec</a>',
         '<a href="/schema/v0.2/bundle.schema.json">schema</a>',
     ],
 )
 def test_versioned_learning_url_guard_keeps_core_paths_and_wire_identifiers(content: str) -> None:
     assert not check_site.VERSIONED_LEARNING_URL.search(content)
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "uv run makoto verify bundle demos/v0.2-end-to-end/generated/positive-bundle",
+        'DEMO="$CORE/demos/v0.2-end-to-end/generated"',
+        "./scripts/demo-v0.2.sh --acceptance",
+    ],
+)
+def test_retired_core_demo_path_guard_rejects_commands(content: str) -> None:
+    assert check_site.RETIRED_CORE_DEMO_PATH.search(content)
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "uv run makoto verify bundle demos/end-to-end/generated/positive-bundle",
+        "./scripts/demo.sh --acceptance",
+        "curl -sO https://usemakoto.dev/demos/v0.2-end-to-end/artifacts/data/customers.raw.json",
+    ],
+)
+def test_retired_core_demo_path_guard_allows_current_paths_and_the_mirror(content: str) -> None:
+    assert not check_site.RETIRED_CORE_DEMO_PATH.search(content)
+
+
+def test_retired_core_demo_path_is_absent_from_every_page() -> None:
+    errors: list[str] = []
+    check_site.check_legacy_redirects(errors)
+    assert not [error for error in errors if "retired core demo path" in error]
 
 
 def test_explorer_loads_only_published_artifacts_and_reports_every_attack() -> None:

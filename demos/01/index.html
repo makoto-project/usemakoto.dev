@@ -98,8 +98,8 @@
 <figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#code-the-output-that-catches-it">The output that catches it</a> below.</figcaption><pre><code class="language-bash">$ makoto verify bundle handoffs/mutated-final-data/bundle \
   --policy receiver/policy.json \
   --schema-catalog receiver/catalog.json \
-  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
-  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7 \
+  --expected-head sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce \
   --expected-artifact receiver/expected/mutated-final-data.artifact.json \
   --evaluation-time 2026-09-16T16:00:00Z
 PASS        load-safely
@@ -119,11 +119,11 @@ FAIL        artifact-bytes
 PASS        artifact-profiles
 PASS        decision
 DENY        decision
-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7
 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
 $ echo $?
 1</code></pre></figure>
-<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core verifier at commit <code>0e41afb</code>. The pinned core commit <code>27d3352</code> adds verification summaries and a separately dispatched newer protocol version without changing these results, and the gate below runs it. Verification-summary tables are computed from the published reports with its property rules. The verification reports are byte-for-byte the files published under <a href="/demos/end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core verifier at the pinned commit <code>276008e</code>, which the gate below runs. Verification-summary tables are computed from the published reports with its property rules. The verification reports are byte-for-byte the files published under <a href="/demos/end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
 
 <section>
 <h2>The problem</h2>
@@ -136,24 +136,24 @@ $ echo $?
 <li><div>
 <h2>The raw example</h2>
 <p>This is what the downstream team is supposed to receive: three customer records with direct identifiers removed and ages bucketed. The final signed statement names those exact bytes by SHA-256 digest.</p>
-<pre><code class="language-bash">$ final=artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin
+<pre><code class="language-bash">$ final=artifacts/final/71895faa8bce0d0426b2e447bb12d15e50e9f9d27135ebabbb94bc9d59426d4e.bin
 $ jq . handoffs/positive/bundle/$final
 [
   {
-    "age_band": "0-17",
-    "customer_id": "2da7dbbb0e3f243b06cb",
-    "marketing_consent": true,
-    "region": "CA"
-  },
-  {
     "age_band": "25-34",
-    "customer_id": "3fb57f8f4d704855a7aa",
+    "customer_id": "4956cf12a64fd24a0815",
     "marketing_consent": true,
     "region": "US"
   },
   {
+    "age_band": "0-17",
+    "customer_id": "b8610bcb16fd5eb07f52",
+    "marketing_consent": true,
+    "region": "CA"
+  },
+  {
     "age_band": "65+",
-    "customer_id": "ce76ddf0a0df7f1d0add",
+    "customer_id": "d7ab36aae7b1e4237278",
     "marketing_consent": false,
     "region": "GB"
   }
@@ -163,7 +163,7 @@ $ statement positive | jq .subject
 [
   {
     "digest": {
-      "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+      "sha256": "ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e"
     },
     "name": "customers.public.json"
   }
@@ -174,21 +174,21 @@ $ statement positive | jq .subject
 <li><div>
 <h2>How it failed</h2>
 <p>The poisoned copy differs from the signed file by a single trailing byte. Everything that describes the file is untouched: the signed handoff manifest and all three signed statements are byte-identical to the good bundle. A pipeline that trusts the metadata, or only checks that the signatures are valid, accepts it.</p>
-<pre><code class="language-bash">$ final=artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin
+<pre><code class="language-bash">$ final=artifacts/final/71895faa8bce0d0426b2e447bb12d15e50e9f9d27135ebabbb94bc9d59426d4e.bin
 $ cmp handoffs/positive/bundle/$final handoffs/mutated-final-data/bundle/$final
-cmp: EOF on 'handoffs/positive/bundle/artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin' after byte 291, line 1
+cmp: EOF on 'handoffs/positive/bundle/artifacts/final/71895faa8bce0d0426b2e447bb12d15e50e9f9d27135ebabbb94bc9d59426d4e.bin' after byte 291, line 1
 $ tail -c 24 handoffs/mutated-final-data/bundle/$final | od -c | tail -n 3
 0000000    :   f   a   l   s   e   ,   "   r   e   g   i   o   n   "   :
 0000020    "   G   B   "   }   ]  \n   x                                
 0000030
 $ shasum -a 256 handoffs/*/bundle/$final
-08c9a837dc92517fb621d5cafc2d9b54011d5a6e68cd21423b967a9d5612e485  handoffs/mutated-final-data/bundle/artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin
-2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4  handoffs/positive/bundle/artifacts/final/74ca1fffa13e171a10e838cf6a1516167ae8de5420f331974d0bcbdc7f67db76.bin
+87b8382c73288bf07cec11080071d0e6a425e88ef4bd3a662d0f103c523c5f64  handoffs/mutated-final-data/bundle/artifacts/final/71895faa8bce0d0426b2e447bb12d15e50e9f9d27135ebabbb94bc9d59426d4e.bin
+ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e  handoffs/positive/bundle/artifacts/final/71895faa8bce0d0426b2e447bb12d15e50e9f9d27135ebabbb94bc9d59426d4e.bin
 $ cmp handoffs/positive/bundle/manifest.dsse.json handoffs/mutated-final-data/bundle/manifest.dsse.json &amp;&amp; echo 'signed handoff manifest: byte-identical'
 signed handoff manifest: byte-identical
 $ diff -r handoffs/positive/bundle/attestations handoffs/mutated-final-data/bundle/attestations &amp;&amp; echo 'signed statements: byte-identical'
 signed statements: byte-identical</code></pre>
-<p>The signed digest is <code>2f4fe11d…</code>. The bytes that arrived hash to <code>08c9a837…</code>. Nothing in the bundle says so; only a receiver that hashes what it actually received can tell.</p>
+<p>The signed digest is <code>ecd821db…</code>. The bytes that arrived hash to <code>87b8382c…</code>. Nothing in the bundle says so; only a receiver that hashes what it actually received can tell.</p>
 </div></li>
 
 <li><div>
@@ -230,11 +230,11 @@ jobs:
           # The sender publishes manifest and head digests out of band.
           # The receiver pins them here, never inside the bundle.
           - handoff: positive
-            manifest: sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
-            head: sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+            manifest: sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7
+            head: sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce
           - handoff: mutated-final-data
-            manifest: sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
-            head: sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+            manifest: sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7
+            head: sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce
     steps:
       - uses: actions/checkout@v4
       # Pin the verifier to an exact core commit, like any dependency.
@@ -244,7 +244,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: makoto-project/makoto
-          ref: 27d335292ad240fb9ebd6d5d6778a2a3ab3465f7
+          ref: 276008eeec0f10d5322c4c627b8c103222fee841
           path: .makoto-core
           persist-credentials: false
       - uses: astral-sh/setup-uv@v6
@@ -291,10 +291,10 @@ jobs:
 <pre><code class="language-bash">$ jq . receiver/expected/mutated-final-data.artifact.json
 {
   "digest": {
-    "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+    "sha256": "ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e"
   },
   "head": {
-    "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+    "sha256": "99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce"
   },
   "subjectName": "customers.public.json"
 }</code></pre>
@@ -307,8 +307,8 @@ jobs:
 <pre><code class="language-bash">$ makoto verify bundle handoffs/mutated-final-data/bundle \
   --policy receiver/policy.json \
   --schema-catalog receiver/catalog.json \
-  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
-  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7 \
+  --expected-head sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce \
   --expected-artifact receiver/expected/mutated-final-data.artifact.json \
   --evaluation-time 2026-09-16T16:00:00Z
 PASS        load-safely
@@ -328,7 +328,7 @@ FAIL        artifact-bytes
 PASS        artifact-profiles
 PASS        decision
 DENY        decision
-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7
 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
 $ echo $?
 1</code></pre>
@@ -342,10 +342,10 @@ $ echo $?
       "code": "E_ARTIFACT_DIGEST",
       "context": {
         "artifactDigest": {
-          "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+          "sha256": "ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e"
         },
         "head": {
-          "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+          "sha256": "99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce"
         },
         "subjectName": "customers.public.json"
       },
@@ -375,8 +375,8 @@ $ echo $?
 <pre><code class="language-bash">$ makoto verify bundle handoffs/positive/bundle \
   --policy receiver/policy.json \
   --schema-catalog receiver/catalog.json \
-  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
-  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7 \
+  --expected-head sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce \
   --expected-artifact receiver/expected/positive.artifact.json \
   --evaluation-time 2026-09-16T16:00:00Z
 PASS        load-safely
@@ -396,7 +396,7 @@ PASS        artifact-bytes
 PASS        artifact-profiles
 PASS        decision
 ALLOW       decision
-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7
 $ echo $?
 0</code></pre>
 <h3>What a verification summary records</h3>

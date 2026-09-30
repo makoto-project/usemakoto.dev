@@ -255,15 +255,15 @@ def test_copy_release_content_rejects_schema_id_not_equal_hosted_url(
         del core, revision
         if prefix == "schemas/v0.2":
             return tuple(schema_paths)
-        if prefix == "demos/v0.2-end-to-end/generated":
-            return ("demos/v0.2-end-to-end/generated/manifest.json",)
+        if prefix == "demos/end-to-end/generated":
+            return ("demos/end-to-end/generated/manifest.json",)
         raise AssertionError(prefix)
 
     def fake_blob(core: Path, revision: str, path: str) -> bytes:
         del core, revision
         if path == "spec/v0.2.md":
             return b"spec\n"
-        if path == "demos/v0.2-end-to-end/generated/manifest.json":
+        if path == "demos/end-to-end/generated/manifest.json":
             return b"{}\n"
         return blobs[path]
 
@@ -370,7 +370,7 @@ def test_copy_release_content_mirrors_demo_artifacts_at_the_retired_path(
                 )
             blobs[path] = data
             checksum_digests[path] = sha256(data)
-    demo_source = "demos/v0.2-end-to-end/generated/data/customers.raw.json"
+    demo_source = "demos/end-to-end/generated/data/customers.raw.json"
     blobs[demo_source] = b"[1]\n"
 
     def fake_tree(core: Path, revision: str, prefix: str) -> tuple[str, ...]:
@@ -379,7 +379,7 @@ def test_copy_release_content_mirrors_demo_artifacts_at_the_retired_path(
         if family in sync_core_release.SCHEMA_FAMILIES:
             names = sync_core_release.SCHEMA_FAMILIES[family]
             return tuple(f"{prefix}/{name}" for name in names)
-        if prefix == "demos/v0.2-end-to-end/generated":
+        if prefix == "demos/end-to-end/generated":
             return (demo_source,)
         raise AssertionError(prefix)
 
