@@ -33,11 +33,11 @@ jobs:
           # The sender publishes manifest and head digests out of band.
           # The receiver pins them here, never inside the bundle.
           - handoff: edited-signed-metadata
-            manifest: sha256:68ad42d12c69eccb2ba40b3323eaedde67597ee237d02574c48d9497a1cf914c
-            head: sha256:e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932
+            manifest: sha256:2b051dc3aeea5530c72cf2a92da9d57d1e929ff4e77041aa4e0751625a2606dd
+            head: sha256:c4af1b433b03c69ae3d4ed795d4f39e189118d1cc3c4dc52397f911f13d6dc3d
           - handoff: statement-digest-mismatch
-            manifest: sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
-            head: sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+            manifest: sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7
+            head: sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce
     steps:
       - uses: actions/checkout@v4
       # Pin the verifier to an exact core commit, like any dependency.
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: makoto-project/makoto
-          ref: 27d335292ad240fb9ebd6d5d6778a2a3ab3465f7
+          ref: 276008eeec0f10d5322c4c627b8c103222fee841
           path: .makoto-core
           persist-credentials: false
       - uses: astral-sh/setup-uv@v6

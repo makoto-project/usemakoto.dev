@@ -210,7 +210,7 @@ def load_expectations(
     if paths.count(WALKTHROUGH_PATH) != 1:
         raise ProbeError(f"{mode} pin must contain the exact walkthrough path once")
     revision = pin["commit"] if candidate else pin["tag"]
-    source_link = f"https://github.com/makoto-project/makoto/tree/{revision}/demos/v0.2-end-to-end"
+    source_link = f"https://github.com/makoto-project/makoto/tree/{revision}/demos/end-to-end"
     return resources, source_link
 
 

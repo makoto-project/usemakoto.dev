@@ -25,10 +25,10 @@ decision=deny primaryError=E_ARTIFACT_DIGEST
   step 12 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
   statements 3/3 valid, signatures 4/4 valid, policy 614eb137303b
 tampered bundle refused, as it should be</code></pre></figure>
-<p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>27d335292ad2</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
+<p class="editorial-note"><strong>What you are binding to.</strong> Makoto ships as source: a Python reference library and the <code>makoto</code> command-line interface in the core repository, pinned here to revision <code>276008eeec0f</code>. There is no published package on PyPI, npm, or the Go module proxy, and the PyPI name <code>makoto</code> belongs to an unrelated project. Every binding on these pages therefore drives the pinned reference verifier and reads its JSON report. That is the supported automation contract: exit status plus the report, never scraped human wording.</p>
 <section aria-labelledby="install"><h2 id="install">1. Install the verifier and the fixtures</h2><p>Clone the core repository at the documented revision, sync its locked environment, and generate the fixture set every example uses.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto
-git checkout 27d335292ad240fb9ebd6d5d6778a2a3ab3465f7
+git checkout 276008eeec0f10d5322c4c627b8c103222fee841
 uv sync --locked --dev
 
 # Writes the deterministic fixture set: one allowed bundle, seven denials.
@@ -54,13 +54,13 @@ from pathlib import Path
 from jsonschema import Draft202012Validator
 
 CORE = Path(os.environ["MAKOTO_CORE"]).resolve()
-DEMO = CORE / "demos/v0.2-end-to-end/generated"
+DEMO = CORE / "demos/end-to-end/generated"
 SCHEMA_BASE = "https://usemakoto.dev/schema/v0.2/"
 
 # Independent expectations. In production these arrive out of band from the
 # producer (a ticket, a signed release note, a registry), never from the bundle.
-EXPECTED_MANIFEST = "sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c"
-EXPECTED_HEAD = "sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+EXPECTED_MANIFEST = "sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7"
+EXPECTED_HEAD = "sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce"
 EVALUATION_TIME = "2026-09-16T16:00:00Z"
 
 
@@ -288,11 +288,11 @@ import makoto
 from makoto.bundle import VerificationRequest, verify_bundle
 
 core = Path(makoto.__file__).resolve().parents[2]
-demo = core / "demos/v0.2-end-to-end/generated"
+demo = core / "demos/end-to-end/generated"
 expected_artifact = {
-    "head": {"sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"},
+    "head": {"sha256": "99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce"},
     "subjectName": "customers.public.json",
-    "digest": {"sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"},
+    "digest": {"sha256": "ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e"},
 }
 
 report = verify_bundle(
@@ -301,8 +301,8 @@ report = verify_bundle(
         policy_path=demo / "receiver/policy.json",
         repository_root=core,
         schema_catalogs=(demo / "receiver/catalog.json",),
-        expected_manifest={"sha256": "b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c"},
-        expected_heads=({"sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"},),
+        expected_manifest={"sha256": "e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7"},
+        expected_heads=({"sha256": "99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce"},),
         expected_artifacts=(expected_artifact,),
         evaluation_time="2026-09-16T16:00:00Z",
     )

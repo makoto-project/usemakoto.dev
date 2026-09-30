@@ -69,6 +69,12 @@ LEGACY_REDIRECTS = {
 VERSIONED_LEARNING_URL = re.compile(
     r"(?:usemakoto\.dev|href=\"|src=\"|\]\()/?(?:\.\./)*(?:demos/v0\.2-end-to-end|examples/v0\.2|integrations/v0\.2)/"
 )
+# Core renamed its demo to demos/end-to-end with one versionless scripts/demo.sh.
+# The old core paths no longer exist, so a command that names them cannot run.
+RETIRED_CORE_DEMO_PATH = re.compile(
+    r"demos/v0\.2-end-to-end/(?:generated|fixtures|private-schemas|README\.md|run_demo\.py)"
+    r"|demo-v0\.2\.sh"
+)
 SOURCE_REVISION_PREFIX = "https://github.com/makoto-project/makoto/tree/"
 CANONICAL_PRESENTATION_PAGES = (
     "community/index.html",
@@ -260,12 +266,12 @@ PUBLIC_TEXT_REWRITES = {
         ),
         ("(../spec/v0.2.md)", "(../spec/v0.2/spec.md)"),
     ),
-    "docs/v0.2-migration.md": (("(../demos/v0.2-end-to-end/README.md)", "(../demos/end-to-end/)"),),
+    "docs/v0.2-migration.md": (("(../demos/end-to-end/README.md)", "(../demos/end-to-end/)"),),
 }
 JSON_EXAMPLE_SCHEMAS = {
     "demos/end-to-end/artifacts/positive-bundle/attestations/1f28b72bcd4c1e9b7df71403ac6bb1670c2f2b09628ca6d76a2fa384db9a0848.dsse.json": "envelope.schema.json",
     "demos/end-to-end/artifacts/positive-bundle/attestations/56b7be4394fe09c62ec7a3d5763cecc251e9696f267f35b2acc717b0d170a27a.dsse.json": "envelope.schema.json",
-    "demos/end-to-end/artifacts/positive-bundle/attestations/962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977.dsse.json": "envelope.schema.json",
+    "demos/end-to-end/artifacts/positive-bundle/attestations/99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce.dsse.json": "envelope.schema.json",
     "demos/end-to-end/artifacts/positive-bundle/bundle.json": "bundle.schema.json",
     "demos/end-to-end/artifacts/positive-bundle/manifest.dsse.json": "envelope.schema.json",
     "demos/end-to-end/artifacts/receiver/attacker-known-policy.json": "trust-policy.schema.json",
@@ -308,8 +314,9 @@ FORBIDDEN_TRACKED_SEGMENTS = {
     "node_modules",
 }
 CORE_CHECKSUM_PREFIXES = (
-    "demos/v0.2-end-to-end",
+    "demos/end-to-end",
     "docs",
+    "examples/github-actions",
     "examples/go",
     "schemas/v0.2",
     "schemas/v0.3",
@@ -468,14 +475,14 @@ def expected_resource_files() -> dict[str, tuple[Path, str, bool]]:
 
 def validate_source_revision_link(pin: dict[str, Any], mode: str, errors: list[str]) -> None:
     revision = pin["commit"] if mode == "candidate" else pin["tag"]
-    expected = f"{SOURCE_REVISION_PREFIX}{revision}/demos/v0.2-end-to-end"
+    expected = f"{SOURCE_REVISION_PREFIX}{revision}/demos/end-to-end"
     walkthrough = ROOT / WALKTHROUGH_PAGE
     try:
         text = walkthrough.read_text(encoding="utf-8")
     except (OSError, UnicodeError) as error:
         errors.append(f"cannot inspect walkthrough source revision link: {error}")
         return
-    links = re.findall(rf'{re.escape(SOURCE_REVISION_PREFIX)}[^"\s<]+/demos/v0\.2-end-to-end', text)
+    links = re.findall(rf'{re.escape(SOURCE_REVISION_PREFIX)}[^"\s<]+/demos/end-to-end', text)
     if links != [expected]:
         errors.append(
             f"walkthrough source revision link is not exact: expected={expected!r} actual={links!r}"
@@ -656,7 +663,7 @@ def check_core_parity(core: Path, errors: list[str]) -> None:
             errors.append(f"core resource differs from checksum manifest: {core_relative}")
     compare_trees(
         ROOT / DEMO_ARTIFACTS,
-        core / "demos/v0.2-end-to-end/generated",
+        core / "demos/end-to-end/generated",
         "v0.2 demo artifacts",
         errors,
     )
@@ -763,6 +770,8 @@ def check_legacy_redirects(errors: list[str]) -> None:
         content = path.read_text(encoding="utf-8", errors="replace")
         for match in VERSIONED_LEARNING_URL.finditer(content):
             errors.append(f"versioned learning URL remains in {relative}: {match.group(0)}")
+        for match in RETIRED_CORE_DEMO_PATH.finditer(content):
+            errors.append(f"retired core demo path remains in {relative}: {match.group(0)}")
 
 
 def check_demo_manifest(errors: list[str]) -> None:
@@ -1058,8 +1067,8 @@ def check_truthfulness(errors: list[str], *, mode: str = "working-tree") -> None
         errors.append("v0.2 demo does not display the verified source digest prefix")
     for required_demo_text in (
         "MAKOTO_RECEIVER_DIR",
-        "--expected-manifest sha256:b83a5cd1",
-        "--expected-artifact demos/v0.2-end-to-end/generated/receiver/expected-artifact.json",
+        "--expected-manifest sha256:e24aae77",
+        "--expected-artifact demos/end-to-end/generated/receiver/expected-artifact.json",
         "artifacts/data/customers.public.json",
         "artifacts/receiver/expected-artifact.json",
     ):

@@ -98,8 +98,8 @@
 <figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#code-the-output-that-catches-it">The output that catches it</a> below.</figcaption><pre><code class="language-bash">$ makoto verify bundle handoffs/edited-signed-metadata/bundle \
   --policy receiver/policy.json \
   --schema-catalog receiver/catalog.json \
-  --expected-manifest sha256:68ad42d12c69eccb2ba40b3323eaedde67597ee237d02574c48d9497a1cf914c \
-  --expected-head sha256:e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932 \
+  --expected-manifest sha256:2b051dc3aeea5530c72cf2a92da9d57d1e929ff4e77041aa4e0751625a2606dd \
+  --expected-head sha256:c4af1b433b03c69ae3d4ed795d4f39e189118d1cc3c4dc52397f911f13d6dc3d \
   --expected-artifact receiver/expected/edited-signed-metadata.artifact.json \
   --evaluation-time 2026-09-16T16:00:00Z
 PASS        load-safely
@@ -119,14 +119,14 @@ SKIPPED     artifact-bytes
 SKIPPED     artifact-profiles
 PASS        decision
 DENY        decision
-manifest sha256:68ad42d12c69eccb2ba40b3323eaedde67597ee237d02574c48d9497a1cf914c
+manifest sha256:2b051dc3aeea5530c72cf2a92da9d57d1e929ff4e77041aa4e0751625a2606dd
 E_SIGNATURE_INVALID: signature verification failed
 E_SIGNER_UNAUTHORIZED: no matching policy rule met its signature threshold
 E_MANIFEST_SET: final artifact is not an exact terminal subject of its declared head
 E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle index
 $ echo $?
 1</code></pre></figure>
-<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core verifier at commit <code>0e41afb</code>. The pinned core commit <code>27d3352</code> adds verification summaries and a separately dispatched newer protocol version without changing these results, and the gate below runs it. Verification-summary tables are computed from the published reports with its property rules. The verification reports are byte-for-byte the files published under <a href="/demos/end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
+<p class="editorial-note"><strong>Evidence boundary.</strong> Every terminal block on this page was captured by running the command shown against the checked-in reference fixtures with the Makoto core verifier at the pinned commit <code>276008e</code>, which the gate below runs. Verification-summary tables are computed from the published reports with its property rules. The verification reports are byte-for-byte the files published under <a href="/demos/end-to-end/">the end-to-end proof</a>. Nothing below was typed by hand.</p>
 
 <section>
 <h2>The problem</h2>
@@ -170,7 +170,7 @@ $ statement positive | jq '.predicate | {operation, event, inputs}'
 <li><div>
 <h2>How it failed</h2>
 <p><strong>Variant one, an edited record.</strong> The operation name is rewritten. The signature is copied unchanged, so the envelope still looks signed.</p>
-<p><strong>Variant two, an edited payload under an old index entry.</strong> The same edit is written into the envelope file in place. The bundle index still names the file by the original statement digest, <code>962be717…</code>, but the bytes inside now hash to <code>e03d959d…</code>.</p>
+<p><strong>Variant two, an edited payload under an old index entry.</strong> The same edit is written into the envelope file in place. The bundle index still names the file by the original statement digest, <code>99aee76d…</code>, but the bytes inside now hash to <code>c4af1b43…</code>.</p>
 <pre><code class="language-bash">$ statement() { b=handoffs/$1/bundle; d=$(jq -r '.artifacts[0].statementDigest.sha256' $b/bundle.json); jq -r .payload $b/attestations/$d.dsse.json | base64 -d; }
 $ envelope() { b=handoffs/$1/bundle; d=$(jq -r '.artifacts[0].statementDigest.sha256' $b/bundle.json); cat $b/attestations/$d.dsse.json; }
 $ diff &lt;(statement positive | jq .predicate.operation) &lt;(statement edited-signed-metadata | jq .predicate.operation)
@@ -182,9 +182,9 @@ $ diff &lt;(envelope positive | jq .signatures) &lt;(envelope edited-signed-meta
 signature bytes: unchanged
 $ b=handoffs/statement-digest-mismatch/bundle
 $ jq -r '.attestations[2].statementDigest.sha256' $b/bundle.json
-962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce
 $ jq -r .payload $b/$(jq -r '.attestations[2].path' $b/bundle.json) | base64 -d | shasum -a 256
-e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932  -</code></pre>
+c4af1b433b03c69ae3d4ed795d4f39e189118d1cc3c4dc52397f911f13d6dc3d  -</code></pre>
 </div></li>
 
 <li><div>
@@ -226,11 +226,11 @@ jobs:
           # The sender publishes manifest and head digests out of band.
           # The receiver pins them here, never inside the bundle.
           - handoff: edited-signed-metadata
-            manifest: sha256:68ad42d12c69eccb2ba40b3323eaedde67597ee237d02574c48d9497a1cf914c
-            head: sha256:e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932
+            manifest: sha256:2b051dc3aeea5530c72cf2a92da9d57d1e929ff4e77041aa4e0751625a2606dd
+            head: sha256:c4af1b433b03c69ae3d4ed795d4f39e189118d1cc3c4dc52397f911f13d6dc3d
           - handoff: statement-digest-mismatch
-            manifest: sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
-            head: sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977
+            manifest: sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7
+            head: sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce
     steps:
       - uses: actions/checkout@v4
       # Pin the verifier to an exact core commit, like any dependency.
@@ -240,7 +240,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: makoto-project/makoto
-          ref: 27d335292ad240fb9ebd6d5d6778a2a3ab3465f7
+          ref: 276008eeec0f10d5322c4c627b8c103222fee841
           path: .makoto-core
           persist-credentials: false
       - uses: astral-sh/setup-uv@v6
@@ -304,8 +304,8 @@ jobs:
 <pre><code class="language-bash">$ makoto verify bundle handoffs/edited-signed-metadata/bundle \
   --policy receiver/policy.json \
   --schema-catalog receiver/catalog.json \
-  --expected-manifest sha256:68ad42d12c69eccb2ba40b3323eaedde67597ee237d02574c48d9497a1cf914c \
-  --expected-head sha256:e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932 \
+  --expected-manifest sha256:2b051dc3aeea5530c72cf2a92da9d57d1e929ff4e77041aa4e0751625a2606dd \
+  --expected-head sha256:c4af1b433b03c69ae3d4ed795d4f39e189118d1cc3c4dc52397f911f13d6dc3d \
   --expected-artifact receiver/expected/edited-signed-metadata.artifact.json \
   --evaluation-time 2026-09-16T16:00:00Z
 PASS        load-safely
@@ -325,7 +325,7 @@ SKIPPED     artifact-bytes
 SKIPPED     artifact-profiles
 PASS        decision
 DENY        decision
-manifest sha256:68ad42d12c69eccb2ba40b3323eaedde67597ee237d02574c48d9497a1cf914c
+manifest sha256:2b051dc3aeea5530c72cf2a92da9d57d1e929ff4e77041aa4e0751625a2606dd
 E_SIGNATURE_INVALID: signature verification failed
 E_SIGNER_UNAUTHORIZED: no matching policy rule met its signature threshold
 E_MANIFEST_SET: final artifact is not an exact terminal subject of its declared head
@@ -342,7 +342,7 @@ $ echo $?
       "context": {
         "keyid": "sha256:8cef065b7af83669150b7d32704d3d3e75c3e9aee0d4f6740544c68e81b377aa",
         "statementDigest": {
-          "sha256": "e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932"
+          "sha256": "c4af1b433b03c69ae3d4ed795d4f39e189118d1cc3c4dc52397f911f13d6dc3d"
         }
       },
       "message": "signature verification failed",
@@ -353,7 +353,7 @@ $ echo $?
       "code": "E_SIGNER_UNAUTHORIZED",
       "context": {
         "statementDigest": {
-          "sha256": "e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932"
+          "sha256": "c4af1b433b03c69ae3d4ed795d4f39e189118d1cc3c4dc52397f911f13d6dc3d"
         }
       },
       "message": "no matching policy rule met its signature threshold",
@@ -364,11 +364,11 @@ $ echo $?
       "code": "E_MANIFEST_SET",
       "context": {
         "artifactDigest": {
-          "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+          "sha256": "ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e"
         },
         "bundleId": "urn:makoto:demo:negative:edited-signed-metadata",
         "head": {
-          "sha256": "e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932"
+          "sha256": "c4af1b433b03c69ae3d4ed795d4f39e189118d1cc3c4dc52397f911f13d6dc3d"
         },
         "subjectName": "customers.public.json"
       },
@@ -436,8 +436,8 @@ $ echo $?
 <pre><code class="language-bash">$ makoto verify bundle handoffs/statement-digest-mismatch/bundle \
   --policy receiver/policy.json \
   --schema-catalog receiver/catalog.json \
-  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
-  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7 \
+  --expected-head sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce \
   --expected-artifact receiver/expected/statement-digest-mismatch.artifact.json \
   --evaluation-time 2026-09-16T16:00:00Z
 PASS        load-safely
@@ -457,7 +457,7 @@ SKIPPED     artifact-bytes
 FAIL        artifact-profiles
 PASS        decision
 DENY        decision
-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7
 E_STATEMENT_DIGEST: indexed statement digest differs from decoded payload bytes
 E_MANIFEST_SET: final artifact is not an exact terminal subject of its declared head
 E_MANIFEST_SET: signed manifest sets do not equal the verified graph and bundle index
@@ -474,10 +474,10 @@ $ echo $?
       "code": "E_STATEMENT_DIGEST",
       "context": {
         "declared": {
-          "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+          "sha256": "99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce"
         },
         "statementDigest": {
-          "sha256": "e03d959d1c3b1dc11b6380b08b0adc2635547a36cab5e69049c70630a4ccb932"
+          "sha256": "c4af1b433b03c69ae3d4ed795d4f39e189118d1cc3c4dc52397f911f13d6dc3d"
         }
       },
       "message": "indexed statement digest differs from decoded payload bytes",
@@ -488,11 +488,11 @@ $ echo $?
       "code": "E_MANIFEST_SET",
       "context": {
         "artifactDigest": {
-          "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+          "sha256": "ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e"
         },
         "bundleId": "urn:uuid:55555555-5555-4555-8555-555555555555",
         "head": {
-          "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+          "sha256": "99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce"
         },
         "subjectName": "customers.public.json"
       },

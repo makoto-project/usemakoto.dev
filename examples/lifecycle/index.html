@@ -42,7 +42,7 @@
       </li>
       <li class="lf-stage">
         <p class="lf-verb" data-flow-label="normalized&gt;public">public-safe derivative</p>
-        <div class="lf-card" data-flow-id="public"><span class="lf-kind">New file</span><strong>Public-safe</strong><code>customers.public.json</code><br><code class="hash" title="sha256:2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4" tabindex="0" aria-label="sha256 2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4">2f4fe11d…</code><small>Both earlier files remain readable.</small></div>
+        <div class="lf-card" data-flow-id="public"><span class="lf-kind">New file</span><strong>Public-safe</strong><code>customers.public.json</code><br><code class="hash" title="sha256:ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e" tabindex="0" aria-label="sha256 ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e">ecd821db…</code><small>Both earlier files remain readable.</small></div>
         <div class="lf-statement" data-flow-id="st-public"><span class="lf-kind">Signs the file above</span><strong>Transformation statement</strong><code class="hash" title="sha256:6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d" tabindex="0" aria-label="sha256 6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d">6c8f8061…</code><small>Input: the normalized digest. Predecessor: the normalize statement.</small></div>
       </li>
     </ol>
@@ -205,13 +205,13 @@
   <li id="transform-again" class="pair-data"><div><div class="step-head"><p class="explorer-pane-title">The data</p><h2>Transform it again</h2>
     <p class="lf-note">Another new file: <code>customers.public.json</code>. The normalized and raw files stay as they were.</p>
     <p>The normalized data still carries direct identifiers, so it cannot leave. A second transformation produces a public-safe derivative: email dropped, customer id replaced by a pseudonym, exact age generalised into a band.</p></div>
-    <div class="step-body"><pre data-filename="customers.public.json" data-digest="sha256:2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"><code class="language-json">[{"age_band":"0-17","customer_id":"2da7dbbb0e3f243b06cb","marketing_consent":true,"region":"CA"},{"age_band":"25-34","customer_id":"3fb57f8f4d704855a7aa","marketing_consent":true,"region":"US"},{"age_band":"65+","customer_id":"ce76ddf0a0df7f1d0add","marketing_consent":false,"region":"GB"}]</code></pre>
+    <div class="step-body"><pre data-filename="customers.public.json" data-digest="sha256:ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e"><code class="language-json">[{"age_band":"25-34","customer_id":"4956cf12a64fd24a0815","marketing_consent":true,"region":"US"},{"age_band":"0-17","customer_id":"b8610bcb16fd5eb07f52","marketing_consent":true,"region":"CA"},{"age_band":"65+","customer_id":"d7ab36aae7b1e4237278","marketing_consent":false,"region":"GB"}]</code></pre>
     <div class="step-foot"><table class="wide-table"><caption>Before and after the public-safe step, for the one record in the <code>US</code> region. Region is what lines the two rows up — the identifier no longer can. Scroll sideways on a narrow screen.</caption>
       <thead><tr><th scope="col">Field</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">What happened</th></tr></thead>
-      <tbody><tr><td><code>email</code></td><td><code>"alice@example.com"</code></td><td><em>not present</em></td><td>Direct identifier removed outright.</td></tr><tr><td><code>customer_id</code></td><td><code>"C-1001"</code></td><td><code>"3fb57f8f4d704855a7aa"</code></td><td>Replaced by a pseudonym; the original value is not recoverable from these bytes.</td></tr><tr><td><code>age</code></td><td><code>34</code></td><td><em>not present</em></td><td>Generalised.</td></tr><tr><td><code>age_band</code></td><td><em>not present</em></td><td><code>"25-34"</code></td><td>Replaces the exact age.</td></tr><tr><td><code>marketing_consent</code></td><td><code>true</code></td><td><code>true</code></td><td>Carried through unchanged.</td></tr><tr><td><code>region</code></td><td><code>"US"</code></td><td><code>"US"</code></td><td>Carried through unchanged.</td></tr></tbody>
+      <tbody><tr><td><code>email</code></td><td><code>"alice@example.com"</code></td><td><em>not present</em></td><td>Direct identifier removed outright.</td></tr><tr><td><code>customer_id</code></td><td><code>"C-1001"</code></td><td><code>"4956cf12a64fd24a0815"</code></td><td>Replaced by a pseudonym; the original value is not recoverable from these bytes.</td></tr><tr><td><code>age</code></td><td><code>34</code></td><td><em>not present</em></td><td>Generalised.</td></tr><tr><td><code>age_band</code></td><td><em>not present</em></td><td><code>"25-34"</code></td><td>Replaces the exact age.</td></tr><tr><td><code>marketing_consent</code></td><td><code>true</code></td><td><code>true</code></td><td>Carried through unchanged.</td></tr><tr><td><code>region</code></td><td><code>"US"</code></td><td><code>"US"</code></td><td>Carried through unchanged.</td></tr></tbody>
     </table>
     <p>The shape of the data changed this time, not just its formatting. That is worth attesting precisely because it is the step a downstream consumer most wants assurance about.</p>
-    <dl class="meta-list"><dt>Digest before</dt><dd><code class="hash">421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8</code></dd><dt>Digest after</dt><dd><code class="hash">2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4</code></dd></dl>
+    <dl class="meta-list"><dt>Digest before</dt><dd><code class="hash">421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8</code></dd><dt>Digest after</dt><dd><code class="hash">ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e</code></dd></dl>
   </div></div></div></li>
 
   <li id="re-attest-again" class="pair-statement"><div><div class="step-head"><p class="explorer-pane-title">What Makoto adds</p><h2>Re-attest the transformed dataset</h2>
@@ -222,7 +222,7 @@
     {
       "name": "customers.public.json",
       "digest": {
-        "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+        "sha256": "ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e"
       }
     }
   ],
@@ -269,7 +269,7 @@
   }
 }</code></pre>
     <div class="step-foot"><p>Three statements, and the chain reads backwards from any point without consulting a server: the public-safe statement names the normalization statement, which names the origin statement, which names nothing, because it is the root.</p>
-    <dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4</code></dd><dt>Statement digest</dt><dd><code class="hash">6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d</code></dd><dt>Points back to</dt><dd><code class="hash">9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55</code></dd><dt>Document</dt><dd><a href="/attestations/public-transform-example.json">public-transform-example.json</a></dd></dl>
+    <dl class="meta-list"><dt>Subject digest</dt><dd><code class="hash">ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e</code></dd><dt>Statement digest</dt><dd><code class="hash">6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d</code></dd><dt>Points back to</dt><dd><code class="hash">9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55</code></dd><dt>Document</dt><dd><a href="/attestations/public-transform-example.json">public-transform-example.json</a></dd></dl>
   </div></div></div></li>
 
   <li id="receiver"><div><h2>What a receiver now sees</h2>
@@ -279,7 +279,7 @@
       <tbody>
         <tr><td>Origin</td><td><code class="hash">4e90181e7f75ccdf0e4d81c83d281f53806bed241787cdc751e22b2d4cd19919</code></td><td><code class="hash">014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11</code></td><td>— <span class="hash">root of the graph</span></td></tr>
         <tr><td>Normalize</td><td><code class="hash">421e19cf002aa25cf6f2f9ed788e04c9badfd9cbc6b00030b0b089810b2ae4f8</code></td><td><code class="hash">9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55</code></td><td><code class="hash">014b4252977a17c8f2423210fc4c123a464efcc36eefa70e4203c3adee1a3b11</code></td></tr>
-        <tr><td>Public-safe</td><td><code class="hash">2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4</code></td><td><code class="hash">6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d</code></td><td><code class="hash">9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55</code></td></tr>
+        <tr><td>Public-safe</td><td><code class="hash">ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e</code></td><td><code class="hash">6c8f8061f0173e9ee0011fdb5ec604dde4f93597d29d0b8f5098ea05683ea33d</code></td><td><code class="hash">9ef9051c4f0229f9238cfc8541e76d9f2517ddc69a6e3ccf8e69604899527a55</code></td></tr>
       </tbody>
     </table>
     <p>The checks it can run on that, alone, at its own desk:</p>

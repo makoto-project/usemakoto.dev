@@ -24,12 +24,12 @@
 <span class="kicker">Receiver verification</span>
 <h1>A signature is one check, not the verdict.</h1>
 <p class="lead">A receiver should be able to verify the evidence without access to the producer&rsquo;s platform: parse the resources, authenticate each signed claim, decide whether each signer was authorized, reconstruct the source-to-handoff graph, resolve exact schemas, and hash the bytes that actually arrived.</p>
-<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#run">Run the reference verifier</a> below.</figcaption><pre><code class="language-bash">uv run makoto verify bundle demos/v0.2-end-to-end/generated/positive-bundle \
-  --policy demos/v0.2-end-to-end/generated/receiver/policy.json \
-  --schema-catalog demos/v0.2-end-to-end/generated/receiver/catalog.json \
-  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
-  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
-  --expected-artifact demos/v0.2-end-to-end/generated/receiver/expected-artifact.json \
+<figure class="lead-exhibit"><figcaption><strong>The code this page is about.</strong> Repeated from <a href="#run">Run the reference verifier</a> below.</figcaption><pre><code class="language-bash">uv run makoto verify bundle demos/end-to-end/generated/positive-bundle \
+  --policy demos/end-to-end/generated/receiver/policy.json \
+  --schema-catalog demos/end-to-end/generated/receiver/catalog.json \
+  --expected-manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7 \
+  --expected-head sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce \
+  --expected-artifact demos/end-to-end/generated/receiver/expected-artifact.json \
   --evaluation-time 2026-09-16T16:00:00Z \
   --json</code></pre></figure>
 
@@ -56,12 +56,12 @@
 <section aria-labelledby="run"><h2 id="run">Run the reference verifier</h2><p>Start with the deterministic handoff fixture. It produces one allowed bundle and seven denial cases, so the first experience includes the failure boundary as well as the happy path.</p><pre><code class="language-bash">git clone https://github.com/makoto-project/makoto.git
 cd makoto
 uv sync --locked --dev
-./scripts/demo.sh --acceptance</code></pre><p>To inspect the receiver command directly:</p><pre><code class="language-bash">uv run makoto verify bundle demos/v0.2-end-to-end/generated/positive-bundle \
-  --policy demos/v0.2-end-to-end/generated/receiver/policy.json \
-  --schema-catalog demos/v0.2-end-to-end/generated/receiver/catalog.json \
-  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
-  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
-  --expected-artifact demos/v0.2-end-to-end/generated/receiver/expected-artifact.json \
+./scripts/demo.sh --acceptance</code></pre><p>To inspect the receiver command directly:</p><pre><code class="language-bash">uv run makoto verify bundle demos/end-to-end/generated/positive-bundle \
+  --policy demos/end-to-end/generated/receiver/policy.json \
+  --schema-catalog demos/end-to-end/generated/receiver/catalog.json \
+  --expected-manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7 \
+  --expected-head sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce \
+  --expected-artifact demos/end-to-end/generated/receiver/expected-artifact.json \
   --evaluation-time 2026-09-16T16:00:00Z \
   --json</code></pre><p>Exit status 0 is an allow and 1 is a deny, each with a full JSON report on stdout; 2 and 3 mean the tool could not run and no verdict exists. The expected manifest, head, and artifact are the receiver&rsquo;s independent anchors, and this policy requires all three: drop them and the same bundle is denied at step 11. The report keeps schema, signature, authorization, profile, graph, completeness, freshness, and artifact checks separate. A single boolean would hide which trust boundary failed.</p><p><a href="/demos/end-to-end/"><strong>Open the complete walkthrough and exact denial reports &rarr;</strong></a></p></section>
 
@@ -97,13 +97,13 @@ uv sync --locked --dev
   },
   "policyDigestEncoding": "exact-input-bytes",
   "coreCatalogDigest": {
-    "sha256": "298f55040022b6fe7c71e7a37d6ec4a75317d1c0b52a679dcca744cb4a3eaaf3"
+    "sha256": "b68cb2cae64cfcd2a5021a725505ccbaa80dfaa053322ce276af9c6650860304"
   },
   "manifestDigest": {
-    "sha256": "b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c"
+    "sha256": "e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7"
   },
   "expectedManifestDigest": {
-    "sha256": "b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c"
+    "sha256": "e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7"
   },
   "summary": {
     "artifactsChecked": 0,
@@ -150,10 +150,10 @@ uv sync --locked --dev
       "code": "E_ARTIFACT_DIGEST",
       "context": {
         "artifactDigest": {
-          "sha256": "2f4fe11d8b533357fa0fdb890f1a714047393c962d75c8dd8cbb009e01fbd9f4"
+          "sha256": "ecd821dbe6f4204c4aad64878643d7954cb8c94abbf8d0b28f9c2bfc272f781e"
         },
         "head": {
-          "sha256": "962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977"
+          "sha256": "99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce"
         },
         "subjectName": "customers.public.json"
       },
@@ -164,7 +164,7 @@ uv sync --locked --dev
   "warnings": [],
   "tool": {
     "name": "makoto",
-    "version": "0.2.0a0"
+    "version": "0.3.0a0"
   }
 }</code></pre><p class="editorial-note"><strong>This is a real report.</strong> It is the reference verifier&rsquo;s output for the fixture bundle whose delivered data was changed after signing, trimmed only by omitting the per-statement, per-profile, and per-artifact arrays. Signatures, authorization, and the graph all pass; <code>artifact-bytes</code> alone fails, at step 12. The <a href="/demos/end-to-end/artifacts/reports/mutated-final-data.json">complete report</a> is published with the walkthrough.</p>
 <ul class="evidence-trail">

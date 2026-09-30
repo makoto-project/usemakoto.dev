@@ -85,8 +85,8 @@
             <pre data-flow-id="run" data-filename="receiver · poisoned handoff"><code class="language-bash">$ makoto verify bundle handoffs/mutated-final-data/bundle \
   --policy receiver/policy.json \
   --schema-catalog receiver/catalog.json \
-  --expected-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c \
-  --expected-head sha256:962be71738a0146642d27c87fba3c7338b0f2bb764b113b16867bb4808b11977 \
+  --expected-manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7 \
+  --expected-head sha256:99aee76db46a720405da6d0015d427c791b0d4e02367b9e2bc36ce82ae812bce \
   --expected-artifact receiver/expected/mutated-final-data.artifact.json \
   --evaluation-time 2026-09-16T16:00:00Z
 PASS        load-safely
@@ -106,7 +106,7 @@ FAIL        artifact-bytes
 PASS        artifact-profiles
 PASS        decision
 DENY        decision
-manifest sha256:b83a5cd1870b8ce1f2931650611f0a19deed0796c0f262e4632efc17981f695c
+manifest sha256:e24aae77ba1374162edff49aa0ab1d8dd7e38c333e134a2128ad1598fec99fb7
 E_ARTIFACT_DIGEST: final artifact bytes differ from the signed digest
 $ echo $?
 1</code></pre>
